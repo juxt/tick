@@ -3,22 +3,24 @@
    [clojure.test :refer :all]
    [tick.core :refer :all])
   (:import
-   [java.time Clock ZoneId Instant Duration DayOfWeek Month]
-   [java.time.temporal ChronoField]))
+   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime]
+   [java.time.temporal ChronoField ChronoUnit]))
 
 ;; TODO: All instants must be in timezones
 
-(def T0 (parse "2012-12-04T05:21:00Z"))
+(def LONDON (ZoneId/of "Europe/London"))
+
+(def T0 (parse "2012-12-04T05:21:00Z" "Europe/London"))
 (def T1 (.plusSeconds T0 10))
 
-(def LONDON (ZoneId/of "Europe/London"))
+
 
 (deftest periodic-seq-test
   (let [sq (periodic-seq (fixed-clock T0) (minutes 1))]
     (testing "sq starts with start time"
       (is (= T0 (first sq))))
     (testing "sq moves forward by 10 minutes"
-      (is (= (parse "2012-12-04T05:31:00Z") (first (drop 10 sq)))))))
+      (is (= (parse "2012-12-04T05:31:00Z" "Europe/London") (first (drop 10 sq)))))))
 
 (deftest schedule-test
   (let [at (atom [])
@@ -35,27 +37,48 @@
 
 ;; Rather than drainer, can we use something like tmap (time-map) or map-past ?
 
-(defn acceptable-hours [zid]
-  (fn [t]
-    (let [h (.getHour (java.time.ZonedDateTime/ofInstant t zid))]
-      (<= 7 h 21))))
+(defn acceptable-hours [zdt]
+  (let [h (.getHour zdt)]
+    (<= 7 h 21)))
 
 (deftest composition-test
   (testing "Filter by acceptable hours"
     (is (= 62 (count
                (->> (periodic-seq (fixed-clock T0) (hours 1))
                     (take 100)
-                    (filter (acceptable-hours (ZoneId/of "Europe/London")))))))))
+                    (filter acceptable-hours)))))))
 
 (deftest easter-test
-  (is ((easter-sunday? LONDON) (parse "2017-04-16T12:00:00Z")))
-  (is ((good-friday? LONDON) (parse "2017-04-14T12:00:00Z")))
-  (is ((easter-monday? LONDON) (parse "2017-04-17T12:00:00Z")))
-  (is (not ((easter-sunday? LONDON) (parse "2018-04-16T12:00:00Z")))))
+  (is (easter-sunday? (parse "2017-04-16T12:00:00Z" "Europe/London")))
+  (is (good-friday? (parse "2017-04-14T12:00:00Z" "Europe/London")))
+  (is (easter-monday? (parse "2017-04-17T12:00:00Z" "Europe/London")))
+  (is (not (easter-sunday? (parse "2018-04-16T12:00:00Z" "Europe/London")))))
 
 
 ;; Need to use ZonedDateTime really, rather than instant.
 
 ;; Convert with ZonedDateTime/ofInstant
 
-(time (count (take 200 (filter (easter-sunday? LONDON) (periodic-seq (fixed-clock T0) (days 1))))))
+#_(fixed-clock T0)
+
+#_(take 10 (periodic-seq (fixed-clock T0) (days 2)))
+
+#_(def next-easters (comp (filter easter-sunday?)
+                         (take 200)))
+
+#_(->> (periodic-seq (fixed-clock T0) (days 1))
+     (eduction next-easters)
+     )
+
+
+(def a
+  (let [clock (clock)]
+    (new-clock-tracker
+     clock
+     (take 10 (periodic-seq clock (seconds 1)))
+     println
+     (new java.util.concurrent.ScheduledThreadPoolExecutor 16))
+
+    ))
+
+;;(:tick/future-timeline (deref a))

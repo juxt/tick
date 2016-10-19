@@ -8,15 +8,25 @@ Most Clojure time libraries use clj-time, but tick uses *java.time*
 
 which means that it requires Java 8.
 
-## Schedules
+## Timelines
 
-Schedules are created by composition from building blocks.
+Tick adds the concept of *timelines* to java.time. A timeline is a
+lazy sequence of `java.time.ZonedDateTime` instances.
+
+Timelines are easy to generate. One generator is `periodic-seq`, which
+generates a uniform series of times separated by a fixed period.
 
 ```clojure
 (require '[tick.core :as t])
 
-(t/periodic-seq (t/clock))
+;; A timeline of 15 minute intervals
+(t/periodic-seq (t/clock) (t/minutes 15))
 ```
+
+## Schedules
+
+Schedules are created by composition from building blocks.
+
 
 ## Copyright & License
 
