@@ -6,14 +6,8 @@
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime]
    [java.time.temporal ChronoField ChronoUnit]))
 
-;; TODO: All instants must be in timezones
-
-(def LONDON (ZoneId/of "Europe/London"))
-
 (def T0 (parse "2012-12-04T05:21:00Z" "Europe/London"))
 (def T1 (.plusSeconds T0 10))
-
-
 
 (deftest periodic-seq-test
   (let [sq (periodic-seq (fixed-clock T0) (minutes 1))]
@@ -22,7 +16,7 @@
     (testing "sq moves forward by 10 minutes"
       (is (= (parse "2012-12-04T05:31:00Z" "Europe/London") (first (drop 10 sq)))))))
 
-(deftest schedule-test
+#_(deftest schedule-test
   (let [at (atom [])
         schedule (atom (periodic-seq (fixed-clock T0) (seconds 1)))
         d (drainer (fixed-clock T1) #(swap! at conj %))]
@@ -54,9 +48,7 @@
   (is (easter-monday? (parse "2017-04-17T12:00:00Z" "Europe/London")))
   (is (not (easter-sunday? (parse "2018-04-16T12:00:00Z" "Europe/London")))))
 
-
 ;; Need to use ZonedDateTime really, rather than instant.
-
 ;; Convert with ZonedDateTime/ofInstant
 
 #_(fixed-clock T0)
@@ -70,15 +62,12 @@
      (eduction next-easters)
      )
 
-
 (def a
   (let [clock (clock)]
     (new-clock-tracker
      clock
-     (take 10 (periodic-seq clock (seconds 1)))
+     (take 4 (periodic-seq clock (seconds 1)))
      println
-     (new java.util.concurrent.ScheduledThreadPoolExecutor 16))
-
-    ))
+     (new java.util.concurrent.ScheduledThreadPoolExecutor 16))))
 
 ;;(:tick/future-timeline (deref a))

@@ -93,19 +93,6 @@
 (defn easter-monday? [zdt]
   (easter-sunday? (.minus zdt (days 1))))
 
-;; TODO: rename?
-(defn drainer
-  "Call sinkf with each past event. Return future events"
-  [^Clock clock sinkf]
-  (fn [times]
-    (let [now (.instant clock)]
-      (loop [tms times]
-        (if-not (.isAfter (.toInstant (first tms)) now)
-          (do
-            (sinkf (first tms))
-            (recur (rest tms)))
-          tms)))))
-
 ;; Scheduler
 
 ;; An atom containing a (potentially ticking) clock.
@@ -114,57 +101,39 @@
 ;; A function to call with a ZDT as an argument
 ;;
 
+(defn schedule-next [clock next-time executor callback]
+  (when next-time
+    (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
+      (.schedule executor ^Callable callback dly TimeUnit/MILLISECONDS))))
+
 (defn callback [a]
-  (fn []
-    ;; Find past/future times
-    ;; Reschedule (update atom)
+  (let [{:tick/keys [clock future-timeline callable executor]} (deref a)
+        ;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
+        ;; TODO: This may not be necessary
+        ;; now (.minus (.instant clock) (millis 2))
+        now (.instant clock)]
+    (try
+      (let [[due next-future-timeline] (split-with (fn [zdt] (not (.isAfter (.toInstant zdt) now))) future-timeline)]
+        (swap! a assoc :tick/future-timeline next-future-timeline)
+        (schedule-next clock (first next-future-timeline) executor #(callback a))
+        ;; dorun map our callable on each of the past times
+        (dorun (map callable due)))
 
-    (let [{:tick/keys [clock future-timeline callable executor]} (deref a)
-          ;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
-          ;; TODO: This may not be necessary
-          ;; now (.minus (.instant clock) (millis 2))
-          now (.instant clock)
-          ]
-      (println "TICK")
-      (try
-        (let [[due next-future-timeline] (split-with (fn [zdt] (not (.isAfter (.toInstant zdt) now))) future-timeline)]
-
-          (swap! a assoc :tick/future-timeline next-future-timeline)
-
-          (when-let [ff (first next-future-timeline)]
-            (let [dly (.until (.instant clock)
-                              ff
-                              ChronoUnit/MILLIS)]
-              (.schedule executor ^Callable (callback a) dly TimeUnit/MILLISECONDS)))
-
-          ;; dorun map our callable on each of the past times
-          (dorun (map callable due)))
-
-        (catch Exception e
-          (println "ERROR" e))))))
+      (catch Exception e
+        (println "ERROR" e)))))
 
 (defn new-clock-tracker [^java.time.Clock clock timeline callable executor]
-  (let [a
-        (atom {:tick/future-timeline timeline
-               :tick/clock clock
-               :tick/callable callable
-               :tick/executor executor})]
+  (let [a (atom {:tick/future-timeline timeline
+                 :tick/clock clock
+                 :tick/callable callable
+                 :tick/executor executor})]
 
     (when true ;; clock is moving, we schedule the 'next' for real
-      (let [dly (.until (.instant clock)
-                        (first timeline)
-                        ChronoUnit/MILLIS)]
+      (schedule-next clock (first timeline) executor #(do
+                                                        (println "MAIN CALLBACK:" callback)
+                                                        (callback a))))
 
-        (println "Delay by " dly + "ms")
-
-        ;; Figure out the time between the clock and (first timeline)
-        (.schedule executor
-                   ^Callable (callback a) dly TimeUnit/MILLISECONDS)))
-    ;; Add watch to retrigger
-    ;;(add-watch a )
-
-    a
-    ))
+    a))
 
 (defn- merge-timelines
   "Merge sort across set of collections.
@@ -185,4 +154,4 @@
             (map first)
             (take-while (partial not= end))))))
   ([colls]
-   (merge-sort compare colls)))
+   (merge-timelines compare colls)))
