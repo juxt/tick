@@ -1,11 +1,22 @@
 # tick
 
-A simple Clojure scheduling library.
+A Clojure library for dealing with time.
+
+## java.time
+
+Most Clojure time libraries use clj-time, but tick uses *java.time*
+
+which means that it requires Java 8.
 
 ## Schedules
 
-Schedules are created with
+Schedules are created by composition from building blocks.
 
+```clojure
+(require '[tick.core :as t])
+
+(t/periodic-seq (t/clock))
+```
 
 ## Copyright & License
 

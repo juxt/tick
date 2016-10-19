@@ -5,6 +5,6 @@
   :url "https://github.com/juxt/tick"
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
-  :dependencies [[clj-time/clj-time "0.12.0"]]
+  :dependencies []
   :profiles {:dev
              {:dependencies [[org.clojure/clojure "1.9.0-alpha13"]]}})
