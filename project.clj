@@ -1,7 +1,7 @@
 ;; Copyright © 2016, JUXT LTD.
 
 (defproject tick "0.1.0"
-  :description "Lightweight scheduling"
+  :description "A Clojure library that deals with time"
   :url "https://github.com/juxt/tick"
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
