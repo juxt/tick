@@ -6,7 +6,7 @@
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime]
    [java.time.temporal ChronoUnit]
-   [java.util.concurrent TimeUnit]))
+   [java.util.concurrent TimeUnit ScheduledThreadPoolExecutor]))
 
 (defn clock []
   (Clock/systemDefaultZone))
@@ -43,13 +43,9 @@
    (-> (parse s) (.atZone (ZoneId/of z)))))
 
 (defn periodic-seq
-  "Given a clock and a duration, create an infinite sequence of
-  ZonedDateTime instances starting with the clock's instant and
-  advancing by the given period."
-  ([^Clock c ^Duration period]
-   (let [zone (.getZone c)]
-     (->> (iterate #(.addTo period %) (.instant c))
-          (map #(.atZone % zone))))))
+  "Given a start time, create a timeline with times at constant intervals of period length"
+  ([^ZonedDateTime start ^Duration period]
+   (iterate #(.addTo period %) start)))
 
 (defn day-of-week
   "Return the day of the week for a given ZonedDateTime"
@@ -101,39 +97,60 @@
 ;; A function to call with a ZDT as an argument
 ;;
 
-(defn schedule-next [clock next-time executor callback]
+(defn schedule-next [clock next-time executor cb]
   (when next-time
     (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
-      (.schedule executor ^Callable callback dly TimeUnit/MILLISECONDS))))
+      (.schedule executor ^Callable cb dly TimeUnit/MILLISECONDS))))
 
-(defn callback [a]
-  (let [{:tick/keys [clock future-timeline callable executor]} (deref a)
-        ;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
+(defn callback [timeline clock trigger executor]
+  (println "callback: " (first timeline))
+  (let [;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
         ;; TODO: This may not be necessary
         ;; now (.minus (.instant clock) (millis 2))
         now (.instant clock)]
     (try
-      (let [[due next-future-timeline] (split-with (fn [zdt] (not (.isAfter (.toInstant zdt) now))) future-timeline)]
-        (swap! a assoc :tick/future-timeline next-future-timeline)
-        (schedule-next clock (first next-future-timeline) executor #(callback a))
-        ;; dorun map our callable on each of the past times
-        (dorun (map callable due)))
+      (let [[due next-timeline] (split-with (fn [zdt] (not (.isAfter (.toInstant zdt) now))) timeline)]
+
+        (schedule-next clock (first next-timeline) executor #(callback next-timeline clock trigger executor))
+        (dorun (map trigger due)))
 
       (catch Exception e
         (println "ERROR" e)))))
 
-(defn new-clock-tracker [^java.time.Clock clock timeline callable executor]
-  (let [a (atom {:tick/future-timeline timeline
-                 :tick/clock clock
-                 :tick/callable callable
-                 :tick/executor executor})]
+(defprotocol ITimelineRunner
+  (start [_ clock] [_ clock executor])
+  (pause [_])
+  (resume [_])
+  (stop [_]))
 
-    (when true ;; clock is moving, we schedule the 'next' for real
+(defrecord TimelineRunner [trigger timeline]
+  ITimelineRunner
+  (start [_ clock]
+    (let [executor (new ScheduledThreadPoolExecutor 16)]
+      (schedule-next
+       clock
+       (first timeline)
+       executor
+       #(callback timeline clock trigger executor))))
+  (pause [_] nil)
+  (resume [_] nil)
+  (stop [_] nil))
+
+(defn map-t
+  [trigger timeline]
+  (->TimelineRunner trigger timeline))
+
+#_(defn start [runner]
+  (schedule-next
+   (:clock runner)
+   executor #(do
+               (println "MAIN CALLBACK:" callback)
+               (callback a))))
+
+#_(when true ;; clock is moving, we schedule the 'next' for real
       (schedule-next clock (first timeline) executor #(do
                                                         (println "MAIN CALLBACK:" callback)
                                                         (callback a))))
-
-    a))
 
 (defn- merge-timelines
   "Merge sort across set of collections.

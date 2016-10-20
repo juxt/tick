@@ -1,3 +1,5 @@
+;; Copyright © 2016, JUXT LTD.
+
 (ns tick.core-test
   (:require
    [clojure.test :refer :all]
@@ -10,7 +12,7 @@
 (def T1 (.plusSeconds T0 10))
 
 (deftest periodic-seq-test
-  (let [sq (periodic-seq (fixed-clock T0) (minutes 1))]
+  (let [sq (periodic-seq T0 (minutes 1))]
     (testing "sq starts with start time"
       (is (= T0 (first sq))))
     (testing "sq moves forward by 10 minutes"
@@ -18,7 +20,7 @@
 
 #_(deftest schedule-test
   (let [at (atom [])
-        schedule (atom (periodic-seq (fixed-clock T0) (seconds 1)))
+        schedule (atom (periodic-seq T0 (seconds 1)))
         d (drainer (fixed-clock T1) #(swap! at conj %))]
     (swap! schedule d)
     (is (not (empty? @at)))
@@ -62,12 +64,11 @@
      (eduction next-easters)
      )
 
-(def a
-  (let [clock (clock)]
-    (new-clock-tracker
-     clock
-     (take 4 (periodic-seq clock (seconds 1)))
-     println
-     (new java.util.concurrent.ScheduledThreadPoolExecutor 16))))
+(let [clock (clock)
+      now (.atZone (.instant clock) (ZoneId/of "Europe/London"))
+      timeline (take 4 (periodic-seq now (seconds 1)))
+      runner (map-t println timeline)]
+  (start runner clock)
+  )
 
 ;;(:tick/future-timeline (deref a))
