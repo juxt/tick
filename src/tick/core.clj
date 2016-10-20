@@ -103,18 +103,9 @@
       (.schedule executor ^Callable cb dly TimeUnit/MILLISECONDS))))
 
 (defn callback [timeline clock trigger executor]
-  (let [;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
-        ;; TODO: This may not be necessary
-        ;; now (.minus (.instant clock) (millis 2))
-        now (.instant clock)]
-    (try
-      (let [[due next-timeline] (split-with (fn [zdt] (not (.isAfter (.toInstant zdt) now))) timeline)]
-
-        (schedule-next clock (first next-timeline) executor #(callback next-timeline clock trigger executor))
-        (dorun (map trigger due)))
-
-      (catch Exception e
-        (println "ERROR" e)))))
+  (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant %) (.instant clock))) timeline)]
+    (schedule-next clock (first next-timeline) executor #(callback next-timeline clock trigger executor))
+    (dorun (map trigger due))))
 
 (defprotocol ITimelineRunner
   (start [_ clock] [_ clock executor])
@@ -127,6 +118,7 @@
   (start [this clock]
     (start this clock (new ScheduledThreadPoolExecutor 16)))
   (start [_ clock executor]
+    ;; TODO: Store this ScheduledFuture so we can cancel it on 'stop'
     (schedule-next
      clock
      (first timeline)
