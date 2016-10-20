@@ -18,21 +18,6 @@
     (testing "sq moves forward by 10 minutes"
       (is (= (parse "2012-12-04T05:31:00Z" "Europe/London") (first (drop 10 sq)))))))
 
-#_(deftest schedule-test
-  (let [at (atom [])
-        schedule (atom (periodic-seq T0 (seconds 1)))
-        d (drainer (fixed-clock T1) #(swap! at conj %))]
-    (swap! schedule d)
-    (is (not (empty? @at)))
-    (testing "Inclusive of T0 and the instant ten seconds ahead of the start-time."
-      (is (= 11 (count @at))))
-    (testing "First element is T0"
-      (is (= T0 (first @at))))
-    (testing "Last element is T1"
-      (is (= T1 (last @at))))))
-
-;; Rather than drainer, can we use something like tmap (time-map) or map-past ?
-
 (defn acceptable-hours [zdt]
   (let [h (.getHour zdt)]
     (<= 7 h 21)))
@@ -50,25 +35,9 @@
   (is (easter-monday? (parse "2017-04-17T12:00:00Z" "Europe/London")))
   (is (not (easter-sunday? (parse "2018-04-16T12:00:00Z" "Europe/London")))))
 
-;; Need to use ZonedDateTime really, rather than instant.
-;; Convert with ZonedDateTime/ofInstant
-
-#_(fixed-clock T0)
-
-#_(take 10 (periodic-seq (fixed-clock T0) (days 2)))
-
-#_(def next-easters (comp (filter easter-sunday?)
-                         (take 200)))
-
-#_(->> (periodic-seq (fixed-clock T0) (days 1))
-     (eduction next-easters)
-     )
-
 (let [clock (clock)
       now (.atZone (.instant clock) (ZoneId/of "Europe/London"))
-      timeline (take 4 (periodic-seq now (seconds 1)))
+      timeline (take 10 (periodic-seq now (seconds 1)))
       runner (map-t println timeline)]
   (start runner clock)
   )
-
-;;(:tick/future-timeline (deref a))

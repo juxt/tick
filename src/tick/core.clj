@@ -103,7 +103,6 @@
       (.schedule executor ^Callable cb dly TimeUnit/MILLISECONDS))))
 
 (defn callback [timeline clock trigger executor]
-  (println "callback: " (first timeline))
   (let [;; We capture a little bit ahead of ourselves, to avoid an unnecessary reschedule.
         ;; TODO: This may not be necessary
         ;; now (.minus (.instant clock) (millis 2))
@@ -125,13 +124,14 @@
 
 (defrecord TimelineRunner [trigger timeline]
   ITimelineRunner
-  (start [_ clock]
-    (let [executor (new ScheduledThreadPoolExecutor 16)]
-      (schedule-next
-       clock
-       (first timeline)
-       executor
-       #(callback timeline clock trigger executor))))
+  (start [this clock]
+    (start this clock (new ScheduledThreadPoolExecutor 16)))
+  (start [_ clock executor]
+    (schedule-next
+     clock
+     (first timeline)
+     executor
+     #(callback timeline clock trigger executor)))
   (pause [_] nil)
   (resume [_] nil)
   (stop [_] nil))
@@ -139,18 +139,6 @@
 (defn map-t
   [trigger timeline]
   (->TimelineRunner trigger timeline))
-
-#_(defn start [runner]
-  (schedule-next
-   (:clock runner)
-   executor #(do
-               (println "MAIN CALLBACK:" callback)
-               (callback a))))
-
-#_(when true ;; clock is moving, we schedule the 'next' for real
-      (schedule-next clock (first timeline) executor #(do
-                                                        (println "MAIN CALLBACK:" callback)
-                                                        (callback a))))
 
 (defn- merge-timelines
   "Merge sort across set of collections.
