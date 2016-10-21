@@ -38,6 +38,6 @@
 (let [clock (clock)
       now (.atZone (.instant clock) (ZoneId/of "Europe/London"))
       timeline (take 10 (periodic-seq now (seconds 1)))
-      runner (map-t println timeline)]
-  (start runner clock)
+      ticker (mapt println timeline)]
+  (start ticker clock)
   )

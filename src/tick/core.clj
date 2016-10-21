@@ -107,14 +107,14 @@
     (schedule-next clock (first next-timeline) executor #(callback next-timeline clock trigger executor))
     (dorun (map trigger due))))
 
-(defprotocol ITimelineRunner
+(defprotocol ITicker
   (start [_ clock] [_ clock executor])
   (pause [_])
   (resume [_])
   (stop [_]))
 
-(defrecord TimelineRunner [trigger timeline]
-  ITimelineRunner
+(defrecord Ticker [trigger timeline]
+  ITicker
   (start [this clock]
     (start this clock (new ScheduledThreadPoolExecutor 16)))
   (start [_ clock executor]
@@ -128,9 +128,10 @@
   (resume [_] nil)
   (stop [_] nil))
 
-(defn map-t
+(defn mapt
+  "Think of this like map, but applying a function over a timeline. Returns a ticker."
   [trigger timeline]
-  (->TimelineRunner trigger timeline))
+  (->Ticker trigger timeline))
 
 (defn- merge-timelines
   "Merge sort across set of collections.
