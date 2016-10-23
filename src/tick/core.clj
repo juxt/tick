@@ -4,7 +4,7 @@
   (:require
    [clojure.spec :as s])
   (:import
-   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime]
+   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate]
    [java.time.temporal ChronoUnit]
    [java.util.concurrent TimeUnit ScheduledThreadPoolExecutor]))
 
@@ -35,13 +35,6 @@
 (defn days [n]
   (Duration/ofDays n))
 
-(defn parse
-  "Given a string in ISO-8601 format, parse to an java.time.Instant."
-  ([s]
-   (Instant/parse s))
-  ([s z]
-   (-> (parse s) (.atZone (ZoneId/of z)))))
-
 (defn periodic-seq
   "Given a start time, create a timeline with times at constant intervals of period length"
   ([^ZonedDateTime start ^Duration period]
@@ -57,37 +50,97 @@
   [zdt]
   (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (day-of-week zdt)))
 
-(defn easter-sunday? [zdt]
+(defn- easter-sunday-by-year
+  "Return a pair containing [month day] of Easter Sunday given the year."
+  ;; TODO: From what year does this algorithm makes sense from, need
+  ;; to throw an exception outside this range.
+  [year]
+  (let [a (mod year 19)
+        b (quot year 100)
+        c (mod year 100)
+        d (quot b 4)
+        e (mod b 4)
+        f (quot (+ b 8) 25)
+        g (quot (+ (- b f) 1) 3)
+        h (mod (+ (* 19 a) (- b d g) 15) 30)
+        i (quot c 4)
+        k (mod c 4)
+        l (mod (- (+ 32 (* 2 e) (* 2 i)) h k) 7)
+        m (quot (+ a (* 11 h) (* 22 l)) 451)
+        n (quot (+ h (- l (* 7 m)) 114) 31)
+        p (mod (+ h (- l (* 7 m)) 114) 31)]
+    [n (+ p 1)]))
+
+(defn easter-sunday? [dt]
   "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a ZoneId, return a
-  predicate that tests is the instant falls on an Easter Sunday. From
+  predicate that tests if the instant falls on an Easter Sunday. From
   https://github.com/eivindw/clj-easter-day, using Spencer Jones
   formula."
-  (let [year (.getYear zdt)
-        month (.getMonthValue zdt)]
+  (let [year (.getYear dt)
+        month (.getMonthValue dt)]
     (and
-     (= (day-of-week zdt) DayOfWeek/SUNDAY)
-     (or (= month 3) (= month 4))
-     (let [a (mod year 19)
-           b (quot year 100)
-           c (mod year 100)
-           d (quot b 4)
-           e (mod b 4)
-           f (quot (+ b 8) 25)
-           g (quot (+ (- b f) 1) 3)
-           h (mod (+ (* 19 a) (- b d g) 15) 30)
-           i (quot c 4)
-           k (mod c 4)
-           l (mod (- (+ 32 (* 2 e) (* 2 i)) h k) 7)
-           m (quot (+ a (* 11 h) (* 22 l)) 451)
-           n (quot (+ h (- l (* 7 m)) 114) 31)
-           p (mod (+ h (- l (* 7 m)) 114) 31)]
-       (and (= n month) (= (.getDayOfMonth zdt) (+ p 1)))))))
+     (= (day-of-week dt) DayOfWeek/SUNDAY)
+     (or (= month (.getValue java.time.Month/MARCH)) (= month (.getValue java.time.Month/APRIL)))
+     (let [[m d] (easter-sunday-by-year year)]
+       (and (= m month) (= (.getDayOfMonth dt) d))))))
 
-(defn good-friday? [zdt]
-  (easter-sunday? (.plus zdt (days 2))))
+(defn good-friday? [dt]
+  (easter-sunday? (.plusDays dt 2)))
 
-(defn easter-monday? [zdt]
-  (easter-sunday? (.minus zdt (days 1))))
+(defn easter-monday? [dt]
+  (easter-sunday? (.minusDays dt 1)))
+
+(defn drop-past [now]
+  (fn [d] (.isBefore d now)))
+
+(defn easter-sundays
+  "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a
+  java.time.LocalDate (defaults to now), return a sequence of Easter
+  Sundays as LocalData instances. From
+  https://github.com/eivindw/clj-easter-day, using Spencer Jones
+  formula."
+  ([^LocalDate from-local-date]
+   (let [year (.getYear from-local-date)]
+     (drop-while (drop-past from-local-date)
+                 (for [year (range year 2200)]
+                   (let [[month day] (easter-sunday-by-year year)]
+                     (LocalDate/of year month day))))))
+  ([]
+   (easter-sundays (LocalDate/now))))
+
+(defn easter-sundays
+  "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a
+  java.time.LocalDate (defaults to now), return a sequence of Easter
+  Sundays as LocalData instances. From
+  https://github.com/eivindw/clj-easter-day, using Spencer Jones
+  formula."
+  ([^LocalDate from-local-date]
+   (let [year (.getYear from-local-date)]
+     (drop-while (drop-past from-local-date)
+                 (for [year (range year 2200)]
+                   (let [[month day] (easter-sunday-by-year year)]
+                     (LocalDate/of year month day))))))
+  ([]
+   (easter-sundays (LocalDate/now))))
+
+(defn good-fridays
+  ([^LocalDate from-local-date]
+   (map
+    ;; Strangly, we get an error with (.plus ... (days 2)) which I think is a Java bug.
+    #(.minusDays % 2)
+    (easter-sundays (.plusDays from-local-date 2))))
+  ([]
+   (good-fridays (LocalDate/now))))
+
+(defn easter-mondays
+  ([^LocalDate from-local-date]
+   (map
+    #(.plusDays % 1)
+    (easter-sundays (.minusDays from-local-date 1))))
+  ([]
+   (easter-mondays (LocalDate/now))))
+
+;; TODO: Easter Monday
 
 ;; Scheduler
 
@@ -131,7 +184,8 @@
 (defn mapt
   "Think of this like map, but applying a function over a timeline. Returns a ticker."
   [trigger timeline]
-  (->Ticker trigger timeline))
+  (map->Ticker {:trigger trigger
+                :timeline timeline}))
 
 (defn- merge-timelines
   "Merge sort across set of collections.
