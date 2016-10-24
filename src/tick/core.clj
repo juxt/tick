@@ -167,9 +167,18 @@
 
 (defn callback [state timeline clock trigger executor]
   (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant %) (.instant clock))) timeline)]
-    (swap! state assoc
-           :timeline next-timeline
-           :scheduled-future (schedule-next clock (first next-timeline) executor #(callback state next-timeline clock trigger executor)))
+
+    (if-not (empty? next-timeline)
+      ;; Schedule next
+      (swap! state assoc
+             :timeline next-timeline
+             :scheduled-future (schedule-next clock (first next-timeline) executor #(callback state next-timeline clock trigger executor)))
+      ;; Set status to :done
+      (swap! state (fn [s] (-> s
+                               (assoc :status :done)
+                               (dissoc :timeline :scheduled-future)))))
+
+    ;; Call the trigger for each due time
     (dorun (map trigger due))))
 
 (defprotocol ITicker
@@ -183,22 +192,44 @@
   (start [this clock]
     (start this clock (new ScheduledThreadPoolExecutor 16)))
   (start [_ clock executor]
-    (let [fut
-          (schedule-next
-           clock
-           (first timeline)
-           executor
-           #(callback state timeline clock trigger executor))]
-      (swap! state assoc
-             :timeline timeline
-             :scheduled-future fut)
-      :ok))
+    (swap! state assoc
+           :status :running
+           :timeline timeline
+           :scheduled-future (schedule-next
+                              clock
+                              (first timeline)
+                              executor
+                              #(callback state timeline clock trigger executor))
+           :clock clock
+           :executor executor)
+    :ok)
+
   (pause [_]
     (when-let [fut (:scheduled-future @state)]
       (.cancel fut false)
-      (swap! state dissoc :scheduled-future)))
-  (resume [_] nil)
-  (stop [_] nil))
+      ;; TODO: Use (compare-and-set!) instead to avoid a race-condition
+      (swap! state (fn [s] (-> s (assoc :status :paused)
+                               (dissoc :scheduled-future))))
+      :ok))
+  (resume [_]
+    (let [st @state]
+      (when (= :paused (:status st))
+        (let [timeline (:timeline st)
+              executor (:executor st)
+              clock (:clock st)]
+          ;; TODO: Use (compare-and-set!) instead to avoid a race-condition
+          (swap! state (fn [s] (-> s (assoc :status :running
+                                            :scheduled-future (schedule-next
+                                                               clock
+                                                               (first timeline)
+                                                               executor
+                                                               #(callback state timeline clock trigger executor)))))))
+        :ok)))
+  (stop [_]
+    (when-let [fut (:scheduled-future @state)]
+      (.cancel fut false))
+    (swap! state (fn [s] (-> s (assoc :status :stopped) (dissoc :scheduled-future))))
+    :ok))
 
 (defn mapt
   "Think of this like map, but applying a function over a timeline. Returns a ticker."
