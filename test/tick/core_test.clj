@@ -43,14 +43,16 @@
 
 (def ticker
   (let [now (just-now)
-        timeline (take 60 (periodic-seq now (seconds 1)))]
-    (mapt println timeline)))
+        timeline (take 30 (periodic-seq now (seconds 1)))]
+    (schedule println timeline)))
 
-(println ticker)
+#_(println ticker)
 
 (start ticker (clock-ticking-in-seconds))
 
 (pause ticker)
+
+#_(first (timeline ticker))
 
 (resume ticker)
 

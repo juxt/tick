@@ -8,9 +8,6 @@
    [java.time.temporal ChronoUnit]
    [java.util.concurrent TimeUnit ScheduledThreadPoolExecutor]))
 
-(defn clock []
-  (Clock/systemDefaultZone))
-
 (defn clock-ticking-in-seconds []
   (Clock/tickSeconds (ZoneId/systemDefault)))
 
@@ -182,16 +179,16 @@
     (dorun (map trigger due))))
 
 (defprotocol ITicker
-  (start [_ clock] [_ clock executor])
+  (start [_ clock])
   (pause [_])
   (resume [_])
-  (stop [_]))
+  (stop [_])
+  (timeline [_])
+  (clock [_]))
 
-(defrecord Ticker [trigger timeline state]
+(defrecord SchedulingTicker [trigger timeline executor state]
   ITicker
-  (start [this clock]
-    (start this clock (new ScheduledThreadPoolExecutor 16)))
-  (start [_ clock executor]
+  (start [_ clock]
     (swap! state assoc
            :status :running
            :timeline timeline
@@ -229,16 +226,38 @@
     (when-let [fut (:scheduled-future @state)]
       (.cancel fut false))
     (swap! state (fn [s] (-> s (assoc :status :stopped) (dissoc :scheduled-future))))
-    :ok))
+    :ok)
 
-(defn mapt
+  (timeline [_]
+    (:timeline @state))
+  (timeline [_]
+    (:clock @state)))
+
+(defn schedule
   "Think of this like map, but applying a function over a timeline. Returns a ticker."
-  [trigger timeline]
-  (map->Ticker {:trigger trigger
-                :timeline timeline
-                :state (atom {})}))
+  ([trigger timeline]
+   (schedule trigger timeline {}))
+  ([trigger timeline {:keys [executor]}]
+   (map->SchedulingTicker {:trigger trigger
+                           :timeline timeline
+                           :state (atom {})
+                           :executor (or executor (new ScheduledThreadPoolExecutor 16))})))
 
-(defn- merge-timelines
+(defrecord FixedClockAdvancingTicker []
+  ITicker
+  (start [this clock] nil)
+  (pause [this] nil)
+  (resume [this] nil)
+  (stop [this] nil)
+  (timeline [this] nil))
+
+;; ???
+(defn simulate []
+  ;; Create a map->FixedClockAdvancingTicker
+  )
+
+
+(defn merge-timelines
   "Merge sort across set of collections.
    See http://blog.malcolmsparks.com/?p=42 for full details."
   ([^java.util.Comparator comp colls]
