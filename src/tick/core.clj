@@ -165,9 +165,11 @@
     (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
       (.schedule executor ^Callable cb dly TimeUnit/MILLISECONDS))))
 
-(defn callback [timeline clock trigger executor]
+(defn callback [state timeline clock trigger executor]
   (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant %) (.instant clock))) timeline)]
-    (schedule-next clock (first next-timeline) executor #(callback next-timeline clock trigger executor))
+    (swap! state assoc
+           :timeline next-timeline
+           :scheduled-future (schedule-next clock (first next-timeline) executor #(callback state next-timeline clock trigger executor)))
     (dorun (map trigger due))))
 
 (defprotocol ITicker
@@ -176,18 +178,25 @@
   (resume [_])
   (stop [_]))
 
-(defrecord Ticker [trigger timeline]
+(defrecord Ticker [trigger timeline state]
   ITicker
   (start [this clock]
     (start this clock (new ScheduledThreadPoolExecutor 16)))
   (start [_ clock executor]
-    ;; TODO: Store this ScheduledFuture so we can cancel it on 'stop'
-    (schedule-next
-     clock
-     (first timeline)
-     executor
-     #(callback timeline clock trigger executor)))
-  (pause [_] nil)
+    (let [fut
+          (schedule-next
+           clock
+           (first timeline)
+           executor
+           #(callback state timeline clock trigger executor))]
+      (swap! state assoc
+             :timeline timeline
+             :scheduled-future fut)
+      :ok))
+  (pause [_]
+    (when-let [fut (:scheduled-future @state)]
+      (.cancel fut false)
+      (swap! state dissoc :scheduled-future)))
   (resume [_] nil)
   (stop [_] nil))
 
@@ -195,7 +204,8 @@
   "Think of this like map, but applying a function over a timeline. Returns a ticker."
   [trigger timeline]
   (map->Ticker {:trigger trigger
-                :timeline timeline}))
+                :timeline timeline
+                :state (atom {})}))
 
 (defn- merge-timelines
   "Merge sort across set of collections.

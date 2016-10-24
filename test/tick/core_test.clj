@@ -41,9 +41,13 @@
   (is (every? good-friday? (good-fridays (-> "1900-01-01" LocalDate/parse))))
   (is (every? easter-monday? (easter-mondays (-> "1900-01-01" LocalDate/parse)))))
 
-#_(let [clock (clock)
-      now (.atZone (.instant clock) (ZoneId/of "Europe/London"))
-      timeline (take 10 (periodic-seq now (seconds 1)))
-      ticker (mapt println timeline)]
-  (start ticker clock)
-  )
+(def ticker
+  (let [now (just-now)
+        timeline (take 10 (periodic-seq now (seconds 1)))]
+    (mapt println timeline)))
+
+(println ticker)
+
+(start ticker (clock-ticking-in-seconds))
+
+(pause ticker)
