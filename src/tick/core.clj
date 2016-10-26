@@ -56,7 +56,10 @@
   (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (day-of-week zdt)))
 
 (defn- easter-sunday-by-year
-  "Return a pair containing [month day] of Easter Sunday given the year."
+  "Return a pair containing [month day] of Easter Sunday given the
+  year. Copyright © 2016 Eivind Waaler. EPL v1.0. From
+  https://github.com/eivindw/clj-easter-day, using Spencer Jones
+  formula."
   ;; TODO: From what year does this algorithm makes sense from, need
   ;; to throw an exception outside this range.
   [year]
@@ -77,10 +80,8 @@
     [n (+ p 1)]))
 
 (defn easter-sunday? [dt]
-  "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a ZoneId, return a
-  predicate that tests if the instant falls on an Easter Sunday. From
-  https://github.com/eivindw/clj-easter-day, using Spencer Jones
-  formula."
+  "Given a ZoneId, return a predicate that tests if the instant falls
+  on an Easter Sunday."
   (let [year (.getYear dt)
         month (.getMonthValue dt)]
     (and
@@ -95,18 +96,15 @@
 (defn easter-monday? [dt]
   (easter-sunday? (.minusDays dt 1)))
 
-(defn drop-past [now]
+(defn past? [now]
   (fn [d] (.isBefore d now)))
 
 (defn easter-sundays
-  "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a
-  java.time.LocalDate (defaults to now), return a sequence of Easter
-  Sundays as LocalData instances. From
-  https://github.com/eivindw/clj-easter-day, using Spencer Jones
-  formula."
+  "Given a java.time.LocalDate (defaults to now), return a sequence of Easter
+  Sundays as LocalData instances. "
   ([^LocalDate from-local-date]
    (let [year (.getYear from-local-date)]
-     (drop-while (drop-past from-local-date)
+     (drop-while (past? from-local-date)
                  (for [year (range year 2200)]
                    (let [[month day] (easter-sunday-by-year year)]
                      (LocalDate/of year month day))))))
@@ -229,7 +227,7 @@
 
   (timeline [_]
     (:timeline @state))
-  (timeline [_]
+  (clock [_]
     (:clock @state)))
 
 (defn schedule
@@ -242,7 +240,7 @@
                            :state (atom {})
                            :executor (or executor (new ScheduledThreadPoolExecutor 16))})))
 
-(defrecord FixedClockAdvancingTicker []
+(defrecord ImpatientTicker []
   ITicker
   (start [this clock] nil)
   (pause [this] nil)
@@ -252,7 +250,7 @@
 
 ;; ???
 (defn simulate []
-  ;; Create a map->FixedClockAdvancingTicker
+  ;; Create a map->ImpatientTicker
   )
 
 
