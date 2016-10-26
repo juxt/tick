@@ -41,19 +41,20 @@
   (is (every? good-friday? (good-fridays (-> "1900-01-01" LocalDate/parse))))
   (is (every? easter-monday? (easter-mondays (-> "1900-01-01" LocalDate/parse)))))
 
-(def ticker
-  (let [now (just-now)
-        timeline (take 30 (periodic-seq now (seconds 1)))]
-    (schedule println timeline)))
+(deftest schedule-test
+  (let [a (atom 0)
+        f (fn [dt] (swap! a inc))
+        clk (clock-ticking-in-seconds)
+        now (just-now clk)
+        timeline (take 10 (periodic-seq now (millis 10)))]
+    @(start (schedule f timeline) clk)
+    (is (= @a 10))))
 
-#_(println ticker)
-
-(start ticker (clock-ticking-in-seconds))
-
-(pause ticker)
-
-#_(first (timeline ticker))
-
-(resume ticker)
-
-(stop ticker)
+(deftest simulate-test
+  (let [a (atom 0)
+        f (fn [dt] (swap! a inc))
+        clk (clock-ticking-in-seconds)
+        now (just-now clk)
+        timeline (take 1000 (periodic-seq now (seconds 1)))]
+    @(start (simulate f timeline) clk)
+    (is (= @a 1000))))
