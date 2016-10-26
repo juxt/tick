@@ -52,7 +52,7 @@ Another ticker, useful for testing, can be created with `simulate`.
 
 ## Acknowledgements
 
-Tick is based on the same original idea as [Chime](https://github.com/jarohen/chime). The motivation is to be able to view timelines of remaining times while the schedule is running.
+Tick is based on the same original idea as [Chime](https://github.com/jarohen/chime). The motivation is to be able to view timelines of remaining times while the schedule is running. Thanks to James Henderson for this work on Chime.
 
 ## Copyright & License
 
