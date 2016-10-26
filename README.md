@@ -4,13 +4,13 @@ A Clojure library for dealing with time.
 
 ## java.time
 
-Most Clojure time libraries use clj-time, but tick uses *java.time*
-
+Most Clojure time libraries use clj-time, but tick uses
+[**java.time**](http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html)
 which means that it requires Java 8.
 
 ## Timelines
 
-Tick adds the concept of *timelines* to java.time. A timeline is a
+Tick adds the concept of immutable *timelines* to java.time. A timeline is a
 lazy sequence of `java.time.ZonedDateTime` instances.
 
 Timelines are easy to generate. One generator is `periodic-seq`, which
@@ -31,10 +31,10 @@ have transducers applied.
 A ticker travels across a timeline. Tickers can have different behaviours.
 
 ```clojure
-(def s (t/schedule println timeline))
+(def ticker (t/schedule println timeline))
 ```
 
-Tickers can be `start`ed with a `clock`, `pause`d, `resume`d and `stopped`.
+Tickers can be `start`ed with a `clock`, and if necessary, `stop`ed.
 
 ```clojure
 (start s (t/clock-ticking-in-seconds))
@@ -45,7 +45,9 @@ If you want to wait for a ticker to complete its journey over a timeline, `deref
 Another ticker, useful for testing, can be created with `simulate`.
 
 ```clojure
-(def s (t/simulate println timeline))
+(def test-ticker (t/simulate println timeline))
+
+(start s (t/fixed-clock ...))
 ```
 
 ## Copyright & License
