@@ -50,6 +50,10 @@ Another ticker, useful for testing, can be created with `simulate`.
 (start s (t/fixed-clock ...))
 ```
 
+## Acknowledgements
+
+Tick is based on the same original idea as [Chime](https://github.com/jarohen/chime). The motivation is to be able to view timelines of remaining times while the schedule is running.
+
 ## Copyright & License
 
 The MIT License (MIT)
