@@ -20,13 +20,33 @@ generates a uniform series of times separated by a fixed period.
 (require '[tick.core :as t])
 
 ;; A timeline of 15 minute intervals
-(t/periodic-seq (t/clock) (t/minutes 15))
+(t/periodic-seq (t/clock-ticking-in-seconds) (t/minutes 15))
 ```
 
-## Schedules
+Timelines are just sequences, so can be transformed, filtered and can
+have transducers applied.
 
-Schedules are created by composition from building blocks.
+## Tickers
 
+A ticker travels across a timeline. Tickers can have different behaviours.
+
+```clojure
+(def s (t/schedule println timeline))
+```
+
+Tickers can be `start`ed with a `clock`, `pause`d, `resume`d and `stopped`.
+
+```clojure
+(start s (t/clock-ticking-in-seconds))
+```
+
+If you want to wait for a ticker to complete its journey over a timeline, `deref` the result of `start`.
+
+Another ticker, useful for testing, can be created with `simulate`.
+
+```clojure
+(def s (t/simulate println timeline))
+```
 
 ## Copyright & License
 
