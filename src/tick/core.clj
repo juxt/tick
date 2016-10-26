@@ -12,10 +12,8 @@
   (Clock/tickSeconds (ZoneId/systemDefault)))
 
 (defn now
-  ([]
-   (ZonedDateTime/now))
-  ([clock]
-   (ZonedDateTime/now clock)))
+  ([] (ZonedDateTime/now))
+  ([clock] (ZonedDateTime/now clock)))
 
 (defn just-now "Now, but truncated to the nearest second"
   ([] (.truncatedTo (now) (ChronoUnit/SECONDS)))
@@ -202,12 +200,12 @@
     :ok)
 
   (pause [_]
-    (when-let [fut (:scheduled-future @state)]
-      (.cancel fut false)
-      ;; TODO: Use (compare-and-set!) instead to avoid a race-condition
-      (swap! state (fn [s] (-> s (assoc :status :paused)
-                               (dissoc :scheduled-future))))
+    (let [st @state]
+      (when-let [fut (:scheduled-future st)]
+        (.cancel fut false))
+      (swap! state (fn [st] (-> st (assoc :status :paused) (dissoc :scheduled-future))))
       :ok))
+
   (resume [_]
     (let [st @state]
       (when (= :paused (:status st))
@@ -215,13 +213,14 @@
               executor (:executor st)
               clock (:clock st)]
           ;; TODO: Use (compare-and-set!) instead to avoid a race-condition
-          (swap! state (fn [s] (-> s (assoc :status :running
-                                            :scheduled-future (schedule-next
-                                                               clock
-                                                               (first timeline)
-                                                               executor
-                                                               #(callback state timeline clock trigger executor)))))))
+          (swap! state (fn [st] (-> st (assoc :status :running
+                                              :scheduled-future (schedule-next
+                                                                 clock
+                                                                 (first timeline)
+                                                                 executor
+                                                                 #(callback state timeline clock trigger executor)))))))
         :ok)))
+
   (stop [_]
     (when-let [fut (:scheduled-future @state)]
       (.cancel fut false))
