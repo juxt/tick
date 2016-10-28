@@ -119,7 +119,7 @@
   formula."
   ([^LocalDate from-local-date]
    (let [year (.getYear from-local-date)]
-     (drop-while (drop-past from-local-date)
+     (drop-while (past? from-local-date)
                  (for [year (range year 2200)]
                    (let [[month day] (easter-sunday-by-year year)]
                      (LocalDate/of year month day))))))
