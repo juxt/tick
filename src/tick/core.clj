@@ -143,6 +143,27 @@
   ([]
    (easter-mondays (LocalDate/now))))
 
+(defn merge-timelines
+  "Merge sort across set of collections.
+   See http://blog.malcolmsparks.com/?p=42 for full details."
+  ([^java.util.Comparator comp colls]
+   (let [begin (new Object)
+         end (new Object)]
+     (letfn [(next-item [[_ colls]]
+               (if (nil? colls)
+                 [end nil]
+                 (let [[[yield & p] & q]
+                       (sort-by first comp colls)]
+                   [yield (if p (cons p q) q)])))]
+       (->> colls
+            (vector begin)
+            (iterate next-item)
+            (drop 1)
+            (map first)
+            (take-while (partial not= end))))))
+  ([colls]
+   (merge-timelines compare colls)))
+
 (defn schedule-next [clock next-time executor cb]
   (when next-time
     (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
@@ -275,24 +296,3 @@
                           :timeline timeline
                           :state (atom {})
                           :executor (or executor (new ScheduledThreadPoolExecutor 1))})))
-
-(defn merge-timelines
-  "Merge sort across set of collections.
-   See http://blog.malcolmsparks.com/?p=42 for full details."
-  ([^java.util.Comparator comp colls]
-   (let [begin (new Object)
-         end (new Object)]
-     (letfn [(next-item [[_ colls]]
-               (if (nil? colls)
-                 [end nil]
-                 (let [[[yield & p] & q]
-                       (sort-by first comp colls)]
-                   [yield (if p (cons p q) q)])))]
-       (->> colls
-            (vector begin)
-            (iterate next-item)
-            (drop 1)
-            (map first)
-            (take-while (partial not= end))))))
-  ([colls]
-   (merge-timelines compare colls)))
