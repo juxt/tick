@@ -41,6 +41,14 @@
   (is (every? good-friday? (good-fridays (-> "1900-01-01" LocalDate/parse))))
   (is (every? easter-monday? (easter-mondays (-> "1900-01-01" LocalDate/parse)))))
 
+(deftest merge-timelines-test
+  (let [merged
+        (merge-timelines
+         [(take 10 (periodic-seq (.plus (just-now) (seconds 10)) (minutes 1)))
+          (take 10 (periodic-seq (just-now) (minutes 1)))])]
+    (is (distinct? merged))
+    (is (= 20 (count merged)))))
+
 (deftest schedule-test
   (let [a (atom 0)
         f (fn [dt] (swap! a inc))
