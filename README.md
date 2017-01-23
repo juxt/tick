@@ -57,7 +57,7 @@ rather than sequences.
 Tickers can be `start`ed with a clock, and if necessary, `stop`ed.
 
 ```clojure
-(start simulator (t/fixed-clock ...))
+(t/start simulator (t/fixed-clock ...))
 ```
 
 ## Real time
@@ -68,7 +68,7 @@ timeline.
 ```clojure
 (def schedule (t/schedule println timeline))
 
-(start schedule (t/clock-ticking-in-seconds))
+(t/start schedule (t/clock-ticking-in-seconds))
 ```
 
 If you want to wait for a ticker to complete its journey over a
