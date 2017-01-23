@@ -97,6 +97,10 @@ Tick is based on the same original idea as
 able to view timelines of remaining times while the schedule is
 running. Thanks to James Henderson for this work on Chime.
 
+## Comparison to Quartz
+
+See https://dzone.com/articles/why-you-shouldnt-use-quartz
+
 ## Copyright & License
 
 The MIT License (MIT)
