@@ -23,7 +23,7 @@ generates a uniform series of times separated by a fixed period.
 (require '[tick.core :as t])
 
 ;; A timeline of 15 minute intervals
-(t/periodic-seq (t/clock-ticking-in-seconds) (t/minutes 15))
+(t/periodic-seq (t/now) (t/minutes 15))
 ```
 
 Timelines are just sequences, so can be transformed, filtered and can
