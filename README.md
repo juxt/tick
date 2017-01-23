@@ -2,6 +2,14 @@
 
 A Clojure library for dealing with time.
 
+## Install
+
+Add to your lein or boot dependencies:
+
+```clojure
+[tick "0.1.0"]
+```
+
 ## Timelines
 
 Tick adds the concept of immutable *timelines* to java.time. A
