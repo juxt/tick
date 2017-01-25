@@ -164,12 +164,12 @@
   ([colls]
    (merge-timelines compare colls)))
 
-(defn schedule-next [clock next-time executor cb]
+(defn schedule-next [next-time {:keys [clock executor callback]}]
   (when next-time
     (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
-      (.schedule executor ^Callable cb dly TimeUnit/MILLISECONDS))))
+      (.schedule executor ^Callable callback dly TimeUnit/MILLISECONDS))))
 
-(defn callback [state timeline clock trigger executor promise]
+(defn callback [state timeline {:keys [clock trigger executor promise] :as opts}]
   (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant %) (.instant clock))) timeline)]
 
     (if-not (empty? next-timeline)
@@ -177,7 +177,10 @@
       (do
         (swap! state assoc
                :timeline next-timeline
-               :scheduled-future (schedule-next clock (first next-timeline) executor #(callback state next-timeline clock trigger executor promise)))
+               :scheduled-future (schedule-next (first next-timeline)
+                                                {:clock clock
+                                                 :executor executor
+                                                 :callback #(callback state next-timeline opts)}))
         (dorun (map trigger due)))
 
       ;; Set status to :done
@@ -204,10 +207,10 @@
            :status :running
            :timeline timeline
            :scheduled-future (schedule-next
-                              clock
                               (first timeline)
-                              executor
-                              #(callback state timeline clock trigger executor promise))
+                              {:clock clock
+                               :executor executor
+                               :callback #(callback state timeline {:clock clock :trigger trigger :executor executor :promise promise})})
            :clock clock
            :executor executor)
     promise)
@@ -227,10 +230,11 @@
               clock (:clock st)]
           (swap! state (fn [st] (-> st (assoc :status :running
                                               :scheduled-future (schedule-next
-                                                                 clock
                                                                  (first timeline)
-                                                                 executor
-                                                                 #(callback state timeline clock trigger executor promise)))))))
+                                                                 {:clock clock
+                                                                  :executor executor
+                                                                  :callback #(callback state timeline {:clock clock :trigger trigger :executor executor :promise promise})}))))))
+
         :ok)))
 
   (stop [_]
