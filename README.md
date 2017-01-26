@@ -10,6 +10,10 @@ Add to your lein or boot dependencies:
 [tick "0.2.0"]
 ```
 
+[![Clojars Project](http://clojars.org/bidi/latest-version.svg)](http://clojars.org/tick)
+[![CircleCIStatus](https://circleci.com/gh/juxt/tick.svg?style=shield&circle-token=d604205dab0328029e95202a4344e6a1082b79c2)](https://circleci.com/gh/juxt/tick)
+
+
 ## Timelines
 
 Tick adds the concept of immutable *timelines* to java.time. A
