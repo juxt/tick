@@ -48,21 +48,3 @@
           (take 10 (periodic-seq (just-now) (minutes 1)))])]
     (is (distinct? merged))
     (is (= 20 (count merged)))))
-
-(deftest schedule-test
-  (let [a (atom 0)
-        f (fn [dt] (swap! a inc))
-        clk (clock-ticking-in-seconds)
-        now (just-now clk)
-        timeline (take 10 (periodic-seq now (millis 10)))]
-    @(start (schedule f timeline) clk)
-    (is (= @a 10))))
-
-(deftest simulate-test
-  (let [a (atom 0)
-        f (fn [dt] (swap! a inc))
-        clk (clock-ticking-in-seconds)
-        now (just-now clk)
-        timeline (take 1000 (periodic-seq now (seconds 1)))]
-    @(start (simulate f timeline) clk)
-    (is (= @a 1000))))
