@@ -1,0 +1,10 @@
+= Change Log
+
+== [0.2.0] Ticks on timelines are maps not times.
+
+- Facilitates meta-data on ticks.
+
+- Breaking change: Removed merge-timelines because the use of the word
+  timelines is confusing
+
+== [0.1.0] Initial version
