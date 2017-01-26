@@ -10,11 +10,15 @@ image::http://clojars.org/tick/latest-version.svg[]
 
 image::https://circleci.com/gh/juxt/tick.svg?style=shield&circle-token=43344d03de5e6ee2fab96d3b3e1046e7bb8fd7ab[]
 
+== Dependencies
+
+Tick is dependent on Clojure 1.9, since it uses +clojure.spec+.
+
 == Timelines
 
 Tick adds the concept of immutable *timelines* to java.time. A
-timeline is a lazy but orderered sequence of `java.time.ZonedDateTime`
-instances.
+timeline is a lazy but orderered sequence of maps, each containing a
+`java.time.ZonedDateTime` entry (under the key `:tick/date`.
 
 Timelines are easy to generate. One generator is `periodic-seq`, which
 generates a uniform series of times separated by a fixed period.
