@@ -3,8 +3,9 @@
 (ns tick.timeline-test
   (:require
    [clojure.test :refer :all]
-   [tick.timeline :refer [merge-timelines periodic-seq]]
+   [tick.timeline :refer [interleave-timelines periodic-seq timeline sequencer]]
    [tick.clock :refer [just-now]]
+   [tick.cal :as cal]
    [tick.core :refer [seconds minutes hours]])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate LocalDateTime]
@@ -34,10 +35,20 @@
                     (take 100)
                     (filter acceptable-hours)))))))
 
-(deftest merge-timelines-test
+(deftest interleave-timelines-test
   (let [merged
-        (merge-timelines
-         [(take 10 (periodic-seq (.plus (just-now) (seconds 10)) (minutes 1)))
-          (take 10 (periodic-seq (just-now) (minutes 1)))])]
+        (interleave-timelines
+         (take 10 (timeline (periodic-seq (.plus (just-now) (seconds 10)) (minutes 1))))
+         (take 10 (timeline (periodic-seq (just-now) (minutes 1)))))]
     (is (distinct? merged))
     (is (= 20 (count merged)))))
+
+(deftest sequencer-test
+  (is (= 0 (:tick/seq (first (sequence (sequencer)
+                                       (interleave-timelines
+                                        (timeline (cal/easter-mondays))
+                                        (timeline (cal/good-fridays))))))))
+  (is (= 10 (:tick/seq (first (sequence (sequencer 10)
+                                       (interleave-timelines
+                                        (timeline (cal/easter-mondays))
+                                        (timeline (cal/good-fridays)))))))))

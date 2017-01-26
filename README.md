@@ -20,50 +20,46 @@ Timelines are easy to generate. One generator is `periodic-seq`, which
 generates a uniform series of times separated by a fixed period.
 
 ```clojure
-(require '[tick.core :as t])
+(require '[tick.core :refer [minutes]]
+          [tick.timeline :refer [timeline periodic-seq]]
+          [tick.clock :refer [now]])
 
 ;; A timeline of 15 minute intervals
-(t/periodic-seq (t/now) (t/minutes 15))
+(take 10
+  (timeline (periodic-seq (now) (minutes 15))))
 ```
 
-Timelines are just sequences, so can be transformed, filtered and can
-have transducers applied.
+Timelines are sequences of instances, and instances are Clojure maps:
+
+```clojure
+{:tick/date #object[java.time.ZonedDateTime 0x5a56528d "2012-12-04T05:21Z[Europe/London]"]}
+```
 
 Timelines can be finite or infinite.
 
-Timelines are composeable, and `merge-timelines` takes a collection of
-timelines and returns a lazy sequence of the result of their
-amalgamation.
+## Interleaving timelines
+
+Timelines can be interleaved into a consolidated timeline.
+
+`interleave-timelines` takes any number of timelines and returns a
+conslidated time-ordered timeline.  amalgamation.
 
 ```clojure
-(merge-timelines
-  (bank-holiday-mondays)
-  (easter-fridays))
+(require '[tick.cal :refer [easter-fridays]])
+
+(def holidays
+  (interleave-timelines
+    (timeline (bank-holiday-mondays))
+    (timeline (easter-fridays))))
 ```
 
-## Tickers
+## Schedules
 
-A ticker is something that travels across a timeline.
+Clojure's `map` takes a function and applies it to every item in a sequence.
 
-One such ticker, useful for testing, can be created with `simulate`.
+Similarly, tick's `schedule` takes a function and applies it to timelines.
 
-```clojure
-(def simulator (t/simulate println timeline))
-```
-
-You can think of this as similar to map, but applied to timelines
-rather than sequences.
-
-Tickers can be `start`ed with a clock, and if necessary, `stop`ed.
-
-```clojure
-(t/start simulator (t/fixed-clock ...))
-```
-
-## Real time
-
-A schedule is another type of ticker, executing a function across a
-timeline.
+Schedules can be run by starting them with a clock.
 
 ```clojure
 (def schedule (t/schedule println timeline))
@@ -71,11 +67,21 @@ timeline.
 (t/start schedule (t/clock-ticking-in-seconds))
 ```
 
+## Testing
+
+A type of schdule, useful for testing, can be created with `simulate`.
+
+```clojure
+(def simulator (t/simulate println timeline))
+
+(t/start simulator (t/fixed-clock ...))
+```
+
 If you want to wait for a ticker to complete its journey over a
 timeline, `deref` the result of `start`.
 
 At any time after starting a ticker you can find out its future
-timeline with `timeline`, while inspecting its clock with `clock`.
+timeline with `remaining`, while inspecting its clock with `clock`.
 
 ## java.time
 
@@ -103,7 +109,7 @@ where he argues that time is a perception.
 Tick is based on the same original idea as
 [Chime](https://github.com/jarohen/chime). The motivation is to be
 able to view timelines of remaining times while the schedule is
-running. Thanks to James Henderson for this work on Chime.
+running. Thanks to James Henderson for his work on Chime.
 
 ## Comparison to Quartz
 

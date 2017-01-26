@@ -34,11 +34,11 @@
 (defprotocol ITicker
   "A ticker travels across a timeline, usually triggering some action for each time on the timeline."
   (start [_ clock] "Start a ticker. If requirefd, deref the result to block until the schedule is complete.")
-  (pause [_] "If supported by the ticker, pause. Can be resumed")
+  (pause [_] "If supported by the ticker, pause. Can be resumed.")
   (resume [_] "Resume a paused ticker.")
-  (stop [_] "Stop the ticker. Can be restarted with start")
-  (timeline [_] "Return the timeline of outstanding times (not yet reached by the ticker)")
-  (clock [_] "Return the clock indicating where the ticker is in the timeline"))
+  (stop [_] "Stop the ticker. Can be restarted with start.")
+  (remaining [_] "Return the remaining timeline yet to be visited by the ticker.")
+  (clock [_] "Return the clock indicating where the ticker is in the timeline."))
 
 (defrecord SchedulingTicker [trigger timeline executor state promise]
   ITicker
@@ -83,7 +83,7 @@
     (swap! state (fn [s] (-> s (assoc :status :stopped) (dissoc :scheduled-future))))
     :ok)
 
-  (timeline [_]
+  (remaining [_]
     (:timeline @state))
   (clock [_]
     (:clock @state)))
@@ -127,7 +127,7 @@
   (stop [this]
     (swap! state assoc :status :stopped)
     :ok)
-  (timeline [this] (:timeline @state))
+  (remaining [this] (:timeline @state))
   (clock [this] (:clock @state)))
 
 (defn simulate
