@@ -114,14 +114,13 @@ The 'flow of time' complicates our systems and we can simplify them if
 we separate the concept of a timeline from the 'flow' of time we
 perceive.
 
-For more information, see the author's talk at ClojuTRE-2016 on [The
-Universe As A Value](https://www.youtube.com/watch?v=odPAkEO2uPQ)
-where he argues that time is a perception.
+For more information, see the author's talk at ClojuTRE-2016 on https://www.youtube.com/watch?v=odPAkEO2uPQ[The
+Universe As A Value] where he argues that time is a perception.
 
 == Acknowledgements
 
 Tick is based on the same original idea as
-[Chime](https://github.com/jarohen/chime). The motivation is to be
+https://github.com/jarohen/chime[Chime]. The motivation is to be
 able to view timelines of remaining times while the schedule is
 running. Thanks to James Henderson for his work on Chime.
 
