@@ -7,7 +7,7 @@ A Clojure library for dealing with time.
 Add to your lein or boot dependencies:
 
 [![Clojars Project](http://clojars.org/tick/latest-version.svg)](http://clojars.org/tick)
-[![CircleCIStatus](https://circleci.com/gh/juxt/tick.svg?style=shield&circle-token=d604205dab0328029e95202a4344e6a1082b79c2)](https://circleci.com/gh/juxt/tick)
+[![CircleCIStatus](https://circleci.com/gh/juxt/tick.svg?style=shield&circle-token=43344d03de5e6ee2fab96d3b3e1046e7bb8fd7ab)](https://circleci.com/gh/juxt/tick)
 
 ## Timelines
 
