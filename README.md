@@ -29,17 +29,23 @@ generates a uniform series of times separated by a fixed period.
   (timeline (periodic-seq (now) (minutes 15))))
 ```
 
-Timelines are sequences of instances, and instances are Clojure maps:
+Timelines are sequences of ticks, and ticks are Clojure maps. Here's one:
 
 ```clojure
 {:tick/date #object[java.time.ZonedDateTime 0x5a56528d "2012-12-04T05:21Z[Europe/London]"]}
 ```
 
-Timelines can be finite or infinite.
+Timelines can be finite or, or of course, infinite so
+
+```clojure
+(set! *print-length* 16)
+```
+
+to avoid eternal waits.
 
 ## Interleaving timelines
 
-Timelines can be interleaved into a consolidated timeline.
+Multiple timelines can be interleaved into a consolidated timeline.
 
 `interleave-timelines` takes any number of timelines and returns a
 conslidated time-ordered timeline.  amalgamation.
@@ -55,9 +61,9 @@ conslidated time-ordered timeline.  amalgamation.
 
 ## Schedules
 
-Clojure's `map` takes a function and applies it to every item in a sequence.
-
-Similarly, tick's `schedule` takes a function and applies it to timelines.
+Clojure's `map` takes a function and applies it to every item in a
+sequence. Similarly, tick's `schedule` takes a function and applies it
+to timelines.
 
 Schedules can be run by starting them with a clock.
 
@@ -67,14 +73,16 @@ Schedules can be run by starting them with a clock.
 (t/start schedule (t/clock-ticking-in-seconds))
 ```
 
+You can `stop`, `pause` and `resume` schedules too.
+
 ## Testing
 
 A type of schdule, useful for testing, can be created with `simulate`.
 
 ```clojure
-(def simulator (t/simulate println timeline))
+(def simulator (simulate println timeline))
 
-(t/start simulator (t/fixed-clock ...))
+(start simulator (fixed-clock ...))
 ```
 
 If you want to wait for a ticker to complete its journey over a
