@@ -3,7 +3,7 @@
 (ns tick.schedule-test
   (:require
    [clojure.test :refer :all]
-   [tick.timeline :refer [periodic-seq]]
+   [tick.timeline :refer [periodic-seq timeline]]
    [tick.core :refer [seconds millis]]
    [tick.clock :refer [clock-ticking-in-seconds just-now]]
    [tick.schedule :as sched]))
@@ -13,7 +13,7 @@
         f (fn [dt] (swap! a inc))
         clk (clock-ticking-in-seconds)
         now (just-now clk)
-        timeline (take 10 (periodic-seq now (millis 10)))]
+        timeline (take 10 (timeline (periodic-seq now (millis 10))))]
     @(sched/start (sched/schedule f timeline) clk)
     (is (= @a 10))))
 
@@ -22,6 +22,6 @@
         f (fn [dt] (swap! a inc))
         clk (clock-ticking-in-seconds)
         now (just-now clk)
-        timeline (take 1000 (periodic-seq now (seconds 1)))]
+        timeline (take 1000 (timeline (periodic-seq now (seconds 1))))]
     @(sched/start (sched/simulate f timeline) clk)
     (is (= @a 1000))))
