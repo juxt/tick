@@ -6,11 +6,11 @@
 
 (defn schedule-next [next-time {:keys [clock executor callback]}]
   (when next-time
-    (let [dly (.until (.instant clock) next-time ChronoUnit/MILLIS)]
+    (let [dly (.until (.instant clock) (:tick/date next-time) ChronoUnit/MILLIS)]
       (.schedule executor ^Callable callback dly TimeUnit/MILLISECONDS))))
 
 (defn callback [state timeline {:keys [clock trigger executor promise] :as opts}]
-  (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant %) (.instant clock))) timeline)]
+  (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant (:tick/date %)) (.instant clock))) timeline)]
 
     (if-not (empty? next-timeline)
       ;; Schedule next
@@ -112,14 +112,14 @@
      ^Runnable
      (fn []
        (loop [timeline timeline]
-         (when-let [t (first timeline)]
+         (when-let [tick (first timeline)]
            (when (= (:status @state) :running)
              ;; Advance clock
              (swap! state assoc
-                    :clock (Clock/fixed (.toInstant t) (.getZone clock))
+                    :clock (Clock/fixed (.toInstant (:tick/date tick)) (.getZone clock))
                     :timeline (next timeline))
              ;; Call trigger
-             (trigger t)
+             (trigger tick)
              (recur (next timeline))))))))
 
   (pause [this] :unsupported)
