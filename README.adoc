@@ -10,7 +10,7 @@ image::http://clojars.org/tick/latest-version.svg[]
 
 image::https://circleci.com/gh/juxt/tick.svg?style=shield&circle-token=43344d03de5e6ee2fab96d3b3e1046e7bb8fd7ab[]
 
-== Dependencies
+=== Dependencies
 
 Tick is dependent on Clojure 1.9, since it uses +clojure.spec+.
 
