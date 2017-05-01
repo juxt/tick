@@ -1,22 +1,78 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.cal
+  (:require
+   [clojure.spec :as s])
   (:import
-   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate]
-   [java.time.temporal ChronoUnit]
-   ))
+   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate YearMonth Month]
+   [java.time.temporal ChronoUnit]))
+
+(s/def ::year int?)
+(s/def ::name string?)
+(s/def ::date #(instance? LocalDate %))
+(s/def ::substitute-day boolean?)
+(s/def ::holiday (s/keys :req [::name ::date]
+                         :opt [::substitute-day]))
 
 (defn day-of-week
   "Return the day of the week for a given ZonedDateTime"
-  [zdt]
-  (.getDayOfWeek zdt))
+  [dt]
+  (.getDayOfWeek dt))
 
 (defn weekend?
   "Is the ZonedDateTime during the weekend?"
-  [zdt]
-  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (day-of-week zdt)))
+  [dt]
+  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (day-of-week dt)))
 
-(defn- easter-sunday-by-year
+(defn past? [now]
+  (fn [d] (.isBefore d now)))
+
+(defn day-seq [ld]
+  (iterate #(.plusDays % 1) ld))
+
+(defn day-seq-backwards [ld]
+  (iterate #(.minusDays % 1) ld))
+
+(defn- first-named-day-from [ld day]
+  (first (drop-while #(not= (day-of-week %) day) (day-seq ld))))
+
+(defn- last-named-day-from [ld day]
+  (first (drop-while #(not= (day-of-week %) day) (day-seq-backwards ld))))
+
+(defn first-monday-of-month [^YearMonth ym]
+  (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
+
+(defn last-monday-of-month [^YearMonth ym]
+  (last-named-day-from (.atEndOfMonth ym) DayOfWeek/MONDAY))
+
+(defn first-friday-of-month [^YearMonth ym]
+  (first-named-day-from (.atDay ym 1) DayOfWeek/FRIDAY))
+
+(defn last-friday-of-month [^YearMonth ym]
+  (last-named-day-from (.atEndOfMonth ym) DayOfWeek/FRIDAY))
+
+(defn holiday
+  ([name day]
+   {:name name
+    :date day})
+  ([name day hol]
+   {:name name
+    :date hol
+    :substitute-day (and hol (not= day hol))}))
+
+(s/fdef holiday
+        :args (s/cat :name ::name :day ::date :hol ::date)
+        :ret ::holiday)
+
+(defn new-years-day [year]
+  (LocalDate/of year 1 1))
+
+(defn new-years-day-holiday [year]
+  (let [day (new-years-day year)
+        hol (cond-> day (weekend? day) (first-named-day-from DayOfWeek/MONDAY))]
+    (holiday "New Year's Day" day hol)))
+
+(defn easter-sunday
   "Return a pair containing [month day] of Easter Sunday given the
   year. Copyright © 2016 Eivind Waaler. EPL v1.0. From
   https://github.com/eivindw/clj-easter-day, using Spencer Jones
@@ -38,56 +94,83 @@
         m (quot (+ a (* 11 h) (* 22 l)) 451)
         n (quot (+ h (- l (* 7 m)) 114) 31)
         p (mod (+ h (- l (* 7 m)) 114) 31)]
-    [n (+ p 1)]))
+    (LocalDate/of year n (+ p 1))))
 
-(defn easter-sunday? [dt]
-  "Given a ZoneId, return a predicate that tests if the instant falls
-  on an Easter Sunday."
-  (let [year (.getYear dt)
-        month (.getMonthValue dt)]
-    (and
-     (= (day-of-week dt) DayOfWeek/SUNDAY)
-     (or (= month (.getValue java.time.Month/MARCH)) (= month (.getValue java.time.Month/APRIL)))
-     (let [[m d] (easter-sunday-by-year year)]
-       (and (= m month) (= (.getDayOfMonth dt) d))))))
+(defn good-friday [year]
+  (.minusDays (easter-sunday year) 2))
 
-(defn good-friday? [dt]
-  (easter-sunday? (.plusDays dt 2)))
+(defn good-friday-holiday [year]
+  (holiday "Good Friday" (good-friday year)))
 
-(defn easter-monday? [dt]
-  (easter-sunday? (.minusDays dt 1)))
+(defn easter-monday [year]
+  (.plusDays (easter-sunday year) 1))
 
-(defn past? [now]
-  (fn [d] (.isBefore d now)))
+(defn easter-monday-holiday [year]
+  (holiday "Easter Monday" (easter-monday year)))
 
-(defn easter-sundays
-  "Copyright © 2016 Eivind Waaler. EPL v1.0. Given a
-  java.time.LocalDate (defaults to now), return a sequence of Easter
-  Sundays as LocalData instances. From
-  https://github.com/eivindw/clj-easter-day, using Spencer Jones
-  formula."
-  ([^LocalDate from-local-date]
-   (let [year (.getYear from-local-date)]
-     (drop-while (past? from-local-date)
-                 (for [year (range year 2200)]
-                   (let [[month day] (easter-sunday-by-year year)]
-                     (LocalDate/of year month day))))))
-  ([]
-   (easter-sundays (LocalDate/now))))
+(defn may-day [year]
+  (LocalDate/of year 5 1))
 
-(defn good-fridays
-  ([^LocalDate from-local-date]
-   (map
-    ;; Strangly, we get an error with (.plus ... (days 2)) which I think is a Java bug.
-    #(.minusDays % 2)
-    (easter-sundays (.plusDays from-local-date 2))))
-  ([]
-   (good-fridays (LocalDate/now))))
+(defn early-may-bank-holiday [year]
+  (holiday "Early May bank holiday"
+           (first-named-day-from (may-day year) DayOfWeek/MONDAY)))
 
-(defn easter-mondays
-  ([^LocalDate from-local-date]
-   (map
-    #(.plusDays % 1)
-    (easter-sundays (.minusDays from-local-date 1))))
-  ([]
-   (easter-mondays (LocalDate/now))))
+(defn spring-bank-holiday [year]
+  (holiday "Spring bank holiday"
+           (last-monday-of-month (YearMonth/of year Month/MAY))))
+
+(defn summer-bank-holiday [year]
+  (holiday "Summer bank holiday"
+           (last-monday-of-month (YearMonth/of year Month/AUGUST))))
+
+(defn christmas-day [year]
+  (LocalDate/of year 12 25))
+
+(s/fdef christmas-day
+        :args (s/cat :year ::year)
+        :ret ::date)
+
+(defn christmas-day-holiday [year]
+  (let [day (christmas-day year)
+        hol (cond-> day
+              (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
+    (holiday "Christmas Day" day hol)))
+
+(s/fdef christmas-day-holiday
+        :args (s/cat :year ::year)
+        :ret ::holiday)
+
+(defn boxing-day [year]
+  (LocalDate/of year 12 26))
+
+(s/fdef boxing-day
+        :args (s/cat :year ::year)
+        :ret ::date)
+
+(defn boxing-day-holiday [year]
+  (let [day (boxing-day year)
+        hol (cond-> day
+              (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
+    (holiday "Boxing Day" day hol)))
+
+(s/fdef boxing-day-holiday
+        :args (s/cat :year ::year)
+        :ret ::holiday)
+
+(def holidays-in-england-and-wales
+  (juxt new-years-day-holiday
+        good-friday-holiday
+        easter-monday-holiday
+        early-may-bank-holiday
+        spring-bank-holiday
+        summer-bank-holiday
+        christmas-day-holiday
+        boxing-day-holiday))
+
+;; TODO: Scotland
+
+;; TODO: Northern Ireland
+
+;; TODO: Republic of Ireland
+
+;; TODO: Isle of Man

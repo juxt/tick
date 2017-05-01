@@ -46,9 +46,9 @@
 (deftest sequencer-test
   (is (= 0 (:tick/seq (first (sequence (sequencer)
                                        (interleave-timelines
-                                        (timeline (cal/easter-mondays))
-                                        (timeline (cal/good-fridays))))))))
+                                        (timeline (map cal/easter-monday (iterate inc 2012)))
+                                        (timeline (map cal/good-friday (iterate inc 2012)))))))))
   (is (= 10 (:tick/seq (first (sequence (sequencer 10)
-                                       (interleave-timelines
-                                        (timeline (cal/easter-mondays))
-                                        (timeline (cal/good-fridays)))))))))
+                                        (interleave-timelines
+                                         (timeline (map cal/easter-monday (iterate inc 2012)))
+                                         (timeline (map cal/good-friday (iterate inc 2012))))))))))
