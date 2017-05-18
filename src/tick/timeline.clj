@@ -2,7 +2,7 @@
 
 (ns tick.timeline
   (:require
-   [clojure.spec :as s])
+   [clojure.spec.alpha :as s])
   (:import
    [java.time Duration ZonedDateTime]))
 
