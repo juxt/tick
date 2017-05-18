@@ -2,7 +2,7 @@
 
 (ns tick.cal
   (:require
-   [clojure.spec :as s])
+   [clojure.spec.alpha :as s])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate YearMonth Month]
    [java.time.temporal ChronoUnit]))
