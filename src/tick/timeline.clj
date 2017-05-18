@@ -4,11 +4,12 @@
   (:require
    [clojure.spec.alpha :as s])
   (:import
-   [java.time Duration ZonedDateTime]))
+   [java.time ZonedDateTime]
+   [java.time.temporal Temporal TemporalAmount]))
 
 (defn periodic-seq
   "Given a start time, create a timeline with times at constant intervals of period length"
-  ([^ZonedDateTime start ^Duration period]
+  ([^Temporal start ^TemporalAmount period]
    (iterate #(.addTo period %) start)))
 
 (s/def :tick/date #(instance? ZonedDateTime %))
