@@ -59,12 +59,12 @@ conslidated time-ordered timeline.  amalgamation.
 
 [source,clojure]
 ----
-(require '[tick.cal :refer [easter-fridays]])
+(require '[tick.cal])
 
 (def holidays
   (interleave-timelines
-    (timeline (bank-holiday-mondays))
-    (timeline (easter-fridays))))
+    (timeline (tick.cal/bank-holiday-mondays))
+    (timeline (tick.cal/easter-fridays))))
 ----
 
 == Schedules
@@ -77,9 +77,9 @@ Schedules can be run by starting them with a clock.
 
 [source,clojure]
 ----
-(def schedule (t/schedule println timeline))
+(def schedule (tick.schedule/schedule println timeline))
 
-(t/start schedule (t/clock-ticking-in-seconds))
+(tick.schedule/start schedule (tick.clock/clock-ticking-in-seconds))
 ----
 
 You can `stop`, `pause` and `resume` schedules too.
@@ -90,9 +90,9 @@ A type of schdule, useful for testing, can be created with `simulate`.
 
 [source,clojure]
 ----
-(def simulator (simulate println timeline))
+(def simulator (tick.schedule/simulate println timeline))
 
-(start simulator (fixed-clock ...))
+(tick.schedule/start simulator (tick.clock/fixed-clock ...))
 ----
 
 If you want to wait for a ticker to complete its journey over a
