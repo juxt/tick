@@ -78,6 +78,7 @@ Schedules can be run by starting them with a clock.
 [source,clojure]
 ----
 (def schedule (tick.schedule/schedule println timeline))
+;; note that the scheduled function   ^^^^^^^   takes one argument 
 
 (tick.schedule/start schedule (tick.clock/clock-ticking-in-seconds))
 ----
