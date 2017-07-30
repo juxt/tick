@@ -146,7 +146,7 @@ Specify an intervals as a tuple (vector) of two instants. Instants can be create
    (instant "2017-07-30T11:00:00Z")])
 ----
 
-Tick has an implementation of <<ALLEN-1983>> described in <<ALSPAUGH-2009>>.
+Tick has an implementation of Allen's Interval Algebra <<ALLEN-1983>> described in <<ALSPAUGH-2009>>.
 
 There is a composition of a number of functions that can be used to compare intervals.
 
