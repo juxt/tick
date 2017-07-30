@@ -7,4 +7,5 @@
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/spec.alpha "0.1.94"]]
   :profiles {:dev
-             {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]}})
+             {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]
+              :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}})
