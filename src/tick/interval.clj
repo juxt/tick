@@ -1,13 +1,13 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-;; Allen's interval algebra: http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf
-;; See also https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html for clear explanation
+;; Allen's interval algebra:
 
 ;; Use of Allens' interval algebra from a suggestion by Eric Evans.
 
 (ns tick.interval
   (:refer-clojure :exclude [contains?])
   (:require
+   [clojure.set :as set]
    [clojure.spec.alpha :as s]
    [tick.core :refer [instant]]
    [clojure.test :refer [is]]))
@@ -67,18 +67,32 @@
    (= (second x) (second y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.
-(defn converse
-  "The converse of a relation."
+(defn conv
+  "The converse of a basic relation."
   [f]
   (fn [x y]
     (f y x)))
 
-(def preceded-by? (converse precedes?))
-(def met-by? (converse meets?))
-(def overlapped-by? (converse overlaps?))
-(def finished-by? (converse finishes?))
-(def contains? (converse during?))
-(def started-by? (converse starts?))
+(defn preceded-by? [x y] ((conv precedes?) x y))
+(defn met-by? [x y] ((conv meets?) x y))
+(defn overlapped-by? [x y] ((conv overlaps?) x y))
+(defn finished-by? [x y] ((conv finishes?) x y))
+(defn contains? [x y] ((conv during?) x y))
+(defn started-by? [x y] ((conv starts?) x y))
+
+(def code {precedes? \p
+           meets? \m
+           overlaps? \o
+           finished-by? \F
+           contains? \D
+           starts? \s
+           equals? \e
+           started-by? \S
+           during? \d
+           finishes? \f
+           overlapped-by? \O
+           met-by? \M
+           preceded-by? \P})
 
 (def ^{:test
        (fn []
@@ -91,21 +105,54 @@
    starts? equals? started-by? during? finishes? overlapped-by?
    met-by? preceded-by?])
 
-(defn relation [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
-  (cond
-    (precedes? x y) :precedes
-    (meets? x y) :meets
-    (overlaps? x y) :overlaps
-    (finished-by? x y) :finished-by
-    (contains? x y) :contains
-    (starts? x y) :starts
-    (equals? x y) :equals
-    (started-by? x y) :started-by
-    (during? x y) :during
-    (finishes? x y) :finishes
-    (overlapped-by? x y) :overlapped-by
-    (met-by? x y) :met-by
-    (preceded-by? x y) :preceded-by
-    :else (throw (ex-info "Should not get here" {}))))
+(defrecord GeneralRelation [relations]
+  clojure.lang.IFn
+  (invoke [_ x y]
+    (s/assert ::interval x)
+    (s/assert ::interval y)
+    (some (fn [f] (when (f x y) f)) relations)))
+
+;; Relations are 'basic relations' in [ALSPAUGH-2009]. Invoking a
+;; general relation on two intervals returns the basic relation that
+;; causes the general relation to hold. Note there can only be one
+;; such basic relation due to the relations being distinct.
+
+(defn make-relation [& basic-relations]
+  (->GeneralRelation basic-relations))
+
+(def ^{:doc "A function to determine the (basic) relation between two intervals."}
+  relation
+  (apply make-relation basic-relations))
+
+;; Operations on relations
+
+(defn complement
+  "Return the complement of the general relation. The complement ~r of
+  a relation r is the relation consisting of all basic relations not
+  in r."
+  [^GeneralRelation r]
+  (assoc r :relations (remove (set (:relations r)) basic-relations)))
+
+(defn compose
+  "Return the composition of r and s"
+  [r s]
+  (throw (new UnsupportedOperationException "Not yet implemented")))
+
+(defn converse
+  "Return the converse of the given general relation. The converse !r
+  of a relation r is the relation consisting of the converses of all
+  basic relations in r."
+  [^GeneralRelation r]
+  (assoc r :relations (map conv (:relations r))))
+
+(defn intersection
+  "Return the intersection of the r with s"
+  [^GeneralRelation r ^GeneralRelation s]
+  (s/assert r #(instance? GeneralRelation %))
+  (->GeneralRelation (set/intersection (set (:relations r))))
+  (throw (new UnsupportedOperationException "Not yet implemented")))
+
+;; Useful relations
+
+(def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
+(def concur? (complement disjoint?))

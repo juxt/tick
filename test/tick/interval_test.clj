@@ -1,9 +1,5 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-;; Tests for Allen's interval algebra: http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf
-
-;; See also https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html for clear explanation
-
 (ns tick.interval-test
   (:refer-clojure :exclude [contains?])
   (:require
@@ -13,15 +9,15 @@
    [tick.interval :refer :all]))
 
 ;; Allen's Interval Algebra
-;; distinct: because no pair of definite intervals can be related by more than one of the relationships
-;; (From https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html)
 
-;; We can exhaustively test every combination of interval relation with just 4 instants.
+;; We can construct every possible combination of interval relation with just 4 instants.
 (def instants [(instant "2017-07-30T09:00:00Z")
                (instant "2017-07-30T11:00:00Z")
                (instant "2017-07-30T13:00:00Z")
                (instant "2017-07-30T15:00:00Z")])
 
+;; Distinct: because no pair of definite intervals can be related by more than one of the relationships.
+;; From [ALSPAUGH-2009]
 (deftest distinct-test
   (is
    (= [1]   ; Each interval should have just one relation that is true
@@ -39,9 +35,7 @@
            ;; (should be just one each time)
            (count (filter true? (f x y)))))))))
 
-
-;; exhaustive: because any pair of definite intervals are described by one of the relations
-;; Note: tick.interval/relation throws an exception if a coding error means the 13 relations are not exhaustive.
+;; Exhaustive: because any pair of definite intervals are described by one of the relations.
 (deftest exhaustive-test []
   (is
    (= 13 ; Thirteen basic relations
@@ -57,4 +51,38 @@
                     y [y1 y2]]]
           ;; For each combination, count how many relations are true
           ;; (should be just one each time)
-          (relation x y)))))))
+          (code (relation x y))))))))
+
+
+(deftest disjoint-test []
+  (is (disjoint?
+       [(instants 0) (instants 1)]
+       [(instants 2) (instants 3)]))
+  (is (= (disjoint?
+          [(instants 0) (instants 1)]
+          [(instants 2) (instants 3)]) precedes?))
+  (is (nil?
+       (disjoint?
+        [(instants 0) (instants 2)]
+        [(instants 1) (instants 3)])))
+  (is (nil?
+       (disjoint?
+        [(instants 0) (instants 3)]
+        [(instants 1) (instants 2)]))))
+
+;; concur is really the complement to disjoint, but we'll test it
+;; anywhere to ensure the complement function is working as expected.
+
+(deftest concur-test []
+  (is (nil?
+       (concur?
+        [(instants 0) (instants 1)]
+        [(instants 2) (instants 3)])))
+  (is (= (concur?
+          [(instants 0) (instants 2)]
+          [(instants 1) (instants 3)])
+         overlaps?))
+  (is (= (concur?
+          [(instants 0) (instants 3)]
+          [(instants 1) (instants 2)])
+         contains?)))

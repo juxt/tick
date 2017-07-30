@@ -112,6 +112,12 @@ For more information, see the author's talk at ClojuTRE-2016 on [The
 Universe As A Value](https://www.youtube.com/watch?v=odPAkEO2uPQ)
 where he argues that time is a perception.
 
+## Bibliography
+
+- [ALLEN-1983]: http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf
+
+- [ALSPAUGH-2009]: https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html for clear explanation
+
 ## Acknowledgements
 
 Tick is based on the same original idea as
