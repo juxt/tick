@@ -1,6 +1,6 @@
 ;; Copyright © 2016, JUXT LTD.
 
-(defproject tick "0.2.3"
+(defproject tick "0.2.4"
   :description "A Clojure library that deals with time"
   :url "https://github.com/juxt/tick"
   :license {:name "The MIT License"
