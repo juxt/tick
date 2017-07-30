@@ -5,7 +5,7 @@
 ;; Use of Allens' interval algebra from a suggestion by Eric Evans.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains?])
+  (:refer-clojure :exclude [contains? complement])
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]

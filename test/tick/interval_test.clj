@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval-test
-  (:refer-clojure :exclude [contains?])
+  (:refer-clojure :exclude [contains? complement])
   (:require
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
