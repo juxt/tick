@@ -78,7 +78,7 @@ Schedules can be run by starting them with a clock.
 [source,clojure]
 ----
 (def schedule (tick.schedule/schedule println timeline))
-;; note that the scheduled function   ^^^^^^^   takes one argument 
+;; note that the scheduled function   ^^^^^^^   takes one argument
 
 (tick.schedule/start schedule (tick.clock/clock-ticking-in-seconds))
 ----
@@ -132,6 +132,12 @@ running. Thanks to James Henderson for his work on Chime.
 == Comparison to Quartz
 
 See https://dzone.com/articles/why-you-shouldnt-use-quartz
+
+[bibliography]
+== Bibliography
+
+- [[[ALLEN-1983]]] link:http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf[Allen's original 1983 paper]
+- [[[ALSPAUGH-2009]]] link:https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html[Alspaugh 2009 tutorial]
 
 == Copyright & License
 
