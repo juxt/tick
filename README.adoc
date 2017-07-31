@@ -133,42 +133,6 @@ running. Thanks to James Henderson for his work on Chime.
 
 See https://dzone.com/articles/why-you-shouldnt-use-quartz
 
-== Intervals
-
-Specify an intervals as a tuple (vector) of two instants. Instants can be created with `tick.core/instant`.
-
-[source,clojure]
-----
-(require '[tick.core :refer [instant]])
-
-(def interval
-  [(instant "2017-07-30T09:00:00Z")
-   (instant "2017-07-30T11:00:00Z")])
-----
-
-Tick has an implementation of Allen's Interval Algebra <<ALLEN-1983>> described in <<ALSPAUGH-2009>>.
-
-There is a composition of a number of functions that can be used to compare intervals.
-
-For example, it is possible to use `tick.interval/concur?` to determine if 2 intervals overlap.
-
-[source,clojure]
-----
-(require '[tick.interval :refer [concur?]])
-
-(concur?
-  [(instant "2017-07-30T09:00:00Z")
-   (instant "2017-07-30T11:00:00Z")]
-  [(instant "2017-07-30T09:00:00Z")
-   (instant "2017-07-30T11:00:00Z")])
-----
-
-[bibliography]
-== Bibliography
-
-- [[[ALLEN-1983]]] link:http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf[Maintaining Knowledge about Temporal Intervals]
-- [[[ALSPAUGH-2009]]] link:https://www.ics.uci.edu/~alspaugh/cls/shr/allen.html[Allen's Interval Algebra by Thomas A. Alspaugh]
-
 == Copyright & License
 
 The MIT License (MIT)
