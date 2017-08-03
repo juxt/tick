@@ -2,7 +2,8 @@
 
 (ns tick.cal
   (:require
-   [clojure.spec.alpha :as s])
+   [clojure.spec.alpha :as s]
+   [tick.core :as core])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate YearMonth Month]
    [java.time.temporal ChronoUnit]))
@@ -27,17 +28,11 @@
 (defn past? [now]
   (fn [d] (.isBefore d now)))
 
-(defn day-seq [ld]
-  (iterate #(.plusDays % 1) ld))
-
-(defn day-seq-backwards [ld]
-  (iterate #(.minusDays % 1) ld))
-
 (defn- first-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (day-seq ld))))
+  (first (drop-while #(not= (day-of-week %) day) (core/range-t ld))))
 
 (defn- last-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (day-seq-backwards ld))))
+  (first (drop-while #(not= (day-of-week %) day) (core/range-t ld nil -1))))
 
 (defn first-monday-of-month [^YearMonth ym]
   (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
