@@ -81,17 +81,3 @@
                  to (take-while #(.isBefore % to) )))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(.isBefore % to))))))
-
-(defn + [arg & args]
-  (reduce #(plus-t %1 %2) arg args))
-
-(defn - [arg & args]
- (reduce #(minus-t %1 %2) arg args))
-
-(defn max [arg & args]
-  (reduce #(max-t %1 %2) arg args))
-
-(defn min [arg & args]
-  (reduce #(min-t %1 %2) arg args))
-
-(def range range-t)
