@@ -33,7 +33,7 @@
 
 (defprotocol ITicker
   "A ticker travels across a timeline, usually triggering some action for each time on the timeline."
-  (start [_ clock] "Start a ticker. If requirefd, deref the result to block until the schedule is complete.")
+  (start [_ clock] "Start a ticker. If required, deref the result to block until the schedule is complete.")
   (pause [_] "If supported by the ticker, pause. Can be resumed.")
   (resume [_] "Resume a paused ticker.")
   (stop [_] "Stop the ticker. Can be restarted with start.")
