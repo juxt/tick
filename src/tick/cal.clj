@@ -29,10 +29,10 @@
   (fn [d] (.isBefore d now)))
 
 (defn- first-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (core/range-t ld))))
+  (first (drop-while #(not= (day-of-week %) day) (core/range ld))))
 
 (defn- last-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (core/range-t ld nil -1))))
+  (first (drop-while #(not= (day-of-week %) day) (core/range ld nil -1))))
 
 (defn first-monday-of-month [^YearMonth ym]
   (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
