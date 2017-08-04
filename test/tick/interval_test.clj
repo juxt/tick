@@ -16,6 +16,13 @@
     (interval "2017-08-19T23:00:00Z" "2017-08-20T23:00:00Z")
     (to-interval (local-date "2017-08-20") (zone "Europe/London")))))
 
+(deftest local-dates-test []
+  (let [res
+        (local-dates (interval "2017-08-19T23:00:00Z" "2017-09-20T23:00:00Z") (zone "Europe/London"))]
+    (is (= 33 (count res)))
+    (is (= "2017-08-20" (str (first res))))
+    (is (= "2017-09-21" (str (last res))))))
+
 ;; Allen's Interval Algebra
 
 (deftest basic-relations-test
@@ -98,3 +105,51 @@
           [(instants 0) (instants 3)]
           [(instants 1) (instants 2)])
          contains?)))
+
+(deftest intersection-test []
+  (is
+   (=
+    (interval (instants 1) (instants 2))
+    (intersection
+     (interval (instants 0) (instants 2))
+     (interval (instants 1) (instants 3)))))
+
+  (is
+   (=
+    (interval (instants 1) (instants 2))
+    (intersection
+     (interval (instants 1) (instants 3))
+     (interval (instants 0) (instants 2)))))
+
+  (is
+   (nil?
+    (intersection
+     (interval (instants 0) (instants 1))
+     (interval (instants 2) (instants 3)))))
+
+  (is
+   (nil?
+    (intersection
+     (interval (instants 0) (instants 1))
+     (interval (instants 1) (instants 2)))))
+
+  (is
+   (=
+    (interval (instants 0) (instants 2))
+    (intersection
+     (interval (instants 0) (instants 2))
+     (interval (instants 0) (instants 3)))))
+
+  (is
+   (=
+    (interval (instants 0) (instants 2))
+    (intersection
+     (interval (instants 0) (instants 3))
+     (interval (instants 0) (instants 2)))))
+
+  (is
+   (=
+    (interval (instants 1) (instants 3))
+    (intersection
+     (interval (instants 1) (instants 3))
+     (interval (instants 0) (instants 3))))))
