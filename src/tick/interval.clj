@@ -1,28 +1,43 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-;; Allen's interval algebra:
-
-;; Use of Allens' interval algebra from a suggestion by Eric Evans.
-
 (ns tick.interval
   (:refer-clojure :exclude [contains? complement])
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
-   [tick.core :refer [instant]]
-   [clojure.test :refer [is]]))
+   [tick.core :as t])
+  (:import
+   [java.time Duration ZoneId LocalDate YearMonth]))
 
 (s/def ::interval
   (s/and
    (s/tuple :tick.core/instant :tick.core/instant)
    #(.isBefore (first %) (second %))))
 
-(defn ^{:test
-        (fn []
-          (is (precedes?
-               [(instant "2017-07-30T09:00:00Z") (instant "2017-07-30T12:00:00Z")]
-               [(instant "2017-07-30T13:00:00Z") (instant "2017-07-30T17:00:00Z")])))}
-  precedes? [x y]
+(defn interval
+  "Make an interval from arguments."
+  [v1 v2]
+  [(t/instant v1) (t/instant v2)])
+
+(defprotocol ICoercions
+  (to-interval [_ zone] "Coercions to an interval"))
+
+(extend-protocol ICoercions
+  LocalDate
+  (to-interval [date zone]
+    (interval (.atStartOfDay date zone)
+              (.atStartOfDay (t/inc date) zone)))
+  YearMonth
+  (to-interval [date] :todo))
+
+(defn duration [interval]
+  (Duration/between (first interval) (second interval)))
+
+;; Use of Allen's Interval Algebra from an idea by Eric Evans.
+
+;; Allen's Basic Relations
+
+(defn precedes? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (.isBefore (second x) (first y)))
@@ -94,16 +109,12 @@
            met-by? \M
            preceded-by? \P})
 
-(def ^{:test
-       (fn []
-         ;; There are 13 basic relations
-         (is (= (count basic-relations) 13))
-         ;; Distinct check (make sure we're not including any of them more than once)
-         (is (distinct? basic-relations)))}
-  basic-relations
+(def basic-relations
   [precedes? meets? overlaps? finished-by? contains?
    starts? equals? started-by? during? finishes? overlapped-by?
    met-by? preceded-by?])
+
+;; Allen's General Relations
 
 (defrecord GeneralRelation [relations]
   clojure.lang.IFn
@@ -156,3 +167,18 @@
 
 (def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
 (def concur? (complement disjoint?))
+
+;; Interval arithmetic
+
+#_(defn + )
+
+;; Functions that make use of Allens' Interval Algebra
+
+(do
+  (defn partition-by-date [interval ^ZoneId zone]
+    (->> (t/local-dates interval zone)
+         (map #(to-interval % zone))
+         (map (partial relation interval))))
+  (partition-by-date
+   (interval (t/now) (t/+ (t/now) (t/days 20)))
+   (t/zone "Europe/London")))

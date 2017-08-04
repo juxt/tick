@@ -5,10 +5,22 @@
   (:require
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
-   [tick.core :refer [instant]]
+   [tick.core :refer [instant zone local-date]]
    [tick.interval :refer :all]))
 
+(s/check-asserts true)
+
+(deftest to-interval-test []
+  (is
+   (=
+    (interval "2017-08-19T23:00:00Z" "2017-08-20T23:00:00Z")
+    (to-interval (local-date "2017-08-20") (zone "Europe/London")))))
+
 ;; Allen's Interval Algebra
+
+(deftest basic-relations-test
+  (is (= (count basic-relations) 13))
+  (is (distinct? basic-relations)))
 
 ;; We can construct every possible combination of interval relation with just 4 instants.
 (def instants [(instant "2017-07-30T09:00:00Z")

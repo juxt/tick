@@ -5,7 +5,8 @@
   (:require
    [clojure.spec.alpha :as s])
   (:import
-   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate]
+   [java.util Date]
+   [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate ZoneId]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
@@ -34,33 +35,53 @@
 
 (s/def ::instant #(instance? Instant %))
 
-(defprotocol IInstant
-  (instant [_] "Make java.time.Instant instance"))
+(defprotocol IConstructors
+  (instant [_] "Make a java.time.Instant instance.")
+  (local-date [_] [_ zone] "Make a java.time.Instant instance.")
+  (zone [_] "Make a java.time.ZoneId instance."))
 
-(extend-protocol IInstant
+(extend-protocol IConstructors
+  Instant
+  (instant [i] i)
+  (local-date
+    ([i] (throw (ex-info "Needs zone" {})))
+    ([i zone] (.. i (atZone zone) toLocalDate)))
   String
-  (instant [s] (Instant/from (.parse (DateTimeFormatter/ISO_INSTANT) s))))
+  (instant [s] (Instant/from (.parse (DateTimeFormatter/ISO_INSTANT) s)))
+  (local-date
+    ([s] (LocalDate/parse s))
+    ([s zone] (local-date (instant s) zone)))
+  (zone [s] (ZoneId/of s))
+  Date
+  (instant [d] (.toInstant d))
+  (local-date
+    ([d] (throw (ex-info "Needs zone" {})))
+    ([d zone] (local-date (instant d) zone)))
+  ZoneId
+  (zone [z] z)
+  ZonedDateTime
+  (instant [zdt] (.toInstant zdt)))
 
 (defprotocol ITimeArithmetic
-  (plus-t [_ _] "Add time")
-  (minus-t [_ _] "Subtract time")
-  (inc-t [_] "Increment time")
-  (dec-t [_] "Decrement time")
-  (max-t [_ _] "Return maximum")
-  (min-t [_ _] "Return minimum")
-  (range-t [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
+  (+ [_ _] "Add time")
+  (- [_ _] "Subtract time")
+  (inc [_] "Increment time")
+  (dec [_] "Decrement time")
+  (max [_ _] "Return maximum")
+  (min [_ _] "Return minimum")
+  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
 (extend-type Instant
   ITimeArithmetic
-  (plus-t [t x] (.plus t x))
-  (minus-t [t x] (.minus t x))
-  (inc-t [t] (plus-t t (seconds 1)))
-  (dec-t [t] (minus-t 1 (seconds 1)))
-  (max-t [x y] (if (>= (.toEpochMilli x) (.toEpochMilli y))
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
+  (inc [t] (+ t (seconds 1)))
+  (dec [t] (- 1 (seconds 1)))
+  (max [x y] (if (>= (.toEpochMilli x) (.toEpochMilli y))
                  x y))
-  (min-t [x y] (if (<= (.toEpochMilli x) (.toEpochMilli y))
+  (min [x y] (if (<= (.toEpochMilli x) (.toEpochMilli y))
                  x y))
-  (range-t
+  (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
                  to (take-while #(.isBefore % to))))
@@ -69,15 +90,23 @@
 
 (extend-type LocalDate
   ITimeArithmetic
-  (plus-t [t x] (.plusDays t x))
-  (minus-t [t x] (.minusDays t x))
-  (inc-t [t] (.plusDays t 1))
-  (dec-t [t] (.minusDays t 1))
-  (max-t [x y] (if (>= (.toEpochDay x) (.toEpochDay y)) x y))
-  (min-t [x y] (if (<= (.toEpochDay x) (.toEpochDay y)) x y))
-  (range-t
+  (+ [t x] (.plusDays t x))
+  (- [t x] (.minusDays t x))
+  (inc [t] (.plusDays t 1))
+  (dec [t] (.minusDays t 1))
+  (max [x y] (if (>= (.toEpochDay x) (.toEpochDay y)) x y))
+  (min [x y] (if (<= (.toEpochDay x) (.toEpochDay y)) x y))
+  (range
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
                  to (take-while #(.isBefore % to) )))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(.isBefore % to))))))
+
+
+(defn local-dates
+  "Return a lazy sequence of the local-dates (inclusive) that the
+  given interval spans."
+  [interval zone]
+  (range (local-date (first interval) zone)
+         (inc (local-date (second interval) zone))))
