@@ -30,8 +30,18 @@
   YearMonth
   (to-interval [date] :todo))
 
-(defn duration [interval]
-  (Duration/between (first interval) (second interval)))
+(defn duration
+  ([interval]
+   (Duration/between (first interval) (second interval)))
+  ([i1 i2]
+   (Duration/between (t/instant i1) (t/instant i2))))
+
+(defn local-dates
+  "Return a lazy sequence of the local-dates (inclusive) that the
+  given interval spans."
+  [interval zone]
+  (t/range (t/local-date (first interval) zone)
+           (t/inc (t/local-date (second interval) zone))))
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
@@ -168,17 +178,22 @@
 (def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
 (def concur? (complement disjoint?))
 
-;; Interval arithmetic
-
-#_(defn + )
-
 ;; Functions that make use of Allens' Interval Algebra
 
-(do
-  (defn partition-by-date [interval ^ZoneId zone]
-    (->> (t/local-dates interval zone)
-         (map #(to-interval % zone))
-         (map (partial relation interval))))
-  (partition-by-date
-   (interval (t/now) (t/+ (t/now) (t/days 20)))
-   (t/zone "Europe/London")))
+(defn intersection
+  "Return the interval representing the intersection of the given intervals. Returns nil if the two given intervals are disjoint."
+  [x y]
+  (case (code (relation x y))
+    \o (interval (first y) (second x))
+    \O (interval (first x) (second y))
+    (\s \f \d \e) x
+    (\S \F \D) y
+    nil))
+
+(defn partition-by-date
+  "Split the interval in to a lazy sequence of intervals, one for each local date."
+  [interval ^ZoneId zone]
+  (->> (local-dates interval zone)
+       (map #(to-interval % zone))
+       (map (partial intersection interval))
+       (remove nil?)))
