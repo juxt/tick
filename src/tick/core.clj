@@ -103,10 +103,12 @@
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(.isBefore % to))))))
 
-
-(defn local-dates
-  "Return a lazy sequence of the local-dates (inclusive) that the
-  given interval spans."
-  [interval zone]
-  (range (local-date (first interval) zone)
-         (inc (local-date (second interval) zone))))
+(extend-type Duration
+  ITimeArithmetic
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
+  (inc [t] (.plusSeconds t 1))
+  (dec [t] (.minusSeconds t 1))
+  ;; TODO: Copy with nanoseconds
+  #_(max [x y] (if (>= (.getSeconds x) (.getSeconds y)) x y))
+  #_(min [x y] (if (<= (.getSeconds x) (.getSeconds y)) x y)))

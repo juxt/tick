@@ -14,6 +14,9 @@
 ;; over performance. Where performance is critical, use tick.core and
 ;; friends.
 
+;; clojure.spec assertions are used to check correctness, but these
+;; are disabled by default.
+
 (defn nanos [n] (core/nanos n))
 (defn millis [n] (core/millis n))
 (defn seconds [n] (core/seconds n))
@@ -56,30 +59,33 @@
 
 (defn interval
   ([v1 v2]
-   {:post [(s/valid? :tick.interval/interval %)]}
+   {:post [(s/assert :tick.interval/interval %)]}
    (interval/interval v1 v2)))
 
 (defn to-interval [v zone]
-  {:post [(s/valid? :tick.interval/interval %)]}
+  {:post [(s/assert :tick.interval/interval %)]}
   (interval/to-interval v (core/zone zone)))
 
 (defn duration [interval]
-  (s/assert :tick.interval/interval interval)
+  {:pre [(s/assert :tick.interval/interval interval)]}
   (interval/duration interval))
 
-(defn partition-by-date [interval z]
-  (s/assert :tick.interval/interval interval)
-  (interval/partition-by-date interval (core/zone z)))
+(defn zone [z]
+  (core/zone z))
 
-(partition-by-date
- (interval (now) (+ (now) (days 2)))
- "Europe/London")
+(defn intersection [x y]
+  (interval/intersection x y))
+
+(defn partition-by-date [interval zone]
+  {:pre [(s/assert :tick.interval/interval interval)]}
+  (interval/partition-by-date interval (core/zone zone)))
 
 (defn local-dates
   "Return a lazy sequence of the local-dates (inclusive) that the
   given interval spans."
   [interval zone]
-  (core/local-dates))
+  {:pre [(s/assert :tick.interval/interval interval)]}
+  (interval/local-dates interval (core/zone zone)))
 
 ;; Assertions
 
