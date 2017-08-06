@@ -147,26 +147,26 @@
 
 ;; Operations on relations
 
-(defn complement
+(defn complement-relation
   "Return the complement of the general relation. The complement ~r of
   a relation r is the relation consisting of all basic relations not
   in r."
   [^GeneralRelation r]
   (assoc r :relations (remove (set (:relations r)) basic-relations)))
 
-(defn compose
+(defn compose-relation
   "Return the composition of r and s"
   [r s]
   (throw (new UnsupportedOperationException "Not yet implemented")))
 
-(defn converse
+(defn converse-relation
   "Return the converse of the given general relation. The converse !r
   of a relation r is the relation consisting of the converses of all
   basic relations in r."
   [^GeneralRelation r]
   (assoc r :relations (map conv (:relations r))))
 
-(defn intersection
+(defn intersection-relation
   "Return the intersection of the r with s"
   [^GeneralRelation r ^GeneralRelation s]
   (s/assert r #(instance? GeneralRelation %))
@@ -176,7 +176,7 @@
 ;; Useful relations
 
 (def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
-(def concur? (complement disjoint?))
+(def concur? (complement-relation disjoint?))
 
 ;; Functions that make use of Allens' Interval Algebra
 
@@ -189,6 +189,19 @@
     (\s \f \d \e) x
     (\S \F \D) y
     nil))
+
+(defn concurrencies
+  "Return a sequence of occurances where intervals coincide (having non-nil intersections)."
+  [& intervals]
+  (let [intervals (vec intervals)]
+    (for [xi (range (count intervals))
+          yi (range (count intervals))
+          :when (< xi yi)
+          :let [x (get intervals xi)
+                y (get intervals yi)
+                ins (intersection x y)]
+          :when ins]
+      {:x x :y y :intersection ins})))
 
 (defn partition-by-date
   "Split the interval in to a lazy sequence of intervals, one for each local date."
