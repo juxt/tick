@@ -1,5 +1,7 @@
 = Change Log
 
+== [0.3.0] tick.api added, containing public api
+
 == [0.2.0] Ticks on timelines are maps not times.
 
 - Facilitates meta-data on ticks.
