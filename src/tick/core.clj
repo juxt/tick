@@ -36,27 +36,28 @@
 (s/def ::instant #(instance? Instant %))
 
 (defprotocol IConstructors
+  (inst [_] "Make a java.util.Date instance.")
   (instant [_] "Make a java.time.Instant instance.")
-  (local-date [_] [_ zone] "Make a java.time.Instant instance.")
+  (date [_] [_ zone] "Make a java.time.LocalDate instance.")
   (zone [_] "Make a java.time.ZoneId instance."))
 
 (extend-protocol IConstructors
   Instant
   (instant [i] i)
-  (local-date
+  (date
     ([i] (throw (ex-info "Needs zone" {})))
     ([i zone] (.. i (atZone zone) toLocalDate)))
   String
   (instant [s] (Instant/from (.parse (DateTimeFormatter/ISO_INSTANT) s)))
-  (local-date
+  (date
     ([s] (LocalDate/parse s))
-    ([s zone] (local-date (instant s) zone)))
+    ([s zone] (date (instant s) zone)))
   (zone [s] (ZoneId/of s))
   Date
   (instant [d] (.toInstant d))
-  (local-date
+  (date
     ([d] (throw (ex-info "Needs zone" {})))
-    ([d zone] (local-date (instant d) zone)))
+    ([d zone] (date (instant d) zone)))
   ZoneId
   (zone [z] z)
   ZonedDateTime

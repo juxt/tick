@@ -51,20 +51,20 @@
 (defn instant [v]
   (core/instant v))
 
-(defn local-date
+(defn date
   ([v zone]
-   (core/local-date v zone))
+   (core/date v zone))
   ([v]
-   (core/local-date v)))
+   (core/date v)))
 
 (defn interval
   ([v1 v2]
    {:post [(s/assert :tick.interval/interval %)]}
    (interval/interval v1 v2)))
 
-(defn to-interval [v zone]
+(defn as-interval [v zone]
   {:post [(s/assert :tick.interval/interval %)]}
-  (interval/to-interval v (core/zone zone)))
+  (interval/as-interval v (core/zone zone)))
 
 (defn duration [interval]
   {:pre [(s/assert :tick.interval/interval interval)]}
@@ -80,12 +80,12 @@
   {:pre [(s/assert :tick.interval/interval interval)]}
   (interval/partition-by-date interval (core/zone zone)))
 
-(defn local-dates
-  "Return a lazy sequence of the local-dates (inclusive) that the
+(defn dates
+  "Return a lazy sequence of the dates (inclusive) that the
   given interval spans."
   [interval zone]
   {:pre [(s/assert :tick.interval/interval interval)]}
-  (interval/local-dates interval (core/zone zone)))
+  (interval/dates interval (core/zone zone)))
 
 ;; Assertions
 

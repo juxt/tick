@@ -5,20 +5,20 @@
   (:require
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
-   [tick.core :refer [instant zone local-date]]
+   [tick.core :refer [instant zone date]]
    [tick.interval :refer :all]))
 
 (s/check-asserts true)
 
-(deftest to-interval-test []
+(deftest as-interval-test []
   (is
    (=
     (interval "2017-08-19T23:00:00Z" "2017-08-20T23:00:00Z")
-    (to-interval (local-date "2017-08-20") (zone "Europe/London")))))
+    (as-interval (date "2017-08-20") (zone "Europe/London")))))
 
-(deftest local-dates-test []
+(deftest dates-test []
   (let [res
-        (local-dates (interval "2017-08-19T23:00:00Z" "2017-09-20T23:00:00Z") (zone "Europe/London"))]
+        (dates (interval "2017-08-19T23:00:00Z" "2017-09-20T23:00:00Z") (zone "Europe/London"))]
     (is (= 33 (count res)))
     (is (= "2017-08-20" (str (first res))))
     (is (= "2017-09-21" (str (last res))))))
