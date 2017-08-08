@@ -20,15 +20,15 @@
   [(t/instant v1) (t/instant v2)])
 
 (defprotocol ICoercions
-  (to-interval [_ zone] "Coercions to an interval"))
+  (as-interval [_ zone] "Coercions to an interval"))
 
 (extend-protocol ICoercions
   LocalDate
-  (to-interval [date zone]
+  (as-interval [date zone]
     (interval (.atStartOfDay date zone)
               (.atStartOfDay (t/inc date) zone)))
   YearMonth
-  (to-interval [date] :todo))
+  (as-interval [date] :todo))
 
 (defn duration
   ([interval]
@@ -36,12 +36,12 @@
   ([i1 i2]
    (Duration/between (t/instant i1) (t/instant i2))))
 
-(defn local-dates
-  "Return a lazy sequence of the local-dates (inclusive) that the
+(defn dates
+  "Return a lazy sequence of the dates (inclusive) that the
   given interval spans."
   [interval zone]
-  (t/range (t/local-date (first interval) zone)
-           (t/inc (t/local-date (second interval) zone))))
+  (t/range (t/date (first interval) zone)
+           (t/inc (t/date (second interval) zone))))
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
@@ -206,7 +206,7 @@
 (defn partition-by-date
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [interval ^ZoneId zone]
-  (->> (local-dates interval zone)
-       (map #(to-interval % zone))
+  (->> (dates interval zone)
+       (map #(as-interval % zone))
        (map (partial intersection interval))
        (remove nil?)))
