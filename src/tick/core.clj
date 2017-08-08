@@ -42,25 +42,34 @@
   (zone [_] "Make a java.time.ZoneId instance."))
 
 (extend-protocol IConstructors
+
   Instant
+  (inst [i] (Date/from i))
   (instant [i] i)
   (date
     ([i] (throw (ex-info "Needs zone" {})))
     ([i zone] (.. i (atZone zone) toLocalDate)))
+
   String
+  (inst [s] (inst (instant s)))
   (instant [s] (Instant/from (.parse (DateTimeFormatter/ISO_INSTANT) s)))
   (date
     ([s] (LocalDate/parse s))
     ([s zone] (date (instant s) zone)))
   (zone [s] (ZoneId/of s))
+
   Date
+  (inst [d] d)
   (instant [d] (.toInstant d))
   (date
     ([d] (throw (ex-info "Needs zone" {})))
     ([d zone] (date (instant d) zone)))
+
   ZoneId
   (zone [z] z)
+
   ZonedDateTime
+  (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt)))
 
 (defprotocol ITimeArithmetic
