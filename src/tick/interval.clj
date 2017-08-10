@@ -100,24 +100,6 @@
   ([i1 i2]
    (Duration/between (t/instant i1) (t/instant i2))))
 
-(defn dates
-  "Return a lazy sequence of the dates (inclusive) that the
-  given interval spans."
-  [interval]
-  (t/range
-   (t/date (first interval))
-   (cond-> (t/date (second interval))
-     (not (t/midnight? (second interval))) (t/inc))))
-
-(defn year-months
-  "Return a lazy sequence of the year-months (inclusive) that the
-  given interval spans."
-  [interval]
-  (t/range
-   (t/year-month (first interval))
-   (cond-> (t/year-month (second interval))
-     (not (t/midnight? (second interval))) (t/inc))))
-
 ;; Allen's Basic Relations
 
 (defn precedes? [x y]
@@ -277,6 +259,36 @@
       {:x x :y y :intersection ins})))
 
 ;; Useful functions that make use of the above.
+
+(defn dates
+  "Return a lazy sequence of the dates (inclusive) that the
+  given interval spans."
+  [ival]
+  (cond->
+      (t/range
+       (t/date (first ival))
+       (t/date (second ival)))
+    (intersection (interval (t/date (second ival))) ival) (concat [(t/date (second ival))])))
+
+(defn year-months
+  "Return a lazy sequence of the year-months (inclusive) that the
+  given interval spans."
+  [ival]
+  (cond->
+      (t/range
+       (t/year-month (first ival))
+       (t/year-month (second ival)))
+    (intersection (interval (t/year-month (second ival))) ival) (concat [(t/year-month (second ival))])))
+
+(defn years
+  "Return a lazy sequence of the years (inclusive) that the
+  given interval spans."
+  [ival]
+  (cond->
+      (t/range
+       (t/year (first ival))
+       (t/year (second ival)))
+    (intersection (interval (t/year (second ival))) ival) (concat [(t/year (second ival))])))
 
 (defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."

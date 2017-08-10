@@ -31,6 +31,29 @@
 #_(deftest today-test
   (is (t/today)))
 
+;; Dates test
+
+(deftest dates-test
+  (is (= 30 (count (t/dates "2017-09"))))
+  (is (= (t/date "2017-09-01") (first (t/dates "2017-09"))))
+  (is (= (t/date "2017-09-30") (last (t/dates "2017-09"))))
+  (is (= 31 (count (t/dates "2017-10"))))
+  (is (= 8 (count (t/dates (t/interval "2017-10-03" "2017-10-10")))))
+  (is (= [(t/date "2017-09-10")] (t/dates (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))))
+  (is (= 2 (count (t/year-months (t/interval "2017-09-10" "2017-10-10")))))
+  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019")))))
+  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019-02")))))
+  )
+
+#_(t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))
+
+#_(t/interval "2017-09-10T12:00" "2017-09-10T14:00")
+
+#_(t/dates (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))
+
+
+
 
 
 
@@ -76,9 +99,7 @@
  (t/end
   (t/year-month "2017-09")))
 
-#_(interval (t/year-month "2017-09"))
 
-#_(t/dates "2017-10")
 
 #_(t/interval "2017-09-10T14:00" "2017-10-30T08:00")
 
@@ -102,3 +123,15 @@
 
 
 ;;(partition-by-date )
+
+
+#_(-> (t/year-month "2017-09") t/interval second t/year-month t/inc t/start)
+
+#_(t/start (second (t/interval "2017-09")))
+
+
+#_(t/year-months (t/interval "2017-09"))
+
+#_(t/dates (t/interval "2017-09"))
+
+#_(range 10 10)
