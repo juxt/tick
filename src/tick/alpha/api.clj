@@ -94,6 +94,9 @@
 (defn year-months [interval]
   (interval/year-months (interval/interval interval)))
 
+(defn years [interval]
+  (interval/years (interval/interval interval)))
+
 (defn partition-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)

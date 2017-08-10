@@ -162,7 +162,7 @@
   (dec [_] "Decrement time")
   (max [_ _] "Return maximum")
   (min [_ _] "Return minimum")
-  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (inclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
+  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
 (extend-type Instant
   ITimeArithmetic
@@ -175,9 +175,9 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(not (.isAfter % to)))))
+                 to (take-while #(.isBefore % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(not (.isAfter % to)))))))
+                      to (take-while #(.isBefore % to))))))
 
 (extend-type LocalDate
   ITimeArithmetic
@@ -190,9 +190,9 @@
   (range
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
-                 to (take-while #(not (.isAfter % to)) )))
+                 to (take-while #(.isBefore % to) )))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
-                      to (take-while #(not (.isAfter % to)))))))
+                      to (take-while #(.isBefore % to))))))
 
 (extend-type LocalDateTime
   ITimeArithmetic
@@ -205,9 +205,9 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(not (.isAfter % to)) )))
+                 to (take-while #(.isBefore % to) )))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(not (.isAfter % to)))))))
+                      to (take-while #(.isBefore % to))))))
 
 (extend-type YearMonth
   ITimeArithmetic
@@ -216,7 +216,13 @@
   (inc [t] (.plusMonths t 1))
   (dec [t] (.minusMonths t 1))
   (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y)))
+  (min [x y] (if (neg? (compare x y)) x y))
+  (range
+    ([from] (iterate #(.plusMonths % 1) from))
+    ([from to] (cond->> (iterate #(.plusMonths % 1) from)
+                 to (take-while #(.isBefore % to) )))
+    ([from to step] (cond->> (iterate #(.plus % step) from)
+                      to (take-while #(.isBefore % to))))))
 
 (extend-type Year
   ITimeArithmetic
@@ -225,7 +231,13 @@
   (inc [t] (.plusYears t 1))
   (dec [t] (.minusYears t 1))
   (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y)))
+  (min [x y] (if (neg? (compare x y)) x y))
+  (range
+    ([from] (iterate #(.plusYears % 1) from))
+    ([from to] (cond->> (iterate #(.plusYears % 1) from)
+                 to (take-while #(.isBefore % to) )))
+    ([from to step] (cond->> (iterate #(.plus % step) from)
+                      to (take-while #(.isBefore % to))))))
 
 (extend-type Duration
   ITimeArithmetic
