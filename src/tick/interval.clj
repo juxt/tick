@@ -1,34 +1,98 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement])
+  (:refer-clojure :exclude [contains? complement partition-by group-by])
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
    [tick.core :as t])
   (:import
-   [java.time Duration ZoneId LocalDate YearMonth]))
+   [java.util Date]
+   [java.time Instant Duration ZoneId LocalDate LocalDateTime Year YearMonth ZoneId]))
+
+;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
 (s/def ::interval
   (s/and
-   (s/tuple :tick.core/instant :tick.core/instant)
-   #(.isBefore (first %) (second %))))
+   (s/or :local (s/tuple t/local? t/local?)
+         :non-local (s/tuple (comp not t/local?) (comp not t/local?)))
+   #(let [[_ [t1 t2]] %] (.isBefore t1 t2))))
+
+;; An interval can be between 2 local times or 2 non-local times.
+;; When there is a mix, an error occurs.
+;; The second interval must be after the first interval.
+
+(defn- make-interval
+  "Make an interval from unordered arguments. Arguments must both be
+  local, or both non-local (zoned)."
+  [v1 v2]
+  {:pre [(s/assert
+          (s/or :local (s/tuple t/local? t/local?)
+                :non-local (s/tuple (comp not t/local?) (comp not t/local?)))
+          [v1 v2])]
+   ;; Post condition must hold, and it is intentional that is cannot be disabled.
+   ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
+   :post [(.isBefore (first %) (second %))]}
+  (if (neg? (compare v1 v2))
+    [v1 v2]
+    [v2 v1]))
+
+(defn- join [ival1 ival2]
+  (make-interval
+   (t/min (first ival1) (first ival2))
+   (t/max (second ival1) (second ival2))))
+
+(defprotocol ISpan
+  (span [_] [_ _] "Return an interval from a bounded period of time."))
+
+(extend-protocol ISpan
+  LocalDate
+  (span
+    ([date] (make-interval (t/start date) (t/end date)))
+    ([date1 date2] (join (span date1) (span date2))))
+
+  YearMonth
+  (span
+    ([ym] (span (t/start ym) (t/end ym)))
+    ([ym v] (span (t/start ym) (t/end v))))
+
+  Year
+  (span
+    ([y] (span (t/start y) (t/end y)))
+    ([y v] (span (t/start y) (t/end v))))
+
+  clojure.lang.PersistentVector
+  (span
+    ([v] v)
+    ([v1 v2] (join (span v1) (span v2))))
+
+  LocalDateTime
+  (span
+    ([dt] [dt dt])
+    ([dt1 dt2] (join (span dt1) (span dt2))))
+
+  Instant
+  (span
+    ([i] [i i])
+    ([i1 i2] (join (span i1) (span i2))))
+
+  String
+  (span
+    ([s] (span (t/parse s)))
+    ([s1 s2] (join (span s1) (span s2))))
+
+  Date
+  (span
+    ([d] [(t/instant d) (t/instant d)])
+    ([d1 d2] (join (span d1) (span d2)))))
 
 (defn interval
-  "Make an interval from arguments."
-  [v1 v2]
-  [(t/instant v1) (t/instant v2)])
+  ([v] (span v))
+  ([v1 & args] (reduce span v1 args)))
 
-(defprotocol ICoercions
-  (as-interval [_ zone] "Coercions to an interval"))
-
-(extend-protocol ICoercions
-  LocalDate
-  (as-interval [date zone]
-    (interval (.atStartOfDay date zone)
-              (.atStartOfDay (t/inc date) zone)))
-  YearMonth
-  (as-interval [date] :todo))
+(defn at-zone [[t1 t2] ^ZoneId zone]
+  [(t/at-zone t1 zone)
+   (t/at-zone t2 zone)])
 
 (defn duration
   ([interval]
@@ -39,11 +103,20 @@
 (defn dates
   "Return a lazy sequence of the dates (inclusive) that the
   given interval spans."
-  [interval zone]
-  (t/range (t/date (first interval) zone)
-           (t/inc (t/date (second interval) zone))))
+  [interval]
+  (t/range
+   (t/date (first interval))
+   (cond-> (t/date (second interval))
+     (not (t/midnight? (second interval))) (t/inc))))
 
-;; Use of Allen's Interval Algebra from an idea by Eric Evans.
+(defn year-months
+  "Return a lazy sequence of the year-months (inclusive) that the
+  given interval spans."
+  [interval]
+  (t/range
+   (t/year-month (first interval))
+   (cond-> (t/year-month (second interval))
+     (not (t/midnight? (second interval))) (t/inc))))
 
 ;; Allen's Basic Relations
 
@@ -184,8 +257,8 @@
   "Return the interval representing the intersection of the given intervals. Returns nil if the two given intervals are disjoint."
   [x y]
   (case (code (relation x y))
-    \o (interval (first y) (second x))
-    \O (interval (first x) (second y))
+    \o (make-interval (first y) (second x))
+    \O (make-interval (first x) (second y))
     (\s \f \d \e) x
     (\S \F \D) y
     nil))
@@ -203,10 +276,24 @@
           :when ins]
       {:x x :y y :intersection ins})))
 
-(defn partition-by-date
+;; Useful functions that make use of the above.
+
+(defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
-  [interval ^ZoneId zone]
-  (->> (dates interval zone)
-       (map #(as-interval % zone))
-       (map (partial intersection interval))
+  [f ival]
+  (->> (f ival)
+       (map interval)
+       (map (partial intersection ival))
        (remove nil?)))
+
+(defn group-by
+  "Split the interval in to a lazy sequence of intervals, one for each local date."
+  [f ival]
+  (let [ivals (f ival)]
+    (into {}
+          (remove nil?
+                  (map (fn [k v] (when v [k v]))
+                       ivals
+                       (->> ivals
+                            (map interval)
+                            (map (partial intersection ival))))))))
