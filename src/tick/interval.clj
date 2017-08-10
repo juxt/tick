@@ -90,7 +90,10 @@
   ([v] (span v))
   ([v1 & args] (reduce span v1 args)))
 
-(defn at-zone [[t1 t2] ^ZoneId zone]
+(defn at-zone
+  "Put the given interval at the given zone."
+  [[t1 t2 :as interval] ^ZoneId zone]
+  (s/assert ::interval interval)
   [(t/at-zone t1 zone)
    (t/at-zone t2 zone)])
 

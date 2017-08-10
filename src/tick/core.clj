@@ -31,9 +31,17 @@
 (defn weeks [n]
   (Duration/ofDays (* 7 n)))
 
-(defn now [] (Instant/now))
+(def ^{:dynamic true} *clock* nil)
 
-(defn today [] (LocalDate/now))
+(defn now []
+  (if *clock*
+    (Instant/now *clock*)
+    (Instant/now)))
+
+(defn today []
+  (if *clock*
+    (LocalDate/now *clock*)
+    (LocalDate/now)))
 
 (s/def ::instant #(instance? Instant %))
 

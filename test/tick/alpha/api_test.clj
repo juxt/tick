@@ -28,8 +28,15 @@
 
 ;; Constructors
 
-#_(deftest today-test
-  (is (t/today)))
+(deftest today-test
+  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+    (is (= (t/date "2017-08-08") (t/today)))
+    (is (= (t/date "2017-08-07") (t/yesterday)))
+    (is (= (t/date "2017-08-09") (t/tomorrow)))))
+
+(deftest now-test
+  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+    (is (= (t/time "2017-08-08T12:00:00Z") (t/now)))))
 
 ;; Dates test
 
@@ -43,18 +50,13 @@
   (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))))
   (is (= 2 (count (t/year-months (t/interval "2017-09-10" "2017-10-10")))))
   (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019")))))
-  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019-02")))))
-  )
+  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019-02"))))))
 
 #_(t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))
 
 #_(t/interval "2017-09-10T12:00" "2017-09-10T14:00")
 
 #_(t/dates (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))
-
-
-
-
 
 
 #_(t/time "2017-08-19T02:00:00Z")

@@ -69,6 +69,11 @@
 (defn end [v] (core/end v))
 (defn midnight? [v] (core/midnight? v))
 
+;; Zones
+
+(def UTC (zone "UTC"))
+(def LONDON (zone "Europe/London"))
+
 ;; Intervals
 
 (defn interval
@@ -113,18 +118,8 @@
 (defn group-by-date [interval]
   (group-by dates interval))
 
+;; Fixing the clock used for `today` and `now`.
 
-#_(defn dates
-  "Return a lazy sequence of the dates (inclusive) that the
-  given interval spans."
-  [interval zone]
-  {:pre [(s/assert :tick.interval/interval interval)]}
-  (interval/dates interval (core/zone zone)))
-
-;; Assertions
-
-(defn assert-interval
-  "Assert an interval without requiring client knowledge of the spec
-  keyword (which may change)."
-  [interval]
-  (s/assert :tick.interval/interval interval))
+(defmacro with-clock [^java.time.Clock clock & body]
+  `(binding [tick.core/*clock* ~clock]
+     ~@body))
