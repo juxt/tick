@@ -333,22 +333,27 @@
 
 ;; TODO: hours, minutes, seconds
 
+(defn- augment-interval
+  "Take any additional data in the old interval and apply to the new interval"
+  [new-ival old-ival]
+  (vec (concat (take 2 new-ival) (drop 2 old-ival))))
+
 (defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [f ival]
   (->> (f ival)
        (map interval)
        (map (partial intersection ival))
+       (map #(augment-interval % ival))
        (remove nil?)))
 
 (defn group-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [f ival]
   (let [ivals (f ival)]
-    (into {}
-          (remove nil?
-                  (map (fn [k v] (when v [k v]))
-                       ivals
-                       (->> ivals
-                            (map interval)
-                            (map (partial intersection ival))))))))
+    (->> ivals
+         (map interval)
+         (map (partial intersection ival))
+         (map (fn [k v] (when v [k (list (augment-interval v ival))])) ivals)
+         (remove nil?)
+         (into {}))))
