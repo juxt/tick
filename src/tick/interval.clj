@@ -12,8 +12,8 @@
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
-(s/def ::local (s/tuple t/local? t/local?))
-(s/def ::non-local (s/tuple (comp not t/local?) (comp not t/local?)))
+(s/def ::local (s/and #(t/local? (first %)) #(t/local? (second %))))
+(s/def ::non-local (s/and #(not (t/local? (first %))) #(not (t/local? (second %)))))
 
 (s/def ::interval
   (s/and
@@ -44,10 +44,11 @@
    (t/min (first ival1) (first ival2))
    (t/max (second ival1) (second ival2))))
 
-(defn local? [ival]
-  (and
-   (t/local? (first ival))
-   (t/local? (second ival))))
+(extend-protocol t/ITime
+  clojure.lang.PersistentVector
+  (local? [ival] (and
+                  (t/local? (first ival))
+                  (t/local? (second ival)))))
 
 (defprotocol ISpan
   (span [_] [_ _] "Return an interval from a bounded period of time."))
@@ -73,7 +74,7 @@
     ([v]
      (if (= 2 (count v))
        (span (first v) (second v))
-       (vec (concat [(span (first v) (second v))]
+       (vec (concat (span (first v) (second v))
                     (drop 2 v)))))
     ([v1 v2] (join (span v1) (span v2))))
 
@@ -101,7 +102,7 @@
   ([v] (span v))
   ([v1 & args] (reduce span v1 args)))
 
-(defn at-zone
+(defn- interval-at-zone
   "Put the given interval at the given zone."
   [interval ^ZoneId zone]
   (s/assert ::interval interval)
@@ -109,7 +110,7 @@
       (update 0 t/at-zone zone)
       (update 1 t/at-zone zone)))
 
-(defn local-interval
+(defn- local-interval
   "Put the given interval at the given zone and convert to local time."
   ([interval]
    (s/assert ::interval interval)
@@ -121,6 +122,13 @@
    (-> interval
        (update 0 t/localtime zone)
        (update 1 t/localtime zone))))
+
+(extend-protocol t/IAtZone
+  clojure.lang.PersistentVector
+  (at-zone [interval zone] (interval-at-zone interval zone))
+  (localtime
+    ([interval] (local-interval interval))
+    ([interval zone] (local-interval interval zone))))
 
 (defn duration
   ([interval]

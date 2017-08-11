@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - inc dec max min range time partition-by group-by])
+  (:refer-clojure :exclude [+ - inc dec max min range time partition-by group-by int long])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
@@ -49,20 +49,31 @@
 
 (def range core/range)
 
+(defn int [arg] (core/int arg))
+(defn long [arg] (core/long arg))
+
 ;; Constructors
 
-(defn date [v] (core/date v))
+(defn date
+  ([] (core/date (today)))
+  ([v] (core/date v)))
 (defn inst [v] (core/inst v))
 (defn instant [v] (core/instant v))
 (defn offset-date-time [v] (core/offset-date-time v))
-(defn year [v] (core/year v))
-(defn year-month [v] (core/year-month v))
+(defn year
+  ([] (core/year (date)))
+  ([v] (core/year v)))
+(defn year-month
+  ([] (core/year-month (date)))
+  ([v] (core/year-month v)))
 (defn zone [z] (core/zone z))
 (defn zoned-date-time [z] (core/zoned-date-time z))
 
 ;; Time
 
-(defn time [v] (core/time v))
+(defn time
+  ([] (core/time (now)))
+  ([v] (core/time v)))
 (defn on [t d] (core/on (time t) (date d)))
 (defn at [d t] (core/at (date d) (time t)))
 (defn start [v] (core/start v))
@@ -73,6 +84,10 @@
 
 (defn at-zone [t z]
   (core/at-zone t (zone z)))
+
+(defn localtime
+  ([v] (core/localtime v))
+  ([v z] (core/localtime v (zone z))))
 
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
@@ -87,12 +102,6 @@
 ;; An interval is just a vector with at least 2 entries. The 3rd entry
 ;; onwards are free to use by the caller.
 (defn interval? [v] (and (vector? v) (>= (count v) 2)))
-
-(defn interval-at-zone [interval z]
-  (interval/at-zone (interval/interval interval) (zone z)))
-
-(defn local-interval [interval z]
-  (interval/local-interval (interval/interval interval) (zone z)))
 
 (defn duration [interval]
   (let [interval (interval/interval interval)]
