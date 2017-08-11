@@ -71,6 +71,9 @@
 
 ;; Zones
 
+(defn at-zone [t z]
+  (core/at-zone t (zone z)))
+
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
 
@@ -85,6 +88,12 @@
 ;; onwards are free to use by the caller.
 (defn interval? [v] (and (vector? v) (>= (count v) 2)))
 
+(defn interval-at-zone [interval z]
+  (interval/at-zone (interval/interval interval) (zone z)))
+
+(defn local-interval [interval z]
+  (interval/local-interval (interval/interval interval) (zone z)))
+
 (defn duration [interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
@@ -93,14 +102,22 @@
 (defn intersection [x y]
   (interval/intersection x y))
 
-(defn dates [interval]
-  (interval/dates (interval/interval interval)))
+;; Useful functions
 
-(defn year-months [interval]
-  (interval/year-months (interval/interval interval)))
+(defn dates-over [interval]
+  (let [interval (interval/interval interval)]
+    (s/assert :tick.interval/interval interval)
+    (interval/dates-over interval)))
 
-(defn years [interval]
-  (interval/years (interval/interval interval)))
+(defn year-months-over [interval]
+  (let [interval (interval/interval interval)]
+    (s/assert :tick.interval/interval interval)
+    (interval/year-months-over interval)))
+
+(defn years-over [interval]
+  (let [interval (interval/interval interval)]
+    (s/assert :tick.interval/interval interval)
+    (interval/years-over interval)))
 
 (defn partition-by [f interval]
   (let [interval (interval/interval interval)]
@@ -108,7 +125,7 @@
     (interval/partition-by f interval)))
 
 (defn partition-by-date [interval]
-  (partition-by dates interval))
+  (partition-by interval/dates-over interval))
 
 (defn group-by [f interval]
   (let [interval (interval/interval interval)]
@@ -116,7 +133,7 @@
     (sort (interval/group-by f interval))))
 
 (defn group-by-date [interval]
-  (group-by dates interval))
+  (group-by interval/dates-over interval))
 
 ;; Fixing the clock used for `today` and `now`.
 
