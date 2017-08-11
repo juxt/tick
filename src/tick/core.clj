@@ -170,7 +170,14 @@
   (dec [_] "Decrement time")
   (max [_ _] "Return maximum")
   (min [_ _] "Return minimum")
-  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
+  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity.")
+  (int [_] "Return value as integer")
+  (long [_] "Return value as long"))
+
+(extend-protocol ITimeArithmetic
+  Object
+  (int [v] (clojure.core/int v))
+  (long [v] (clojure.core/long v)))
 
 (extend-type Instant
   ITimeArithmetic

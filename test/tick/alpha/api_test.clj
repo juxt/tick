@@ -56,13 +56,15 @@
 ;; London timezone. Here we define a holiday between Monday 31st July
 ;; and Friday 11th August (inclusive).
 
-#_(let [holidays [;; 31st July to 11th August inclusive
-                [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"]
+(let [holidays [;; 31st July to 11th August inclusive
+                [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00" "Sicily"]
                 ;; 21st to 24th April inclusive
-                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]]]
+                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00" "Isle of Wight"]]]
   (->> holidays
        (map t/interval)
-       #_(map t/partition-by-date)))
+       (map #(t/localtime % t/LONDON))
+       (map t/group-by-date)
+       ))
 
 #_((t/at-zone (t/interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
 
