@@ -56,15 +56,20 @@
 ;; London timezone. Here we define a holiday between Monday 31st July
 ;; and Friday 11th August (inclusive).
 
+
 (let [holidays [;; 31st July to 11th August inclusive
                 [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00" "Sicily"]
                 ;; 21st to 24th April inclusive
-                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00" "Isle of Wight"]]]
+                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00" "Isle of Wight"]
+                ;; overlapping holiday
+                (conj (t/interval "2017-08-09" "2017-08-11") "Overlapping")
+
+                ]]
   (->> holidays
        (map t/interval)
        (map #(t/localtime % t/LONDON))
        (map t/group-by-date)
-       ))
+       (apply merge-with concat)))
 
 #_((t/at-zone (t/interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
 

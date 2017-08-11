@@ -57,14 +57,26 @@
 (defn date
   ([] (core/date (today)))
   ([v] (core/date v)))
-(defn inst [v] (core/inst v))
-(defn instant [v] (core/instant v))
-(defn offset-date-time [v] (core/offset-date-time v))
+(defn day
+  ([] (core/day (today)))
+  ([v] (core/day v)))
+(defn inst
+  ([] (core/inst (now)))
+  ([v] (core/inst v)))
+(defn instant
+  ([] (core/instant (now)))
+  ([v] (core/instant v)))
+(defn offset-date-time
+  ([] (core/offset-date-time (now)))
+  ([v] (core/offset-date-time v)))
+(defn month
+  ([] (core/month (today)))
+  ([v] (core/month v)))
 (defn year
-  ([] (core/year (date)))
+  ([] (core/year (today)))
   ([v] (core/year v)))
 (defn year-month
-  ([] (core/year-month (date)))
+  ([] (core/year-month (today)))
   ([v] (core/year-month v)))
 (defn zone [z] (core/zone z))
 (defn zoned-date-time [z] (core/zoned-date-time z))
@@ -139,7 +151,7 @@
 (defn group-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
-    (sort (interval/group-by f interval))))
+    (interval/group-by f interval)))
 
 (defn group-by-date [interval]
   (group-by interval/dates-over interval))

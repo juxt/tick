@@ -1,9 +1,10 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - inc dec max min range time])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long])
   (:require
-   [clojure.spec.alpha :as s])
+   [clojure.spec.alpha :as s]
+   [clojure.string :as str])
   (:import
    [java.util Date]
    [java.time Clock ZoneId ZoneOffset Instant Duration DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
@@ -46,7 +47,7 @@
 (s/def ::instant #(instance? Instant %))
 
 (defn- parse-day [input]
-  (condp re-matches input
+  (condp re-matches (str/lower-case input)
     #"(mon)(day)?" DayOfWeek/MONDAY
     #"(tue)(s|sday)?" DayOfWeek/TUESDAY
     #"(wed)(s|nesday)?" DayOfWeek/WEDNESDAY
@@ -56,7 +57,7 @@
     #"(sun)(day)?" DayOfWeek/SUNDAY))
 
 (defn- parse-month [input]
-  (condp re-matches input
+  (condp re-matches (str/lower-case input)
     #"(jan)(uary)?" Month/JANUARY
     #"(feb)(ruary)?" Month/FEBRUARY
     #"(mar)(ch)?" Month/MARCH
@@ -103,8 +104,12 @@
 
 (defprotocol IConstructors
   (date [_] "Make a java.time.LocalDate instance.")
+  (day [_] "Make a java.time.DayOfWeek instance.")
   (inst [_] "Make a java.util.Date instance.")
   (instant [_] "Make a java.time.Instant instance.")
+  (int [_] "Return value as integer")
+  (long [_] "Return value as long")
+  (month [_] "Make a java.time.Month instance.")
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (year [_] "Make a java.time.Year instance.")
   (year-month [_] "Make a java.time.YearMonth instance.")
@@ -112,28 +117,61 @@
   (zoned-date-time [_] "Make a java.time.ZonedDateTime instance."))
 
 (extend-protocol IConstructors
+  Object
+  (int [v] (clojure.core/int v))
+  (long [v] (clojure.core/long v))
+
+  clojure.lang.Fn
+  (date [f] (date (f)))
+  (day [f] (day (f)))
+  (inst [f] (inst (f)))
+  (instant [f] (instant (f)))
+  (int [f] (int (f)))
+  (long [f] (long (f)))
+  (month [f] (month (f)))
+  (offset-date-time [f] (offset-date-time (f)))
+  (year [f] (year (f)))
+  (year-month [f] (year-month (f)))
+  (zone [f] (zone (f)))
+  (zoned-date-time [f] (zone (f)))
 
   Instant
   (inst [i] (Date/from i))
   (instant [i] i)
   (date [i] (date (zoned-date-time i)))
+  (day [i] (day (date i)))
+  (month [d] (month (date d)))
   (zoned-date-time [i] (.atZone i ZoneOffset/UTC))
+  (int [i] (.getNano i))
+  (long [i] (.getEpochSecond i))
 
   String
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
+  (day [s] (parse-day s))
   (date [s] (date (parse s)))
+  (month [s] (parse-month s))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
   (zone [s] (ZoneId/of s))
+  (int [s] (.getNano (instant s)))
+  (long [s] (.getEpochSecond (instant s)))
 
   Number
+  (day [n] (DayOfWeek/of n))
+  (month [n] (Month/of n))
+  (instant [n] (Instant/ofEpochSecond n))
   (year [n] (Year/of n))
 
   LocalDate
   (date [d] d)
+  (day [d] (.getDayOfWeek d))
+  (month [d] (Month/from d))
   (year-month [d] (YearMonth/of (.getYear d) (.getMonthValue d)))
   (year [d] (Year/of (.getYear d)))
+
+  Month
+  (int [m] (.getValue m))
 
   LocalDateTime
   (date [dt] (.toLocalDate dt))
@@ -153,6 +191,7 @@
 
   Year
   (year [y] y)
+  (int [y] (.getValue y))
 
   ZoneId
   (zone [z] z)
@@ -170,14 +209,7 @@
   (dec [_] "Decrement time")
   (max [_ _] "Return maximum")
   (min [_ _] "Return minimum")
-  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity.")
-  (int [_] "Return value as integer")
-  (long [_] "Return value as long"))
-
-(extend-protocol ITimeArithmetic
-  Object
-  (int [v] (clojure.core/int v))
-  (long [v] (clojure.core/long v)))
+  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
 (extend-type Instant
   ITimeArithmetic
