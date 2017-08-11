@@ -12,10 +12,12 @@
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
+(s/def ::local (s/tuple t/local? t/local?))
+(s/def ::non-local (s/tuple (comp not t/local?) (comp not t/local?)))
+
 (s/def ::interval
   (s/and
-   (s/or :local (s/tuple t/local? t/local?)
-         :non-local (s/tuple (comp not t/local?) (comp not t/local?)))
+   (s/or :local ::local :non-local ::non-local)
    #(let [[_ [t1 t2]] %] (.isBefore t1 t2))))
 
 ;; An interval can be between 2 local times or 2 non-local times.
@@ -42,6 +44,11 @@
    (t/min (first ival1) (first ival2))
    (t/max (second ival1) (second ival2))))
 
+(defn local? [ival]
+  (and
+   (t/local? (first ival))
+   (t/local? (second ival))))
+
 (defprotocol ISpan
   (span [_] [_ _] "Return an interval from a bounded period of time."))
 
@@ -63,7 +70,11 @@
 
   clojure.lang.PersistentVector
   (span
-    ([v] v)
+    ([v]
+     (if (= 2 (count v))
+       (span (first v) (second v))
+       (vec (concat [(span (first v) (second v))]
+                    (drop 2 v)))))
     ([v1 v2] (join (span v1) (span v2))))
 
   LocalDateTime
@@ -92,10 +103,24 @@
 
 (defn at-zone
   "Put the given interval at the given zone."
-  [[t1 t2 :as interval] ^ZoneId zone]
+  [interval ^ZoneId zone]
   (s/assert ::interval interval)
-  [(t/at-zone t1 zone)
-   (t/at-zone t2 zone)])
+  (-> interval
+      (update 0 t/at-zone zone)
+      (update 1 t/at-zone zone)))
+
+(defn local-interval
+  "Put the given interval at the given zone and convert to local time."
+  ([interval]
+   (s/assert ::interval interval)
+   (-> interval
+       (update 0 t/localtime)
+       (update 1 t/localtime)))
+  ([interval ^ZoneId zone]
+   (s/assert ::interval interval)
+   (-> interval
+       (update 0 t/localtime zone)
+       (update 1 t/localtime zone))))
 
 (defn duration
   ([interval]
@@ -263,17 +288,20 @@
 
 ;; Useful functions that make use of the above.
 
-(defn dates
-  "Return a lazy sequence of the dates (inclusive) that the
-  given interval spans."
+(defn dates-over
+  "Return a lazy sequence of the dates (inclusive) that the given
+  (local) interval spans. Must be a local interval, since calendar
+  dates are a local construct."
   [ival]
+  {:pre [(s/assert ::local ival)]}
   (cond->
       (t/range
        (t/date (first ival))
        (t/date (second ival)))
+    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
     (intersection (interval (t/date (second ival))) ival) (concat [(t/date (second ival))])))
 
-(defn year-months
+(defn year-months-over
   "Return a lazy sequence of the year-months (inclusive) that the
   given interval spans."
   [ival]
@@ -281,17 +309,21 @@
       (t/range
        (t/year-month (first ival))
        (t/year-month (second ival)))
+    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
     (intersection (interval (t/year-month (second ival))) ival) (concat [(t/year-month (second ival))])))
 
-(defn years
-  "Return a lazy sequence of the years (inclusive) that the
-  given interval spans."
+(defn years-over
+  "Return a lazy sequence of the years (inclusive) that the given
+  interval spans."
   [ival]
   (cond->
       (t/range
        (t/year (first ival))
        (t/year (second ival)))
+    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
     (intersection (interval (t/year (second ival))) ival) (concat [(t/year (second ival))])))
+
+;; TODO: hours, minutes, seconds
 
 (defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."

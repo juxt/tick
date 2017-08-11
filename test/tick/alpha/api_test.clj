@@ -40,17 +40,39 @@
 
 ;; Dates test
 
-(deftest dates-test
-  (is (= 30 (count (t/dates "2017-09"))))
-  (is (= (t/date "2017-09-01") (first (t/dates "2017-09"))))
-  (is (= (t/date "2017-09-30") (last (t/dates "2017-09"))))
-  (is (= 31 (count (t/dates "2017-10"))))
-  (is (= 8 (count (t/dates (t/interval "2017-10-03" "2017-10-10")))))
-  (is (= [(t/date "2017-09-10")] (t/dates (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))))
-  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))))
-  (is (= 2 (count (t/year-months (t/interval "2017-09-10" "2017-10-10")))))
-  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019")))))
-  (is (= 3 (count (t/years (t/interval "2017-09-10T12:00" "2019-02"))))))
+(deftest dates-over-test
+  (is (= 30 (count (t/dates-over "2017-09"))))
+  (is (= (t/date "2017-09-01") (first (t/dates-over "2017-09"))))
+  (is (= (t/date "2017-09-30") (last (t/dates-over "2017-09"))))
+  (is (= 31 (count (t/dates-over "2017-10"))))
+  (is (= 8 (count (t/dates-over (t/interval "2017-10-03" "2017-10-10")))))
+  (is (= [(t/date "2017-09-10")] (t/dates-over (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/dates-over (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))))
+  (is (= 2 (count (t/year-months-over (t/interval "2017-09-10" "2017-10-10")))))
+  (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019")))))
+  (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019-02"))))))
+
+;; Imagine we have some holidays defined as a pair of insts, in the
+;; London timezone. Here we define a holiday between Monday 31st July
+;; and Friday 11th August (inclusive).
+
+#_(let [holidays [;; 31st July to 11th August inclusive
+                [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"]
+                ;; 21st to 24th April inclusive
+                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]]]
+  (->> holidays
+       (map t/interval)
+       #_(map t/partition-by-date)))
+
+#_((t/at-zone (t/interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
+
+#_(t/interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
+
+#_(t/partition-by-date
+ (t/interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
+ )
+
+#_(t/interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"])
 
 #_(t/dates (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))
 

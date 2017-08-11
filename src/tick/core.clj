@@ -337,14 +337,27 @@
   (.isZero (Duration/between t (start (date t)))))
 
 (defprotocol IAtZone
-  (at-zone [t zone] "Put time at zone"))
+  (at-zone [t zone] "Put time at zone")
+  (localtime [t] [t zone] "Convert to local time at zone."))
 
 (extend-protocol IAtZone
   LocalDateTime
   (at-zone [t zone] (.atZone t zone))
+  (localtime
+    ([t] t)
+    ([t zone] (localtime (at-zone t zone))))
   Instant
   (at-zone [t zone] (.atZone t zone))
+  (localtime
+    ([t] (throw (ex-info "Error, zone required" {})))
+    ([t zone] (localtime (at-zone t zone))))
   ZonedDateTime
   (at-zone [t zone] (.withZoneSameInstant t zone))
+  (localtime
+    ([t] (.toLocalDateTime t))
+    ([t zone] (localtime (at-zone t zone))))
   Date
-  (at-zone [t zone] (at-zone (instant t) zone)))
+  (at-zone [t zone] (at-zone (instant t) zone))
+  (localize
+    ([t] (throw (ex-info "Error, zone required" {})))
+    ([t zone] (localtime (at-zone t zone)))))
