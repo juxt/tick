@@ -67,9 +67,14 @@
                 ]]
   (->> holidays
        (map t/interval)
-       (map #(t/localtime % t/LONDON))
+       (map #(t/to-local % t/LONDON))
        (map t/group-by-date)
        (apply merge-with concat)))
+
+
+#_(t/years-over (t/interval ["2017-12-31" "2018-01-01"]))
+
+#_(t/partition-by-date)
 
 #_((t/at-zone (t/interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
 

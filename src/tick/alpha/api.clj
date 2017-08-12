@@ -97,9 +97,9 @@
 (defn at-zone [t z]
   (core/at-zone t (zone z)))
 
-(defn localtime
-  ([v] (core/localtime v))
-  ([v z] (core/localtime v (zone z))))
+(defn to-local
+  ([v] (core/to-local v))
+  ([v z] (core/to-local v (zone z))))
 
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
