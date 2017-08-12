@@ -29,8 +29,11 @@
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
 
-(defn + [arg & args]
-  (reduce #(core/+ %1 %2) arg args))
+(defn +
+  ([] Duration/ZERO)
+  ([arg] arg)
+  ([arg & args]
+   (reduce #(core/+ %1 %2) arg args)))
 
 (defn - [arg & args]
   (reduce #(core/- %1 %2) arg args))
