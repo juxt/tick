@@ -115,18 +115,18 @@
   ([interval]
    (s/assert ::interval interval)
    (-> interval
-       (update 0 t/localtime)
-       (update 1 t/localtime)))
+       (update 0 t/to-local)
+       (update 1 t/to-local)))
   ([interval ^ZoneId zone]
    (s/assert ::interval interval)
    (-> interval
-       (update 0 t/localtime zone)
-       (update 1 t/localtime zone))))
+       (update 0 t/to-local zone)
+       (update 1 t/to-local zone))))
 
 (extend-protocol t/IAtZone
   clojure.lang.PersistentVector
   (at-zone [interval zone] (interval-at-zone interval zone))
-  (localtime
+  (to-local
     ([interval] (local-interval interval))
     ([interval zone] (local-interval interval zone))))
 
