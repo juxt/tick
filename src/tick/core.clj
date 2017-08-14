@@ -175,6 +175,7 @@
 
   LocalDateTime
   (date [dt] (.toLocalDate dt))
+  (day [dt] (day (date dt)))
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
 
