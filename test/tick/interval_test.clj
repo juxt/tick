@@ -1,38 +1,15 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval-test
-  (:refer-clojure :exclude [contains? complement partition-by group-by])
+  (:refer-clojure :exclude [contains? complement partition-by group-by disj])
   (:require
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
    [tick.core :as t]
+   [tick.cal :as cal]
    [tick.interval :refer :all]))
 
 (s/check-asserts true)
-
-;;
-;;(t/range "2017-08-03")
-
-;;(interval "2017-08-01" "2017-08-03")
-
-;;(t/time "2017-08-19T23:00:00Z")
-
-
-
-#_(deftest bounds-test []
-  (is
-   (=
-    (interval "2017-08-19T23:00:00Z" "2017-08-20T23:00:00Z")
-    (bounds (date "2017-08-20") #_(zone "Europe/London")))))
-
-#_(deftest dates-test []
-  (let [res
-        (dates (interval "2017-08-19T23:00:00Z" "2017-09-20T23:00:00Z") (zone "Europe/London"))]
-    (is (= 33 (count res)))
-    (is (= "2017-08-20" (str (first res))))
-    (is (= "2017-09-21" (str (last res))))))
-
-;; Allen's Interval Algebra
 
 (deftest basic-relations-test
   (is (= (count basic-relations) 13))
@@ -115,23 +92,6 @@
           [(instants 1) (instants 2)])
          contains?)))
 
-(instants 1)
-(instants 2)
-
-(interval (instants 1) (instants 2))
-
-(interval (instants 0) (instants 2))
-
-(interval (instants 1) (instants 3))
-
-(intersection
- (interval (instants 0) (instants 2))
- (interval (instants 1) (instants 3)))
-
-
-(relation (interval (instants 0) (instants 2))
-          (interval (instants 1) (instants 3)))
-
 (deftest intersection-test []
   (is
    (=
@@ -179,3 +139,158 @@
     (intersection
      (interval (instants 1) (instants 3))
      (interval (instants 0) (instants 3))))))
+
+;; Sequence tests
+
+;; TODO: Support this: (interval (t/now) (t/seconds 10))
+;; TODO: Don't allow this: (interval (t/now)) -- returns an illegal interval
+
+(deftest ordered-disjoint-intervals?-test
+  (is
+   (ordered-disjoint-intervals? []))
+  (is
+   (ordered-disjoint-intervals?
+    [(interval (t/instant "2017-07-30T09:00:00Z")
+               (t/instant "2017-07-30T10:00:00Z"))]))
+  (is
+   (ordered-disjoint-intervals?
+    [(interval (t/instant "2017-07-30T09:00:00Z")
+               (t/instant "2017-07-30T10:00:00Z"))
+     (interval (t/instant "2017-07-30T11:00:00Z")
+               (t/instant "2017-07-30T13:00:00Z"))]))
+  (is
+   (ordered-disjoint-intervals?
+    [(interval (t/instant "2017-07-30T09:00:00Z")
+               (t/instant "2017-07-30T11:00:00Z"))
+     (interval (t/instant "2017-07-30T11:00:00Z")
+               (t/instant "2017-07-30T13:00:00Z"))]))
+  (is
+   (ordered-disjoint-intervals?
+    [(interval (t/instant "2017-07-30T09:00:00Z")
+               (t/instant "2017-07-30T11:00:00Z"))
+     (interval (t/instant "2017-07-30T11:00:00Z")
+               (t/instant "2017-07-30T13:00:00Z"))
+     (interval (t/instant "2017-07-30T16:00:00Z")
+               (t/instant "2017-07-30T18:00:00Z"))]))
+  (is
+   (false?
+    (ordered-disjoint-intervals?
+     [(interval (t/instant "2017-07-30T09:00:00Z")
+                (t/instant "2017-07-30T12:00:00Z"))
+      (interval (t/instant "2017-07-30T11:00:00Z")
+                (t/instant "2017-07-30T13:00:00Z"))])))
+
+  (is
+   (false?
+    (ordered-disjoint-intervals?
+     [(interval (t/instant "2017-07-30T11:00:00Z")
+                (t/instant "2017-07-30T13:00:00Z"))
+      (interval (t/instant "2017-07-30T09:00:00Z")
+                (t/instant "2017-07-30T10:00:00Z"))]))))
+
+(deftest disj-test
+  (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
+                         (t/instant "2017-01-01T07:00:00Z"))
+
+               (interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T09:00:00Z"))
+
+               (interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+
+               (interval (t/instant "2017-01-01T13:00:00Z")
+                         (t/instant "2017-01-01T15:00:00Z"))
+
+               (interval (t/instant "2017-01-01T17:00:00Z")
+                         (t/instant "2017-01-01T19:00:00Z"))]
+
+        coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T10:00:00Z"))
+
+               (interval (t/instant "2017-01-01T11:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T18:00:00Z"))]]
+    (is
+     (= [[(t/instant "2017-01-01T06:00:00Z") (t/instant "2017-01-01T07:00:00Z")]
+         [(t/instant "2017-01-01T08:00:00Z") (t/instant "2017-01-01T09:00:00Z")]
+         [(t/instant "2017-01-01T10:00:00Z") (t/instant "2017-01-01T11:00:00Z")]
+         [(t/instant "2017-01-01T13:00:00Z") (t/instant "2017-01-01T14:00:00Z")]
+         [(t/instant "2017-01-01T18:00:00Z") (t/instant "2017-01-01T19:00:00Z")]]
+        (disj coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T16:00:00Z"))]
+
+        coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T11:00:00Z"))
+               (interval (t/instant "2017-01-01T13:00:00Z")
+                         (t/instant "2017-01-01T17:00:00Z"))]]
+
+    (is
+     (= [[(t/instant "2017-01-01T08:00:00Z")
+          (t/instant "2017-01-01T09:00:00Z")]
+         [(t/instant "2017-01-01T11:00:00Z")
+          (t/instant "2017-01-01T12:00:00Z")]]
+        (disj coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T16:00:00Z"))]
+        coll2 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))]]
+    (is
+     (=
+      [[(t/instant "2017-01-01T14:00:00Z")
+        (t/instant "2017-01-01T16:00:00Z")]]
+      (disj coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T17:00:00Z")
+                         (t/instant "2017-01-01T19:00:00Z"))]
+
+
+        coll2 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T18:00:00Z"))]]
+
+    (is (=
+         [[(t/instant "2017-01-01T18:00:00Z")
+           (t/instant "2017-01-01T19:00:00Z")]]
+         (disj coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T12:00:00Z")
+                         (t/instant "2017-01-01T14:00:00Z"))]
+        coll2 [(interval (t/instant "2017-01-01T11:00:00Z")
+                         (t/instant "2017-01-01T14:00:00Z"))]]
+    (is (empty? (disj coll1 coll2)))))
+
+(deftest combine-test
+  (let [coll1 [(interval (t/instant "2017-07-30T09:00:00Z")
+                         (t/instant "2017-07-30T12:00:00Z"))]
+        coll2 [(interval (t/instant "2017-07-30T11:00:00Z")
+                         (t/instant "2017-07-30T15:00:00Z"))]
+        coll3 [(interval (t/instant "2017-07-30T17:00:00Z")
+                         (t/instant "2017-07-30T19:00:00Z"))]]
+    (is (= 1 (count (combine coll1 coll2))))
+    (is (ordered-disjoint-intervals? (combine coll1 coll2)))
+    (is (= 2 (count (combine coll1 coll2 coll3))))
+    (is (ordered-disjoint-intervals? (combine coll1 coll2 coll3))))
+
+  (let [year (t/year 2017)
+        holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
+        weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
+    (is (ordered-disjoint-intervals? holidays))
+    (is (ordered-disjoint-intervals? weekends))
+    (let [both (combine holidays weekends)]
+      (is (ordered-disjoint-intervals? both))
+      (is (= 113 (count both)))
+      (is (= 365 (count (dates-over (interval (t/year 2017))))))
+      ;; 252 is the number of working days in 2017 in England & Wales
+      (is (= 252 (- 365 113))))))
+
+;; Calc working days by disj of all days with holidays

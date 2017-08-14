@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by])
+  (:refer-clojure :exclude [contains? complement partition-by group-by disj])
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
@@ -74,8 +74,8 @@
     ([v]
      (if (= 2 (count v))
        (span (first v) (second v))
-       (vec (concat (span (first v) (second v))
-                    (drop 2 v)))))
+       (vec (clojure.core/concat (span (first v) (second v))
+                                 (drop 2 v)))))
     ([v1 v2] (join (span v1) (span v2))))
 
   LocalDateTime
@@ -307,7 +307,7 @@
        (t/date (first ival))
        (t/date (second ival)))
     ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/date (second ival))) ival) (concat [(t/date (second ival))])))
+    (intersection (interval (t/date (second ival))) ival) (clojure.core/concat [(t/date (second ival))])))
 
 (defn year-months-over
   "Return a lazy sequence of the year-months (inclusive) that the
@@ -318,7 +318,7 @@
        (t/year-month (first ival))
        (t/year-month (second ival)))
     ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/year-month (second ival))) ival) (concat [(t/year-month (second ival))])))
+    (intersection (interval (t/year-month (second ival))) ival) (clojure.core/concat [(t/year-month (second ival))])))
 
 (defn years-over
   "Return a lazy sequence of the years (inclusive) that the given
@@ -329,14 +329,14 @@
        (t/year (first ival))
        (t/year (second ival)))
     ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/year (second ival))) ival) (concat [(t/year (second ival))])))
+    (intersection (interval (t/year (second ival))) ival) (clojure.core/concat [(t/year (second ival))])))
 
 ;; TODO: hours, minutes, seconds
 
 (defn- augment-interval
   "Take any additional data in the old interval and apply to the new interval"
   [new-ival old-ival]
-  (vec (concat (take 2 new-ival) (drop 2 old-ival))))
+  (vec (clojure.core/concat (take 2 new-ival) (drop 2 old-ival))))
 
 (defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
@@ -357,3 +357,66 @@
          (map (fn [k v] (when v [k (list (augment-interval v ival))])) ivals)
          (remove nil?)
          (into {}))))
+
+;; Sequences of mutually disjoint intervals
+
+(defn ordered-disjoint-intervals?
+  "Are all the given intervals temporarily ordered and disjoint?  This
+  is a useful property of a collection of intervals. The given
+  collection must contain proper intervals (that is, intervals that
+  have finite greater-than-zero durations)"
+  [intervals]
+  (let [rel (make-relation precedes? meets?)]
+    (some?
+     (loop [[x & xs] intervals]
+       (if (or (nil? x) (nil? (first xs))) true
+           (when (rel x (first xs))
+             (recur xs)))))))
+
+;; TODO: conj
+
+(defn disj
+  "disj[oin]. Returns a new collection of intervals, with all times in intervals-to-subtract removed."
+  [intervals intervals-to-subtract]
+  (loop [xs intervals
+         ys intervals-to-subtract
+         result []]
+    (if xs
+      (if ys
+        (let [x (first xs) y (first ys)]
+          (case (code (relation x y))
+            \p (recur (next xs) ys (conj result x))
+            \m (recur (next xs) ys (conj result x))
+            \s (recur (next xs) ys result)
+            \S (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
+            \f (recur (next xs) (next ys) result)
+            \F (recur (next xs) (next ys) (conj result (interval (first x) (first y))))
+            \o (recur (next xs) ys (conj result (interval (first x) (first y))))
+            \O (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
+            \d (recur (next xs) (next ys) result)
+            \D (recur (next xs) (next ys) (conj result
+                                                (interval (first x) (first y))
+                                                (interval (second y) (second x))))
+            \e (recur (next xs) (next ys) result)))
+        (apply conj result xs))
+      result)))
+
+(defn combine
+  "Combine multiple collections of intervals into a single ordered collection of ordered disjoint intervals."
+  [& colls]
+    (loop [colls colls result []]
+      (let [colls (remove nil? colls)]
+
+        (if (< (count colls) 2)
+          (clojure.core/concat result (first colls))
+
+          (let [[c1 c2 & r] (sort-by ffirst colls)]
+            (if (disjoint? (first c1) (first c2))
+              (recur (apply list (next c1) c2 r) (conj result (first c1)))
+
+              (recur (apply list
+                            (next c1)
+                            (clojure.core/concat [(interval (first c1) (first c2))]
+                                                 (next c2))
+                            r)
+                     result)))))))
