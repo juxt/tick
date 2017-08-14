@@ -46,7 +46,7 @@
 
 (s/def ::instant #(instance? Instant %))
 
-(defn- parse-day [input]
+(defn parse-day [input]
   (condp re-matches (str/lower-case input)
     #"(mon)(day)?" DayOfWeek/MONDAY
     #"(tue)(s|sday)?" DayOfWeek/TUESDAY
@@ -54,9 +54,10 @@
     #"(thur)(s|sday)?" DayOfWeek/THURSDAY
     #"(fri)(day)?" DayOfWeek/FRIDAY
     #"(sat)(urday)?" DayOfWeek/SATURDAY
-    #"(sun)(day)?" DayOfWeek/SUNDAY))
+    #"(sun)(day)?" DayOfWeek/SUNDAY
+    nil))
 
-(defn- parse-month [input]
+(defn parse-month [input]
   (condp re-matches (str/lower-case input)
     #"(jan)(uary)?" Month/JANUARY
     #"(feb)(ruary)?" Month/FEBRUARY
@@ -69,7 +70,8 @@
     #"(sep)(tember)?" Month/SEPTEMBER
     #"(oct)(tober)?" Month/OCTOBER
     #"(nov)(ember)?" Month/NOVEMBER
-    #"(dec)(ember)?" Month/DECEMBER))
+    #"(dec)(ember)?" Month/DECEMBER
+    nil))
 
 (defprotocol IParseable
   (parse [_] "Parse to most applicable instance."))
@@ -148,7 +150,7 @@
   String
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
-  (day [s] (parse-day s))
+  (day [s] (or (parse-day s) (day (date s))))
   (date [s] (date (parse s)))
   (month [s] (parse-month s))
   (year [s] (year (parse s)))

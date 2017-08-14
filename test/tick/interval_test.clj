@@ -7,7 +7,8 @@
    [clojure.spec.alpha :as s]
    [tick.core :as t]
    [tick.cal :as cal]
-   [tick.interval :refer :all]))
+   [tick.interval :refer :all])
+  (:import [java.time.temporal ChronoUnit]))
 
 (s/check-asserts true)
 
@@ -267,7 +268,13 @@
                          (t/instant "2017-01-01T14:00:00Z"))]
         coll2 [(interval (t/instant "2017-01-01T11:00:00Z")
                          (t/instant "2017-01-01T14:00:00Z"))]]
-    (is (empty? (disj coll1 coll2)))))
+    (is (empty? (disj coll1 coll2))))
+
+  (is (= [(interval "2017-07-31" "2017-08-13")]
+         (disj
+          [(interval "2017-07-31" "2017-08-13")]
+          [(interval "2017-01-01")]
+          ))))
 
 (deftest combine-test
   (let [coll1 [(interval (t/instant "2017-07-30T09:00:00Z")
@@ -294,3 +301,35 @@
       (is (= 252 (- 365 113))))))
 
 ;; Calc working days by disj of all days with holidays
+
+#_(/
+ (.getSeconds
+  (apply t/+
+         (map duration
+              (let [year (t/year 2017)
+                    holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
+                    weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
+                (disj
+                 [(interval "2017-07-31" "2017-08-13") (interval "2017-04-14" "2017-04-19")]
+                 (combine holidays weekends)
+                 )
+                ))))
+ (* 60 60 24)
+ )
+
+
+#_(/
+ (.getSeconds
+  (reduce t/+
+          (map duration
+               (let [year (t/year 2017)
+                     holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
+                     weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
+                 (disj
+                  ;; Booked holidays
+                  [(interval "2017-07-31" "2017-08-13")
+                   (interval "2017-04-14" "2017-04-19")]
+                  (combine holidays weekends)
+                  )
+                 ))))
+ (* 60 60 24))

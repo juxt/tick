@@ -383,21 +383,19 @@
          result []]
     (if xs
       (if ys
-        (let [x (first xs) y (first ys)]
-          (case (code (relation x y))
-            \p (recur (next xs) ys (conj result x))
-            \m (recur (next xs) ys (conj result x))
+        (let [x (first xs) y (first ys)
+              code (code (relation x y))]
+          (case code
+            (\p \m) (recur (next xs) ys (conj result x))
+            (\P \M) (recur xs (next ys) result)
+            (\f \d \e) (recur (next xs) (next ys) result)
             \s (recur (next xs) ys result)
-            \S (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-            \f (recur (next xs) (next ys) result)
+            (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
             \F (recur (next xs) (next ys) (conj result (interval (first x) (first y))))
             \o (recur (next xs) ys (conj result (interval (first x) (first y))))
-            \O (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-            \d (recur (next xs) (next ys) result)
-            \D (recur (next xs) (next ys) (conj result
-                                                (interval (first x) (first y))
-                                                (interval (second y) (second x))))
-            \e (recur (next xs) (next ys) result)))
+            \D (recur (cons (interval (second y) (second x)) (next xs))
+                      (next ys)
+                      (conj result (interval (first x) (first y))))))
         (apply conj result xs))
       result)))
 
