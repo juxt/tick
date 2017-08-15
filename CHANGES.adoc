@@ -1,5 +1,7 @@
 = Change Log
 
+== [0.3.1] Algebra for interval sets (union, difference). Various breaking API changes over 0.3.0.
+
 == [0.3.0] tick.api added, containing public api
 
 == [0.2.0] Ticks on timelines are maps not times.
