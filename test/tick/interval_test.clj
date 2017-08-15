@@ -6,7 +6,6 @@
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
    [tick.core :as t]
-   [tick.cal :as cal]
    [tick.interval :refer :all])
   (:import [java.time.temporal ChronoUnit]))
 
@@ -189,7 +188,7 @@
       (interval (t/instant "2017-07-30T09:00:00Z")
                 (t/instant "2017-07-30T10:00:00Z"))]))))
 
-(deftest disj-test
+(deftest difference-test
   (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
                          (t/instant "2017-01-01T07:00:00Z"))
 
@@ -219,7 +218,7 @@
          [(t/instant "2017-01-01T10:00:00Z") (t/instant "2017-01-01T11:00:00Z")]
          [(t/instant "2017-01-01T13:00:00Z") (t/instant "2017-01-01T14:00:00Z")]
          [(t/instant "2017-01-01T18:00:00Z") (t/instant "2017-01-01T19:00:00Z")]]
-        (disj coll1 coll2))))
+        (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
@@ -236,7 +235,7 @@
           (t/instant "2017-01-01T09:00:00Z")]
          [(t/instant "2017-01-01T11:00:00Z")
           (t/instant "2017-01-01T12:00:00Z")]]
-        (disj coll1 coll2))))
+        (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
@@ -248,7 +247,7 @@
      (=
       [[(t/instant "2017-01-01T14:00:00Z")
         (t/instant "2017-01-01T16:00:00Z")]]
-      (disj coll1 coll2))))
+      (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
@@ -262,54 +261,44 @@
     (is (=
          [[(t/instant "2017-01-01T18:00:00Z")
            (t/instant "2017-01-01T19:00:00Z")]]
-         (disj coll1 coll2))))
+         (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T12:00:00Z")
                          (t/instant "2017-01-01T14:00:00Z"))]
         coll2 [(interval (t/instant "2017-01-01T11:00:00Z")
                          (t/instant "2017-01-01T14:00:00Z"))]]
-    (is (empty? (disj coll1 coll2))))
+    (is (empty? (difference coll1 coll2))))
 
   (is (= [(interval "2017-07-31" "2017-08-13")]
-         (disj
+         (difference
           [(interval "2017-07-31" "2017-08-13")]
           [(interval "2017-01-01")]
           ))))
 
-(deftest combine-test
+(deftest union-test
   (let [coll1 [(interval (t/instant "2017-07-30T09:00:00Z")
                          (t/instant "2017-07-30T12:00:00Z"))]
         coll2 [(interval (t/instant "2017-07-30T11:00:00Z")
                          (t/instant "2017-07-30T15:00:00Z"))]
         coll3 [(interval (t/instant "2017-07-30T17:00:00Z")
                          (t/instant "2017-07-30T19:00:00Z"))]]
-    (is (= 1 (count (combine coll1 coll2))))
-    (is (ordered-disjoint-intervals? (combine coll1 coll2)))
-    (is (= 2 (count (combine coll1 coll2 coll3))))
-    (is (ordered-disjoint-intervals? (combine coll1 coll2 coll3))))
+    (is (= 1 (count (union coll1 coll2))))
+    (is (ordered-disjoint-intervals? (union coll1 coll2)))
+    (is (= 2 (count (union coll1 coll2 coll3))))
+    (is (ordered-disjoint-intervals? (union coll1 coll2 coll3)))))
 
-  (let [year (t/year 2017)
-        holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
-        weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
-    (is (ordered-disjoint-intervals? holidays))
-    (is (ordered-disjoint-intervals? weekends))
-    (let [both (combine holidays weekends)]
-      (is (ordered-disjoint-intervals? both))
-      (is (= 113 (count both)))
-      (is (= 365 (count (dates-over (interval (t/year 2017))))))
-      ;; 252 is the number of working days in 2017 in England & Wales
-      (is (= 252 (- 365 113))))))
+;; TODO: Move to API as an example
 
-;; Calc working days by disj of all days with holidays
 
+;; Calc working days by intersection of all days with holidays
 
 #_(let [year (t/year 2017)
         holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
         weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
 
-    (->> (disj
+    (->> (intersection
           [(interval "2017-07-31" "2017-08-13") (interval "2017-04-14" "2017-04-19")]
-          (combine holidays weekends)
+          (union holidays weekends)
           )
          (map duration)
          (reduce t/+)

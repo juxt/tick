@@ -1,12 +1,13 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - inc dec max min range time partition-by group-by int long])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
    [tick.cal :as cal]
-   [tick.interval :as interval])
+   [tick.interval :as interval]
+   [clojure.set :as set])
   (:import
    [java.time Duration ZoneId LocalTime LocalDate]))
 
@@ -160,18 +161,43 @@
 
 ;; Note: Not sure about partition here for an individual interval. Should reserve for interval sets.
 
-(defn partition-by [f interval]
+(defn segment-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
-    (interval/partition-by f interval)))
+    (interval/segment-by f interval)))
 
-(defn partition-by-date [interval]
-  (partition-by interval/dates-over interval))
+(defn segment-by-date [interval]
+  (segment-by interval/dates-over interval))
 
-(defn group-by [f interval]
+(defn group-segments-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
-    (interval/group-by f interval)))
+    (interval/group-segments-by f interval)))
 
-(defn group-by-date [interval]
-  (group-by interval/dates-over interval))
+(defn group-segments-by-date [interval]
+  (group-segments-by interval/dates-over interval))
+
+;; Interval sets
+
+(defn ordered-disjoint-intervals?
+  "An interval set is an ordered collection of disjoint
+  intervals. This predicate can be used to ensure a value conforms to
+  this definition, because some functions depend on this property
+  holding."
+  [s]
+  (interval/ordered-disjoint-intervals? s))
+
+(defn union [& colls]
+  "Return a set that is the union of the input interval sets"
+  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
+  (apply interval/union colls))
+
+(defn difference
+  "Return a set that is the intersection of the input interval sets"
+  ([s1] s1)
+  ([s1 s2]
+   {:pre [(s/assert ordered-disjoint-intervals? s1)
+          (s/assert ordered-disjoint-intervals? s2)]}
+   (interval/difference s1 s2))
+  ([s1 s2 & sets]
+   (difference s1 (apply union s2 sets))))
