@@ -271,8 +271,10 @@
 
 ;; Functions that make use of Allens' Interval Algebra
 
-(defn intersection
-  "Return the interval representing the intersection of the given intervals. Returns nil if the two given intervals are disjoint."
+(defn concur
+  "Return the interval representing the interval, if there is one,
+  representing the interval of time the given intervals are
+  concurrent."
   [x y]
   (case (code (relation x y))
     \o (make-interval (first y) (second x))
@@ -281,8 +283,8 @@
     (\S \F \D) y
     nil))
 
-(defn concurrencies
-  "Return a sequence of occurances where intervals coincide (having non-nil intersections)."
+(defn ^:experimental concurrencies
+  "Return a sequence of occurances where intervals coincide (having non-nil concur intervals)."
   [& intervals]
   (let [intervals (vec intervals)]
     (for [xi (range (count intervals))
@@ -290,9 +292,9 @@
           :when (< xi yi)
           :let [x (get intervals xi)
                 y (get intervals yi)
-                ins (intersection x y)]
-          :when ins]
-      {:x x :y y :intersection ins})))
+                conc (concur x y)]
+          :when conc]
+      {:x x :y y :concur concur})))
 
 ;; Useful functions that make use of the above.
 
@@ -306,8 +308,8 @@
       (t/range
        (t/date (first ival))
        (t/date (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/date (second ival))) ival) (clojure.core/concat [(t/date (second ival))])))
+    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
+    (concur (interval (t/date (second ival))) ival) (concat [(t/date (second ival))])))
 
 (defn year-months-over
   "Return a lazy sequence of the year-months (inclusive) that the
@@ -317,8 +319,8 @@
       (t/range
        (t/year-month (first ival))
        (t/year-month (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/year-month (second ival))) ival) (clojure.core/concat [(t/year-month (second ival))])))
+    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
+    (concur (interval (t/year-month (second ival))) ival) (concat [(t/year-month (second ival))])))
 
 (defn years-over
   "Return a lazy sequence of the years (inclusive) that the given
@@ -328,22 +330,22 @@
       (t/range
        (t/year (first ival))
        (t/year (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it intersects rather than merely meets.
-    (intersection (interval (t/year (second ival))) ival) (clojure.core/concat [(t/year (second ival))])))
+    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
+    (concur (interval (t/year (second ival))) ival) (concat [(t/year (second ival))])))
 
-;; TODO: hours, minutes, seconds
+;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
 (defn- augment-interval
   "Take any additional data in the old interval and apply to the new interval"
   [new-ival old-ival]
-  (vec (clojure.core/concat (take 2 new-ival) (drop 2 old-ival))))
+  (vec (concat (take 2 new-ival) (drop 2 old-ival))))
 
 (defn partition-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [f ival]
   (->> (f ival)
        (map interval)
-       (map (partial intersection ival))
+       (map (partial concur ival))
        (map #(augment-interval % ival))
        (remove nil?)))
 
@@ -353,7 +355,7 @@
   (let [ivals (f ival)]
     (->> ivals
          (map interval)
-         (map (partial intersection ival))
+         (map (partial concur ival))
          (map (fn [k v] (when v [k (list (augment-interval v ival))])) ivals)
          (remove nil?)
          (into {}))))

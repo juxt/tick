@@ -17,43 +17,18 @@
 ;; clojure.spec assertions are used to check correctness, but these
 ;; are disabled by default (except when testing).
 
-(defn nanos [n] (core/nanos n))
-(defn millis [n] (core/millis n))
-(defn seconds [n] (core/seconds n))
-(defn minutes [n] (core/minutes n))
-(defn hours [n] (core/hours n))
-(defn days [n] (core/days n))
-(defn weeks [n] (core/weeks n))
+;; Fixing the clock used for `today` and `now`.
+
+(defmacro with-clock [^java.time.Clock clock & body]
+  `(binding [tick.core/*clock* ~clock]
+     ~@body))
+
+;; Point-in-time 'demo' functions
+
 (defn now [] (core/now))
 (defn today [] (core/today))
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
-
-(defn +
-  ([] Duration/ZERO)
-  ([arg] arg)
-  ([arg & args]
-   (reduce #(core/+ %1 %2) arg args)))
-
-(defn - [arg & args]
-  (reduce #(core/- %1 %2) arg args))
-
-(defn inc [arg]
-  (core/inc arg))
-
-(defn dec [arg]
-  (core/dec arg))
-
-(defn max [arg & args]
-  (reduce #(core/max %1 %2) arg args))
-
-(defn min [arg & args]
-  (reduce #(core/min %1 %2) arg args))
-
-(def range core/range)
-
-(defn int [arg] (core/int arg))
-(defn long [arg] (core/long arg))
 
 ;; Constructors
 
@@ -107,6 +82,46 @@
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
 
+;; Arithmetic
+
+(defn +
+  ([] Duration/ZERO)
+  ([arg] arg)
+  ([arg & args]
+   (reduce #(core/+ %1 %2) arg args)))
+
+(defn - [arg & args]
+  (reduce #(core/- %1 %2) arg args))
+
+(defn inc [arg]
+  (core/inc arg))
+
+(defn dec [arg]
+  (core/dec arg))
+
+(defn max [arg & args]
+  (reduce #(core/max %1 %2) arg args))
+
+(defn min [arg & args]
+  (reduce #(core/min %1 %2) arg args))
+
+(def range core/range)
+
+(defn int [arg] (core/int arg))
+(defn long [arg] (core/long arg))
+
+;; Durations
+
+(defn nanos [v] (core/nanos v))
+(defn millis [v] (core/millis v))
+(defn seconds [v] (core/seconds v))
+(defn minutes [v] (core/minutes v))
+(defn hours [v] (core/hours v))
+(defn days [v] (core/days v))
+(defn weeks [v] (core/weeks v))
+(defn months [v] (core/months v))
+(defn years [v] (core/years v))
+
 ;; Intervals
 
 (defn interval
@@ -123,8 +138,8 @@
     (s/assert :tick.interval/interval interval)
     (interval/duration interval)))
 
-(defn intersection [x y]
-  (interval/intersection x y))
+(defn concur [x y]
+  (interval/concur x y))
 
 ;; Useful functions
 
@@ -143,6 +158,8 @@
     (s/assert :tick.interval/interval interval)
     (interval/years-over interval)))
 
+;; Note: Not sure about partition here for an individual interval. Should reserve for interval sets.
+
 (defn partition-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
@@ -158,9 +175,3 @@
 
 (defn group-by-date [interval]
   (group-by interval/dates-over interval))
-
-;; Fixing the clock used for `today` and `now`.
-
-(defmacro with-clock [^java.time.Clock clock & body]
-  `(binding [tick.core/*clock* ~clock]
-     ~@body))
