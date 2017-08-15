@@ -238,26 +238,26 @@
 
 ;; Operations on relations
 
-(defn complement-relation
+(defn complement-r
   "Return the complement of the general relation. The complement ~r of
   a relation r is the relation consisting of all basic relations not
   in r."
   [^GeneralRelation r]
   (assoc r :relations (remove (set (:relations r)) basic-relations)))
 
-(defn compose-relation
+(defn compose-r
   "Return the composition of r and s"
   [r s]
   (throw (new UnsupportedOperationException "Not yet implemented")))
 
-(defn converse-relation
+(defn converse-r
   "Return the converse of the given general relation. The converse !r
   of a relation r is the relation consisting of the converses of all
   basic relations in r."
   [^GeneralRelation r]
   (assoc r :relations (map conv (:relations r))))
 
-(defn intersection-relation
+(defn intersection-r
   "Return the intersection of the r with s"
   [^GeneralRelation r ^GeneralRelation s]
   (s/assert r #(instance? GeneralRelation %))
@@ -267,7 +267,7 @@
 ;; Useful relations
 
 (def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
-(def concur? (complement-relation disjoint?))
+(def concur? (complement-r disjoint?))
 
 ;; Functions that make use of Allens' Interval Algebra
 
