@@ -4,9 +4,20 @@
   (:require
    [clojure.spec.alpha :as s]
    [clojure.test :refer :all]
-   [tick.alpha.api :as t]))
+   [tick.alpha.api :as t]
+   [tick.cal :as cal]))
 
 (s/check-asserts true)
+
+;; Point-in-time tests
+
+(deftest today-test
+  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+    (is (= (t/time "2017-08-08T12:00:00Z") (t/now)))
+    (is (= (t/date "2017-08-08") (t/today)))
+    (is (= (t/date "2017-08-07") (t/yesterday)))
+    (is (= (t/date "2017-08-09") (t/tomorrow)))
+    (is (= 2017 (t/int (t/year))))))
 
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
@@ -27,17 +38,13 @@
 (deftest subtraction-test
   (is (= (t/seconds 3) (t/- (t/seconds 5) (t/seconds 2)))))
 
-;; Constructors
+;; Range test
 
-(deftest today-test
-  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/date "2017-08-08") (t/today)))
-    (is (= (t/date "2017-08-07") (t/yesterday)))
-    (is (= (t/date "2017-08-09") (t/tomorrow)))))
-
-(deftest now-test
-  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/time "2017-08-08T12:00:00Z") (t/now)))))
+(deftest range-test
+  (is (t/midnight? (t/start (t/today))))
+  (is (t/midnight? (t/end (t/today))))
+  (is (t/midnight? (t/start (t/year))))
+  (is (t/midnight? (t/end (t/year)))))
 
 ;; Dates test
 
@@ -53,25 +60,29 @@
   (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019")))))
   (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019-02"))))))
 
-;; Imagine we have some holidays defined as a pair of insts, in the
-;; London timezone. Here we define a holiday between Monday 31st July
-;; and Friday 11th August (inclusive).
+;; Let's count some days over Easter 2017.
 
+(deftest holiday-counting-test
+  (is (=
+       ;; Easter is mid-April
+       (t/date "2017-04-16")
+       (cal/easter-sunday 2017)))
 
-(let [holidays [;; 31st July to 11th August inclusive
-                [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00" "Sicily"]
-                ;; 21st to 24th April inclusive
-                [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00" "Isle of Wight"]
-                ;; overlapping holiday
-                (conj (t/interval "2017-08-09" "2017-08-11") "Overlapping")
+  (is (= java.time.DayOfWeek/TUESDAY (t/day (t/date "2017-04-11"))))
+  (is (= java.time.DayOfWeek/WEDNESDAY (t/day (t/date "2017-04-19"))))
 
-                ]]
-  (->> holidays
-       (map t/interval)
-       (map #(t/to-local % t/LONDON))
-       (map t/group-by-date)
-       (apply merge-with concat)))
+  ;; Let's take a vacation
+  (let [vacation (t/interval (t/date "2017-04-11") (t/date "2017-04-19"))]
+    ;; This is normally 9 days
+    (is (= 9 (t/days (t/duration vacation))))
 
+    (let [year (t/year 2017)
+          holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
+          weekends (map t/interval (filter cal/weekend? (t/dates-over (t/interval year))))
+          working-days-absent (t/days (apply t/+ (map t/duration (t/difference [vacation] (t/union holidays weekends)))))]
+
+      ;; But really it's just the Tues, Weds, Thurs of the first week (because Good Friday is a holiday in England, and Monday being a bank holiday, just the following Tuesday and Wednesday count. That totals 5.
+      (is (= 5 working-days-absent)))))
 
 #_(t/years-over (t/interval ["2017-12-31" "2018-01-01"]))
 
@@ -172,3 +183,21 @@
 #_(t/dates (t/interval "2017-09"))
 
 #_(range 10 10)
+
+;; Here's a fun test that combines tick's calendar to calculate the
+;; number of working days in 2017 (252). It demonstrates how to use union to combine sets of intervals together, and intersection to remove non-working-days from the year.
+(deftest working-days-in-a-year-test
+  (let [year (t/year 2017)
+        holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
+        weekends (map t/interval (filter cal/weekend? (t/dates-over (t/interval year))))]
+    (is (t/ordered-disjoint-intervals? holidays))
+    (is (t/ordered-disjoint-intervals? weekends))
+    (let [non-working-days (t/union holidays weekends)]
+      (is (t/ordered-disjoint-intervals? non-working-days))
+      (is (= 113 (count non-working-days)))
+      (is (= 365 (count (t/dates-over (t/interval (t/year 2017))))))
+
+      ;; 252 is the number of working days in 2017 in England & Wales.
+      ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.
+      (is (= 252 (- 365 113)))
+      (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/interval (t/year 2017))] non-working-days)))))))))

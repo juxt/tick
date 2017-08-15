@@ -336,11 +336,11 @@
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
 (defn- augment-interval
-  "Take any additional data in the old interval and apply to the new interval"
+  "Take any additional data in the old interval and apply to the new interval. The purpose of additional data is to support monad-style operations on intervals."
   [new-ival old-ival]
   (vec (concat (take 2 new-ival) (drop 2 old-ival))))
 
-(defn partition-by
+(defn segment-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [f ival]
   (->> (f ival)
@@ -349,7 +349,7 @@
        (map #(augment-interval % ival))
        (remove nil?)))
 
-(defn group-by
+(defn group-segments-by
   "Split the interval in to a lazy sequence of intervals, one for each local date."
   [f ival]
   (let [ivals (f ival)]
@@ -360,48 +360,22 @@
          (remove nil?)
          (into {}))))
 
-;; Sequences of mutually disjoint intervals
+;; Interval sets - sequences of mutually disjoint intervals
 
 (defn ordered-disjoint-intervals?
-  "Are all the given intervals temporarily ordered and disjoint?  This
+  "Are all the intervals in the given set temporarily ordered and disjoint?  This
   is a useful property of a collection of intervals. The given
   collection must contain proper intervals (that is, intervals that
   have finite greater-than-zero durations)"
-  [intervals]
+  [s]
   (let [rel (make-relation precedes? meets?)]
     (some?
-     (loop [[x & xs] intervals]
+     (loop [[x & xs] s]
        (if (or (nil? x) (nil? (first xs))) true
            (when (rel x (first xs))
              (recur xs)))))))
 
-;; TODO: conj
-
-(defn disj
-  "disj[oin]. Returns a new collection of intervals, with all times in intervals-to-subtract removed."
-  [intervals intervals-to-subtract]
-  (loop [xs intervals
-         ys intervals-to-subtract
-         result []]
-    (if xs
-      (if ys
-        (let [x (first xs) y (first ys)
-              code (code (relation x y))]
-          (case code
-            (\p \m) (recur (next xs) ys (conj result x))
-            (\P \M) (recur xs (next ys) result)
-            (\f \d \e) (recur (next xs) (next ys) result)
-            \s (recur (next xs) ys result)
-            (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-            \F (recur (next xs) (next ys) (conj result (interval (first x) (first y))))
-            \o (recur (next xs) ys (conj result (interval (first x) (first y))))
-            \D (recur (cons (interval (second y) (second x)) (next xs))
-                      (next ys)
-                      (conj result (interval (first x) (first y))))))
-        (apply conj result xs))
-      result)))
-
-(defn combine
+(defn union
   "Combine multiple collections of intervals into a single ordered collection of ordered disjoint intervals."
   [& colls]
     (loop [colls colls result []]
@@ -420,3 +394,27 @@
                                                  (next c2))
                             r)
                      result)))))))
+
+(defn difference
+  "Return an interval set that is the first set without elements of the remaining sets"
+  [s1 s2]
+  (loop [xs s1
+         ys s2
+         result []]
+    (if xs
+      (if ys
+        (let [x (first xs) y (first ys)
+              code (code (relation x y))]
+          (case code
+            (\p \m) (recur (next xs) ys (conj result x))
+            (\P \M) (recur xs (next ys) result)
+            (\f \d \e) (recur (next xs) (next ys) result)
+            \s (recur (next xs) ys result)
+            (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
+            \F (recur (next xs) (next ys) (conj result (interval (first x) (first y))))
+            \o (recur (next xs) ys (conj result (interval (first x) (first y))))
+            \D (recur (cons (interval (second y) (second x)) (next xs))
+                      (next ys)
+                      (conj result (interval (first x) (first y))))))
+        (apply conj result xs))
+      result)))
