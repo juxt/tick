@@ -129,6 +129,9 @@ https://github.com/jarohen/chime[Chime]. The motivation is to be
 able to view timelines of remaining times while the schedule is
 running. Thanks to James Henderson for his work on Chime.
 
+In particular, special credit to Eric Evans for discovering Allen's
+interval algebra and pointing out its potential usefulness.
+
 == Comparison to Quartz
 
 See https://dzone.com/articles/why-you-shouldnt-use-quartz
