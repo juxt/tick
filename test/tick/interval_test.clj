@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval-test
-  (:refer-clojure :exclude [contains? complement partition-by group-by disj])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj])
   (:require
    [clojure.test :refer :all]
    [clojure.spec.alpha :as s]
@@ -370,22 +370,10 @@
           [(interval "2017-01-01")]
           ))))
 
-
-
-;; TODO: Move to API as an example
-
-
-;; Calc working days by intersection of all days with holidays
-
-#_(let [year (t/year 2017)
-        holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
-        weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
-
-    (->> (intersection
-          [(interval "2017-07-31" "2017-08-13") (interval "2017-04-14" "2017-04-19")]
-          (union holidays weekends)
-          )
-         (map duration)
-         (reduce t/+)
-         t/days)
-    )
+(deftest disj-test
+  (is (=
+       [[(t/time "2017-01-01T00:00")
+         (t/time "2017-07-04T00:00")]
+        [(t/time "2017-07-05T00:00")
+         (t/time "2018-01-01T00:00")]]
+       (disj [(interval "2017")]  (interval (t/date "2017-07-04"))))))
