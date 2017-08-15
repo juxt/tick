@@ -188,6 +188,101 @@
       (interval (t/instant "2017-07-30T09:00:00Z")
                 (t/instant "2017-07-30T10:00:00Z"))]))))
 
+(deftest union-test
+  (let [coll1 [(interval (t/instant "2017-07-30T09:00:00Z")
+                         (t/instant "2017-07-30T12:00:00Z"))]
+        coll2 [(interval (t/instant "2017-07-30T11:00:00Z")
+                         (t/instant "2017-07-30T15:00:00Z"))]
+        coll3 [(interval (t/instant "2017-07-30T17:00:00Z")
+                         (t/instant "2017-07-30T19:00:00Z"))]]
+    (is (= 1 (count (union coll1 coll2))))
+    (is (ordered-disjoint-intervals? (union coll1 coll2)))
+    (is (= 2 (count (union coll1 coll2 coll3))))
+    (is (ordered-disjoint-intervals? (union coll1 coll2 coll3)))))
+
+(deftest intersection-test
+  (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
+                         (t/instant "2017-01-01T07:00:00Z"))
+
+               (interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T09:00:00Z"))
+
+               (interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+
+               (interval (t/instant "2017-01-01T13:00:00Z")
+                         (t/instant "2017-01-01T15:00:00Z"))
+
+               (interval (t/instant "2017-01-01T17:00:00Z")
+                         (t/instant "2017-01-01T19:00:00Z"))]
+
+        coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T10:00:00Z"))
+
+               (interval (t/instant "2017-01-01T11:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T18:00:00Z"))]]
+    (is
+     (= [[(t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T10:00:00Z")]
+         [(t/instant "2017-01-01T11:00:00Z") (t/instant "2017-01-01T12:00:00Z")]
+         [(t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T15:00:00Z")]
+         [(t/instant "2017-01-01T17:00:00Z") (t/instant "2017-01-01T18:00:00Z")]]
+        (intersection coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T16:00:00Z"))]
+
+        coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                         (t/instant "2017-01-01T11:00:00Z"))
+               (interval (t/instant "2017-01-01T13:00:00Z")
+                         (t/instant "2017-01-01T17:00:00Z"))]]
+
+    (is
+     (= [[(t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T11:00:00Z")]
+         [(t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T16:00:00Z")]]
+        (intersection coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T14:00:00Z")
+                         (t/instant "2017-01-01T16:00:00Z"))]
+        coll2 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))]]
+    (is
+     (=
+      [[(t/instant "2017-01-01T08:00:00Z")
+        (t/instant "2017-01-01T12:00:00Z")]]
+      (intersection coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T12:00:00Z"))
+               (interval (t/instant "2017-01-01T17:00:00Z")
+                         (t/instant "2017-01-01T19:00:00Z"))]
+
+
+        coll2 [(interval (t/instant "2017-01-01T08:00:00Z")
+                         (t/instant "2017-01-01T18:00:00Z"))]]
+
+    (is (=
+         [(interval (t/instant "2017-01-01T08:00:00Z")
+                    (t/instant "2017-01-01T12:00:00Z"))
+          (interval (t/instant "2017-01-01T17:00:00Z")
+                    (t/instant "2017-01-01T18:00:00Z"))]
+         (intersection coll1 coll2))))
+
+  (let [coll1 [(interval (t/instant "2017-01-01T12:00:00Z")
+                         (t/instant "2017-01-01T14:00:00Z"))]
+        coll2 [(interval (t/instant "2017-01-01T11:00:00Z")
+                         (t/instant "2017-01-01T14:00:00Z"))]]
+    (is (= [[(t/instant "2017-01-01T12:00:00Z")
+             (t/instant "2017-01-01T14:00:00Z")]]
+           (intersection coll1 coll2))))
+  )
+
 (deftest difference-test
   (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
                          (t/instant "2017-01-01T07:00:00Z"))
@@ -275,17 +370,7 @@
           [(interval "2017-01-01")]
           ))))
 
-(deftest union-test
-  (let [coll1 [(interval (t/instant "2017-07-30T09:00:00Z")
-                         (t/instant "2017-07-30T12:00:00Z"))]
-        coll2 [(interval (t/instant "2017-07-30T11:00:00Z")
-                         (t/instant "2017-07-30T15:00:00Z"))]
-        coll3 [(interval (t/instant "2017-07-30T17:00:00Z")
-                         (t/instant "2017-07-30T19:00:00Z"))]]
-    (is (= 1 (count (union coll1 coll2))))
-    (is (ordered-disjoint-intervals? (union coll1 coll2)))
-    (is (= 2 (count (union coll1 coll2 coll3))))
-    (is (ordered-disjoint-intervals? (union coll1 coll2 coll3)))))
+
 
 ;; TODO: Move to API as an example
 
