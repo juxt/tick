@@ -15,7 +15,8 @@
   (is (= (t/nanos 1e6) (t/millis 1)))
   (is (= (t/nanos 1e9) (t/seconds 1)))
   (is (= (t/millis 1000) (t/seconds 1)))
-  (is (= (t/weeks 2) (t/days 14))))
+  (is (= (t/weeks 2) (t/days 14)))
+  (is (= (t/years 3) (t/months 36))))
 
 ;; Period arithmetic
 

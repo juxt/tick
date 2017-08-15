@@ -203,8 +203,8 @@
   (minutes [n] (Duration/ofMinutes n))
   (hours [n] (Duration/ofHours n))
   (days [n] (Duration/ofDays n))
-  (weeks [n] (Duration/ofDays (/ n 7)))
-  (months [n] (Duration/ofDays (* (years n) 12)))
+  (weeks [n] (Duration/ofDays (* n 7)))
+  (months [n] (.multipliedBy (years n) 12))
   (years [n] (Duration/ofDays (/ n 365.25)))
 
   Duration
@@ -214,10 +214,9 @@
   (minutes [d] (.toMinutes d))
   (hours [d] (.toHours d))
   (days [d] (.toDays d))
-  (weeks [d] (/ (days d) 7))
-  (months [d] (* (years d) 12))
-  (years [d] (/ (days d) 365.24))
-  )
+  (weeks [d] (.dividedBy (days d) 7))
+  (months [d] (.multipliedBy (years d) 12))
+  (years [d] (.dividedBy (days d) 365.24)))
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")

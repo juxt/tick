@@ -93,51 +93,51 @@
           [(instants 1) (instants 2)])
          contains?)))
 
-(deftest intersection-test []
+(deftest concur-test []
   (is
    (=
     (interval (instants 1) (instants 2))
-    (intersection
+    (concur
      (interval (instants 0) (instants 2))
      (interval (instants 1) (instants 3)))))
 
   (is
    (=
     (interval (instants 1) (instants 2))
-    (intersection
+    (concur
      (interval (instants 1) (instants 3))
      (interval (instants 0) (instants 2)))))
 
   (is
    (nil?
-    (intersection
+    (concur
      (interval (instants 0) (instants 1))
      (interval (instants 2) (instants 3)))))
 
   (is
    (nil?
-    (intersection
+    (concur
      (interval (instants 0) (instants 1))
      (interval (instants 1) (instants 2)))))
 
   (is
    (=
     (interval (instants 0) (instants 2))
-    (intersection
+    (concur
      (interval (instants 0) (instants 2))
      (interval (instants 0) (instants 3)))))
 
   (is
    (=
     (interval (instants 0) (instants 2))
-    (intersection
+    (concur
      (interval (instants 0) (instants 3))
      (interval (instants 0) (instants 2)))))
 
   (is
    (=
     (interval (instants 1) (instants 3))
-    (intersection
+    (concur
      (interval (instants 1) (instants 3))
      (interval (instants 0) (instants 3))))))
 
@@ -302,34 +302,16 @@
 
 ;; Calc working days by disj of all days with holidays
 
-#_(/
- (.getSeconds
-  (apply t/+
-         (map duration
-              (let [year (t/year 2017)
-                    holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
-                    weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
-                (disj
-                 [(interval "2017-07-31" "2017-08-13") (interval "2017-04-14" "2017-04-19")]
-                 (combine holidays weekends)
-                 )
-                ))))
- (* 60 60 24)
- )
 
+#_(let [year (t/year 2017)
+        holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
+        weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
 
-#_(/
- (.getSeconds
-  (reduce t/+
-          (map duration
-               (let [year (t/year 2017)
-                     holidays (map (comp interval :date) (cal/holidays-in-england-and-wales year))
-                     weekends (map interval (filter cal/weekend? (dates-over (interval year))))]
-                 (disj
-                  ;; Booked holidays
-                  [(interval "2017-07-31" "2017-08-13")
-                   (interval "2017-04-14" "2017-04-19")]
-                  (combine holidays weekends)
-                  )
-                 ))))
- (* 60 60 24))
+    (->> (disj
+          [(interval "2017-07-31" "2017-08-13") (interval "2017-04-14" "2017-04-19")]
+          (combine holidays weekends)
+          )
+         (map duration)
+         (reduce t/+)
+         t/days)
+    )
