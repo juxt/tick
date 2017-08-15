@@ -11,27 +11,6 @@
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
-(defn nanos [n]
-  (Duration/ofNanos n))
-
-(defn millis [n]
-  (Duration/ofMillis n))
-
-(defn seconds [n]
-  (Duration/ofSeconds n))
-
-(defn minutes [n]
-  (Duration/ofMinutes n))
-
-(defn hours [n]
-  (Duration/ofHours n))
-
-(defn days [n]
-  (Duration/ofDays n))
-
-(defn weeks [n]
-  (Duration/ofDays (* 7 n)))
-
 (def ^{:dynamic true} *clock* nil)
 
 (defn now []
@@ -204,6 +183,41 @@
   (instant [zdt] (.toInstant zdt))
   (date [zdt] (.toLocalDate zdt))
   (zone [zdt] (.getZone zdt)))
+
+(defprotocol IDuration
+  (nanos [_] "Return the given quantity in nanoseconds.")
+  (millis [_] "Return the given quantity in milliseconds.")
+  (seconds [_] "Return the given quantity in seconds.")
+  (minutes [_] "Return the given quantity in minutes.")
+  (hours [_] "Return the given quantity in hours.")
+  (days [_] "Return the given quantity in days.")
+  (weeks [_] "Return the given quantity in weeks.")
+  (months [_] "Return the given quantity in approximate months.")
+  (years [_] "Return the given quantity in approximate years."))
+
+(extend-protocol IDuration
+  Number
+  (nanos [n] (Duration/ofNanos n))
+  (millis [n] (Duration/ofMillis n))
+  (seconds [n] (Duration/ofSeconds n))
+  (minutes [n] (Duration/ofMinutes n))
+  (hours [n] (Duration/ofHours n))
+  (days [n] (Duration/ofDays n))
+  (weeks [n] (Duration/ofDays (/ n 7)))
+  (months [n] (Duration/ofDays (* (years n) 12)))
+  (years [n] (Duration/ofDays (/ n 365.25)))
+
+  Duration
+  (nanos [d] (.toNanos d))
+  (millis [d] (.toMillis d))
+  (seconds [d] (.getSeconds d))
+  (minutes [d] (.toMinutes d))
+  (hours [d] (.toHours d))
+  (days [d] (.toDays d))
+  (weeks [d] (/ (days d) 7))
+  (months [d] (* (years d) 12))
+  (years [d] (/ (days d) 365.24))
+  )
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
