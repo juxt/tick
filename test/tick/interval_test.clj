@@ -281,7 +281,27 @@
     (is (= [[(t/instant "2017-01-01T12:00:00Z")
              (t/instant "2017-01-01T14:00:00Z")]]
            (intersection coll1 coll2))))
-  )
+
+  (let [coll1 [[(t/time "2017-04-11T00:00")
+                (t/time "2017-04-14T00:00")]
+               [(t/time "2017-04-18T00:00")
+                (t/time "2017-04-20T00:00")]
+               [(t/time "2017-12-20T00:00")
+                (t/time "2017-12-23T00:00")]
+               [(t/time "2017-12-27T00:00")
+                (t/time "2018-01-01T00:00")]
+               [(t/time "2018-01-02T00:00")
+                (t/time "2018-01-08T00:00")]]
+        coll2 [(interval "2017")]]
+    (is (= [[(t/time "2017-04-11T00:00")
+             (t/time "2017-04-14T00:00")]
+            [(t/time "2017-04-18T00:00")
+             (t/time "2017-04-20T00:00")]
+            [(t/time "2017-12-20T00:00")
+             (t/time "2017-12-23T00:00")]
+            [(t/time "2017-12-27T00:00")
+             (t/time "2018-01-01T00:00")]]
+           (intersection coll1 coll2)))))
 
 (deftest difference-test
   (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
