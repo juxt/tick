@@ -9,7 +9,7 @@
    [tick.interval :as interval]
    [clojure.set :as set])
   (:import
-   [java.time Duration ZoneId LocalTime LocalDate]))
+   [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month]))
 
 ;; This API is optimises convenience, API stability and (type) safety
 ;; over performance. Where performance is critical, use tick.core and
@@ -30,6 +30,29 @@
 (defn today [] (core/today))
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
+
+;; Constants
+
+(def monday DayOfWeek/MONDAY)
+(def tuesday DayOfWeek/TUESDAY)
+(def wednesday DayOfWeek/WEDNESDAY)
+(def thursday DayOfWeek/THURSDAY)
+(def friday DayOfWeek/FRIDAY)
+(def saturday DayOfWeek/SATURDAY)
+(def sunday DayOfWeek/SUNDAY)
+
+(def january Month/JANUARY)
+(def february Month/FEBRUARY)
+(def march Month/MARCH)
+(def april Month/APRIL)
+(def may Month/MAY)
+(def june Month/JUNE)
+(def july Month/JULY)
+(def august Month/AUGUST)
+(def september Month/SEPTEMBER)
+(def october Month/OCTOBER)
+(def november Month/NOVEMBER)
+(def december Month/DECEMBER)
 
 ;; Constructors
 
