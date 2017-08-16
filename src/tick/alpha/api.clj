@@ -157,6 +157,8 @@
 ;; onwards are free to use by the caller.
 (defn interval? [v] (and (vector? v) (>= (count v) 2)))
 
+(def relation interval/relation)
+
 (defn duration [interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
