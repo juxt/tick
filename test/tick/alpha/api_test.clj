@@ -68,8 +68,8 @@
        (t/date "2017-04-16")
        (cal/easter-sunday 2017)))
 
-  (is (= java.time.DayOfWeek/TUESDAY (t/day (t/date "2017-04-11"))))
-  (is (= java.time.DayOfWeek/WEDNESDAY (t/day (t/date "2017-04-19"))))
+  (is (= t/tuesday (t/day (t/date "2017-04-11"))))
+  (is (= t/wednesday (t/day (t/date "2017-04-19"))))
 
   ;; Let's take a vacation
   (let [vacation (t/interval (t/date "2017-04-11") (t/date "2017-04-19"))]
@@ -77,14 +77,41 @@
     (is (= 9 (t/days (t/duration vacation))))
 
     (let [year (t/year 2017)
-          holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
+          public-holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
           weekends (map t/interval (filter cal/weekend? (t/dates-over (t/interval year))))
-          working-days-absent (t/days (apply t/+ (map t/duration (t/difference [vacation] (t/union holidays weekends)))))]
+          non-working-days (t/union public-holidays weekends)
+          vacation-set (t/difference [vacation] non-working-days)
+          working-days-absent (t/days (apply t/+ (map t/duration vacation-set)))]
 
       ;; But really it's just the Tues, Weds, Thurs of the first week (because Good Friday is a holiday in England, and Monday being a bank holiday, just the following Tuesday and Wednesday count. That totals 5.
-      (is (= 5 working-days-absent)))))
+      (is (= 5 working-days-absent))
 
-#_(t/years-over (t/interval ["2017-12-31" "2018-01-01"]))
+      ;; OK, now we want to display the vacation on a monthly calendar,
+      ;; and want to determine what to display for Thursday 13th April. Does our vacation include this Thursday?
+      (let [day (t/date "2017-04-13")]
+        (is (= t/thursday (t/day day)))
+        ;; Intersections are powerful. If we only booked off a
+        ;; half-day on this thursday, the intersection would return
+        ;; this half-day.
+        (is (not-empty (t/intersection [(t/interval day)] vacation-set))))
+
+      ;; Another use of intersections can be to determine the number of vacation days taken in 2017. But let's make things a little harder by booking time over the new year period.
+      (let [festive-break (t/interval (t/date "2017-12-20") (t/date "2018-01-07"))
+
+            vacation-set
+            (-> vacation-set ; start with our original vacation set
+                ;; Let's add this to our vacation set
+                (t/union vacation-set [festive-break])
+                ;; We'll subtract the actual public holidays and
+                ;; weekends, these shouldn't be deducted from the
+                ;; number of vacation days.
+                (t/difference non-working-days)
+                ;; We only want to know the total vacation day count for 2017
+                (t/intersection [(t/interval "2017")]))]
+
+        ;; The festive vacation days in 2017 are 20th, 21th, 22nd, 27th, 28th, 29th.
+        ;; Added to the 5 days we've already taken, that makes 11
+        (is (= (+ 5 6) (t/days (apply t/+ (map t/duration vacation-set)))))))))
 
 #_(t/partition-by-date)
 
