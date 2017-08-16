@@ -217,12 +217,12 @@
   {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
   (apply interval/union colls))
 
-(defn difference
+(defn intersection [& colls]
   "Return a set that is the intersection of the input interval sets"
-  ([s1] s1)
-  ([s1 s2]
-   {:pre [(s/assert ordered-disjoint-intervals? s1)
-          (s/assert ordered-disjoint-intervals? s2)]}
-   (interval/difference s1 s2))
-  ([s1 s2 & sets]
-   (difference s1 (apply union s2 sets))))
+  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
+  (apply interval/intersection colls))
+
+(defn difference [& colls]
+  "Return a set that is the intersection of the input interval sets"
+  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
+  (apply interval/difference colls))
