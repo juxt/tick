@@ -387,8 +387,7 @@
   (is (= [(interval "2017-07-31" "2017-08-13")]
          (difference
           [(interval "2017-07-31" "2017-08-13")]
-          [(interval "2017-01-01")]
-          ))))
+          [(interval "2017-01-01")]))))
 
 (deftest disj-test
   (is (=
