@@ -226,3 +226,7 @@
   "Return a set that is the intersection of the input interval sets"
   {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
   (apply interval/difference colls))
+
+(defn complement [coll]
+  {:pre [(s/assert ordered-disjoint-intervals? coll)]}
+  (interval/complement coll))
