@@ -242,6 +242,21 @@
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(.isBefore % to))))))
 
+(extend-type ZonedDateTime
+  ITimeArithmetic
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
+  (inc [t] (+ t (seconds 1)))
+  (dec [t] (- t (seconds 1)))
+  (max [x y] (if (neg? (compare x y)) y x))
+  (min [x y] (if (neg? (compare x y)) x y))
+  (range
+    ([from] (iterate #(.plusSeconds % 1) from))
+    ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
+                 to (take-while #(.isBefore % to))))
+    ([from to step] (cond->> (iterate #(.plus % step) from)
+                      to (take-while #(.isBefore % to))))))
+
 (extend-type LocalDate
   ITimeArithmetic
   (+ [t x] (if (number? x) (.plusDays t x) (.plus t x)))
@@ -416,3 +431,21 @@
   (to-local
     ([t] (throw (ex-info "Error, zone required" {})))
     ([t zone] (to-local (at-zone t zone)))))
+
+(defprotocol MinMax
+  (min-of-type [_] "Return the min")
+  (max-of-type [_] "Return the max"))
+
+(extend-protocol MinMax
+  LocalDateTime
+  (min-of-type [_] (LocalDateTime/MIN))
+  (max-of-type [_] (LocalDateTime/MAX))
+  Instant
+  (min-of-type [_] (Instant/MIN))
+  (max-of-type [_] (Instant/MAX))
+  ZonedDateTime
+  (min-of-type [_] (Instant/MIN))
+  (max-of-type [_] (Instant/MAX))
+  nil
+  (min-of-type [_] (Instant/MIN))
+  (max-of-type [_] (Instant/MAX)))
