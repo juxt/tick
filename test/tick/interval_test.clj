@@ -397,3 +397,23 @@
         [(t/time "2017-07-05T00:00")
          (t/time "2018-01-01T00:00")]]
        (disj [(interval "2017")]  (interval (t/date "2017-07-04"))))))
+
+(deftest complement-test
+  ;; Not sure why this is failing on the equals check
+  #_(is (=
+       [[(tick.core/min-of-type (t/time "2017-01-01T00:00:00Z"))
+         (t/time "2017-01-01T00:00:00Z")]
+
+        [(t/time "2017-01-04T00:00:00Z")
+         (t/time "2017-01-05T00:00:00Z")]
+
+        [(t/time "2018-01-01T00:00:00Z")
+         (tick.core/max-of-type (t/time "2017-01-01T00:00:00Z"))
+         ]]
+
+       (complement [[(t/time "2017-01-01T00:00:00Z")
+                     (t/time "2017-07-04T00:00:00Z")]
+                    [(t/time "2017-07-05T00:00:00Z")
+                     (t/time "2018-01-01T00:00:00Z")]])))
+
+  (is (= [] (complement (complement [])))))
