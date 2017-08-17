@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - inc dec max min range time int long])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long complement])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
