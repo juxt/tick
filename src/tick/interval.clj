@@ -152,7 +152,7 @@
 (defn equals? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
-  (= x y))
+  (= (take 2 x) (take 2 y)))
 
 (defn meets? [x y]
   (s/assert ::interval x)
@@ -410,6 +410,9 @@
 (defn conj [coll interval]
   (union coll [interval]))
 
+(defn derive-interval [x y from]
+  (augment-interval (interval x y) from))
+
 (defn intersection
   "Return an interval set that is the intersection of the input
   interval sets."
@@ -420,24 +423,46 @@
           result []]
      (if (and xs ys)
        (let [x (first xs) y (first ys)
-             code (code (relation x y))]
+             rel (relation x y)
+             _ (when-not rel (println "rel is nil, x is" x ", y is" y))
+             code (code rel)]
+         (println "code is <" code ">")
          (case code
            (\p \m)  (recur (next xs) ys result)
            (\P \M)  (recur xs (next ys) result)
-           \S (recur (cons (interval (second y) (second x)) (next xs)) (next ys) (clojure.core/conj result y))
-           \F (recur (next xs) (next ys) (clojure.core/conj result y))
-           \o (recur (cons (interval (first y) (second x)) (next xs))
-                     (cons (interval (second x) (second y)) (next ys))
-                     (clojure.core/conj result (interval (first y) (second x))))
-           \O (recur (cons (interval (second y) (second x)) (next xs))
+           \S (recur (cons (derive-interval (second y) (second x) x)
+                           (next xs))
                      (next ys)
-                     (clojure.core/conj result (interval (first x) (second y)))
+                     (clojure.core/conj result (augment-interval y x)))
+           \F (recur (next xs) (next ys) (clojure.core/conj result y))
+           \o (recur (cons (derive-interval (first y) (second x) x)
+                           (next xs))
+                     (cons (derive-interval (second x) (second y) x) (next ys))
+                     (clojure.core/conj
+                      result
+                      (derive-interval (first y) (second x) x)))
+           \O (recur (cons
+                      (derive-interval (second y) (second x) x)
+                      (next xs))
+                     (next ys)
+                     (clojure.core/conj
+                      result
+                      (derive-interval (first x) (second y) x))
                      )
-           \D (recur (cons (interval (second y) (second x)) (next xs)) (next ys) (clojure.core/conj result y))
-           \d (recur (next xs) (cons (interval (second x) (second y)) (next ys)) (clojure.core/conj result x))
+           \D (recur (cons
+                      (derive-interval (second y) (second x) x)
+                      (next xs))
+                     (next ys)
+                     (clojure.core/conj result (augment-interval y x)))
+           \d (recur (next xs) (cons (derive-interval (second x) (second y) x)
+                                     (next ys))
+                     (clojure.core/conj result x))
            \e (recur (next xs) (next ys) (clojure.core/conj result x))
            \f (recur (next xs) (next ys) (clojure.core/conj result x))
-           \s (recur (next xs) (cons (interval (second x) (second y)) (next ys)) (clojure.core/conj result x))))
+           \s (recur (next xs)
+                     (cons (derive-interval (second x) (second y) x)
+                           (next ys))
+                     (clojure.core/conj result x))))
        result)))
   ([s1 s2 & sets]
    (reduce intersection s1 (clojure.core/conj sets s2))))
@@ -460,11 +485,11 @@
              (\f \d \e) (recur (next xs) (next ys) result)
              \s (recur (next xs) ys result)
              (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-             \F (recur (next xs) (next ys) (clojure.core/conj result (interval (first x) (first y))))
-             \o (recur (next xs) ys (clojure.core/conj result (interval (first x) (first y))))
+             \F (recur (next xs) (next ys) (clojure.core/conj result (derive-interval (first x) (first y) x)))
+             \o (recur (next xs) ys (clojure.core/conj result (derive-interval (first x) (first y) x)))
              \D (recur (cons (interval (second y) (second x)) (next xs))
                        (next ys)
-                       (clojure.core/conj result (interval (first x) (first y))))))
+                       (clojure.core/conj result (derive-interval (first x) (first y) x)))))
          (apply clojure.core/conj result xs))
        result)))
   ([s1 s2 & sets]

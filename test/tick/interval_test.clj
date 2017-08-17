@@ -301,7 +301,21 @@
              (t/time "2017-12-23T00:00")]
             [(t/time "2017-12-27T00:00")
              (t/time "2018-01-01T00:00")]]
-           (intersection coll1 coll2)))))
+           (intersection coll1 coll2)))
+
+
+    (testing "Extra data of first collection intervals is preserved on intersection"
+      (is (=
+           [[(t/time "2017-04-12T00:00")
+             (t/time "2017-04-13T00:00") :a :b :c]
+            [(t/time "2017-04-14T00:00")
+             (t/time "2017-04-15T00:00") :a :b :c]]
+           (let [coll1 [[(t/time "2017-04-11T00:00")
+                         (t/time "2017-04-18T00:00")
+                         :a :b :c]]
+                 coll2 [(interval "2017-04-12")
+                        (interval "2017-04-14")]]
+             (intersection coll1 coll2)))))))
 
 (deftest difference-test
   (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
@@ -387,7 +401,13 @@
   (is (= [(interval "2017-07-31" "2017-08-13")]
          (difference
           [(interval "2017-07-31" "2017-08-13")]
-          [(interval "2017-01-01")]))))
+          [(interval "2017-01-01")])))
+
+  (testing "Preserve extra data"
+    (is (= [(concat (interval "2017-07-31" "2017-08-13") [:test])]
+           (difference
+            [(concat (interval "2017-07-31" "2017-08-13") [:test])]
+            [(interval "2017-01-01")])))))
 
 (deftest disj-test
   (is (=
