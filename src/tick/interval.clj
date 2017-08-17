@@ -8,7 +8,7 @@
    [tick.core :as t])
   (:import
    [java.util Date]
-   [java.time Instant Duration ZoneId LocalDate LocalDateTime Year YearMonth ZoneId]))
+   [java.time Instant Duration ZoneId LocalDate LocalDateTime Year YearMonth ZoneId ZonedDateTime]))
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
@@ -34,7 +34,7 @@
           [v1 v2])]
    ;; Post condition must hold, and it is intentional that is cannot be disabled.
    ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
-   :post [(.isBefore (first %) (second %))]}
+   :post [(neg? (compare (first %) (second %)))]}
   (if (neg? (compare v1 v2))
     [v1 v2]
     [v2 v1]))
@@ -80,18 +80,23 @@
 
   LocalDateTime
   (span
-    ([dt] [dt dt])
-    ([dt1 dt2] (join (span dt1) (span dt2))))
+    ([x] [x x])
+    ([x y] (join (span x) (span y))))
 
   Instant
   (span
-    ([i] [i i])
-    ([i1 i2] (join (span i1) (span i2))))
+    ([x] [x x])
+    ([x y] (join (span x) (span y))))
+
+  ZonedDateTime
+  (span
+    ([x] [x x])
+    ([x y] (join (span x) (span y))))
 
   String
   (span
-    ([s] (span (t/parse s)))
-    ([s1 s2] (join (span s1) (span s2))))
+    ([x] (span (t/parse x)))
+    ([x y] (join (span x) (span y))))
 
   Date
   (span
@@ -100,7 +105,8 @@
 
 (defn interval
   ([v] (span v))
-  ([v1 & args] (reduce span v1 args)))
+  ([v1 & args]
+   (reduce span v1 args)))
 
 (defn- interval-at-zone
   "Put the given interval at the given zone."
@@ -466,3 +472,14 @@
 
 (defn disj [coll interval]
   (difference coll [interval]))
+
+(defn complement [coll]
+  (if (empty? coll)
+    [(interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
+    (let [r (map (fn [[x y]] (interval (second x) (first y)))
+                 (partition 2 1 coll))]
+      (cond-> r
+        (not= (ffirst coll) (t/min-of-type (ffirst coll)))
+        (#(concat [(interval (t/min-of-type (ffirst coll)) (ffirst coll))] %))
+        (not= (second (last coll)) (t/max-of-type (second (last coll))))
+        (#(concat % [(interval (second (last coll)) (t/max-of-type (second (last coll))))]))))))
