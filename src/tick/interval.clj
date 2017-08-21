@@ -136,11 +136,13 @@
     ([interval] (local-interval interval))
     ([interval zone] (local-interval interval zone))))
 
-(defn duration
-  ([interval]
-   (Duration/between (first interval) (second interval)))
-  ([i1 i2]
-   (Duration/between (t/instant i1) (t/instant i2))))
+(extend-protocol t/IDurationCoercion
+  clojure.lang.PersistentVector
+  (duration
+    ([v]
+     (let [interval (interval v)]
+       (s/assert :tick.interval/interval interval)
+       (Duration/between (first interval) (second interval))))))
 
 ;; Allen's Basic Relations
 
