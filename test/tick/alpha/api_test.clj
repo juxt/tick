@@ -65,6 +65,11 @@
         (t/+ (t/now) (t/seconds 20))
         (t/+ (t/now) (t/seconds 10))))))
 
+;; Duration test
+
+(deftest duration-test
+  (is (= 24 (t/hours (t/duration (t/tomorrow))))))
+
 ;; Dates test
 
 (deftest dates-over-test

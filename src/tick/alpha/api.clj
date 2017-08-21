@@ -179,10 +179,11 @@
 
 (def relation interval/relation)
 
-(defn duration [interval]
-  (let [interval (interval/interval interval)]
-    (s/assert :tick.interval/interval interval)
-    (interval/duration interval)))
+(defn duration
+  ([v]
+   (core/duration v))
+  ([v1 v2]
+   (core/duration v1 v2)))
 
 (defn concur [x y]
   (interval/concur x y))

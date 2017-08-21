@@ -4,7 +4,8 @@
   (:refer-clojure :exclude [+ - inc dec max min range time int long < >])
   (:require
    [clojure.spec.alpha :as s]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [tick.core :as core])
   (:import
    [java.util Date]
    [java.time Clock ZoneId ZoneOffset Instant Duration DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
@@ -218,6 +219,18 @@
   (months [d] (.multipliedBy (years d) 12))
   (years [d] (.dividedBy (days d) 365.24)))
 
+(defprotocol IDurationCoercion
+  (duration [_] [_ _] "Return the duration of the given value, or between a pair of values, if appropriate."))
+
+(extend-protocol IDurationCoercion
+  Duration
+  (duration [d] d)
+  nil
+  (duration ([_] nil) ([_ _] nil))
+  clojure.lang.PersistentVector
+  (duration [i1 i2]
+    (Duration/between (instant i1) (instant i2))))
+
 (definline < [x y] `(.isBefore ~x ~y))
 (definline > [x y] `(.isAfter ~x ~y))
 
@@ -342,6 +355,10 @@
 (defprotocol ITimeRange
   (start [_] "Return the start of a time period.")
   (end [_] "Return the end of a time period."))
+
+(extend-protocol IDurationCoercion
+  Object
+  (duration [v] (Duration/between (start v) (end v))))
 
 (extend-protocol ITime
   String
