@@ -423,10 +423,7 @@
           result []]
      (if (and xs ys)
        (let [x (first xs) y (first ys)
-             rel (relation x y)
-             _ (when-not rel (println "rel is nil, x is" x ", y is" y))
-             code (code rel)]
-         (println "code is <" code ">")
+             code (code (relation x y))]
          (case code
            (\p \m)  (recur (next xs) ys result)
            (\P \M)  (recur xs (next ys) result)
@@ -447,8 +444,7 @@
                      (next ys)
                      (clojure.core/conj
                       result
-                      (derive-interval (first x) (second y) x))
-                     )
+                      (derive-interval (first x) (second y) x)))
            \D (recur (cons
                       (derive-interval (second y) (second x) x)
                       (next xs))
