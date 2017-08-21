@@ -46,6 +46,25 @@
   (is (t/midnight? (t/start (t/year))))
   (is (t/midnight? (t/end (t/year)))))
 
+;; Comparison test
+
+(deftest comparison-test
+  (is
+   (t/<
+    (t/now)
+    (t/+ (t/now) (t/seconds 10))
+    (t/+ (t/now) (t/seconds 20))))
+  (is
+   (t/>
+    (t/+ (t/now) (t/seconds 20))
+    (t/+ (t/now) (t/seconds 10))
+    (t/now)))
+  (is (not
+       (t/<
+        (t/now)
+        (t/+ (t/now) (t/seconds 20))
+        (t/+ (t/now) (t/seconds 10))))))
+
 ;; Dates test
 
 (deftest dates-over-test

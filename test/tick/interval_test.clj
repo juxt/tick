@@ -32,8 +32,8 @@
                x2 instants
                y1 instants
                y2 instants
-               :when (.isBefore x1 x2)
-               :when (.isBefore y1 y2)
+               :when (t/< x1 x2)
+               :when (t/< y1 y2)
                :let [x [x1 x2]
                      y [y1 y2]]]
            ;; For each combination, count how many relations are true
@@ -50,8 +50,8 @@
               x2 instants
               y1 instants
               y2 instants
-              :when (.isBefore x1 x2)
-              :when (.isBefore y1 y2)
+              :when (t/< x1 x2)
+              :when (t/< y1 y2)
               :let [x [x1 x2]
                     y [y1 y2]]]
           ;; For each combination, count how many relations are true

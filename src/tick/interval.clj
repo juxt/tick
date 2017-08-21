@@ -18,7 +18,7 @@
 (s/def ::interval
   (s/and
    (s/or :local ::local :non-local ::non-local)
-   #(let [[_ [t1 t2]] %] (.isBefore t1 t2))))
+   #(let [[_ [t1 t2]] %] (t/< t1 t2))))
 
 ;; An interval can be between 2 local times or 2 non-local times.
 ;; When there is a mix, an error occurs.
@@ -147,7 +147,7 @@
 (defn precedes? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
-  (.isBefore (second x) (first y)))
+  (t/< (second x) (first y)))
 
 (defn equals? [x y]
   (s/assert ::interval x)
@@ -163,29 +163,29 @@
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (.isBefore (first x) (first y))
-   (.isAfter (second x) (first y))
-   (.isBefore (second x) (second y))))
+   (t/< (first x) (first y))
+   (t/> (second x) (first y))
+   (t/< (second x) (second y))))
 
 (defn during? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (.isAfter (first x) (first y))
-   (.isBefore (second x) (second y))))
+   (t/> (first x) (first y))
+   (t/< (second x) (second y))))
 
 (defn starts? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
    (= (first x) (first y))
-   (.isBefore (second x) (second y))))
+   (t/< (second x) (second y))))
 
 (defn finishes? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (.isAfter (first x) (first y))
+   (t/> (first x) (first y))
    (= (second x) (second y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.

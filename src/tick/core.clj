@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - inc dec max min range time int long])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long < >])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -218,6 +218,9 @@
   (months [d] (.multipliedBy (years d) 12))
   (years [d] (.dividedBy (days d) 365.24)))
 
+(definline < [x y] `(.isBefore ~x ~y))
+(definline > [x y] `(.isAfter ~x ~y))
+
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
   (- [_ _] "Subtract time")
@@ -238,9 +241,9 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(.isBefore % to))))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type ZonedDateTime
   ITimeArithmetic
@@ -253,9 +256,9 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(.isBefore % to))))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type LocalDate
   ITimeArithmetic
@@ -268,9 +271,9 @@
   (range
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
-                 to (take-while #(.isBefore % to) )))
+                 to (take-while #(< % to) )))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type LocalDateTime
   ITimeArithmetic
@@ -283,9 +286,9 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(.isBefore % to) )))
+                 to (take-while #(< % to) )))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type YearMonth
   ITimeArithmetic
@@ -298,9 +301,9 @@
   (range
     ([from] (iterate #(.plusMonths % 1) from))
     ([from to] (cond->> (iterate #(.plusMonths % 1) from)
-                 to (take-while #(.isBefore % to) )))
+                 to (take-while #(< % to) )))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type Year
   ITimeArithmetic
@@ -313,9 +316,9 @@
   (range
     ([from] (iterate #(.plusYears % 1) from))
     ([from to] (cond->> (iterate #(.plusYears % 1) from)
-                 to (take-while #(.isBefore % to) )))
+                 to (take-while #(< % to) )))
     ([from to step] (cond->> (iterate #(.plus % step) from)
-                      to (take-while #(.isBefore % to))))))
+                      to (take-while #(< % to))))))
 
 (extend-type Duration
   ITimeArithmetic
