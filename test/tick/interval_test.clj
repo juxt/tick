@@ -78,7 +78,7 @@
 ;; concur is really the complement to disjoint, but we'll test it
 ;; anywhere to ensure the complement function is working as expected.
 
-(deftest concur-test []
+(deftest concur?-test []
   (is (nil?
        (concur?
         [(instants 0) (instants 1)]
