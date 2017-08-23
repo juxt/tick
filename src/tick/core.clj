@@ -4,8 +4,7 @@
   (:refer-clojure :exclude [+ - inc dec max min range time int long < >])
   (:require
    [clojure.spec.alpha :as s]
-   [clojure.string :as str]
-   [tick.core :as core])
+   [clojure.string :as str])
   (:import
    [java.util Date]
    [java.time Clock ZoneId ZoneOffset Instant Duration DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
