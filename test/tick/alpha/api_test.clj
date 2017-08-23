@@ -97,6 +97,19 @@
   (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019")))))
   (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019-02"))))))
 
+;; Concur test
+
+(deftest concur-test
+  (is
+   (= 2
+      (t/hours
+       (t/duration
+        (t/concur (t/interval (t/at (t/today) 16)
+                              (t/end (t/today)))
+                  (t/interval (t/today))
+                  (t/interval (t/at (t/today) 20)
+                              (t/at (t/today) 22))))))))
+
 ;; Let's count some days over Easter 2017.
 
 (deftest holiday-counting-test
