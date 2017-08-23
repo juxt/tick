@@ -285,6 +285,14 @@
 
 ;; Functions that make use of Allens' Interval Algebra
 
+(defn- update-interval
+  "Update the interval with the timings of the second interval. The
+  purpose of updating is to preserve any extra data in the interval."
+  ([ival times]
+   (vec (concat (take 2 times) (drop 2 ival))))
+  ([ival x y]
+   (update-interval ival (interval x y))))
+
 (defn concur
   "Return the interval representing the interval, if there is one,
   representing the interval of time the given intervals are
@@ -350,13 +358,6 @@
 
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
-(defn- augment-interval
-  "Take any additional data in the old interval and apply to the new
-  interval. The purpose of additional data is to support monad-style
-  operations on intervals."
-  [new-ival old-ival]
-  (vec (concat (take 2 new-ival) (drop 2 old-ival))))
-
 (defn segment-by
   "Split the interval in to a lazy sequence of intervals, one for each
   local date."
@@ -364,7 +365,7 @@
   (->> (f ival)
        (map interval)
        (map (partial concur ival))
-       (map #(augment-interval % ival))
+       (map #(update-interval ival %))
        (remove nil?)))
 
 (defn group-segments-by
@@ -375,7 +376,7 @@
     (->> ivals
          (map interval)
          (map (partial concur ival))
-         (map (fn [k v] (when v [k (list (augment-interval v ival))])) ivals)
+         (map (fn [k v] (when v [k (list (update-interval ival v))])) ivals)
          (remove nil?)
          (into {}))))
 
@@ -418,9 +419,6 @@
 (defn conj [coll interval]
   (union coll [interval]))
 
-(defn derive-interval [x y from]
-  (augment-interval (interval x y) from))
-
 (defn intersection
   "Return an interval set that is the intersection of the input
   interval sets."
@@ -435,36 +433,36 @@
          (case code
            (\p \m)  (recur (next xs) ys result)
            (\P \M)  (recur xs (next ys) result)
-           \S (recur (cons (derive-interval (second y) (second x) x)
+           \S (recur (cons (update-interval x (second y) (second x))
                            (next xs))
                      (next ys)
-                     (clojure.core/conj result (augment-interval y x)))
+                     (clojure.core/conj result (update-interval x y)))
            \F (recur (next xs) (next ys) (clojure.core/conj result y))
-           \o (recur (cons (derive-interval (first y) (second x) x)
+           \o (recur (cons (update-interval x (first y) (second x))
                            (next xs))
-                     (cons (derive-interval (second x) (second y) x) (next ys))
+                     (cons (update-interval x (second x) (second y)) (next ys))
                      (clojure.core/conj
                       result
-                      (derive-interval (first y) (second x) x)))
+                      (update-interval x (first y) (second x))))
            \O (recur (cons
-                      (derive-interval (second y) (second x) x)
+                      (update-interval x (second y) (second x))
                       (next xs))
                      (next ys)
                      (clojure.core/conj
                       result
-                      (derive-interval (first x) (second y) x)))
+                      (update-interval x (first x) (second y))))
            \D (recur (cons
-                      (derive-interval (second y) (second x) x)
+                      (update-interval x (second y) (second x))
                       (next xs))
                      (next ys)
-                     (clojure.core/conj result (augment-interval y x)))
-           \d (recur (next xs) (cons (derive-interval (second x) (second y) x)
+                     (clojure.core/conj result (update-interval x y)))
+           \d (recur (next xs) (cons (update-interval x (second x) (second y))
                                      (next ys))
                      (clojure.core/conj result x))
            \e (recur (next xs) (next ys) (clojure.core/conj result x))
            \f (recur (next xs) (next ys) (clojure.core/conj result x))
            \s (recur (next xs)
-                     (cons (derive-interval (second x) (second y) x)
+                     (cons (update-interval x (second x) (second y))
                            (next ys))
                      (clojure.core/conj result x))))
        result)))
@@ -489,11 +487,11 @@
              (\f \d \e) (recur (next xs) (next ys) result)
              \s (recur (next xs) ys result)
              (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-             \F (recur (next xs) (next ys) (clojure.core/conj result (derive-interval (first x) (first y) x)))
-             \o (recur (next xs) ys (clojure.core/conj result (derive-interval (first x) (first y) x)))
+             \F (recur (next xs) (next ys) (clojure.core/conj result (update-interval x (first x) (first y))))
+             \o (recur (next xs) ys (clojure.core/conj result (update-interval x (first x) (first y))))
              \D (recur (cons (interval (second y) (second x)) (next xs))
                        (next ys)
-                       (clojure.core/conj result (derive-interval (first x) (first y) x)))))
+                       (clojure.core/conj result (update-interval x (first x) (first y))))))
          (apply clojure.core/conj result xs))
        result)))
   ([s1 s2 & sets]
