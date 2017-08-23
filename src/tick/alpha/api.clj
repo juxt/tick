@@ -192,8 +192,11 @@
   ([v1 v2]
    (core/duration v1 v2)))
 
-(defn concur [x y]
-  (interval/concur x y))
+(defn concur
+  ([] nil)
+  ([x] x)
+  ([x & args]
+   (reduce interval/concur x args)))
 
 ;; Useful functions
 
