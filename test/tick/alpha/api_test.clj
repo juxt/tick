@@ -17,7 +17,9 @@
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
     (is (= (t/date "2017-08-09") (t/tomorrow)))
-    (is (= 2017 (t/int (t/year))))))
+    (is (= 2017 (t/int (t/year))))
+    (is (= (t/time "2017-08-08T12:00:00") (t/noon (t/today))))
+    (is (= (t/time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
@@ -64,6 +66,17 @@
         (t/now)
         (t/+ (t/now) (t/seconds 20))
         (t/+ (t/now) (t/seconds 10))))))
+
+;; AM/PM
+
+(deftest am-test
+  (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+    (is (= [(t/time "2017-08-08T00:00:00")
+            (t/time "2017-08-08T12:00:00")]
+           (t/am (t/today))))
+    (is (= [(t/time "2017-08-08T12:00:00")
+            (t/time "2017-08-09T00:00:00")]
+           (t/pm (t/today))))))
 
 ;; Duration test
 

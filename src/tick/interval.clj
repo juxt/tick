@@ -144,6 +144,12 @@
        (s/assert :tick.interval/interval interval)
        (Duration/between (first interval) (second interval))))))
 
+(defn am [^LocalDate date]
+  (interval (t/start date) (t/noon date)))
+
+(defn pm [^LocalDate date]
+  (interval (t/noon date) (t/end date)))
+
 ;; Allen's Basic Relations
 
 (defn precedes? [x y]
