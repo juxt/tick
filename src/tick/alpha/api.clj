@@ -62,6 +62,9 @@
 (defn day
   ([] (core/day (today)))
   ([v] (core/day v)))
+(defn day-of-month
+  ([] (core/day-of-month (today)))
+  ([v] (core/day-of-month v)))
 (defn inst
   ([] (core/inst (now)))
   ([v] (core/inst v)))
