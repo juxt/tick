@@ -299,10 +299,10 @@
   concurrent."
   [x y]
   (case (code (relation x y))
-    \o (make-interval (first y) (second x))
-    \O (make-interval (first x) (second y))
+    \o (update-interval x (first y) (second x))
+    \O (update-interval x (first x) (second y))
     (\s \f \d \e) x
-    (\S \F \D) y
+    (\S \F \D) (update-interval x y)
     nil))
 
 (defn ^:experimental concurrencies
