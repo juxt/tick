@@ -384,7 +384,11 @@
 
   LocalTime
   (time [i] i)
-  (local? [i] true))
+  (local? [i] true)
+
+  nil
+  (time [_] nil)
+  (local? [_] nil))
 
 (extend-protocol ITimeRange
   String
@@ -417,7 +421,11 @@
 
   LocalDateTime
   (start [time] time)
-  (end [end] end))
+  (end [end] end)
+
+  nil
+  (start [_] nil)
+  (end [_] nil))
 
 (defn on [^LocalTime time ^LocalDate date]
   (.atTime date time))
