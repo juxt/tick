@@ -83,6 +83,10 @@
 (defn zone [z] (core/zone z))
 (defn zoned-date-time [z] (core/zoned-date-time z))
 
+
+(defn start [v] (core/start v))
+(defn end [v] (core/end v))
+
 ;; Time
 
 (defn time
@@ -90,8 +94,8 @@
   ([v] (core/time v)))
 (defn on [t d] (core/on (time t) (date d)))
 (defn at [d t] (core/at (date d) (time t)))
-(defn start [v] (core/start v))
-(defn end [v] (core/end v))
+(defn noon [v] (core/noon v))
+(defn midnight [v] (core/midnight v))
 (defn midnight? [v] (core/midnight? v))
 
 ;; Zones
@@ -176,6 +180,9 @@
 ;; An interval is just a vector with at least 2 entries. The 3rd entry
 ;; onwards are free to use by the caller.
 (defn interval? [v] (and (vector? v) (>= (count v) 2)))
+
+(defn am [^LocalDate date] (interval/am date))
+(defn pm [^LocalDate date] (interval/pm date))
 
 (def relation interval/relation)
 

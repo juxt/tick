@@ -423,6 +423,12 @@
 (defn at [^LocalDate date ^LocalTime time]
   (.atTime date time))
 
+(defn midnight [^LocalDate date]
+  (at date (LocalTime/MIDNIGHT)))
+
+(defn noon [^LocalDate date]
+  (at date (LocalTime/NOON)))
+
 (defn midnight? [^LocalDateTime t]
   (.isZero (Duration/between t (start (date t)))))
 
