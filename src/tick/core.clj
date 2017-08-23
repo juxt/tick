@@ -87,6 +87,7 @@
 (defprotocol IConstructors
   (date [_] "Make a java.time.LocalDate instance.")
   (day [_] "Make a java.time.DayOfWeek instance.")
+  (day-of-month [_] "Return value of the day in the month as an integer.")
   (inst [_] "Make a java.util.Date instance.")
   (instant [_] "Make a java.time.Instant instance.")
   (int [_] "Return value as integer")
@@ -148,6 +149,7 @@
   LocalDate
   (date [d] d)
   (day [d] (.getDayOfWeek d))
+  (day-of-month [d] (.getDayOfMonth d))
   (month [d] (Month/from d))
   (year-month [d] (YearMonth/of (.getYear d) (.getMonthValue d)))
   (year [d] (Year/of (.getYear d)))
@@ -158,6 +160,7 @@
   LocalDateTime
   (date [dt] (.toLocalDate dt))
   (day [dt] (day (date dt)))
+  (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
 

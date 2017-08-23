@@ -17,6 +17,7 @@
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
     (is (= (t/date "2017-08-09") (t/tomorrow)))
+    (is (= 8 (t/day-of-month (t/today))))
     (is (= 2017 (t/int (t/year))))
     (is (= (t/time "2017-08-08T12:00:00") (t/noon (t/today))))
     (is (= (t/time "2017-08-08T00:00:00") (t/midnight (t/today))))))
