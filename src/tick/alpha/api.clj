@@ -6,6 +6,7 @@
    [clojure.spec.alpha :as s]
    [tick.core :as core]
    [tick.cal :as cal]
+   tick.file ; To ensure protocol extension
    [tick.interval :as interval]
    [clojure.set :as set])
   (:import
