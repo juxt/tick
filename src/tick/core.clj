@@ -233,8 +233,8 @@
   (duration [i1 i2]
     (Duration/between (instant i1) (instant i2))))
 
-(definline < [x y] `(.isBefore ~x ~y))
-(definline > [x y] `(.isAfter ~x ~y))
+(definline < [x y] `(.isBefore (or ~x (epoch)) (or~y (epoch))))
+(definline > [x y] `(.isAfter (or ~x (epoch)) (or ~y (epoch))))
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
