@@ -23,6 +23,9 @@
     (LocalDate/now *clock*)
     (LocalDate/now)))
 
+(defn epoch []
+  (java.time.Instant/EPOCH))
+
 (s/def ::instant #(instance? Instant %))
 
 (defn parse-day [input]
@@ -349,9 +352,6 @@
 
 (defn yesterday []
   (- (today) 1))
-
-(defn epoch []
-  (java.time.Instant/EPOCH))
 
 (defprotocol ITime
   (time [s] "Constructor of an instant, inst, java.time.LocalTime or java.time.LocalDateTime?")
