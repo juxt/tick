@@ -22,6 +22,9 @@
     (is (= (t/time "2017-08-08T12:00:00") (t/noon (t/today))))
     (is (= (t/time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
+(deftest epoch-test
+  (is (= (java.time.Instant/parse "1970-01-01T00:00:00Z") (t/epoch))))
+
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
 

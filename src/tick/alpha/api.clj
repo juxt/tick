@@ -101,6 +101,7 @@
 (defn noon [v] (core/noon v))
 (defn midnight [v] (core/midnight v))
 (defn midnight? [v] (core/midnight? v))
+(defn epoch [] (core/epoch))
 
 ;; Zones
 
