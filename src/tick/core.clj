@@ -350,6 +350,9 @@
 (defn yesterday []
   (- (today) 1))
 
+(defn epoch []
+  (java.time.Instant/EPOCH))
+
 (defprotocol ITime
   (time [s] "Constructor of an instant, inst, java.time.LocalTime or java.time.LocalDateTime?")
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
