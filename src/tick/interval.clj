@@ -422,12 +422,14 @@
 (defn intersection
   "Return an interval set that is the intersection of the input
   interval sets."
+  ;; Single arity
   ([s1] s1)
+  ;; 2-arity
   ([s1 s2]
    (loop [xs s1
           ys s2
           result []]
-     (if (and xs ys)
+     (if (and (not-empty xs) (not-empty ys))
        (let [x (first xs) y (first ys)
              code (code (relation x y))]
          (case code
@@ -477,8 +479,8 @@
    (loop [xs s1
           ys s2
           result []]
-     (if xs
-       (if ys
+     (if (not-empty xs)
+       (if (not-empty ys)
          (let [x (first xs) y (first ys)
                code (code (relation x y))]
            (case code

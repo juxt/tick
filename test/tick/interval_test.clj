@@ -315,40 +315,65 @@
                          :a :b :c]]
                  coll2 [(interval "2017-04-12")
                         (interval "2017-04-14")]]
-             (intersection coll1 coll2)))))))
+             (intersection coll1 coll2))))))
+
+
+  (let [coll1 [[(t/time "2017-04-11T00:00")
+                (t/time "2017-04-14T00:00")]
+               [(t/time "2017-04-18T00:00")
+                (t/time "2017-04-20T00:00")]
+               [(t/time "2017-12-20T00:00")
+                (t/time "2017-12-23T00:00")]
+               [(t/time "2017-12-27T00:00")
+                (t/time "2018-01-01T00:00")]
+               [(t/time "2018-01-02T00:00")
+                (t/time "2018-01-08T00:00")]]
+        coll2 [(interval "2017")]]
+    (is (= [[(t/time "2017-04-11T00:00")
+             (t/time "2017-04-14T00:00")]
+            [(t/time "2017-04-18T00:00")
+             (t/time "2017-04-20T00:00")]
+            [(t/time "2017-12-20T00:00")
+             (t/time "2017-12-23T00:00")]
+            [(t/time "2017-12-27T00:00")
+             (t/time "2018-01-01T00:00")]]
+           (intersection coll1 coll2)))
+
+
+    (testing "Extra data of first collection intervals is preserved on intersection"
+      (is (=
+           [[(t/time "2017-04-12T00:00")
+             (t/time "2017-04-13T00:00") :a :b :c]
+            [(t/time "2017-04-14T00:00")
+             (t/time "2017-04-15T00:00") :a :b :c]]
+           (let [coll1 [[(t/time "2017-04-11T00:00")
+                         (t/time "2017-04-18T00:00")
+                         :a :b :c]]
+                 coll2 [(interval "2017-04-12")
+                        (interval "2017-04-14")]]
+             (intersection coll1 coll2)))))
+
+    (testing "Empty sets"
+      (let [coll1 []
+            coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                             (t/instant "2017-01-01T10:00:00Z"))
+
+                   (interval (t/instant "2017-01-01T11:00:00Z")
+                             (t/instant "2017-01-01T12:00:00Z"))
+
+                   (interval (t/instant "2017-01-01T14:00:00Z")
+                             (t/instant "2017-01-01T18:00:00Z"))]]
+        (is
+         (= []
+            (intersection coll1 coll2)))
+        (is
+         (= []
+            (intersection coll2 coll1)))
+        (is
+         (= []
+            (intersection [] [])))))))
 
 (deftest difference-test
-  (let [coll1 [(interval (t/instant "2017-01-01T06:00:00Z")
-                         (t/instant "2017-01-01T07:00:00Z"))
-
-               (interval (t/instant "2017-01-01T08:00:00Z")
-                         (t/instant "2017-01-01T09:00:00Z"))
-
-               (interval (t/instant "2017-01-01T09:00:00Z")
-                         (t/instant "2017-01-01T12:00:00Z"))
-
-               (interval (t/instant "2017-01-01T13:00:00Z")
-                         (t/instant "2017-01-01T15:00:00Z"))
-
-               (interval (t/instant "2017-01-01T17:00:00Z")
-                         (t/instant "2017-01-01T19:00:00Z"))]
-
-        coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
-                         (t/instant "2017-01-01T10:00:00Z"))
-
-               (interval (t/instant "2017-01-01T11:00:00Z")
-                         (t/instant "2017-01-01T12:00:00Z"))
-
-               (interval (t/instant "2017-01-01T14:00:00Z")
-                         (t/instant "2017-01-01T18:00:00Z"))]]
-    (is
-     (= [[(t/instant "2017-01-01T06:00:00Z") (t/instant "2017-01-01T07:00:00Z")]
-         [(t/instant "2017-01-01T08:00:00Z") (t/instant "2017-01-01T09:00:00Z")]
-         [(t/instant "2017-01-01T10:00:00Z") (t/instant "2017-01-01T11:00:00Z")]
-         [(t/instant "2017-01-01T13:00:00Z") (t/instant "2017-01-01T14:00:00Z")]
-         [(t/instant "2017-01-01T18:00:00Z") (t/instant "2017-01-01T19:00:00Z")]]
-        (difference coll1 coll2))))
-
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
                (interval (t/instant "2017-01-01T14:00:00Z")
@@ -407,7 +432,27 @@
     (is (= [(concat (interval "2017-07-31" "2017-08-13") [:test])]
            (difference
             [(concat (interval "2017-07-31" "2017-08-13") [:test])]
-            [(interval "2017-01-01")])))))
+            [(interval "2017-01-01")]))))
+
+  (testing "Empty sets"
+      (let [coll1 []
+            coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                             (t/instant "2017-01-01T10:00:00Z"))
+
+                   (interval (t/instant "2017-01-01T11:00:00Z")
+                             (t/instant "2017-01-01T12:00:00Z"))
+
+                   (interval (t/instant "2017-01-01T14:00:00Z")
+                             (t/instant "2017-01-01T18:00:00Z"))]]
+        (is
+         (= []
+            (difference coll1 coll2)))
+        (is
+         (= coll2
+            (difference coll2 coll1)))
+        (is
+         (= []
+            (difference [] []))))))
 
 (deftest disj-test
   (is (=
