@@ -59,14 +59,11 @@
         :args (s/cat :name ::name :day ::date :hol ::date)
         :ret ::holiday)
 
-(defn int-year [year]
-  (core/int (core/year year)))
-
 (defn new-years-day [year]
-  (LocalDate/of (int-year year) 1 1))
+  (LocalDate/of (core/int (core/year year)) 1 1))
 
 (defn new-years-day-holiday [year]
-  (let [day (new-years-day (int-year year))
+  (let [day (new-years-day (core/int (core/year year)))
         hol (cond-> day (weekend? day) (first-named-day-from DayOfWeek/MONDAY))]
     (holiday "New Year's Day" day hol)))
 
@@ -78,7 +75,7 @@
   ;; TODO: From what year does this algorithm makes sense from, need
   ;; to throw an exception outside this range.
   [year]
-  (let [year (int-year year)
+  (let [year (core/int (core/year year))
         a (mod year 19)
         b (quot year 100)
         c (mod year 100)
@@ -96,41 +93,41 @@
     (LocalDate/of year n (+ p 1))))
 
 (defn good-friday [year]
-  (.minusDays (easter-sunday (int-year year)) 2))
+  (.minusDays (easter-sunday (core/int (core/year year))) 2))
 
 (defn good-friday-holiday [year]
-  (holiday "Good Friday" (good-friday (int-year year))))
+  (holiday "Good Friday" (good-friday (core/int (core/year year)))))
 
 (defn easter-monday [year]
-  (.plusDays (easter-sunday (int-year year)) 1))
+  (.plusDays (easter-sunday (core/int (core/year year))) 1))
 
 (defn easter-monday-holiday [year]
-  (holiday "Easter Monday" (easter-monday (int-year year))))
+  (holiday "Easter Monday" (easter-monday (core/int (core/year year)))))
 
 (defn may-day [year]
-  (LocalDate/of (int-year year) 5 1))
+  (LocalDate/of (core/int (core/year year)) 5 1))
 
 (defn early-may-bank-holiday [year]
   (holiday "Early May bank holiday"
-           (first-named-day-from (may-day (int-year year)) DayOfWeek/MONDAY)))
+           (first-named-day-from (may-day (core/int (core/year year))) DayOfWeek/MONDAY)))
 
 (defn spring-bank-holiday [year]
   (holiday "Spring bank holiday"
-           (last-monday-of-month (YearMonth/of (int-year year) Month/MAY))))
+           (last-monday-of-month (YearMonth/of (core/int (core/year year)) Month/MAY))))
 
 (defn summer-bank-holiday [year]
   (holiday "Summer bank holiday"
-           (last-monday-of-month (YearMonth/of (int-year year) Month/AUGUST))))
+           (last-monday-of-month (YearMonth/of (core/int (core/year year)) Month/AUGUST))))
 
 (defn christmas-day [year]
-  (LocalDate/of (int-year year) 12 25))
+  (LocalDate/of (core/int (core/year year)) 12 25))
 
 (s/fdef christmas-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn christmas-day-holiday [year]
-  (let [day (christmas-day (int-year year))
+  (let [day (christmas-day (core/int (core/year year)))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Christmas Day" day hol)))
@@ -140,14 +137,14 @@
         :ret ::holiday)
 
 (defn boxing-day [year]
-  (LocalDate/of (int-year year) 12 26))
+  (LocalDate/of (core/int (core/year year)) 12 26))
 
 (s/fdef boxing-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn boxing-day-holiday [year]
-  (let [day (boxing-day (int-year year))
+  (let [day (boxing-day (core/int (core/year year)))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Boxing Day" day hol)))
