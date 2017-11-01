@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 744.09448819 1052.3622047" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <path id="a" d="m372.1 593.34v-430.8" fill="none" stroke="#000" stroke-linecap="square" stroke-width="12.348"/>
+ <use transform="matrix(0 1 -1 0 749.99 5.837)" width="744.09448" height="1052.3622" xlink:href="#a"/>
+ <use transform="matrix(.86603 -.5 .5 .86603 -139.17 236.69)" width="744.09448" height="1052.3622" xlink:href="#a"/>
+ <use transform="matrix(.5 -.86603 .86603 .5 -141.31 511.22)" width="744.09448" height="1052.3622" xlink:href="#a"/>
+ <use transform="matrix(.5 .86603 -.86603 .5 513.3 -133.28)" width="744.09448" height="1052.3622" xlink:href="#a"/>
+ <use transform="matrix(.86603 .5 -.5 .86603 238.77 -135.42)" width="744.09448" height="1052.3622" xlink:href="#a"/>
+ <path transform="matrix(1.0321 0 0 .99025 -196.34 -106.79)" d="m727.86 489.51a177.14 177.14 0 1 1 -354.29 0 177.14 177.14 0 1 1 354.29 0z" fill="#fff" fill-rule="evenodd"/>
+ <path d="m355.45 362.61 124.9 115.97" fill="none" stroke="#000" stroke-linecap="square" stroke-width="10"/>
+ <path id="b" d="m316.24 377.94h111.61" fill="none" stroke="#000" stroke-width=".001"/>
+ <use transform="matrix(0 -1 1 0 -5.8937 749.99)" width="744.09448" height="1052.3622" xlink:href="#b"/>
+ <path d="m392.64 371.05-96.38 31.837" fill="none" stroke="#000" stroke-linecap="square" stroke-width="14.838"/>
+ <path transform="matrix(14.176 0 0 14.176 -4902.2 -4979.8)" d="m373.08 377.94a1.0312 1.0312 0 1 1 -2.0625 0 1.0312 1.0312 0 1 1 2.0625 0z" fill-rule="evenodd"/>
+</svg>
