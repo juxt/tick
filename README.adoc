@@ -7,7 +7,7 @@ A Clojure library for dealing with time.
 Add to your lein or boot dependencies:
 
 ```
-[tick "0.2.4"]
+[tick "0.3.5"]
 ```
 
 === Dependencies
