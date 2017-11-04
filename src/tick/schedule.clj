@@ -9,27 +9,37 @@
     (let [dly (.until (.instant clock) (:tick/date next-time) ChronoUnit/MILLIS)]
       (.schedule executor ^Callable callback dly TimeUnit/MILLISECONDS))))
 
-(defn callback [state timeline {:keys [clock trigger executor promise] :as opts}]
-  (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant (:tick/date %)) (.instant clock))) timeline)]
+(defn callback [state {:keys [clock trigger executor promise] :as opts}]
+  ;; The time is now. We have been called for a reason. That reason
+  ;; might be that we have to run a task.
+  (let [{:keys [timeline due status] :as result}
+        (swap! state
+               (fn [st]
+                 (if-not (= :running (:status st))
+                   ;; If we are stopped, paused or done, then we do nothing. We don't
+                   ;; schedule another task. We just exit.
+                   (dissoc st :due)
 
-    (if-not (empty? next-timeline)
-      ;; Schedule next
-      (do
-        (swap! state assoc
-               :timeline next-timeline
-               :scheduled-future (schedule-next (first next-timeline)
-                                                {:clock clock
-                                                 :executor executor
-                                                 :callback #(callback state next-timeline opts)}))
-        (dorun (map trigger due)))
+                   (let [[due next-timeline] (split-with #(not (.isAfter (.toInstant (:tick/date %)) (.instant clock))) (:timeline st))]
 
-      ;; Set status to :done
-      (do (swap! state (fn [s] (-> s
-                                   (assoc :status :done)
-                                   (dissoc :timeline :scheduled-future))))
-          (dorun (map trigger due))
-          (deliver promise :done)))))
+                     (cond-> st
+                       (not (empty? next-timeline)) (assoc :timeline next-timeline)
+                       (empty? next-timeline) (-> (assoc :status :done)
+                                                  (dissoc :timeline))
+                       due (assoc :due due))))))]
 
+    (when due
+      (when (and (= status :running) timeline)
+        (schedule-next (first timeline)
+                       {:clock clock
+                        :executor executor
+                        :callback #(callback state opts)}))
+
+      (doseq [job due]
+        (.submit executor #(trigger job))))
+
+    (when (= status :done)
+      (deliver promise :done))))
 
 (defprotocol ITicker
   "A ticker travels across a timeline, usually triggering some action for each time on the timeline."
@@ -43,23 +53,22 @@
 (defrecord SchedulingTicker [trigger timeline executor state promise]
   ITicker
   (start [_ clock]
-    (swap! state assoc
-           :status :running
-           :timeline timeline
-           :scheduled-future (schedule-next
-                              (first timeline)
-                              {:clock clock
-                               :executor executor
-                               :callback #(callback state timeline {:clock clock :trigger trigger :executor executor :promise promise})})
-           :clock clock
-           :executor executor)
+    (let [{:keys [timeline]} (swap! state assoc
+                                    :status :running
+                                    :timeline timeline
+                                    :clock clock
+                                    :executor executor)]
+      (schedule-next
+       (first timeline)
+       {:clock clock
+        :executor executor
+        :callback #(callback state {:clock clock :trigger trigger :executor executor :promise promise})}))
+
     promise)
 
   (pause [_]
     (let [st @state]
-      (when-let [fut (:scheduled-future st)]
-        (.cancel fut false))
-      (swap! state (fn [st] (-> st (assoc :status :paused) (dissoc :scheduled-future))))
+      (swap! state (fn [st] (-> st (assoc :status :paused))))
       :ok))
 
   (resume [_]
@@ -68,19 +77,18 @@
         (let [timeline (:timeline st)
               executor (:executor st)
               clock (:clock st)]
-          (swap! state (fn [st] (-> st (assoc :status :running
-                                              :scheduled-future (schedule-next
-                                                                 (first timeline)
-                                                                 {:clock clock
-                                                                  :executor executor
-                                                                  :callback #(callback state timeline {:clock clock :trigger trigger :executor executor :promise promise})}))))))
-
+          (let [{:keys [timeline]}
+                (swap! state (fn [st] (-> st (assoc :status :running
+                                                    ))))]
+            (schedule-next
+             (first timeline)
+             {:clock clock
+              :executor executor
+              :callback #(callback state {:clock clock :trigger trigger :executor executor :promise promise})})))
         :ok)))
 
   (stop [_]
-    (when-let [fut (:scheduled-future @state)]
-      (.cancel fut false))
-    (swap! state (fn [s] (-> s (assoc :status :stopped) (dissoc :scheduled-future))))
+    (swap! state (fn [s] (-> s (assoc :status :stopped))))
     :ok)
 
   (remaining [_]
