@@ -3,7 +3,7 @@
 (ns tick.cal
   (:require
    [clojure.spec.alpha :as s]
-   [tick.core :as core])
+   [tick.core :as t])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate YearMonth Month]
    [java.time.temporal ChronoUnit]))
@@ -29,10 +29,10 @@
   (fn [d] (.isBefore d now)))
 
 (defn- first-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (core/range ld))))
+  (first (drop-while #(not= (day-of-week %) day) (t/range ld))))
 
 (defn- last-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (core/range ld nil -1))))
+  (first (drop-while #(not= (day-of-week %) day) (t/range ld nil -1))))
 
 (defn first-monday-of-month [^YearMonth ym]
   (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
@@ -60,10 +60,10 @@
         :ret ::holiday)
 
 (defn new-years-day [year]
-  (LocalDate/of (core/int (core/year year)) 1 1))
+  (LocalDate/of (t/int (t/year year)) 1 1))
 
 (defn new-years-day-holiday [year]
-  (let [day (new-years-day (core/int (core/year year)))
+  (let [day (new-years-day (t/int (t/year year)))
         hol (cond-> day (weekend? day) (first-named-day-from DayOfWeek/MONDAY))]
     (holiday "New Year's Day" day hol)))
 
@@ -75,7 +75,7 @@
   ;; TODO: From what year does this algorithm makes sense from, need
   ;; to throw an exception outside this range.
   [year]
-  (let [year (core/int (core/year year))
+  (let [year (t/int (t/year year))
         a (mod year 19)
         b (quot year 100)
         c (mod year 100)
@@ -93,41 +93,41 @@
     (LocalDate/of year n (+ p 1))))
 
 (defn good-friday [year]
-  (.minusDays (easter-sunday (core/int (core/year year))) 2))
+  (.minusDays (easter-sunday (t/int (t/year year))) 2))
 
 (defn good-friday-holiday [year]
-  (holiday "Good Friday" (good-friday (core/int (core/year year)))))
+  (holiday "Good Friday" (good-friday (t/int (t/year year)))))
 
 (defn easter-monday [year]
-  (.plusDays (easter-sunday (core/int (core/year year))) 1))
+  (.plusDays (easter-sunday (t/int (t/year year))) 1))
 
 (defn easter-monday-holiday [year]
-  (holiday "Easter Monday" (easter-monday (core/int (core/year year)))))
+  (holiday "Easter Monday" (easter-monday (t/int (t/year year)))))
 
 (defn may-day [year]
-  (LocalDate/of (core/int (core/year year)) 5 1))
+  (LocalDate/of (t/int (t/year year)) 5 1))
 
 (defn early-may-bank-holiday [year]
   (holiday "Early May bank holiday"
-           (first-named-day-from (may-day (core/int (core/year year))) DayOfWeek/MONDAY)))
+           (first-named-day-from (may-day (t/int (t/year year))) DayOfWeek/MONDAY)))
 
 (defn spring-bank-holiday [year]
   (holiday "Spring bank holiday"
-           (last-monday-of-month (YearMonth/of (core/int (core/year year)) Month/MAY))))
+           (last-monday-of-month (YearMonth/of (t/int (t/year year)) Month/MAY))))
 
 (defn summer-bank-holiday [year]
   (holiday "Summer bank holiday"
-           (last-monday-of-month (YearMonth/of (core/int (core/year year)) Month/AUGUST))))
+           (last-monday-of-month (YearMonth/of (t/int (t/year year)) Month/AUGUST))))
 
 (defn christmas-day [year]
-  (LocalDate/of (core/int (core/year year)) 12 25))
+  (LocalDate/of (t/int (t/year year)) 12 25))
 
 (s/fdef christmas-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn christmas-day-holiday [year]
-  (let [day (christmas-day (core/int (core/year year)))
+  (let [day (christmas-day (t/int (t/year year)))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Christmas Day" day hol)))
@@ -137,14 +137,14 @@
         :ret ::holiday)
 
 (defn boxing-day [year]
-  (LocalDate/of (core/int (core/year year)) 12 26))
+  (LocalDate/of (t/int (t/year year)) 12 26))
 
 (s/fdef boxing-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn boxing-day-holiday [year]
-  (let [day (boxing-day (core/int (core/year year)))
+  (let [day (boxing-day (t/int (t/year year)))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Boxing Day" day hol)))
