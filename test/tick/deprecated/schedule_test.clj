@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.schedule-test
+(ns tick.deprecated.schedule-test
   (:require
    [clojure.test :refer :all]
    [tick.timeline :refer [periodic-seq timeline]]

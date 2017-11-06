@@ -1,6 +1,6 @@
 ;; Copyright © 2016, JUXT LTD.
 
-(ns tick.timeline-test
+(ns tick.deprecated.timeline-test
   (:require
    [clojure.test :refer :all]
    [tick.timeline :refer [interleave-timelines periodic-seq timeline sequencer]]
