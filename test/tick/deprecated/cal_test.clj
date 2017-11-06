@@ -1,9 +1,9 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.cal-test
+(ns tick.deprecated.cal-test
   (:require
    [clojure.test :refer :all]
-   [tick.cal :refer :all])
+   [tick.deprecated.cal :refer :all])
   (:import
    [java.time LocalDate YearMonth DayOfWeek]))
 

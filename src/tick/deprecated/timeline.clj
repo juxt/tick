@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.timeline
+(ns tick.deprecated.timeline
   (:require
    [clojure.spec.alpha :as s])
   (:import

@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.clock
+(ns tick.deprecated.clock
   (:import
    [java.time Clock ZoneId ZonedDateTime]
    [java.time.temporal ChronoUnit]))

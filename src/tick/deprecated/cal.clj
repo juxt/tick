@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.cal
+(ns tick.deprecated.cal
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as t])

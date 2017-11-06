@@ -1,4 +1,4 @@
-(ns tick.schedule
+(ns tick.deprecated.schedule
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate]
    [java.time.temporal ChronoUnit]

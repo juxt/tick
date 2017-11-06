@@ -3,9 +3,9 @@
 (ns tick.deprecated.timeline-test
   (:require
    [clojure.test :refer :all]
-   [tick.timeline :refer [interleave-timelines periodic-seq timeline sequencer]]
-   [tick.clock :refer [just-now]]
-   [tick.cal :as cal]
+   [tick.deprecated.timeline :refer [interleave-timelines periodic-seq timeline sequencer]]
+   [tick.deprecated.clock :refer [just-now]]
+   [tick.deprecated.cal :as cal]
    [tick.core :refer [seconds minutes hours]])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate LocalDateTime]

@@ -3,10 +3,10 @@
 (ns tick.deprecated.schedule-test
   (:require
    [clojure.test :refer :all]
-   [tick.timeline :refer [periodic-seq timeline]]
+   [tick.deprecated.timeline :refer [periodic-seq timeline]]
    [tick.core :refer [seconds millis]]
-   [tick.clock :refer [clock-ticking-in-seconds just-now]]
-   [tick.schedule :as sched]))
+   [tick.deprecated.clock :refer [clock-ticking-in-seconds just-now]]
+   [tick.deprecated.schedule :as sched]))
 
 (deftest schedule-test
   (let [a (atom 0)

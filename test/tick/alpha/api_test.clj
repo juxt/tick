@@ -5,7 +5,7 @@
    [clojure.spec.alpha :as s]
    [clojure.test :refer :all]
    [tick.alpha.api :as t]
-   [tick.cal :as cal]))
+   [tick.deprecated.cal :as cal]))
 
 (s/check-asserts true)
 
