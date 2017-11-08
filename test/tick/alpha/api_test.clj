@@ -9,6 +9,12 @@
 
 (s/check-asserts true)
 
+;; Constructor test
+
+(deftest constructor-test
+  (is (= java.time.Year (type (t/year 2017))))
+  (is (= java.time.Month (type (t/month 12)))))
+
 ;; Point-in-time tests
 
 (deftest today-test
@@ -69,7 +75,9 @@
        (t/<
         (t/now)
         (t/+ (t/now) (t/seconds 20))
-        (t/+ (t/now) (t/seconds 10))))))
+        (t/+ (t/now) (t/seconds 10)))))
+  (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/seconds 1))))
+  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/seconds 1)))))
 
 ;; AM/PM
 
@@ -87,19 +95,28 @@
 (deftest duration-test
   (is (= 24 (t/hours (t/duration (t/tomorrow))))))
 
-;; Dates test
+;; TODO: Interval testing
 
-(deftest dates-over-test
-  (is (= 30 (count (t/dates-over "2017-09"))))
-  (is (= (t/date "2017-09-01") (first (t/dates-over "2017-09"))))
-  (is (= (t/date "2017-09-30") (last (t/dates-over "2017-09"))))
-  (is (= 31 (count (t/dates-over "2017-10"))))
-  (is (= 8 (count (t/dates-over (t/interval "2017-10-03" "2017-10-10")))))
-  (is (= [(t/date "2017-09-10")] (t/dates-over (t/interval "2017-09-10T12:00" "2017-09-10T14:00"))))
-  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/dates-over (t/interval "2017-09-10T12:00" "2017-09-11T14:00"))))
-  (is (= 2 (count (t/year-months-over (t/interval "2017-09-10" "2017-10-10")))))
-  (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019")))))
-  (is (= 3 (count (t/years-over (t/interval "2017-09-10T12:00" "2019-02"))))))
+;; Division tests
+
+(deftest division-test
+  (is (= 365 (count (t// (t/year 2017) :days))))
+  (is (= 12 (count (t// (t/year 2017) :months))))
+  (is (= 30 (count (t// "2017-09" :days))))
+  (is (= (t/date "2017-09-01") (first (t// "2017-09" :days))))
+  (is (= (t/date "2017-09-30") (last (t// "2017-09" :days))))
+  (is (= 31 (count (t// "2017-10" :days))))
+  (is (= 8 (count (t// (t/interval "2017-10-03" "2017-10-10") :days))))
+  (is (= [(t/date "2017-09-10")] (t// (t/interval "2017-09-10T12:00" "2017-09-10T14:00") :days)))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t// (t/interval "2017-09-10T12:00" "2017-09-11T14:00") :days)))
+  (is (= 2 (count (t// (t/interval "2017-09-10" "2017-10-10") :months))))
+  (is (= 3 (count (t// (t/interval "2017-09-10T12:00" "2019") :years))))
+  (is (= 3 (count (t// (t/interval "2017-09-10T12:00" "2019-02") :years))))
+  (is (= 24 (count (t// (t/date "2017-09-10") :hours)))))
+
+;; TODO: Divide by duration
+
+
 
 ;; Concur test
 
@@ -132,7 +149,7 @@
 
     (let [year (t/year 2017)
           public-holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
-          weekends (map t/interval (filter cal/weekend? (t/dates-over (t/interval year))))
+          weekends (map t/interval (filter cal/weekend? (t// year :days)))
           non-working-days (t/union public-holidays weekends)
           vacation-set (t/difference [vacation] non-working-days)
           working-days-absent (t/days (apply t/+ (map t/duration vacation-set)))]
@@ -270,13 +287,13 @@
 (deftest working-days-in-a-year-test
   (let [year (t/year 2017)
         holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
-        weekends (map t/interval (filter cal/weekend? (t/dates-over (t/interval year))))]
+        weekends (map t/interval (filter cal/weekend? (t// year :days)))]
     (is (t/ordered-disjoint-intervals? holidays))
     (is (t/ordered-disjoint-intervals? weekends))
     (let [non-working-days (t/union holidays weekends)]
       (is (t/ordered-disjoint-intervals? non-working-days))
       (is (= 113 (count non-working-days)))
-      (is (= 365 (count (t/dates-over (t/interval (t/year 2017))))))
+      (is (= 365 (count (t// (t/year 2017) :days))))
 
       ;; 252 is the number of working days in 2017 in England & Wales.
       ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.

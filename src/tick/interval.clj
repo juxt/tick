@@ -44,11 +44,14 @@
    (t/min (first ival1) (first ival2))
    (t/max (second ival1) (second ival2))))
 
-(extend-protocol t/ITime
-  clojure.lang.PersistentVector
+(extend-type clojure.lang.PersistentVector
+  t/ITimeRange
+  (start [v] (first v))
+  (end [v] (second v))
+  t/ITime
   (local? [ival] (and
-                  (t/local? (first ival))
-                  (t/local? (second ival)))))
+                   (t/local? (first ival))
+                   (t/local? (second ival)))))
 
 (defprotocol ISpan
   (span [_] [_ _] "Return an interval from a bounded period of time."))
@@ -321,44 +324,53 @@
 
 ;; Useful functions that make use of the above.
 
-(defn dates-over
-  "Return a lazy sequence of the dates (inclusive) that the given
-  (local) interval spans. Must be a local interval, since calendar
-  dates are a local construct."
-  [ival]
-  {:pre [(s/assert ::local ival)]}
+(defn divide-by
+  "Return a lazy sequence of java.time.Temporal instances over the
+  given (local) interval."
+  [ival f]
   (cond->
       (t/range
-       (t/date (first ival))
-       (t/date (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
-    (concur (interval (t/date (second ival))) ival) (concat [(t/date (second ival))])))
+        (f (first ival))
+        (f (second ival)))
+    ;; Since range is exclusive, we must add one more value, but only
+    ;; if it concurs rather than merely meets.
+    (concur (interval (f (second ival))) ival)
+    (concat [(f (second ival))])))
 
-(defn year-months-over
-  "Return a lazy sequence of the year-months (inclusive) that the
-  given interval spans."
-  [ival]
-  (cond->
-      (t/range
-       (t/year-month (first ival))
-       (t/year-month (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
-    (concur (interval (t/year-month (second ival))) ival) (concat [(t/year-month (second ival))])))
+;; Division
 
-(defn years-over
-  "Return a lazy sequence of the years (inclusive) that the given
-  interval spans."
-  [ival]
-  (cond->
-      (t/range
-       (t/year (first ival))
-       (t/year (second ival)))
-    ;; Since range is exclusive, we must add one more value, but only if it concurs rather than merely meets.
-    (concur (interval (t/year (second ival))) ival) (concat [(t/year (second ival))])))
+(defmulti divide "Divide an interval by a given factor"
+  (fn [ival factor] factor))
+
+(defn divide-by-units [ival dur]
+  (map interval
+       (map (juxt identity #(t/min (t/+ % dur) (t/end ival)))
+            (t/range
+              (first ival)
+              (second ival)
+              dur))))
+
+(defmethod divide :hours [ival _]
+  (divide-by-units ival (t/duration 1 :hours)))
+
+(defmethod divide :minutes [ival _]
+  (divide-by-units ival (t/duration 1 :minutes)))
+
+(defmethod divide :days [ival _]
+  (divide-by ival t/date))
+
+(defmethod divide :months [ival _]
+  (divide-by ival t/year-month))
+
+(defmethod divide :years [ival _]
+  (divide-by ival t/year))
+
+#_(defmethod divide java.time.Duration [ival _]
+  (dates-over ival))
 
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
-(defn segment-by
+#_(defn segment-by
   "Split the interval in to a lazy sequence of intervals, one for each
   local date."
   [f ival]
@@ -368,7 +380,7 @@
        (map #(update-interval ival %))
        (remove nil?)))
 
-(defn group-segments-by
+#_(defn group-segments-by
   "Split the interval in to a lazy sequence of intervals, one for each
   local date."
   [f ival]

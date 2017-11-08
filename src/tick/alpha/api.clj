@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - inc dec max min range time int long complement < >])
+  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >=])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
@@ -18,6 +18,10 @@
 ;; clojure.spec assertions are used to check correctness, but these
 ;; are disabled by default (except when testing).
 
+;; Surfacing some useful constants
+
+(def units core/units)
+
 ;; Fixing the clock used for `today` and `now`.
 
 (defmacro with-clock [^java.time.Clock clock & body]
@@ -27,6 +31,7 @@
 ;; Point-in-time 'demo' functions
 
 (defn now [] (core/now))
+(defn just-now [] (core/just-now))
 (defn today [] (core/today))
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
@@ -165,6 +170,15 @@
                   (core/< y (first more)))
                 false)))
 
+(defn <=
+  ([x] true)
+  ([x y] (core/<= x y))
+  ([x y & more] (if (core/<= x y)
+                (if (next more)
+                  (recur y (first more) (next more))
+                  (core/<= y (first more)))
+                false)))
+
 (defn >
   ([x] true)
   ([x y] (core/> x y))
@@ -173,6 +187,17 @@
                   (recur y (first more) (next more))
                   (core/> y (first more)))
                 false)))
+
+(defn >=
+  ([x] true)
+  ([x y] (core/>= x y))
+  ([x y & more] (if (core/>= x y)
+                (if (next more)
+                  (recur y (first more) (next more))
+                  (core/>= y (first more)))
+                false)))
+
+;; TODO: Multiplication (of durations)
 
 ;; Intervals
 
@@ -196,45 +221,52 @@
   ([v1 v2]
    (core/duration v1 v2)))
 
+(def between core/between)
+
 (defn concur
   ([] nil)
   ([x] x)
   ([x & args]
    (reduce interval/concur x args)))
 
+;; Divisions
+
+(defn / [interval divisor]
+  (interval/divide (interval/interval interval) divisor))
+
 ;; Useful functions
 
-(defn dates-over [interval]
+#_(defn dates-over [interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
     (interval/dates-over interval)))
 
-(defn year-months-over [interval]
+#_(defn year-months-over [interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
     (interval/year-months-over interval)))
 
-(defn years-over [interval]
+#_(defn years-over [interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
     (interval/years-over interval)))
 
 ;; Note: Not sure about partition here for an individual interval. Should reserve for interval sets.
 
-(defn segment-by [f interval]
+#_(defn segment-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
     (interval/segment-by f interval)))
 
-(defn segment-by-date [interval]
+#_(defn segment-by-date [interval]
   (segment-by interval/dates-over interval))
 
-(defn group-segments-by [f interval]
+#_(defn group-segments-by [f interval]
   (let [interval (interval/interval interval)]
     (s/assert :tick.interval/interval interval)
     (interval/group-segments-by f interval)))
 
-(defn group-segments-by-date [interval]
+#_(defn group-segments-by-date [interval]
   (group-segments-by interval/dates-over interval))
 
 ;; Interval sets

@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - inc dec max min range time int long < >])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >=])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -11,12 +11,33 @@
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
+(def units
+  {:nanos ChronoUnit/NANOS
+   :micros ChronoUnit/MICROS
+   :millis ChronoUnit/MILLIS
+   :seconds ChronoUnit/SECONDS
+   :minutes ChronoUnit/MINUTES
+   :hours ChronoUnit/HOURS
+   :half-days ChronoUnit/HALF_DAYS
+   :days ChronoUnit/DAYS
+   :weeks ChronoUnit/WEEKS
+   :months ChronoUnit/MONTHS
+   :years ChronoUnit/YEARS
+   :decades ChronoUnit/DECADES
+   :centuries ChronoUnit/CENTURIES
+   :millennia ChronoUnit/MILLENNIA
+   :eras ChronoUnit/ERAS
+   :forever ChronoUnit/FOREVER})
+
 (def ^{:dynamic true} *clock* nil)
 
 (defn now []
   (if *clock*
     (Instant/now *clock*)
     (Instant/now)))
+
+(defn just-now []
+  (.truncatedTo (now) (ChronoUnit/SECONDS)))
 
 (defn today []
   (if *clock*
@@ -225,19 +246,25 @@
   (years [d] (.dividedBy (days d) 365.24)))
 
 (defprotocol IDurationCoercion
-  (duration [_] [_ _] "Return the duration of the given value, or between a pair of values, if appropriate."))
+  (duration [_] [_ _] "Return the duration of the given value, or construct a duration between an amount and units"))
 
 (extend-protocol IDurationCoercion
   Duration
   (duration [d] d)
   nil
-  (duration ([_] nil) ([_ _] nil))
-  clojure.lang.PersistentVector
-  (duration [i1 i2]
-    (Duration/between (instant i1) (instant i2))))
+  (duration [_] nil)
+  Number
+  (duration
+    ([n] (duration n :seconds))
+    ([n u] (Duration/of n (units u)))))
+
+(defn between [i1 i2]
+  (Duration/between (instant i1) (instant i2)))
 
 (definline < [x y] `(.isBefore (or ~x (epoch)) (or~y (epoch))))
+(definline <= [x y] `(not (.isAfter (or ~x (epoch)) (or~y (epoch)))))
 (definline > [x y] `(.isAfter (or ~x (epoch)) (or ~y (epoch))))
+(definline >= [x y] `(not (.isBefore (or ~x (epoch)) (or ~y (epoch)))))
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
