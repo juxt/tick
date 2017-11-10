@@ -231,8 +231,8 @@
   (hours [n] (Duration/ofHours n))
   (days [n] (Duration/ofDays n))
   (weeks [n] (Duration/ofDays (* n 7)))
-  (months [n] (.multipliedBy (years n) 12))
-  (years [n] (Duration/ofDays (/ n 365.25)))
+  (months [n] (.dividedBy (years n) 12))
+  (years [n] (Duration/ofDays (* n 365.25)))
 
   Duration
   (nanos [d] (.toNanos d))
@@ -243,7 +243,7 @@
   (days [d] (.toDays d))
   (weeks [d] (.dividedBy (days d) 7))
   (months [d] (.multipliedBy (years d) 12))
-  (years [d] (.dividedBy (days d) 365.24)))
+  (years [d] (/ (days d) 365.24)))
 
 (defprotocol IDurationCoercion
   (duration [_] [_ _] "Return the duration of the given value, or construct a duration between an amount and units"))
