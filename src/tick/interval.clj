@@ -322,7 +322,7 @@
           :when conc]
       {:x x :y y :concur concur})))
 
-;; Useful functions that make use of the above.
+;; Division
 
 (defn divide-by
   "Return a lazy sequence of java.time.Temporal instances over the
@@ -337,60 +337,64 @@
     (concur (interval (f (second ival))) ival)
     (concat [(f (second ival))])))
 
-;; Division
+(defn divide-by-duration
+  "Divide an interval by a duration, returning a sequence of
+  intervals. If the interval cannot be wholly sub-divided by the
+  duration divisor, the last interval will represent the 'remainder'
+  of the division and not be as long as the other preceeding
+  intervals."
+  [ival dur]
+  (->> (t/range
+         (first ival)
+         (second ival)
+         dur)
+       ;; Bound by given interval, last will become a remainder.
+       (map (juxt identity #(t/min (t/+ % dur) (t/end ival))))
+       (map interval)))
 
-(defmulti divide "Divide an interval by a given factor"
-  (fn [ival factor] factor))
+(defn divide-by-divisor [ival divisor]
+  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
 
-(defn divide-by-units [ival dur]
-  (map interval
-       (map (juxt identity #(t/min (t/+ % dur) (t/end ival)))
-            (t/range
-              (first ival)
-              (second ival)
-              dur))))
+(defprotocol IDivisibleInterval
+  (divide [divisor ival] "Divide an interval by a given divisor"))
 
-(defmethod divide :hours [ival _]
-  (divide-by-units ival (t/duration 1 :hours)))
+(defmulti divide-by-keyword ""
+  (fn [ival k] k))
 
-(defmethod divide :minutes [ival _]
-  (divide-by-units ival (t/duration 1 :minutes)))
+(defmethod divide-by-keyword :hours [ival _]
+  (divide-by-duration ival (t/duration 1 :hours)))
 
-(defmethod divide :days [ival _]
+(defmethod divide-by-keyword :minutes [ival _]
+  (divide-by-duration ival (t/duration 1 :minutes)))
+
+(defmethod divide-by-keyword :days [ival _]
   (divide-by ival t/date))
 
-(defmethod divide :months [ival _]
+(defmethod divide-by-keyword :months [ival _]
   (divide-by ival t/year-month))
 
-(defmethod divide :years [ival _]
+(defmethod divide-by-keyword :years [ival _]
   (divide-by ival t/year))
 
-#_(defmethod divide java.time.Duration [ival _]
-  (dates-over ival))
+(extend-protocol IDivisibleInterval
+  clojure.lang.Keyword
+  (divide [kw ival] (divide-by-keyword ival kw))
+  Duration
+  (divide [dur ival] (divide-by-duration ival dur))
+  Long
+  (divide [divisor ival] (divide-by-divisor ival divisor)))
 
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
-#_(defn segment-by
-  "Split the interval in to a lazy sequence of intervals, one for each
-  local date."
-  [f ival]
-  (->> (f ival)
-       (map interval)
-       (map (partial concur ival))
-       (map #(update-interval ival %))
-       (remove nil?)))
-
-#_(defn group-segments-by
-  "Split the interval in to a lazy sequence of intervals, one for each
-  local date."
-  [f ival]
-  (let [ivals (f ival)]
-    (->> ivals
-         (map interval)
-         (map (partial concur ival))
-         (map (fn [k v] (when v [k (list (update-interval ival v))])) ivals)
-         (remove nil?)
-         (into {}))))
+(extend-protocol t/IDivisible
+  LocalDate
+  (/ [ld d] (divide d (interval ld)))
+  Year
+  (/ [n d] (divide d (interval n)))
+  YearMonth
+  (/ [n d] (divide d (interval n)))
+  clojure.lang.PersistentVector
+  (/ [ival o] (divide o ival)))
 
 ;; Interval sets - sequences of mutually disjoint intervals
 

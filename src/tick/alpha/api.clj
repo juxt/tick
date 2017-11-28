@@ -232,8 +232,8 @@
 
 ;; Divisions
 
-(defn / [interval divisor]
-  (interval/divide (interval/interval interval) divisor))
+(defn / [x divisor]
+  (core// x divisor))
 
 ;; Useful functions
 

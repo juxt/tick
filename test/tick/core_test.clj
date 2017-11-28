@@ -14,3 +14,10 @@
   (is (instance? LocalDate (t/today)))
   (is (instance? LocalDate (t/tomorrow)))
   (is (instance? LocalDate (t/yesterday))))
+
+(deftest divide-test
+  (is
+    ;; Duration -> Long -> Duration
+    (= (t/duration 6 :hours) (t// (t/duration 6 :days) 24))
+    ;; Duration -> Duration -> Long
+    (= 63 (t// (t/duration 21 :days) (t/duration 8 :hours)))))

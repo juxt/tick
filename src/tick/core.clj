@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >=])
+  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >=])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -266,6 +266,13 @@
   (min [_ _] "Return minimum")
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
+(defprotocol IDivisible
+  (/ [_ _] "Divide time"))
+
+(extend-protocol IDivisible
+  String
+  (/ [s d] (/ (parse s) d)))
+
 (extend-type Instant
   ITimeArithmetic
   (+ [t x] (.plus t x))
@@ -356,14 +363,26 @@
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
+(defprotocol IDivisbleDuration
+  (divide-duration [divisor duration] "Divide a duration"))
+
+(extend-protocol IDivisbleDuration
+  Long
+  (divide-duration [n duration] (.dividedBy duration n))
+  Duration
+  (divide-duration [divisor duration]
+    (clojure.core// (.getSeconds duration) (.getSeconds divisor))))
+
 (extend-type Duration
   ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-  (inc [t] (.plusSeconds t 1))
-  (dec [t] (.minusSeconds t 1))
+  (+ [d x] (.plus d x))
+  (- [d x] (.minus d x))
+  (inc [d] (.plusSeconds d 1))
+  (dec [d] (.minusSeconds d 1))
   (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y)))
+  (min [x y] (if (neg? (compare x y)) x y))
+  IDivisible
+  (/ [d x] (divide-duration x d)))
 
 (defn tomorrow []
   (+ (today) 1))
