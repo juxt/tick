@@ -247,7 +247,9 @@
   Number
   (duration
     ([n] (duration n :seconds))
-    ([n u] (Duration/of n (units u)))))
+    ([n u] (let [unit (units u)]
+             (assert unit (str "Not a unit: " u))
+             (Duration/of n unit)))))
 
 (defn between [i1 i2]
   (Duration/between (instant i1) (instant i2)))
