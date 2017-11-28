@@ -205,7 +205,7 @@
 
 ;; An interval is just a vector with at least 2 entries. The 3rd entry
 ;; onwards are free to use by the caller.
-(defn interval? [v] (and (vector? v) (>= (count v) 2)))
+(defn interval? [v] (and (vector? v) (clojure.core/>= (count v) 2)))
 
 (defn am [^LocalDate date] (interval/am date))
 (defn pm [^LocalDate date] (interval/pm date))
