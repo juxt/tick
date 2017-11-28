@@ -119,6 +119,10 @@
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
 
+;; Parsing
+
+(def parse core/parse)
+
 ;; Arithmetic
 
 (defn +
