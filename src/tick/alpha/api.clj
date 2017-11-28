@@ -155,9 +155,6 @@
 (defn minutes [v] (core/minutes v))
 (defn hours [v] (core/hours v))
 (defn days [v] (core/days v))
-(defn weeks [v] (core/weeks v))
-(defn months [v] (core/months v))
-(defn years [v] (core/years v))
 
 ;; Comparisons
 

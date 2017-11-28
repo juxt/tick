@@ -34,12 +34,10 @@
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
 
-(deftest periods-test
+(deftest duration-test
   (is (= (t/nanos 1e6) (t/millis 1)))
   (is (= (t/nanos 1e9) (t/seconds 1)))
-  (is (= (t/millis 1000) (t/seconds 1)))
-  (is (= (t/weeks 2) (t/days 14)))
-  (is (= (t/years 3) (t/months 36))))
+  (is (= (t/millis 1000) (t/seconds 1))))
 
 ;; Period arithmetic
 
@@ -115,8 +113,6 @@
   (is (= 24 (count (t// (t/date "2017-09-10") :hours)))))
 
 ;; TODO: Divide by duration
-
-
 
 ;; Concur test
 

@@ -217,10 +217,7 @@
   (seconds [_] "Return the given quantity in seconds.")
   (minutes [_] "Return the given quantity in minutes.")
   (hours [_] "Return the given quantity in hours.")
-  (days [_] "Return the given quantity in days.")
-  (weeks [_] "Return the given quantity in weeks.")
-  (months [_] "Return the given quantity in approximate months.")
-  (years [_] "Return the given quantity in approximate years."))
+  (days [_] "Return the given quantity in days."))
 
 (extend-protocol IDuration
   Number
@@ -230,9 +227,6 @@
   (minutes [n] (Duration/ofMinutes n))
   (hours [n] (Duration/ofHours n))
   (days [n] (Duration/ofDays n))
-  (weeks [n] (Duration/ofDays (* n 7)))
-  (months [n] (.dividedBy (years n) 12))
-  (years [n] (Duration/ofDays (* n 365.25)))
 
   Duration
   (nanos [d] (.toNanos d))
@@ -240,10 +234,7 @@
   (seconds [d] (.getSeconds d))
   (minutes [d] (.toMinutes d))
   (hours [d] (.toHours d))
-  (days [d] (.toDays d))
-  (weeks [d] (.dividedBy (days d) 7))
-  (months [d] (.multipliedBy (years d) 12))
-  (years [d] (/ (days d) 365.24)))
+  (days [d] (.toDays d)))
 
 (defprotocol IDurationCoercion
   (duration [_] [_ _] "Return the duration of the given value, or construct a duration between an amount and units"))
