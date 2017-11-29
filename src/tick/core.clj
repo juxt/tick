@@ -254,10 +254,33 @@
 (defn between [i1 i2]
   (Duration/between (instant i1) (instant i2)))
 
-(definline < [x y] `(.isBefore (or ~x (epoch)) (or~y (epoch))))
-(definline <= [x y] `(not (.isAfter (or ~x (epoch)) (or~y (epoch)))))
-(definline > [x y] `(.isAfter (or ~x (epoch)) (or ~y (epoch))))
-(definline >= [x y] `(not (.isBefore (or ~x (epoch)) (or ~y (epoch)))))
+(defprotocol ITimeComparison
+  (< [x y] "Is x before y?")
+  (<= [x y] "Is x before or at the same time as y?")
+  (> [x y] "Is x after y?")
+  (>= [x y] "Is x after or at the same time as y?"))
+
+(extend-protocol ITimeComparison
+  LocalDate
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  YearMonth
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  Year
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  Instant
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y))))
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
@@ -524,6 +547,23 @@
   ZonedDateTime
   (min-of-type [_] (Instant/MIN))
   (max-of-type [_] (Instant/MAX))
+  ;; TODO: This may cause surprises - see clojure/java-time. We should
+  ;; change the semantics of nil to not imply epoch, forever, or
+  ;; whatever.
   nil
   (min-of-type [_] (Instant/MIN))
   (max-of-type [_] (Instant/MAX)))
+
+
+;; first/last using java.time.temporal/TemporalAdjuster
+;; See also java.time.temporal/TemporalAdjusters
+
+;; java.time.temporal/TemporalAmount
+
+#_(defn adjust [t adjuster]
+  (.with t adjuster))
+
+;; adjust
+
+
+;; Conversions
