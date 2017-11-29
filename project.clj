@@ -10,5 +10,5 @@
              {:dependencies [[org.clojure/clojure "1.9.0-beta3"]
                              [org.apache.xmlgraphics/batik-swing "1.9"]
                              [net.mikera/core.matrix "0.61.0"]]
-              :jvm-opts ["-Dclojure.spec.compile-asserts=true"]
-              :source-paths ["dev/src"]}})
+              :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
+             :repl {:source-paths ["dev/src"]}})
