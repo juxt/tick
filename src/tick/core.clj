@@ -146,7 +146,9 @@
   (instant [i] i)
   (date [i] (date (zoned-date-time i)))
   (day [i] (day (date i)))
-  (month [d] (month (date d)))
+  (month [i] (month (date i)))
+  (year [i] (year (date i)))
+  (year-month [i] (year-month (date i)))
   (zoned-date-time [i] (.atZone i ZoneOffset/UTC))
   (int [i] (.getNano i))
   (long [i] (.getEpochSecond i))
@@ -261,22 +263,22 @@
   (>= [x y] "Is x after or at the same time as y?"))
 
 (extend-protocol ITimeComparison
-  LocalDate
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-  YearMonth
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-  Year
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
   Instant
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  LocalDateTime
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  OffsetDateTime
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
+  ZonedDateTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))

@@ -322,6 +322,30 @@
           :when conc]
       {:x x :y y :concur concur})))
 
+;; Comparison. We now have built up the capability of comparing intervals using the normal <, >, <=, >= operators.
+
+(extend-protocol t/ITimeComparison
+  LocalDate
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
+  YearMonth
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
+  Year
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
+  clojure.lang.PersistentVector
+  (< [x y] (#{precedes? meets?} (relation x y)))
+  (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (relation x y)))
+  (> [x y] (#{preceded-by? met-by?} (relation x y)))
+  (>= [x y] (#{preceded-by? met-by? equals? started-by? overlapped-by? finishes?} (relation x y))))
+
 ;; Division
 
 (defn divide-by
