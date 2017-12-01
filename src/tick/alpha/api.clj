@@ -214,7 +214,10 @@
 (defn am [^LocalDate date] (interval/am date))
 (defn pm [^LocalDate date] (interval/pm date))
 
-(def relation interval/relation)
+(defn relation [i1 i2]
+  (interval/relation
+    (interval/interval i1)
+    (interval/interval i2)))
 
 (defn duration
   ([v]
