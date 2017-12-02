@@ -44,15 +44,6 @@
    (t/min (first ival1) (first ival2))
    (t/max (second ival1) (second ival2))))
 
-(extend-type clojure.lang.PersistentVector
-  t/ITimeRange
-  (start [v] (first v))
-  (end [v] (second v))
-  t/ITime
-  (local? [ival] (and
-                   (t/local? (first ival))
-                   (t/local? (second ival)))))
-
 (defprotocol ISpan
   (span [_] [_ _] "Return an interval from a bounded period of time."))
 
@@ -152,6 +143,38 @@
 
 (defn pm [^LocalDate date]
   (interval (t/noon date) (t/end date)))
+
+;; Interval satisfies protocol
+
+(extend-type clojure.lang.PersistentVector
+  t/ITimeRange
+  (start [v] (first v))
+  (end [v] (second v))
+  t/ITime
+  (local? [ival] (and
+                   (t/local? (first ival))
+                   (t/local? (second ival))))
+  t/ITimeArithmetic
+  (+ [v amt] (apply vector (t/+ (first v) amt) (t/+ (second v) amt) (drop 2 v)))
+  (- [v amt] (apply vector (t/- (first v) amt) (t/- (second v) amt) (drop 2 v)))
+  (inc [v] (apply vector (t/inc (first v)) (t/inc (second v)) (drop 2 v)))
+  (dec [v] (apply vector (t/dec (first v)) (t/dec (second v)) (drop 2 v)))
+  (max [x y] (if (neg? (compare (second x) (second y))) y x))
+  (min [x y] (if (neg? (compare (second x) (second y))) x y))
+  (range
+    ([v]
+     (let [d (t/duration v)]
+       (iterate #(interval (second %) (t/+ (second %) d)) v)))
+    ([v end]
+     (let [d (t/duration v)]
+       (take-while
+         #(t/< (second %) end)
+         (iterate #(interval (second %) (t/+ (second %) d)) v))))
+    ([v end gap]
+     (let [d (t/duration v)]
+       (take-while
+         #(< (second %) end)
+         (iterate #(t/+ (interval (second %) (t/+ (second %) d)) gap) v))))))
 
 ;; Allen's Basic Relations
 
