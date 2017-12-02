@@ -435,8 +435,9 @@
   (time [s] "Constructor of an instant, inst, java.time.LocalTime or java.time.LocalDateTime?")
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
 
-(defprotocol ITimeRange
-  (start [_] "Return the start of a time period.")
+(defprotocol ITimeSpan
+  ;; TODO: Rename start to beginning
+  (start [_] "Return the beginning of a time period.")
   (end [_] "Return the end of a time period."))
 
 (extend-protocol IDurationCoercion
@@ -471,7 +472,7 @@
   (time [_] nil)
   (local? [_] nil))
 
-(extend-protocol ITimeRange
+(extend-protocol ITimeSpan
   String
   (start [s] (start (time s)))
   (end [s] (end (time s)))

@@ -147,7 +147,7 @@
 ;; Interval satisfies protocol
 
 (extend-type clojure.lang.PersistentVector
-  t/ITimeRange
+  t/ITimeSpan
   (start [v] (first v))
   (end [v] (second v))
   t/ITime
