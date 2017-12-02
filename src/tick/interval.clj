@@ -161,6 +161,8 @@
   (dec [v] (apply vector (t/dec (first v)) (t/dec (second v)) (drop 2 v)))
   (max [x y] (if (neg? (compare (second x) (second y))) y x))
   (min [x y] (if (neg? (compare (second x) (second y))) x y))
+
+  t/ITimeRangeable
   (range
     ([v]
      (let [d (t/duration v)]

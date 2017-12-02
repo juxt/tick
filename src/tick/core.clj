@@ -304,7 +304,9 @@
   (inc [_] "Increment time")
   (dec [_] "Decrement time")
   (max [_ _] "Return maximum")
-  (min [_ _] "Return minimum")
+  (min [_ _] "Return minimum"))
+
+(defprotocol ITimeRangeable
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
 (defprotocol IDivisible
@@ -322,6 +324,7 @@
   (dec [t] (- t (seconds 1)))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
@@ -337,6 +340,7 @@
   (dec [t] (- t (seconds 1)))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
@@ -352,6 +356,7 @@
   (dec [t] (.minusDays t 1))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
@@ -367,6 +372,7 @@
   (dec [t] (- t (seconds 1)))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
@@ -382,6 +388,7 @@
   (dec [t] (.minusMonths t 1))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusMonths % 1) from))
     ([from to] (cond->> (iterate #(.plusMonths % 1) from)
@@ -397,6 +404,7 @@
   (dec [t] (.minusYears t 1))
   (max [x y] (if (neg? (compare x y)) y x))
   (min [x y] (if (neg? (compare x y)) x y))
+  ITimeRangeable
   (range
     ([from] (iterate #(.plusYears % 1) from))
     ([from to] (cond->> (iterate #(.plusYears % 1) from)
