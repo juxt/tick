@@ -7,7 +7,7 @@
    [clojure.string :as str])
   (:import
    [java.util Date]
-   [java.time Clock ZoneId ZoneOffset Instant Duration DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
+   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
@@ -252,6 +252,20 @@
     ([n u] (let [unit (units u)]
              (assert unit (str "Not a unit: " u))
              (Duration/of n unit)))))
+
+(defprotocol IPeriodCoercion
+  (period [_ _] "Construct a period of an amount and units"))
+
+(extend-protocol IPeriodCoercion
+  nil
+  (period [_ _] nil)
+  Number
+  (period
+    [n u] (case u
+            :days (Period/ofDays n)
+            :weeks (Period/ofWeeks n)
+            :months (Period/ofMonths n)
+            :years (Period/ofYears n))))
 
 (defn between [i1 i2]
   (Duration/between (instant i1) (instant i2)))

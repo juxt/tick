@@ -8,7 +8,7 @@
    [tick.core :as t])
   (:import
    [java.util Date]
-   [java.time Instant Duration ZoneId LocalDate LocalDateTime Year YearMonth ZoneId ZonedDateTime]))
+   [java.time Instant Duration Period ZoneId LocalDate LocalDateTime Year YearMonth ZoneId ZonedDateTime]))
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
@@ -376,6 +376,16 @@
        (map (juxt identity #(t/min (t/+ % dur) (t/end ival))))
        (map interval)))
 
+(defn divide-by-period
+  [ival period]
+  (->> (t/range
+         (first ival)
+         (second ival)
+         period)
+       ;; Bound by given interval, last will become a remainder.
+       (map (juxt identity #(t/min (t/+ % period) (t/end ival))))
+       (map interval)))
+
 (defn divide-by-divisor [ival divisor]
   (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
 
@@ -405,6 +415,8 @@
   (divide [kw ival] (divide-by-keyword ival kw))
   Duration
   (divide [dur ival] (divide-by-duration ival dur))
+  Period
+  (divide [period ival] (divide-by-period ival period))
   Long
   (divide [divisor ival] (divide-by-divisor ival divisor)))
 

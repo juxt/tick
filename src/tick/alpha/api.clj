@@ -225,6 +225,10 @@
   ([v1 v2]
    (core/duration v1 v2)))
 
+(defn period
+  [v1 v2]
+  (core/period v1 v2))
+
 (def between core/between)
 
 (defn concur
