@@ -92,7 +92,7 @@
 (defn zoned-date-time [z] (core/zoned-date-time z))
 
 
-(defn start [v] (core/start v))
+(defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
 
 ;; Time

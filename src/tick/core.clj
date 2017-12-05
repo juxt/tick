@@ -444,13 +444,12 @@
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
 
 (defprotocol ITimeSpan
-  ;; TODO: Rename start to beginning
-  (start [_] "Return the beginning of a time period.")
+  (beginning [_] "Return the beginning of a time period.")
   (end [_] "Return the end of a time period."))
 
 (extend-protocol IDurationCoercion
   Object
-  (duration [v] (Duration/between (start v) (end v))))
+  (duration [v] (Duration/between (beginning v) (end v))))
 
 (extend-protocol ITime
   String
@@ -482,39 +481,39 @@
 
 (extend-protocol ITimeSpan
   String
-  (start [s] (start (time s)))
+  (beginning [s] (beginning (time s)))
   (end [s] (end (time s)))
 
   Number
-  (start [n] (start (time n)))
+  (beginning [n] (beginning (time n)))
   (end [n] (end (time n)))
 
   LocalDate
-  (start [date] (.atStartOfDay date))
+  (beginning [date] (.atStartOfDay date))
   (end [date] (.atStartOfDay (inc date)))
 
   Year
-  (start [year] (start (.atMonth year 1)))
+  (beginning [year] (beginning (.atMonth year 1)))
   (end [year] (end (.atMonth year 12)))
 
   YearMonth
-  (start [ym] (start (.atDay ym 1)))
+  (beginning [ym] (beginning (.atDay ym 1)))
   (end [ym] (end (.atEndOfMonth ym)))
 
   Instant
-  (start [i] i)
+  (beginning [i] i)
   (end [i] i)
 
   Date
-  (start [i] (instant i))
+  (beginning [i] (instant i))
   (end [i] (instant i))
 
   LocalDateTime
-  (start [time] time)
+  (beginning [time] time)
   (end [end] end)
 
   nil
-  (start [_] nil)
+  (beginning [_] nil)
   (end [_] nil))
 
 (defn on [^LocalTime time ^LocalDate date]
@@ -530,7 +529,7 @@
   (at date (LocalTime/NOON)))
 
 (defn midnight? [^LocalDateTime t]
-  (.isZero (Duration/between t (start (date t)))))
+  (.isZero (Duration/between t (beginning (date t)))))
 
 (defprotocol IAtZone
   (at-zone [t zone] "Put time at zone")

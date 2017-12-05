@@ -51,9 +51,9 @@
 ;; Range test
 
 (deftest range-test
-  (is (t/midnight? (t/start (t/today))))
+  (is (t/midnight? (t/beginning (t/today))))
   (is (t/midnight? (t/end (t/today))))
-  (is (t/midnight? (t/start (t/year))))
+  (is (t/midnight? (t/beginning (t/year))))
   (is (t/midnight? (t/end (t/year)))))
 
 ;; Comparison test
@@ -232,11 +232,11 @@
           (interval (t/at (t/date "2017-07-30") (t/time "4pm"))
                     (t/date "2017-08-11"))))
 
-#_(t/start
+#_(t/beginning
  (t/year-month "2017-09"))
 
 #_(interval
- (t/start
+ (t/beginning
   (t/year-month "2017-09"))
  (t/end
   (t/year-month "2017-09")))
@@ -267,9 +267,9 @@
 ;;(partition-by-date )
 
 
-#_(-> (t/year-month "2017-09") t/interval second t/year-month t/inc t/start)
+#_(-> (t/year-month "2017-09") t/interval second t/year-month t/inc t/beginning)
 
-#_(t/start (second (t/interval "2017-09")))
+#_(t/beginning (second (t/interval "2017-09")))
 
 
 #_(t/year-months (t/interval "2017-09"))

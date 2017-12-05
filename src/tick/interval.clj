@@ -50,18 +50,18 @@
 (extend-protocol ISpan
   LocalDate
   (span
-    ([date] (make-interval (t/start date) (t/end date)))
+    ([date] (make-interval (t/beginning date) (t/end date)))
     ([date1 date2] (join (span date1) (span date2))))
 
   YearMonth
   (span
-    ([ym] (span (t/start ym) (t/end ym)))
-    ([ym v] (span (t/start ym) (t/end v))))
+    ([ym] (span (t/beginning ym) (t/end ym)))
+    ([ym v] (span (t/beginning ym) (t/end v))))
 
   Year
   (span
-    ([y] (span (t/start y) (t/end y)))
-    ([y v] (span (t/start y) (t/end v))))
+    ([y] (span (t/beginning y) (t/end y)))
+    ([y v] (span (t/beginning y) (t/end v))))
 
   clojure.lang.PersistentVector
   (span
@@ -139,7 +139,7 @@
        (Duration/between (first interval) (second interval))))))
 
 (defn am [^LocalDate date]
-  (interval (t/start date) (t/noon date)))
+  (interval (t/beginning date) (t/noon date)))
 
 (defn pm [^LocalDate date]
   (interval (t/noon date) (t/end date)))
@@ -148,7 +148,7 @@
 
 (extend-type clojure.lang.PersistentVector
   t/ITimeSpan
-  (start [v] (first v))
+  (beginning [v] (first v))
   (end [v] (second v))
   t/ITime
   (local? [ival] (and
