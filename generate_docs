@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export AUTODOC_CMD="lein with-profile +codox codox"
+
+\curl -sSL https://raw.githubusercontent.com/plexus/autodoc/master/autodoc.sh | bash
