@@ -8,4 +8,12 @@
   :dependencies [[org.clojure/spec.alpha "0.1.94"]]
   :profiles {:dev
              {:dependencies [[org.clojure/clojure "1.9.0-alpha14"]]
-              :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}})
+              :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
+             :codox {:dependencies [[codox-theme-rdash "0.1.2"]]
+                     :plugins [[lein-codox "0.10.3"]]
+                     :codox {:project {:name "tick"}
+                             :metadata {:doc/format :markdown} ;; docstring format
+                             :themes [:rdash]
+                             :output-path "gh-pages"
+                             :doc-paths ["CHANGELOG.md"
+                                         "doc/intro.md"]}}})
