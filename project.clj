@@ -13,4 +13,12 @@
              {:dependencies
               [[org.clojure/data.xml "0.2.0-alpha5"]
                [org.apache.xmlgraphics/batik-swing "1.9"]]
-              :source-paths ["dev/src"]}})
+              :source-paths ["dev/src"]}
+             :codox {:dependencies [[codox-theme-rdash "0.1.2"]]
+                     :plugins [[lein-codox "0.10.3"]]
+                     :codox {:project {:name "tick"}
+                             :metadata {:doc/format :markdown} ;; docstring format
+                             :themes [:rdash]
+                             :output-path "gh-pages"
+                             :doc-paths ["CHANGELOG.md"
+                                         "doc/intro.md"]}}})
