@@ -242,6 +242,11 @@
 (defn / [x divisor]
   (core// x divisor))
 
+;; Temporal adjusters
+
+#_(defn adjust [t adjuster]
+  (core/adjust t adjuster))
+
 ;; Useful functions
 
 #_(defn dates-over [interval]
