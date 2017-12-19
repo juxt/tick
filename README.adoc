@@ -26,8 +26,8 @@ generates a uniform series of times separated by a fixed period.
 [source,clojure]
 ----
 (require '[tick.core :refer [minutes]]
-          [tick.timeline :refer [timeline periodic-seq]]
-          [tick.clock :refer [now]])
+         '[tick.timeline :refer [timeline periodic-seq]]
+         '[tick.clock :refer [now]])
 
 ;; A timeline of 15 minute intervals
 (take 10
