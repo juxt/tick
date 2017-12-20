@@ -12,19 +12,22 @@
 
 ;; Use of Allen's Interval Algebra from an idea by Eric Evans.
 
-(s/def ::local (s/and #(t/local? (first %)) #(t/local? (second %))))
-(s/def ::non-local (s/and #(not (t/local? (first %))) #(not (t/local? (second %)))))
+(s/def ::local (s/and #(t/local? (t/beginning %)) #(t/local? (t/end %))))
+(s/def ::non-local (s/and #(not (t/local? (t/beginning %))) #(not (t/local? (t/end %)))))
 
 (s/def ::interval
   (s/and
-   (s/or :local ::local :non-local ::non-local)
-   #(let [[_ [t1 t2]] %] (t/< t1 t2))))
+    (s/or :local ::local :non-local ::non-local)
+    #(let [[_ t] %]
+       (let [t1 (t/beginning t)
+             t2 (t/end t)]
+         (t/< t1 t2)))))
 
 ;; An interval can be between 2 local times or 2 non-local times.
 ;; When there is a mix, an error occurs.
 ;; The second interval must be after the first interval.
 
-(defn- make-interval
+(defn interval
   "Make an interval from unordered arguments. Arguments must both be
   local, or both non-local (zoned)."
   [v1 v2]
@@ -34,23 +37,33 @@
           [v1 v2])]
    ;; Post condition must hold, and it is intentional that is cannot be disabled.
    ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
-   :post [(neg? (compare (first %) (second %)))]}
+   :post [(neg? (compare (t/beginning %) (t/end %)))]}
   (if (neg? (compare v1 v2))
     [v1 v2]
     [v2 v1]))
 
-(defn- join [ival1 ival2]
-  (make-interval
-   (t/min (first ival1) (first ival2))
-   (t/max (second ival1) (second ival2))))
+(extend-protocol t/ITimeSpan
+  clojure.lang.PersistentVector
+  (beginning [v] (first v))
+  (end [v] (second v)))
 
-(defprotocol ISpan
+(defn bounds [& args]
+  (interval
+    (apply t/min (map t/beginning args))
+    (apply t/max (map t/end args))))
+
+#_(defn- join [ival1 ival2]
+  (interval
+   (t/min (t/beginning ival1) (t/beginning ival2))
+   (t/max (t/end ival1) (t/end ival2))))
+
+#_(defprotocol ISpan
   (span [_] [_ _] "Return an interval from a bounded period of time."))
 
-(extend-protocol ISpan
+#_(extend-protocol ISpan
   LocalDate
   (span
-    ([date] (make-interval (t/beginning date) (t/end date)))
+    ([date] (interval (t/beginning date) (t/end date)))
     ([date1 date2] (join (span date1) (span date2))))
 
   YearMonth
@@ -67,8 +80,8 @@
   (span
     ([v]
      (if (= 2 (count v))
-       (span (first v) (second v))
-       (vec (clojure.core/concat (span (first v) (second v))
+       (span (t/beginning v) (t/end v))
+       (vec (clojure.core/concat (span (t/beginning v) (t/end v))
                                  (drop 2 v)))))
     ([v1 v2] (join (span v1) (span v2))))
 
@@ -97,12 +110,12 @@
     ([d] [(t/instant d) (t/instant d)])
     ([d1 d2] (join (span d1) (span d2)))))
 
-(defn interval
+#_(defn interval
   ([v] (span v))
   ([v1 & args]
    (reduce span v1 args)))
 
-(defn- interval-at-zone
+#_(defn- interval-at-zone
   "Put the given interval at the given zone."
   [interval ^ZoneId zone]
   (s/assert ::interval interval)
@@ -110,7 +123,7 @@
       (update 0 t/at-zone zone)
       (update 1 t/at-zone zone)))
 
-(defn- local-interval
+#_(defn- local-interval
   "Put the given interval at the given zone and convert to local time."
   ([interval]
    (s/assert ::interval interval)
@@ -123,20 +136,20 @@
        (update 0 t/to-local zone)
        (update 1 t/to-local zone))))
 
-(extend-protocol t/IAtZone
+#_(extend-protocol t/IAtZone
   clojure.lang.PersistentVector
   (at-zone [interval zone] (interval-at-zone interval zone))
   (to-local
     ([interval] (local-interval interval))
     ([interval zone] (local-interval interval zone))))
 
-(extend-protocol t/IDurationCoercion
+#_(extend-protocol t/IDurationCoercion
   clojure.lang.PersistentVector
   (duration
     ([v]
      (let [interval (interval v)]
        (s/assert :tick.interval/interval interval)
-       (Duration/between (first interval) (second interval))))))
+       (Duration/between (t/beginning interval) (t/end interval))))))
 
 (defn am [^LocalDate date]
   (interval (t/beginning date) (t/noon date)))
@@ -146,83 +159,85 @@
 
 ;; Interval satisfies protocol
 
-(extend-type clojure.lang.PersistentVector
+#_(extend-type clojure.lang.PersistentVector
   t/ITimeSpan
-  (beginning [v] (first v))
-  (end [v] (second v))
+  (beginning [v] (t/beginning v))
+  (end [v] (t/end v))
   t/ITime
   (local? [ival] (and
-                   (t/local? (first ival))
-                   (t/local? (second ival))))
+                   (t/local? (t/beginning ival))
+                   (t/local? (t/end ival))))
   t/ITimeArithmetic
-  (+ [v amt] (apply vector (t/+ (first v) amt) (t/+ (second v) amt) (drop 2 v)))
-  (- [v amt] (apply vector (t/- (first v) amt) (t/- (second v) amt) (drop 2 v)))
-  (inc [v] (apply vector (t/inc (first v)) (t/inc (second v)) (drop 2 v)))
-  (dec [v] (apply vector (t/dec (first v)) (t/dec (second v)) (drop 2 v)))
-  (max [x y] (if (neg? (compare (second x) (second y))) y x))
-  (min [x y] (if (neg? (compare (second x) (second y))) x y))
+  (+ [v amt] (apply vector (t/+ (t/beginning v) amt) (t/+ (t/end v) amt) (drop 2 v)))
+  (- [v amt] (apply vector (t/- (t/beginning v) amt) (t/- (t/end v) amt) (drop 2 v)))
+  (inc [v] (apply vector (t/inc (t/beginning v)) (t/inc (t/end v)) (drop 2 v)))
+  (dec [v] (apply vector (t/dec (t/beginning v)) (t/dec (t/end v)) (drop 2 v)))
+  (max [x y] (if (neg? (compare (t/end x) (t/end y))) y x))
+  (min [x y] (if (neg? (compare (t/end x) (t/end y))) x y))
 
   t/ITimeRangeable
   (range
     ([v]
      (let [d (t/duration v)]
-       (iterate #(interval (second %) (t/+ (second %) d)) v)))
+       (iterate #(interval (t/end %) (t/+ (t/end %) d)) v)))
     ([v end]
      (let [d (t/duration v)]
        (take-while
-         #(t/< (second %) end)
-         (iterate #(interval (second %) (t/+ (second %) d)) v))))
+         #(t/< (t/end %) end)
+         (iterate #(interval (t/end %) (t/+ (t/end %) d)) v))))
     ([v end gap]
      (let [d (t/duration v)]
        (take-while
-         #(< (second %) end)
-         (iterate #(t/+ (interval (second %) (t/+ (second %) d)) gap) v))))))
+         #(< (t/end %) end)
+         (iterate #(t/+ (interval (t/end %) (t/+ (t/end %) d)) gap) v))))))
 
 ;; Allen's Basic Relations
 
 (defn precedes? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
-  (t/< (second x) (first y)))
+  (t/< (t/end x) (t/beginning y)))
 
 (defn equals? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
-  (= (take 2 x) (take 2 y)))
+  (and
+    (= (t/beginning x) (t/beginning y))
+    (= (t/end x) (t/end y))))
 
 (defn meets? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
-  (= (second x) (first y)))
+  (= (t/end x) (t/beginning y)))
 
 (defn overlaps? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (t/< (first x) (first y))
-   (t/> (second x) (first y))
-   (t/< (second x) (second y))))
+   (t/< (t/beginning x) (t/beginning y))
+   (t/> (t/end x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn during? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (t/> (first x) (first y))
-   (t/< (second x) (second y))))
+   (t/> (t/beginning x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn starts? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (= (first x) (first y))
-   (t/< (second x) (second y))))
+   (= (t/beginning x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn finishes? [x y]
   (s/assert ::interval x)
   (s/assert ::interval y)
   (and
-   (t/> (first x) (first y))
-   (= (second x) (second y))))
+   (t/> (t/beginning x) (t/beginning y))
+   (= (t/end x) (t/end y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.
 (defn conv
@@ -313,13 +328,40 @@
 
 ;; Functions that make use of Allens' Interval Algebra
 
-(defn- update-interval
-  "Update the interval with the timings of the second interval. The
-  purpose of updating is to preserve any extra data in the interval."
-  ([ival times]
-   (vec (concat (take 2 times) (drop 2 ival))))
-  ([ival x y]
-   (update-interval ival (interval x y))))
+(defprotocol IIntervalOps
+  (narrow [_ beginning end] "Narrow the interval to the new given bounds")
+  (combine [ival1 ival2] "Combine two intervals"))
+
+(extend-protocol IIntervalOps
+  clojure.lang.PersistentVector
+  (narrow [_ beginning end] (interval beginning end))
+  (combine [ival1 ival2] (interval
+                           (t/min (t/beginning ival1) (t/beginning ival2))
+                           (t/max (t/end ival1) (t/end ival2))))
+  LocalDate
+  (narrow [date beginning end]
+    (assert (t/<= (t/beginning date) beginning))
+    (assert (t/>= (t/end date) end))
+    (interval beginning end))
+  (combine [ival1 ival2]
+    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+
+  YearMonth
+  (narrow [ym beginning end]
+    (assert (t/<= (t/beginning ym) beginning))
+    (assert (t/>= (t/end ym) end))
+    (interval beginning end))
+  (combine [ival1 ival2]
+    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+
+  Year
+  (narrow [yr beginning end]
+    (assert (t/<= (t/beginning yr) beginning))
+    (assert (t/>= (t/end yr) end))
+    (interval beginning end))
+  (combine [ival1 ival2]
+    (throw (ex-info "Not implemented" {:args [ival1 ival2]}))))
+
 
 (defn concur
   "Return the interval representing the interval, if there is one,
@@ -327,10 +369,10 @@
   concurrent."
   [x y]
   (case (code (relation x y))
-    \o (update-interval x (first y) (second x))
-    \O (update-interval x (first x) (second y))
+    \o (narrow x (t/beginning y) (t/end x))
+    \O (narrow x (t/beginning x) (t/end y))
     (\s \f \d \e) x
-    (\S \F \D) (update-interval x y)
+    (\S \F \D) (narrow x (t/beginning y) (t/end y))
     nil))
 
 (defn ^:experimental concurrencies
@@ -347,24 +389,27 @@
           :when conc]
       {:x x :y y :concur concur})))
 
-;; Comparison. We now have built up the capability of comparing intervals using the normal <, >, <=, >= operators.
+;; Comparison. We have now built up the capability of comparing
+;; intervals using the normal <, >, <=, >= operators.
+
+(def spanv (juxt t/beginning t/end))
 
 (extend-protocol t/ITimeComparison
   LocalDate
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
+  (< [x y] (t/< (spanv x) (spanv y)))
+  (<= [x y] (t/<= (spanv x) (spanv y)))
+  (> [x y] (t/> (spanv x) (spanv y)))
+  (>= [x y] (t/>= (spanv x) (spanv y)))
   YearMonth
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
+  (< [x y] (t/< (spanv x) (spanv y)))
+  (<= [x y] (t/<= (spanv x) (spanv y)))
+  (> [x y] (t/> (spanv x) (spanv y)))
+  (>= [x y] (t/>= (spanv x) (spanv y)))
   Year
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
+  (< [x y] (t/< (spanv x) (spanv y)))
+  (<= [x y] (t/<= (spanv x) (spanv y)))
+  (> [x y] (t/> (spanv x) (spanv y)))
+  (>= [x y] (t/>= (spanv x) (spanv y)))
   clojure.lang.PersistentVector
   (< [x y] (#{precedes? meets?} (relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (relation x y)))
@@ -379,12 +424,12 @@
   [ival f]
   (cond->
       (t/range
-        (f (first ival))
-        (f (second ival)))
+        (f (t/beginning ival))
+        (f (t/end ival)))
     ;; Since range is exclusive, we must add one more value, but only
     ;; if it concurs rather than merely meets.
-    (concur (interval (f (second ival))) ival)
-    (concat [(f (second ival))])))
+    (concur (f (t/end ival)) ival)
+    (concat [(f (t/end ival))])))
 
 (defn divide-by-duration
   "Divide an interval by a duration, returning a sequence of
@@ -394,22 +439,20 @@
   intervals."
   [ival dur]
   (->> (t/range
-         (first ival)
-         (second ival)
+         (t/beginning ival)
+         (t/end ival)
          dur)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/+ % dur) (t/end ival))))
-       (map interval)))
+       (map (juxt identity #(t/min (t/+ % dur) (t/end ival))))))
 
 (defn divide-by-period
   [ival period]
   (->> (t/range
-         (first ival)
-         (second ival)
+         (t/beginning ival)
+         (t/end ival)
          period)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/+ % period) (t/end ival))))
-       (map interval)))
+       (map (juxt identity #(t/min (t/+ % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
   (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
@@ -449,11 +492,11 @@
 
 (extend-protocol t/IDivisible
   LocalDate
-  (/ [ld d] (divide d (interval ld)))
+  (/ [ld d] (divide d ld))
   Year
-  (/ [n d] (divide d (interval n)))
+  (/ [n d] (divide d n))
   YearMonth
-  (/ [n d] (divide d (interval n)))
+  (/ [n d] (divide d n))
   clojure.lang.PersistentVector
   (/ [ival o] (divide o ival)))
 
@@ -476,22 +519,21 @@
   "Combine multiple collections of intervals into a single ordered
   collection of ordered disjoint intervals."
   [& colls]
-    (loop [colls colls result []]
-      (let [colls (remove nil? colls)]
+  (loop [colls colls result []]
+    (let [colls (remove nil? colls)]
+      (if (<= (count colls) 1)
+        (clojure.core/concat result (first colls))
 
-        (if (< (count colls) 2)
-          (clojure.core/concat result (first colls))
+        (let [[c1 c2 & r] (sort-by (comp t/beginning first) colls)]
+          (if (disjoint? (first c1) (first c2))
+            (recur (apply list (next c1) c2 r) (clojure.core/conj result (first c1)))
 
-          (let [[c1 c2 & r] (sort-by ffirst colls)]
-            (if (disjoint? (first c1) (first c2))
-              (recur (apply list (next c1) c2 r) (clojure.core/conj result (first c1)))
-
-              (recur (apply list
-                            (next c1)
-                            (clojure.core/concat [(interval (first c1) (first c2))]
-                                                 (next c2))
-                            r)
-                     result)))))))
+            (recur (apply list
+                          (next c1)
+                          (clojure.core/concat [(combine (first c1) (first c2))]
+                                               (next c2))
+                          r)
+                   result)))))))
 
 (defn conj [coll interval]
   (union coll [interval]))
@@ -510,38 +552,38 @@
        (let [x (first xs) y (first ys)
              code (code (relation x y))]
          (case code
-           (\p \m)  (recur (next xs) ys result)
-           (\P \M)  (recur xs (next ys) result)
-           \S (recur (cons (update-interval x (second y) (second x))
+           (\p \m) (recur (next xs) ys result)
+           (\P \M) (recur xs (next ys) result)
+           \S (recur (cons (narrow x (t/end y) (t/end x))
                            (next xs))
                      (next ys)
-                     (clojure.core/conj result (update-interval x y)))
+                     (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
            \F (recur (next xs) (next ys) (clojure.core/conj result y))
-           \o (recur (cons (update-interval x (first y) (second x))
+           \o (recur (cons (narrow x (t/beginning y) (t/end x))
                            (next xs))
-                     (cons (update-interval x (second x) (second y)) (next ys))
+                     (cons (narrow x (t/end x) (t/end y)) (next ys))
                      (clojure.core/conj
-                      result
-                      (update-interval x (first y) (second x))))
+                       result
+                       (narrow x (t/beginning y) (t/end x))))
            \O (recur (cons
-                      (update-interval x (second y) (second x))
-                      (next xs))
+                       (narrow x (t/end y) (t/end x))
+                       (next xs))
                      (next ys)
                      (clojure.core/conj
-                      result
-                      (update-interval x (first x) (second y))))
+                       result
+                       (narrow x (t/beginning x) (t/end y))))
            \D (recur (cons
-                      (update-interval x (second y) (second x))
-                      (next xs))
+                       (narrow x (t/end y) (t/end x))
+                       (next xs))
                      (next ys)
-                     (clojure.core/conj result (update-interval x y)))
-           \d (recur (next xs) (cons (update-interval x (second x) (second y))
+                     (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
+           \d (recur (next xs) (cons (narrow x (t/end x) (t/end y))
                                      (next ys))
                      (clojure.core/conj result x))
            \e (recur (next xs) (next ys) (clojure.core/conj result x))
            \f (recur (next xs) (next ys) (clojure.core/conj result x))
            \s (recur (next xs)
-                     (cons (update-interval x (second x) (second y))
+                     (cons (narrow x (t/end x) (t/end y))
                            (next ys))
                      (clojure.core/conj result x))))
        result)))
@@ -565,12 +607,14 @@
              (\P \M) (recur xs (next ys) result)
              (\f \d \e) (recur (next xs) (next ys) result)
              \s (recur (next xs) ys result)
-             (\S \O) (recur (cons (interval (second y) (second x)) (next xs)) (next ys) result)
-             \F (recur (next xs) (next ys) (clojure.core/conj result (update-interval x (first x) (first y))))
-             \o (recur (next xs) ys (clojure.core/conj result (update-interval x (first x) (first y))))
-             \D (recur (cons (interval (second y) (second x)) (next xs))
+             (\S \O) (recur (cons (interval (t/end y) (t/end x)) (next xs)) (next ys) result)
+             \F (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+             \o (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+             ;; TODO: Replace interval (lossy) with type
+             ;; preserving choice of IIntervalOps operation
+             \D (recur (cons (interval (t/end y) (t/end x)) (next xs))
                        (next ys)
-                       (clojure.core/conj result (update-interval x (first x) (first y))))))
+                       (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
          (apply clojure.core/conj result xs))
        result)))
   ([s1 s2 & sets]
@@ -582,10 +626,10 @@
 (defn complement [coll]
   (if (empty? coll)
     [(interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
-    (let [r (map (fn [[x y]] (interval (second x) (first y)))
+    (let [r (map (fn [[x y]] (interval (t/end x) (t/beginning y)))
                  (partition 2 1 coll))]
       (cond-> r
         (not= (ffirst coll) (t/min-of-type (ffirst coll)))
         (#(concat [(interval (t/min-of-type (ffirst coll)) (ffirst coll))] %))
-        (not= (second (last coll)) (t/max-of-type (second (last coll))))
-        (#(concat % [(interval (second (last coll)) (t/max-of-type (second (last coll))))]))))))
+        (not= (t/end (last coll)) (t/max-of-type (t/end (last coll))))
+        (#(concat % [(interval (t/end (last coll)) (t/max-of-type (t/end (last coll))))]))))))

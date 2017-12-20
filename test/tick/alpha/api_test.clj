@@ -77,8 +77,6 @@
   (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/seconds 1))))
   (is (t/>= (t/now) (t/now) (t/- (t/now) (t/seconds 1)))))
 
-;; AM/PM
-
 (deftest am-test
   (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= [(t/time "2017-08-08T00:00:00")
@@ -88,14 +86,10 @@
             (t/time "2017-08-09T00:00:00")]
            (t/pm (t/today))))))
 
-;; Duration test
-
 (deftest duration-test
   (is (= 24 (t/hours (t/duration (t/tomorrow))))))
 
 ;; TODO: Interval testing
-
-;; Division tests
 
 (deftest division-test
   (is (= 365 (count (t// (t/year 2017) :days))))
@@ -104,12 +98,12 @@
   (is (= (t/date "2017-09-01") (first (t// "2017-09" :days))))
   (is (= (t/date "2017-09-30") (last (t// "2017-09" :days))))
   (is (= 31 (count (t// "2017-10" :days))))
-  (is (= 8 (count (t// (t/interval "2017-10-03" "2017-10-10") :days))))
-  (is (= [(t/date "2017-09-10")] (t// (t/interval "2017-09-10T12:00" "2017-09-10T14:00") :days)))
-  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t// (t/interval "2017-09-10T12:00" "2017-09-11T14:00") :days)))
-  (is (= 2 (count (t// (t/interval "2017-09-10" "2017-10-10") :months))))
-  (is (= 3 (count (t// (t/interval "2017-09-10T12:00" "2019") :years))))
-  (is (= 3 (count (t// (t/interval "2017-09-10T12:00" "2019-02") :years))))
+  (is (= 8 (count (t// (t/bounds "2017-10-03" "2017-10-10") :days))))
+  (is (= [(t/date "2017-09-10")] (t// (t/bounds "2017-09-10T12:00" "2017-09-10T14:00") :days)))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t// (t/bounds "2017-09-10T12:00" "2017-09-11T14:00") :days)))
+  (is (= 2 (count (t// (t/bounds "2017-09-10" "2017-10-10") :months))))
+  (is (= 3 (count (t// (t/bounds "2017-09-10T12:00" "2019") :years))))
+  (is (= 3 (count (t// (t/bounds "2017-09-10T12:00" "2019-02") :years))))
   (is (= 24 (count (t// (t/date "2017-09-10") :hours)))))
 
 ;; TODO: Divide by duration
@@ -118,14 +112,14 @@
 
 (deftest concur-test
   (is
-   (= 2
-      (t/hours
-       (t/duration
-        (t/concur (t/interval (t/at (t/today) 16)
-                              (t/end (t/today)))
-                  (t/interval (t/today))
-                  (t/interval (t/at (t/today) 20)
-                              (t/at (t/today) 22))))))))
+    (= 2
+       (t/hours
+         (t/duration
+           (t/concur (t/interval (t/at (t/today) 16)
+                                 (t/end (t/today)))
+                     (t/today)
+                     (t/interval (t/at (t/today) 20)
+                                 (t/at (t/today) 22))))))))
 
 ;; Let's count some days over Easter 2017.
 
@@ -139,13 +133,15 @@
   (is (= t/wednesday (t/day (t/date "2017-04-19"))))
 
   ;; Let's take a vacation
-  (let [vacation (t/interval (t/date "2017-04-11") (t/date "2017-04-19"))]
+  (let [vacation (t/bounds (t/date "2017-04-11") (t/date "2017-04-19"))]
     ;; This is normally 9 days
     (is (= 9 (t/days (t/duration vacation))))
 
     (let [year (t/year 2017)
-          public-holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
-          weekends (map t/interval (filter cal/weekend? (t// year :days)))
+          public-holidays (map :date (cal/holidays-in-england-and-wales year))
+          ;;_ (println "public-holidays:" public-holidays)
+          weekends (filter cal/weekend? (t// year :days))
+          ;;_ (println "weekends:" weekends)
           non-working-days (t/union public-holidays weekends)
           vacation-set (t/difference [vacation] non-working-days)
           working-days-absent (t/days (apply t/+ (map t/duration vacation-set)))]
@@ -160,10 +156,10 @@
         ;; Intersections are powerful. If we only booked off a
         ;; half-day on this thursday, the intersection would return
         ;; this half-day.
-        (is (not-empty (t/intersection [(t/interval day)] vacation-set))))
+        (is (not-empty (t/intersection [day] vacation-set))))
 
       ;; Another use of intersections can be to determine the number of vacation days taken in 2017. But let's make things a little harder by booking time over the new year period.
-      (let [festive-break (t/interval (t/date "2017-12-20") (t/date "2018-01-07"))
+      (let [festive-break (t/bounds (t/date "2017-12-20") (t/date "2018-01-07"))
 
             vacation-set
             (-> vacation-set ; start with our original vacation set
@@ -174,7 +170,7 @@
                 ;; number of vacation days.
                 (t/difference non-working-days)
                 ;; We only want to know the total vacation day count for 2017
-                (t/intersection [(t/interval "2017")]))]
+                (t/intersection [(t/bounds "2017")]))]
 
         ;; The festive vacation days in 2017 are 20th, 21th, 22nd, 27th, 28th, 29th.
         ;; Added to the 5 days we've already taken, that makes 11
@@ -282,8 +278,8 @@
 ;; number of working days in 2017 (252). It demonstrates how to use union to combine sets of intervals together, and intersection to remove non-working-days from the year.
 (deftest working-days-in-a-year-test
   (let [year (t/year 2017)
-        holidays (map (comp t/interval :date) (cal/holidays-in-england-and-wales year))
-        weekends (map t/interval (filter cal/weekend? (t// year :days)))]
+        holidays (map (comp t/bounds :date) (cal/holidays-in-england-and-wales year))
+        weekends (map t/bounds (filter cal/weekend? (t// year :days)))]
     (is (t/ordered-disjoint-intervals? holidays))
     (is (t/ordered-disjoint-intervals? weekends))
     (let [non-working-days (t/union holidays weekends)]
@@ -294,4 +290,4 @@
       ;; 252 is the number of working days in 2017 in England & Wales.
       ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.
       (is (= 252 (- 365 113)))
-      (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/interval (t/year 2017))] non-working-days)))))))))
+      (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/bounds year)] non-working-days)))))))))

@@ -292,7 +292,7 @@
                 (t/time "2018-01-01T00:00")]
                [(t/time "2018-01-02T00:00")
                 (t/time "2018-01-08T00:00")]]
-        coll2 [(interval "2017")]]
+        coll2 [(bounds "2017")]]
     (is (= [[(t/time "2017-04-11T00:00")
              (t/time "2017-04-14T00:00")]
             [(t/time "2017-04-18T00:00")
@@ -301,22 +301,7 @@
              (t/time "2017-12-23T00:00")]
             [(t/time "2017-12-27T00:00")
              (t/time "2018-01-01T00:00")]]
-           (intersection coll1 coll2)))
-
-
-    (testing "Extra data of first collection intervals is preserved on intersection"
-      (is (=
-           [[(t/time "2017-04-12T00:00")
-             (t/time "2017-04-13T00:00") :a :b :c]
-            [(t/time "2017-04-14T00:00")
-             (t/time "2017-04-15T00:00") :a :b :c]]
-           (let [coll1 [[(t/time "2017-04-11T00:00")
-                         (t/time "2017-04-18T00:00")
-                         :a :b :c]]
-                 coll2 [(interval "2017-04-12")
-                        (interval "2017-04-14")]]
-             (intersection coll1 coll2))))))
-
+           (intersection coll1 coll2))))
 
   (let [coll1 [[(t/time "2017-04-11T00:00")
                 (t/time "2017-04-14T00:00")]
@@ -328,7 +313,7 @@
                 (t/time "2018-01-01T00:00")]
                [(t/time "2018-01-02T00:00")
                 (t/time "2018-01-08T00:00")]]
-        coll2 [(interval "2017")]]
+        coll2 [(bounds "2017")]]
     (is (= [[(t/time "2017-04-11T00:00")
              (t/time "2017-04-14T00:00")]
             [(t/time "2017-04-18T00:00")
@@ -338,20 +323,6 @@
             [(t/time "2017-12-27T00:00")
              (t/time "2018-01-01T00:00")]]
            (intersection coll1 coll2)))
-
-
-    (testing "Extra data of first collection intervals is preserved on intersection"
-      (is (=
-           [[(t/time "2017-04-12T00:00")
-             (t/time "2017-04-13T00:00") :a :b :c]
-            [(t/time "2017-04-14T00:00")
-             (t/time "2017-04-15T00:00") :a :b :c]]
-           (let [coll1 [[(t/time "2017-04-11T00:00")
-                         (t/time "2017-04-18T00:00")
-                         :a :b :c]]
-                 coll2 [(interval "2017-04-12")
-                        (interval "2017-04-14")]]
-             (intersection coll1 coll2)))))
 
     (testing "Empty sets"
       (let [coll1 []
@@ -423,16 +394,10 @@
                          (t/instant "2017-01-01T14:00:00Z"))]]
     (is (empty? (difference coll1 coll2))))
 
-  (is (= [(interval "2017-07-31" "2017-08-13")]
+  (is (= [(bounds "2017-07-31" "2017-08-13")]
          (difference
-          [(interval "2017-07-31" "2017-08-13")]
-          [(interval "2017-01-01")])))
-
-  (testing "Preserve extra data"
-    (is (= [(concat (interval "2017-07-31" "2017-08-13") [:test])]
-           (difference
-            [(concat (interval "2017-07-31" "2017-08-13") [:test])]
-            [(interval "2017-01-01")]))))
+          [(bounds "2017-07-31" "2017-08-13")]
+          [(bounds "2017-01-01")])))
 
   (testing "Empty sets"
       (let [coll1 []
@@ -460,7 +425,7 @@
          (t/time "2017-07-04T00:00")]
         [(t/time "2017-07-05T00:00")
          (t/time "2018-01-01T00:00")]]
-       (disj [(interval "2017")]  (interval (t/date "2017-07-04"))))))
+       (disj [(bounds "2017")] (bounds (t/date "2017-07-04"))))))
 
 (deftest complement-test
   ;; Not sure why this is failing on the equals check

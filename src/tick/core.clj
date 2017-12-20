@@ -303,8 +303,14 @@
   (- [_ _] "Subtract time")
   (inc [_] "Increment time")
   (dec [_] "Decrement time")
-  (max [_ _] "Return maximum")
-  (min [_ _] "Return minimum"))
+  (maximum [_ _] "Return maximum")
+  (minimum [_ _] "Return minimum"))
+
+(defn max [arg & args]
+  (reduce #(maximum %1 %2) arg args))
+
+(defn min [arg & args]
+  (reduce #(minimum %1 %2) arg args))
 
 (defprotocol ITimeRangeable
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
@@ -322,8 +328,8 @@
   (- [t x] (.minus t x))
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -338,8 +344,8 @@
   (- [t x] (.minus t x))
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -354,8 +360,8 @@
   (- [t x] (if (number? x) (.minusDays t x) (.minus t x)))
   (inc [t] (.plusDays t 1))
   (dec [t] (.minusDays t 1))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusDays % 1) from))
@@ -370,8 +376,8 @@
   (- [t x] (.minus t x))
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -386,8 +392,8 @@
   (- [t x] (if (number? x) (.minusMonths t x) (.minus t x)))
   (inc [t] (.plusMonths t 1))
   (dec [t] (.minusMonths t 1))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusMonths % 1) from))
@@ -402,8 +408,8 @@
   (- [t x] (if (number? x) (.minusYears t x) (.minus t x)))
   (inc [t] (.plusYears t 1))
   (dec [t] (.minusYears t 1))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
   (range
     ([from] (iterate #(.plusYears % 1) from))
@@ -428,8 +434,8 @@
   (- [d x] (.minus d x))
   (inc [d] (.plusSeconds d 1))
   (dec [d] (.minusSeconds d 1))
-  (max [x y] (if (neg? (compare x y)) y x))
-  (min [x y] (if (neg? (compare x y)) x y))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
   IDivisible
   (/ [d x] (divide-duration x d)))
 
@@ -444,8 +450,8 @@
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
 
 (defprotocol ITimeSpan
-  (beginning [_] "Return the beginning of a time period.")
-  (end [_] "Return the end of a time period."))
+  (beginning [_] "Return the beginning of a span of time")
+  (end [_] "Return the end of a span of time"))
 
 (extend-protocol IDurationCoercion
   Object
@@ -481,8 +487,8 @@
 
 (extend-protocol ITimeSpan
   String
-  (beginning [s] (beginning (time s)))
-  (end [s] (end (time s)))
+  (beginning [s] (beginning (parse s)))
+  (end [s] (end (parse s)))
 
   Number
   (beginning [n] (beginning (time n)))

@@ -140,11 +140,8 @@
 (defn dec [arg]
   (core/dec arg))
 
-(defn max [arg & args]
-  (reduce #(core/max %1 %2) arg args))
-
-(defn min [arg & args]
-  (reduce #(core/min %1 %2) arg args))
+(def max core/max)
+(def min core/min)
 
 (def range core/range)
 
@@ -202,22 +199,17 @@
 
 ;; Intervals
 
-(defn interval
-  "Return an interval which forms the bounding-box of the given arguments."
-  ([v] (interval/interval v))
-  ([v1 & args] (apply interval/interval v1 args)))
+(defn interval [x y]
+  (interval/interval (core/time x) (core/time y)))
 
-;; An interval is just a vector with at least 2 entries. The 3rd entry
-;; onwards are free to use by the caller.
-(defn interval? [v] (and (vector? v) (clojure.core/>= (count v) 2)))
+(def ^{:doc "Return an interval which forms the bounding-box of the given arguments."}
+  bounds interval/bounds)
 
 (defn am [^LocalDate date] (interval/am date))
 (defn pm [^LocalDate date] (interval/pm date))
 
 (defn relation [i1 i2]
-  (interval/relation
-    (interval/interval i1)
-    (interval/interval i2)))
+  (interval/relation i1 i2))
 
 (defn duration
   ([v]
