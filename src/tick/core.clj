@@ -238,37 +238,25 @@
   (hours [d] (.toHours d))
   (days [d] (.toDays d)))
 
-(defprotocol IDurationCoercion
-  (duration [_] [_ _] "Return the duration of the given value, or construct a duration between an amount and units"))
+(defn duration [n u]
+  (let [unit (units u)]
+    (assert unit (str "Not a unit: " u))
+    (Duration/of n unit)))
 
-(extend-protocol IDurationCoercion
-  Duration
-  (duration [d] d)
-  nil
-  (duration [_] nil)
-  Number
-  (duration
-    ([n] (duration n :seconds))
-    ([n u] (let [unit (units u)]
-             (assert unit (str "Not a unit: " u))
-             (Duration/of n unit)))))
+(defn period [n u]
+  (case u
+    :days (Period/ofDays n)
+    :weeks (Period/ofWeeks n)
+    :months (Period/ofMonths n)
+    :years (Period/ofYears n)))
 
-(defprotocol IPeriodCoercion
-  (period [_ _] "Construct a period of an amount and units"))
+(defprotocol ITimeBetween
+  (between [t1 t2] "Return the most appropriate type of value that
+  represents the gap between two times"))
 
-(extend-protocol IPeriodCoercion
-  nil
-  (period [_ _] nil)
-  Number
-  (period
-    [n u] (case u
-            :days (Period/ofDays n)
-            :weeks (Period/ofWeeks n)
-            :months (Period/ofMonths n)
-            :years (Period/ofYears n))))
-
-(defn between [i1 i2]
-  (Duration/between (instant i1) (instant i2)))
+(extend-protocol ITimeBetween
+  Instant
+  (between [inst _] (throw (ex-info "TODO" {}))))
 
 (defprotocol ITimeComparison
   (< [x y] "Is x before y?")
@@ -453,9 +441,8 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
-(extend-protocol IDurationCoercion
-  Object
-  (duration [v] (Duration/between (beginning v) (end v))))
+(defn length "Return the distance between the beginning and end as a duration or period"
+  [v] (Duration/between (beginning v) (end v)))
 
 (extend-protocol ITime
   String

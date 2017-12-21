@@ -212,14 +212,14 @@
   (interval/relation i1 i2))
 
 (defn duration
-  ([v]
-   (core/duration v))
-  ([v1 v2]
-   (core/duration v1 v2)))
+  [v1 v2]
+  (core/duration v1 v2))
 
 (defn period
   [v1 v2]
   (core/period v1 v2))
+
+(def length core/length)
 
 (def between core/between)
 
