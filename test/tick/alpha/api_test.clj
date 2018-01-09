@@ -115,11 +115,11 @@
     (= 2
        (t/hours
          (t/length
-           (t/concur (t/interval (t/at (t/today) 16)
+           (t/concur (t/interval (t/at (t/today) "16:00")
                                  (t/end (t/today)))
                      (t/today)
-                     (t/interval (t/at (t/today) 20)
-                                 (t/at (t/today) 22))))))))
+                     (t/interval (t/at (t/today) "20:00")
+                                 (t/at (t/today) "22:00"))))))))
 
 ;; Let's count some days over Easter 2017.
 

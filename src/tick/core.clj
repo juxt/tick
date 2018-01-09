@@ -450,7 +450,7 @@
 
   Number
   (time [i]
-    (LocalTime/of i 0))
+    (Instant/ofEpochMilli i))
 
   Date
   (time [d] (instant d))
