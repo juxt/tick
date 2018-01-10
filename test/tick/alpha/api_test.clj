@@ -13,7 +13,9 @@
 
 (deftest constructor-test
   (is (= java.time.Year (type (t/year 2017))))
-  (is (= java.time.Month (type (t/month 12)))))
+  (is (= 2017 (.getValue (t/year 2017))))
+  (is (= java.time.Month (type (t/month 12))))
+  (is (= t/december (t/month 12))))
 
 ;; Point-in-time tests
 
