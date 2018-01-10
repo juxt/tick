@@ -286,6 +286,11 @@
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
+  LocalTime
+  (< [x y] (.isBefore x y))
+  (<= [x y] (not (.isAfter x y)))
+  (> [x y] (.isAfter x y))
+  (>= [x y] (not (.isBefore x y)))
   OffsetDateTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
