@@ -6,10 +6,8 @@
   (:import
    [java.time Instant]))
 
-(extend-protocol t/ITime
+(extend-protocol t/IConstructors
   java.io.File
-  (time [f] (Instant/ofEpochMilli (.lastModified f)))
-  (local? [t] false)
+  (instant [f] (Instant/ofEpochMilli (.lastModified f)))
   java.nio.file.Path
-  (time [f] (time (.toFile f)))
-  (local? [t] false))
+  (instant [f] (t/instant (.toFile f))))

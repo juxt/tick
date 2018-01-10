@@ -18,17 +18,16 @@
   (is (= t/december (t/month 12))))
 
 ;; Point-in-time tests
-
 (deftest today-test
   (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/time "2017-08-08T12:00:00Z") (t/now)))
+    (is (= (t/instant "2017-08-08T12:00:00Z") (t/now)))
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
     (is (= (t/date "2017-08-09") (t/tomorrow)))
     (is (= 8 (t/day-of-month (t/today))))
     (is (= 2017 (t/int (t/year))))
-    (is (= (t/time "2017-08-08T12:00:00") (t/noon (t/today))))
-    (is (= (t/time "2017-08-08T00:00:00") (t/midnight (t/today))))))
+    (is (= (t/local-date-time "2017-08-08T12:00:00") (t/noon (t/today))))
+    (is (= (t/local-date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
 (deftest epoch-test
   (is (= (java.time.Instant/parse "1970-01-01T00:00:00Z") (t/epoch))))
@@ -81,11 +80,11 @@
 
 (deftest am-test
   (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= [(t/time "2017-08-08T00:00:00")
-            (t/time "2017-08-08T12:00:00")]
+    (is (= [(t/local-date-time "2017-08-08T00:00:00")
+            (t/local-date-time "2017-08-08T12:00:00")]
            (t/am (t/today))))
-    (is (= [(t/time "2017-08-08T12:00:00")
-            (t/time "2017-08-09T00:00:00")]
+    (is (= [(t/local-date-time "2017-08-08T12:00:00")
+            (t/local-date-time "2017-08-09T00:00:00")]
            (t/pm (t/today))))))
 
 (deftest duration-test

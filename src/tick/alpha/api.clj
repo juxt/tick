@@ -64,6 +64,9 @@
 (defn date
   ([] (core/date (today)))
   ([v] (core/date v)))
+(defn time
+  ([] (core/time (today)))
+  ([v] (core/time v)))
 (defn day
   ([] (core/day (today)))
   ([v] (core/day v)))
@@ -90,6 +93,7 @@
   ([v] (core/year-month v)))
 (defn zone [z] (core/zone z))
 (defn zoned-date-time [z] (core/zoned-date-time z))
+(defn local-date-time [z] (core/local-date-time z))
 
 
 (defn beginning [v] (core/beginning v))
@@ -97,9 +101,6 @@
 
 ;; Time
 
-(defn time
-  ([] (core/time (now)))
-  ([v] (core/time v)))
 (defn on [t d] (core/on (time t) (date d)))
 (defn at [d t] (core/at (date d) (time t)))
 (defn noon [v] (core/noon v))
@@ -200,7 +201,7 @@
 ;; Intervals
 
 (defn interval [x y]
-  (interval/interval (core/time x) (core/time y)))
+  (interval/interval x y))
 
 (def ^{:doc "Return an interval which forms the bounding-box of the given arguments."}
   bounds interval/bounds)

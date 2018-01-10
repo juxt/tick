@@ -109,6 +109,7 @@
 
 (defprotocol IConstructors
   (date [_] "Make a java.time.LocalDate instance.")
+  (time [_] "Make a java.time.LocalTime instance.")
   (day [_] "Make a java.time.DayOfWeek instance.")
   (day-of-month [_] "Return value of the day in the month as an integer.")
   (inst [_] "Make a java.util.Date instance.")
@@ -116,11 +117,12 @@
   (int [_] "Return value as integer")
   (long [_] "Return value as long")
   (month [_] "Make a java.time.Month instance.")
-  (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (year [_] "Make a java.time.Year instance.")
   (year-month [_] "Make a java.time.YearMonth instance.")
   (zone [_] "Make a java.time.ZoneId instance.")
-  (zoned-date-time [_] "Make a java.time.ZonedDateTime instance."))
+  (zoned-date-time [_] "Make a java.time.ZonedDateTime instance.")
+  (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
+  (local-date-time [_] "Make a java.time.LocalDateTime instance."))
 
 (extend-protocol IConstructors
   Object
@@ -129,6 +131,7 @@
 
   clojure.lang.Fn
   (date [f] (date (f)))
+  (time [f] (time (f)))
   (day [f] (day (f)))
   (inst [f] (inst (f)))
   (instant [f] (instant (f)))
@@ -140,6 +143,7 @@
   (year-month [f] (year-month (f)))
   (zone [f] (zone (f)))
   (zoned-date-time [f] (zone (f)))
+  (local-date-time [f] (local-date-time (f)))
 
   Instant
   (inst [i] (Date/from i))
@@ -158,12 +162,14 @@
   (instant [s] (instant (parse s)))
   (day [s] (or (parse-day s) (day (date s))))
   (date [s] (date (parse s)))
+  (time [s] (time (parse s)))
   (month [s] (parse-month s))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
   (zone [s] (ZoneId/of s))
   (int [s] (.getNano (instant s)))
   (long [s] (.getEpochSecond (instant s)))
+  (local-date-time [s] (local-date-time (parse s)))
 
   Number
   (day [n] (DayOfWeek/of n))
@@ -179,15 +185,20 @@
   (year-month [d] (YearMonth/of (.getYear d) (.getMonthValue d)))
   (year [d] (Year/of (.getYear d)))
 
+  LocalTime
+  (time [t] t)
+
   Month
   (int [m] (.getValue m))
 
   LocalDateTime
   (date [dt] (.toLocalDate dt))
+  (time [dt] (.toLocalTime dt))
   (day [dt] (day (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
+  (local-date-time [ldt] ldt)
 
   Date
   (inst [d] d)
@@ -433,44 +444,12 @@
 (defn yesterday []
   (- (today) 1))
 
-(defprotocol ITime
-  (time [s] "Constructor of an instant, inst, java.time.LocalTime or java.time.LocalDateTime?")
-  (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
-
 (defprotocol ITimeSpan
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
 (defn length "Return the distance between the beginning and end as a duration or period"
   [v] (Duration/between (beginning v) (end v)))
-
-(extend-protocol ITime
-  String
-  (time [s] (time (parse s)))
-
-  Number
-  (time [i]
-    (Instant/ofEpochMilli i))
-
-  Date
-  (time [d] (instant d))
-  (local? [d] false)
-
-  Instant
-  (time [i] i)
-  (local? [i] false)
-
-  LocalDateTime
-  (time [i] i)
-  (local? [i] true)
-
-  LocalTime
-  (time [i] i)
-  (local? [i] true)
-
-  nil
-  (time [_] nil)
-  (local? [_] nil))
 
 (extend-protocol ITimeSpan
   String
@@ -550,11 +529,33 @@
     ([t] (throw (ex-info "Error, zone required" {})))
     ([t zone] (to-local (at-zone t zone)))))
 
+(defprotocol ILocalTime
+  (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
+
+(extend-protocol ILocalTime
+  Date
+  (local? [d] false)
+
+  Instant
+  (local? [i] false)
+
+  LocalDateTime
+  (local? [i] true)
+
+  LocalTime
+  (local? [i] true)
+
+  nil
+  (local? [_] nil))
+
 (defprotocol MinMax
   (min-of-type [_] "Return the min")
   (max-of-type [_] "Return the max"))
 
 (extend-protocol MinMax
+  LocalTime
+  (min-of-type [_] (LocalTime/MIN))
+  (max-of-type [_] (LocalTime/MAX))
   LocalDateTime
   (min-of-type [_] (LocalDateTime/MIN))
   (max-of-type [_] (LocalDateTime/MAX))
