@@ -65,7 +65,7 @@
   ([] (core/date (today)))
   ([v] (core/date v)))
 (defn time
-  ([] (core/time (today)))
+  ([] (core/time (now)))
   ([v] (core/time v)))
 (defn day
   ([] (core/day (today)))
