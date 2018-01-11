@@ -98,6 +98,7 @@
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
+(def coincident? core/coincident?)
 
 ;; Time
 

@@ -461,8 +461,21 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
-(defn length "Return the distance between the beginning and end as a duration or period"
+(defn length
+  "Return the distance between the beginning and end as a duration or
+  period"
   [v] (Duration/between (beginning v) (end v)))
+
+;; TODO: Test concurrent? in tick.core-test
+
+(defn coincident?
+  "Does the span of time contain the given event? If the given event
+  is itself a span, then t must wholly contain the beginning and end
+  of the event."
+  [t event]
+  (and
+    (not= 1 (compare (beginning t) (beginning event)))
+    (not= 1 (compare (end event) (end t)))))
 
 (extend-protocol ITimeSpan
   String
