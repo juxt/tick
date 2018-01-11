@@ -7,7 +7,7 @@
    [clojure.string :as str])
   (:import
    [java.util Date]
-   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime]
+   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
@@ -380,6 +380,7 @@
   (- [t x] (.minus t x))
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
+  ;; TODO: Rename maximum to 'greater' and minimum to 'lesser'
   (maximum [x y] (if (neg? (compare x y)) y x))
   (minimum [x y] (if (neg? (compare x y)) x y))
   ITimeRangeable
@@ -518,11 +519,17 @@
   (beginning [_] nil)
   (end [_] nil))
 
-(defn on [^LocalTime time ^LocalDate date]
-  (.atTime date time))
+(defprotocol ITimeAt
+  (on [_ date] "Set time be ON a date")
+  (at [_ date] "Set date to be AT a time")  )
 
-(defn at [^LocalDate date ^LocalTime time]
-  (.atTime date time))
+(extend-protocol ITimeAt
+  LocalTime
+  (on [t date] (.atTime date t))
+  OffsetTime
+  (on [t date] (.atTime date t))
+  LocalDate
+  (at [date time] (.atTime date time)))
 
 (defn midnight [^LocalDate date]
   (at date (LocalTime/MIDNIGHT)))

@@ -47,6 +47,10 @@
   (beginning [v] (first v))
   (end [v] (second v)))
 
+(extend-protocol t/ITimeAt
+  clojure.lang.PersistentVector
+  (on [[b e] date] (interval (t/on b date) (t/on e date))))
+
 (defn bounds [& args]
   (interval
     (apply t/min (map t/beginning args))
