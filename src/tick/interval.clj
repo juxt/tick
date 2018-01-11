@@ -52,189 +52,42 @@
     (apply t/min (map t/beginning args))
     (apply t/max (map t/end args))))
 
-#_(defn- join [ival1 ival2]
-  (interval
-   (t/min (t/beginning ival1) (t/beginning ival2))
-   (t/max (t/end ival1) (t/end ival2))))
-
-#_(defprotocol ISpan
-  (span [_] [_ _] "Return an interval from a bounded period of time."))
-
-#_(extend-protocol ISpan
-  LocalDate
-  (span
-    ([date] (interval (t/beginning date) (t/end date)))
-    ([date1 date2] (join (span date1) (span date2))))
-
-  YearMonth
-  (span
-    ([ym] (span (t/beginning ym) (t/end ym)))
-    ([ym v] (span (t/beginning ym) (t/end v))))
-
-  Year
-  (span
-    ([y] (span (t/beginning y) (t/end y)))
-    ([y v] (span (t/beginning y) (t/end v))))
-
-  clojure.lang.PersistentVector
-  (span
-    ([v]
-     (if (= 2 (count v))
-       (span (t/beginning v) (t/end v))
-       (vec (clojure.core/concat (span (t/beginning v) (t/end v))
-                                 (drop 2 v)))))
-    ([v1 v2] (join (span v1) (span v2))))
-
-  LocalDateTime
-  (span
-    ([x] [x x])
-    ([x y] (join (span x) (span y))))
-
-  Instant
-  (span
-    ([x] [x x])
-    ([x y] (join (span x) (span y))))
-
-  ZonedDateTime
-  (span
-    ([x] [x x])
-    ([x y] (join (span x) (span y))))
-
-  String
-  (span
-    ([x] (span (t/parse x)))
-    ([x y] (join (span x) (span y))))
-
-  Date
-  (span
-    ([d] [(t/instant d) (t/instant d)])
-    ([d1 d2] (join (span d1) (span d2)))))
-
-#_(defn interval
-  ([v] (span v))
-  ([v1 & args]
-   (reduce span v1 args)))
-
-#_(defn- interval-at-zone
-  "Put the given interval at the given zone."
-  [interval ^ZoneId zone]
-  (s/assert ::interval interval)
-  (-> interval
-      (update 0 t/at-zone zone)
-      (update 1 t/at-zone zone)))
-
-#_(defn- local-interval
-  "Put the given interval at the given zone and convert to local time."
-  ([interval]
-   (s/assert ::interval interval)
-   (-> interval
-       (update 0 t/to-local)
-       (update 1 t/to-local)))
-  ([interval ^ZoneId zone]
-   (s/assert ::interval interval)
-   (-> interval
-       (update 0 t/to-local zone)
-       (update 1 t/to-local zone))))
-
-#_(extend-protocol t/IAtZone
-  clojure.lang.PersistentVector
-  (at-zone [interval zone] (interval-at-zone interval zone))
-  (to-local
-    ([interval] (local-interval interval))
-    ([interval zone] (local-interval interval zone))))
-
-#_(extend-protocol t/IDurationCoercion
-  clojure.lang.PersistentVector
-  (duration
-    ([v]
-     (let [interval (interval v)]
-       (s/assert :tick.interval/interval interval)
-       (Duration/between (t/beginning interval) (t/end interval))))))
-
 (defn am [^LocalDate date]
   (interval (t/beginning date) (t/noon date)))
 
 (defn pm [^LocalDate date]
   (interval (t/noon date) (t/end date)))
 
-;; Interval satisfies protocol
-
-#_(extend-type clojure.lang.PersistentVector
-  t/ITimeSpan
-  (beginning [v] (t/beginning v))
-  (end [v] (t/end v))
-  t/ITime
-  (local? [ival] (and
-                   (t/local? (t/beginning ival))
-                   (t/local? (t/end ival))))
-  t/ITimeArithmetic
-  (+ [v amt] (apply vector (t/+ (t/beginning v) amt) (t/+ (t/end v) amt) (drop 2 v)))
-  (- [v amt] (apply vector (t/- (t/beginning v) amt) (t/- (t/end v) amt) (drop 2 v)))
-  (inc [v] (apply vector (t/inc (t/beginning v)) (t/inc (t/end v)) (drop 2 v)))
-  (dec [v] (apply vector (t/dec (t/beginning v)) (t/dec (t/end v)) (drop 2 v)))
-  (max [x y] (if (neg? (compare (t/end x) (t/end y))) y x))
-  (min [x y] (if (neg? (compare (t/end x) (t/end y))) x y))
-
-  t/ITimeRangeable
-  (range
-    ([v]
-     (let [d (t/duration v)]
-       (iterate #(interval (t/end %) (t/+ (t/end %) d)) v)))
-    ([v end]
-     (let [d (t/duration v)]
-       (take-while
-         #(t/< (t/end %) end)
-         (iterate #(interval (t/end %) (t/+ (t/end %) d)) v))))
-    ([v end gap]
-     (let [d (t/duration v)]
-       (take-while
-         #(< (t/end %) end)
-         (iterate #(t/+ (interval (t/end %) (t/+ (t/end %) d)) gap) v))))))
-
 ;; Allen's Basic Relations
 
 (defn precedes? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (t/< (t/end x) (t/beginning y)))
 
 (defn equals? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (and
     (= (t/beginning x) (t/beginning y))
     (= (t/end x) (t/end y))))
 
 (defn meets? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (= (t/end x) (t/beginning y)))
 
 (defn overlaps? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (and
    (t/< (t/beginning x) (t/beginning y))
    (t/> (t/end x) (t/beginning y))
    (t/< (t/end x) (t/end y))))
 
 (defn during? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (and
    (t/> (t/beginning x) (t/beginning y))
    (t/< (t/end x) (t/end y))))
 
 (defn starts? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (and
    (= (t/beginning x) (t/beginning y))
    (t/< (t/end x) (t/end y))))
 
 (defn finishes? [x y]
-  (s/assert ::interval x)
-  (s/assert ::interval y)
   (and
    (t/> (t/beginning x) (t/beginning y))
    (= (t/end x) (t/end y))))
@@ -250,6 +103,8 @@
 (defn met-by? [x y] ((conv meets?) x y))
 (defn overlapped-by? [x y] ((conv overlaps?) x y))
 (defn finished-by? [x y] ((conv finishes?) x y))
+
+;; contains? is semantically similar to tick.core/coincident?
 (defn contains? [x y] ((conv during?) x y))
 (defn started-by? [x y] ((conv starts?) x y))
 
@@ -277,8 +132,8 @@
 (defrecord GeneralRelation [relations]
   clojure.lang.IFn
   (invoke [_ x y]
-    (s/assert ::interval x)
-    (s/assert ::interval y)
+    #_(s/assert ::interval x)
+    #_(s/assert ::interval y)
     (some (fn [f] (when (f x y) f)) relations)))
 
 ;; Relations are 'basic relations' in [ALSPAUGH-2009]. Invoking a
@@ -361,7 +216,6 @@
     (interval beginning end))
   (combine [ival1 ival2]
     (throw (ex-info "Not implemented" {:args [ival1 ival2]}))))
-
 
 (defn concur
   "Return the interval representing the interval, if there is one,
@@ -589,6 +443,9 @@
        result)))
   ([s1 s2 & sets]
    (reduce intersection s1 (clojure.core/conj sets s2))))
+
+(defn intersect? [coll interval]
+  (not-empty (intersection coll [interval])))
 
 (defn difference
   "Return an interval set that is the first set without elements of
