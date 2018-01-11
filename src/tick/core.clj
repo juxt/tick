@@ -390,6 +390,14 @@
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
+(extend-type LocalTime
+  ITimeArithmetic
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
+  (maximum [x y] (if (neg? (compare x y)) y x))
+  (minimum [x y] (if (neg? (compare x y)) x y))
+  )
+
 (extend-type YearMonth
   ITimeArithmetic
   (+ [t x] (if (number? x) (.plusMonths t x) (.plus t x)))
@@ -486,8 +494,12 @@
   (end [i] (instant i))
 
   LocalDateTime
-  (beginning [time] time)
-  (end [end] end)
+  (beginning [x] x)
+  (end [x] x)
+
+  LocalTime
+  (beginning [x] x)
+  (end [x] x)
 
   nil
   (beginning [_] nil)
