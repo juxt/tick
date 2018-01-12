@@ -542,29 +542,29 @@
 
 (defprotocol IAtZone
   (at-zone [t zone] "Put time at zone")
-  (to-local [t] [t zone] "Convert to local time at zone."))
+  (as-local [t] [t zone] "Convert to local time at zone."))
 
 (extend-protocol IAtZone
   LocalDateTime
   (at-zone [t zone] (.atZone t zone))
-  (to-local
+  (as-local
     ([t] t)
-    ([t zone] (to-local (at-zone t zone))))
+    ([t zone] (as-local (at-zone t zone))))
   Instant
   (at-zone [t zone] (.atZone t zone))
-  (to-local
+  (as-local
     ([t] (throw (ex-info "Error, zone required" {})))
-    ([t zone] (to-local (at-zone t zone))))
+    ([t zone] (as-local (at-zone t zone))))
   ZonedDateTime
   (at-zone [t zone] (.withZoneSameInstant t zone))
-  (to-local
+  (as-local
     ([t] (.toLocalDateTime t))
-    ([t zone] (to-local (at-zone t zone))))
+    ([t zone] (as-local (at-zone t zone))))
   Date
   (at-zone [t zone] (at-zone (instant t) zone))
-  (to-local
+  (as-local
     ([t] (throw (ex-info "Error, zone required" {})))
-    ([t zone] (to-local (at-zone t zone)))))
+    ([t zone] (as-local (at-zone t zone)))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
