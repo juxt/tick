@@ -174,7 +174,7 @@
   Number
   (day [n] (DayOfWeek/of n))
   (month [n] (Month/of n))
-  (instant [n] (Instant/ofEpochSecond n))
+  (instant [n] (Instant/ofEpochMilli n))
   (year [n] (Year/of n))
 
   LocalDate
