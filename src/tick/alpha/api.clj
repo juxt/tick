@@ -104,10 +104,14 @@
 
 (defn on [t d] (core/on t (date d)))
 (defn at [d t] (core/at d (time t)))
+
 (defn noon [v] (core/noon v))
 (defn midnight [v] (core/midnight v))
 (defn midnight? [v] (core/midnight? v))
 (defn epoch [] (core/epoch))
+
+(def ago core/ago)
+(def hence core/hence)
 
 ;; Zones
 

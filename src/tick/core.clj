@@ -622,3 +622,11 @@
 
 
 ;; Conversions
+
+;; Ago/hence
+
+(defn ago [dur]
+  (- (now) dur))
+
+(defn hence [dur]
+  (+ (now) dur))
