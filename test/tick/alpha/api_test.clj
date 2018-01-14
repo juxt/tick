@@ -80,11 +80,11 @@
 
 (deftest am-test
   (t/with-clock (java.time.Clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= [(t/local-date-time "2017-08-08T00:00:00")
-            (t/local-date-time "2017-08-08T12:00:00")]
+    (is (= (t/interval (t/local-date-time "2017-08-08T00:00:00")
+                       (t/local-date-time "2017-08-08T12:00:00"))
            (t/am (t/today))))
-    (is (= [(t/local-date-time "2017-08-08T12:00:00")
-            (t/local-date-time "2017-08-09T00:00:00")]
+    (is (= (t/interval (t/local-date-time "2017-08-08T12:00:00")
+                       (t/local-date-time "2017-08-09T00:00:00"))
            (t/pm (t/today))))))
 
 (deftest duration-test

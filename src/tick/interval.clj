@@ -27,6 +27,11 @@
 ;; When there is a mix, an error occurs.
 ;; The second interval must be after the first interval.
 
+(defrecord Interval [from to]
+  t/ITimeSpan
+  (beginning [_] from)
+  (end [_] to))
+
 (defn interval
   "Make an interval from unordered arguments. Arguments must both be
   local, or both non-local (zoned)."
@@ -39,17 +44,12 @@
    ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
    :post [(neg? (compare (t/beginning %) (t/end %)))]}
   (if (neg? (compare v1 v2))
-    [v1 v2]
-    [v2 v1]))
-
-(extend-protocol t/ITimeSpan
-  clojure.lang.PersistentVector
-  (beginning [v] (first v))
-  (end [v] (second v)))
+    (->Interval v1 v2)
+    (->Interval v2 v1)))
 
 (extend-protocol t/ITimeAt
-  clojure.lang.PersistentVector
-  (on [[b e] date] (interval (t/on b date) (t/on e date))))
+  Interval
+  (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date))))
 
 (defn bounds [& args]
   (interval
@@ -192,7 +192,7 @@
   (combine [ival1 ival2] "Combine two intervals"))
 
 (extend-protocol IIntervalOps
-  clojure.lang.PersistentVector
+  Interval
   (narrow [_ beginning end] (interval beginning end))
   (combine [ival1 ival2] (interval
                            (t/min (t/beginning ival1) (t/beginning ival2))
@@ -250,25 +250,26 @@
 ;; Comparison. We have now built up the capability of comparing
 ;; intervals using the normal <, >, <=, >= operators.
 
-(def spanv (juxt t/beginning t/end))
+(defn as-interval [t]
+  (interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
   LocalDate
-  (< [x y] (t/< (spanv x) (spanv y)))
-  (<= [x y] (t/<= (spanv x) (spanv y)))
-  (> [x y] (t/> (spanv x) (spanv y)))
-  (>= [x y] (t/>= (spanv x) (spanv y)))
+  (< [x y] (t/< (as-interval x) (as-interval y)))
+  (<= [x y] (t/<= (as-interval x) (as-interval y)))
+  (> [x y] (t/> (as-interval x) (as-interval y)))
+  (>= [x y] (t/>= (as-interval x) (as-interval y)))
   YearMonth
-  (< [x y] (t/< (spanv x) (spanv y)))
-  (<= [x y] (t/<= (spanv x) (spanv y)))
-  (> [x y] (t/> (spanv x) (spanv y)))
-  (>= [x y] (t/>= (spanv x) (spanv y)))
+  (< [x y] (t/< (as-interval x) (as-interval y)))
+  (<= [x y] (t/<= (as-interval x) (as-interval y)))
+  (> [x y] (t/> (as-interval x) (as-interval y)))
+  (>= [x y] (t/>= (as-interval x) (as-interval y)))
   Year
-  (< [x y] (t/< (spanv x) (spanv y)))
-  (<= [x y] (t/<= (spanv x) (spanv y)))
-  (> [x y] (t/> (spanv x) (spanv y)))
-  (>= [x y] (t/>= (spanv x) (spanv y)))
-  clojure.lang.PersistentVector
+  (< [x y] (t/< (as-interval x) (as-interval y)))
+  (<= [x y] (t/<= (as-interval x) (as-interval y)))
+  (> [x y] (t/> (as-interval x) (as-interval y)))
+  (>= [x y] (t/>= (as-interval x) (as-interval y)))
+  Interval
   (< [x y] (#{precedes? meets?} (relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (relation x y)))
   (> [x y] (#{preceded-by? met-by?} (relation x y)))
@@ -355,7 +356,7 @@
   (/ [n d] (divide d n))
   YearMonth
   (/ [n d] (divide d n))
-  clojure.lang.PersistentVector
+  Interval
   (/ [ival o] (divide o ival)))
 
 ;; Interval sets - sequences of mutually disjoint intervals
@@ -490,7 +491,7 @@
     (let [r (map (fn [[x y]] (interval (t/end x) (t/beginning y)))
                  (partition 2 1 coll))]
       (cond-> r
-        (not= (ffirst coll) (t/min-of-type (ffirst coll)))
-        (#(concat [(interval (t/min-of-type (ffirst coll)) (ffirst coll))] %))
+        (not= (t/beginning (first coll)) (t/min-of-type (t/beginning (first coll))))
+        (#(concat [(interval (t/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))
         (not= (t/end (last coll)) (t/max-of-type (t/end (last coll))))
         (#(concat % [(interval (t/end (last coll)) (t/max-of-type (t/end (last coll))))]))))))

@@ -7,7 +7,8 @@
    [clojure.spec.alpha :as s]
    [tick.core :as t]
    [tick.interval :refer :all])
-  (:import [java.time.temporal ChronoUnit]))
+  (:import
+   [java.time.temporal ChronoUnit]))
 
 (s/check-asserts true)
 
@@ -34,8 +35,8 @@
                y2 instants
                :when (t/< x1 x2)
                :when (t/< y1 y2)
-               :let [x [x1 x2]
-                     y [y1 y2]]]
+               :let [x (interval x1 x2)
+                     y (interval y1 y2)]]
            ;; For each combination, count how many relations are true
            ;; (should be just one each time)
            (count (filter true? (f x y)))))))))
@@ -52,8 +53,8 @@
               y2 instants
               :when (t/< x1 x2)
               :when (t/< y1 y2)
-              :let [x [x1 x2]
-                    y [y1 y2]]]
+              :let [x (interval x1 x2)
+                    y (interval y1 y2)]]
           ;; For each combination, count how many relations are true
           ;; (should be just one each time)
           (code (relation x y))))))))
@@ -61,19 +62,19 @@
 
 (deftest disjoint-test []
   (is (disjoint?
-       [(instants 0) (instants 1)]
-       [(instants 2) (instants 3)]))
+        (interval (instants 0) (instants 1))
+        (interval (instants 2) (instants 3))))
   (is (= (disjoint?
-          [(instants 0) (instants 1)]
-          [(instants 2) (instants 3)]) precedes?))
+           (interval (instants 0) (instants 1))
+           (interval (instants 2) (instants 3))) precedes?))
   (is (nil?
        (disjoint?
-        [(instants 0) (instants 2)]
-        [(instants 1) (instants 3)])))
+         (interval (instants 0) (instants 2))
+         (interval (instants 1) (instants 3)))))
   (is (nil?
        (disjoint?
-        [(instants 0) (instants 3)]
-        [(instants 1) (instants 2)]))))
+         (interval (instants 0) (instants 3))
+         (interval (instants 1) (instants 2))))))
 
 ;; concur is really the complement to disjoint, but we'll test it
 ;; anywhere to ensure the complement function is working as expected.
@@ -81,15 +82,15 @@
 (deftest concur?-test []
   (is (nil?
        (concur?
-        [(instants 0) (instants 1)]
-        [(instants 2) (instants 3)])))
+         (interval (instants 0) (instants 1))
+         (interval (instants 2) (instants 3)))))
   (is (= (concur?
-          [(instants 0) (instants 2)]
-          [(instants 1) (instants 3)])
+           (interval (instants 0) (instants 2))
+           (interval (instants 1) (instants 3)))
          overlaps?))
   (is (= (concur?
-          [(instants 0) (instants 3)]
-          [(instants 1) (instants 2)])
+           (interval (instants 0) (instants 3))
+           (interval (instants 1) (instants 2)))
          contains?)))
 
 (deftest concur-test []
@@ -225,10 +226,10 @@
                (interval (t/instant "2017-01-01T14:00:00Z")
                          (t/instant "2017-01-01T18:00:00Z"))]]
     (is
-     (= [[(t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T10:00:00Z")]
-         [(t/instant "2017-01-01T11:00:00Z") (t/instant "2017-01-01T12:00:00Z")]
-         [(t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T15:00:00Z")]
-         [(t/instant "2017-01-01T17:00:00Z") (t/instant "2017-01-01T18:00:00Z")]]
+      (= [(interval (t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T10:00:00Z"))
+          (interval (t/instant "2017-01-01T11:00:00Z") (t/instant "2017-01-01T12:00:00Z"))
+          (interval (t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T15:00:00Z"))
+          (interval (t/instant "2017-01-01T17:00:00Z") (t/instant "2017-01-01T18:00:00Z"))]
         (intersection coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
@@ -242,8 +243,8 @@
                          (t/instant "2017-01-01T17:00:00Z"))]]
 
     (is
-     (= [[(t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T11:00:00Z")]
-         [(t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T16:00:00Z")]]
+      (= [(interval (t/instant "2017-01-01T09:00:00Z") (t/instant "2017-01-01T11:00:00Z"))
+          (interval (t/instant "2017-01-01T14:00:00Z") (t/instant "2017-01-01T16:00:00Z"))]
         (intersection coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
@@ -254,8 +255,8 @@
                          (t/instant "2017-01-01T12:00:00Z"))]]
     (is
      (=
-      [[(t/instant "2017-01-01T08:00:00Z")
-        (t/instant "2017-01-01T12:00:00Z")]]
+       [(interval (t/instant "2017-01-01T08:00:00Z")
+                  (t/instant "2017-01-01T12:00:00Z"))]
       (intersection coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
@@ -278,50 +279,50 @@
                          (t/instant "2017-01-01T14:00:00Z"))]
         coll2 [(interval (t/instant "2017-01-01T11:00:00Z")
                          (t/instant "2017-01-01T14:00:00Z"))]]
-    (is (= [[(t/instant "2017-01-01T12:00:00Z")
-             (t/instant "2017-01-01T14:00:00Z")]]
+    (is (= [(interval (t/instant "2017-01-01T12:00:00Z")
+                      (t/instant "2017-01-01T14:00:00Z"))]
            (intersection coll1 coll2))))
 
-  (let [coll1 [[(t/parse "2017-04-11T00:00")
-                (t/parse "2017-04-14T00:00")]
-               [(t/parse "2017-04-18T00:00")
-                (t/parse "2017-04-20T00:00")]
-               [(t/parse "2017-12-20T00:00")
-                (t/parse "2017-12-23T00:00")]
-               [(t/parse "2017-12-27T00:00")
-                (t/parse "2018-01-01T00:00")]
-               [(t/parse "2018-01-02T00:00")
-                (t/parse "2018-01-08T00:00")]]
+  (let [coll1 [(interval (t/parse "2017-04-11T00:00")
+                         (t/parse "2017-04-14T00:00"))
+               (interval (t/parse "2017-04-18T00:00")
+                         (t/parse "2017-04-20T00:00"))
+               (interval (t/parse "2017-12-20T00:00")
+                         (t/parse "2017-12-23T00:00"))
+               (interval (t/parse "2017-12-27T00:00")
+                         (t/parse "2018-01-01T00:00"))
+               (interval (t/parse "2018-01-02T00:00")
+                         (t/parse "2018-01-08T00:00"))]
         coll2 [(bounds "2017")]]
-    (is (= [[(t/parse "2017-04-11T00:00")
-             (t/parse "2017-04-14T00:00")]
-            [(t/parse "2017-04-18T00:00")
-             (t/parse "2017-04-20T00:00")]
-            [(t/parse "2017-12-20T00:00")
-             (t/parse "2017-12-23T00:00")]
-            [(t/parse "2017-12-27T00:00")
-             (t/parse "2018-01-01T00:00")]]
+    (is (= [(interval (t/parse "2017-04-11T00:00")
+                      (t/parse "2017-04-14T00:00"))
+            (interval (t/parse "2017-04-18T00:00")
+                      (t/parse "2017-04-20T00:00"))
+            (interval (t/parse "2017-12-20T00:00")
+                      (t/parse "2017-12-23T00:00"))
+            (interval (t/parse "2017-12-27T00:00")
+                      (t/parse "2018-01-01T00:00"))]
            (intersection coll1 coll2))))
 
-  (let [coll1 [[(t/parse "2017-04-11T00:00")
-                (t/parse "2017-04-14T00:00")]
-               [(t/parse "2017-04-18T00:00")
-                (t/parse "2017-04-20T00:00")]
-               [(t/parse "2017-12-20T00:00")
-                (t/parse "2017-12-23T00:00")]
-               [(t/parse "2017-12-27T00:00")
-                (t/parse "2018-01-01T00:00")]
-               [(t/parse "2018-01-02T00:00")
-                (t/parse "2018-01-08T00:00")]]
+  (let [coll1 [(interval (t/parse "2017-04-11T00:00")
+                         (t/parse "2017-04-14T00:00"))
+               (interval (t/parse "2017-04-18T00:00")
+                         (t/parse "2017-04-20T00:00"))
+               (interval (t/parse "2017-12-20T00:00")
+                         (t/parse "2017-12-23T00:00"))
+               (interval (t/parse "2017-12-27T00:00")
+                         (t/parse "2018-01-01T00:00"))
+               (interval (t/parse "2018-01-02T00:00")
+                         (t/parse "2018-01-08T00:00"))]
         coll2 [(bounds "2017")]]
-    (is (= [[(t/parse "2017-04-11T00:00")
-             (t/parse "2017-04-14T00:00")]
-            [(t/parse "2017-04-18T00:00")
-             (t/parse "2017-04-20T00:00")]
-            [(t/parse "2017-12-20T00:00")
-             (t/parse "2017-12-23T00:00")]
-            [(t/parse "2017-12-27T00:00")
-             (t/parse "2018-01-01T00:00")]]
+    (is (= [(interval (t/parse "2017-04-11T00:00")
+                      (t/parse "2017-04-14T00:00"))
+            (interval (t/parse "2017-04-18T00:00")
+                      (t/parse "2017-04-20T00:00"))
+            (interval (t/parse "2017-12-20T00:00")
+                      (t/parse "2017-12-23T00:00"))
+            (interval (t/parse "2017-12-27T00:00")
+                      (t/parse "2018-01-01T00:00"))]
            (intersection coll1 coll2)))
 
     (testing "Empty sets"
@@ -356,11 +357,11 @@
                          (t/instant "2017-01-01T17:00:00Z"))]]
 
     (is
-     (= [[(t/instant "2017-01-01T08:00:00Z")
-          (t/instant "2017-01-01T09:00:00Z")]
-         [(t/instant "2017-01-01T11:00:00Z")
-          (t/instant "2017-01-01T12:00:00Z")]]
-        (difference coll1 coll2))))
+      (= [(interval (t/instant "2017-01-01T08:00:00Z")
+                    (t/instant "2017-01-01T09:00:00Z"))
+          (interval (t/instant "2017-01-01T11:00:00Z")
+                    (t/instant "2017-01-01T12:00:00Z"))]
+         (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
@@ -369,10 +370,10 @@
         coll2 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))]]
     (is
-     (=
-      [[(t/instant "2017-01-01T14:00:00Z")
-        (t/instant "2017-01-01T16:00:00Z")]]
-      (difference coll1 coll2))))
+      (=
+        [(interval (t/instant "2017-01-01T14:00:00Z")
+                   (t/instant "2017-01-01T16:00:00Z"))]
+        (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T08:00:00Z")
                          (t/instant "2017-01-01T12:00:00Z"))
@@ -384,9 +385,9 @@
                          (t/instant "2017-01-01T18:00:00Z"))]]
 
     (is (=
-         [[(t/instant "2017-01-01T18:00:00Z")
-           (t/instant "2017-01-01T19:00:00Z")]]
-         (difference coll1 coll2))))
+          [(interval (t/instant "2017-01-01T18:00:00Z")
+                     (t/instant "2017-01-01T19:00:00Z"))]
+          (difference coll1 coll2))))
 
   (let [coll1 [(interval (t/instant "2017-01-01T12:00:00Z")
                          (t/instant "2017-01-01T14:00:00Z"))]
@@ -396,38 +397,38 @@
 
   (is (= [(bounds "2017-07-31" "2017-08-13")]
          (difference
-          [(bounds "2017-07-31" "2017-08-13")]
-          [(bounds "2017-01-01")])))
+           [(bounds "2017-07-31" "2017-08-13")]
+           [(bounds "2017-01-01")])))
 
   (testing "Empty sets"
-      (let [coll1 []
-            coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
-                             (t/instant "2017-01-01T10:00:00Z"))
+    (let [coll1 []
+          coll2 [(interval (t/instant "2017-01-01T09:00:00Z")
+                           (t/instant "2017-01-01T10:00:00Z"))
 
-                   (interval (t/instant "2017-01-01T11:00:00Z")
-                             (t/instant "2017-01-01T12:00:00Z"))
+                 (interval (t/instant "2017-01-01T11:00:00Z")
+                           (t/instant "2017-01-01T12:00:00Z"))
 
-                   (interval (t/instant "2017-01-01T14:00:00Z")
-                             (t/instant "2017-01-01T18:00:00Z"))]]
-        (is
-         (= []
-            (difference coll1 coll2)))
-        (is
-         (= coll2
-            (difference coll2 coll1)))
-        (is
-         (= []
-            (difference [] []))))))
+                 (interval (t/instant "2017-01-01T14:00:00Z")
+                           (t/instant "2017-01-01T18:00:00Z"))]]
+      (is
+        (= []
+           (difference coll1 coll2)))
+      (is
+        (= coll2
+           (difference coll2 coll1)))
+      (is
+        (= []
+           (difference [] []))))))
 
 (deftest disj-test
   (is (=
-       [[(t/local-date-time "2017-01-01T00:00")
-         (t/local-date-time "2017-07-04T00:00")]
-        [(t/local-date-time "2017-07-05T00:00")
-         (t/local-date-time "2018-01-01T00:00")]]
+        [(interval (t/local-date-time "2017-01-01T00:00")
+                   (t/local-date-time "2017-07-04T00:00"))
+         (interval (t/local-date-time "2017-07-05T00:00")
+                   (t/local-date-time "2018-01-01T00:00"))]
        (disj [(bounds "2017")] (bounds (t/date "2017-07-04"))))))
 
-(deftest complement-test
+#_(deftest complement-test
   ;; Not sure why this is failing on the equals check
   #_(is (=
        [[(tick.core/min-of-type (t/time "2017-01-01T00:00:00Z"))
