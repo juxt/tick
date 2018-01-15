@@ -520,8 +520,8 @@
   (end [_] nil))
 
 (defprotocol ITimeAt
-  (on [_ date] "Set time be ON a date")
-  (at [_ date] "Set date to be AT a time")  )
+  (on [_ _] "Set time be ON a date")
+  (at [_ _] "Set date to be AT a time")  )
 
 (extend-protocol ITimeAt
   LocalTime
