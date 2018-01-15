@@ -529,7 +529,7 @@
   OffsetTime
   (on [t date] (.atTime date t))
   LocalDate
-  (at [date time] (.atTime date time)))
+  (at [date t] (.atTime date (time t))))
 
 (defn midnight [^LocalDate date]
   (at date (LocalTime/MIDNIGHT)))
@@ -546,25 +546,25 @@
 
 (extend-protocol IAtZone
   LocalDateTime
-  (at-zone [t zone] (.atZone t zone))
+  (at-zone [t z] (.atZone t (zone z)))
   (as-local
     ([t] t)
-    ([t zone] (as-local (at-zone t zone))))
+    ([t z] (as-local (at-zone t (zone z)))))
   Instant
-  (at-zone [t zone] (.atZone t zone))
+  (at-zone [t z] (.atZone t (zone z)))
   (as-local
     ([t] (throw (ex-info "Error, zone required" {})))
-    ([t zone] (as-local (at-zone t zone))))
+    ([t z] (as-local (at-zone t (zone z)))))
   ZonedDateTime
-  (at-zone [t zone] (.withZoneSameInstant t zone))
+  (at-zone [t z] (.withZoneSameInstant t (zone z)))
   (as-local
     ([t] (.toLocalDateTime t))
-    ([t zone] (as-local (at-zone t zone))))
+    ([t z] (as-local (at-zone t (zone z)))))
   Date
-  (at-zone [t zone] (at-zone (instant t) zone))
+  (at-zone [t z] (at-zone (instant t) (zone z)))
   (as-local
     ([t] (throw (ex-info "Error, zone required" {})))
-    ([t zone] (as-local (at-zone t zone)))))
+    ([t z] (as-local (at-zone t (zone z))))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
