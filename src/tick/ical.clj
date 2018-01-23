@@ -266,7 +266,7 @@
     :paramtext (apply str v)
     :quoted-string (apply str (:content v))))
 
-(defn parse-contentline [s]
+(defn line->contentline [s]
   (let [m (s/conform ::contentline (seq s))]
     (when-not (:name m) (throw (ex-info "No name" {:contentline s})))
     {:name (-> m :name extract-name-as-string)
@@ -277,5 +277,58 @@
                   (into {} ))
      :value (-> m :value str/join)}))
 
-;; JCF
+;; JCF tip
 ;;(s/conform (s/and (s/conformer seq) ::iana-token) "foobar")
+
+(defmulti add-contentline-to-model
+  "A reducing function that gives a parsed content-line to an
+  accumulator that builds a model."
+  (fn [acc cl] (:name cl)))
+
+(defn error [acc contentline message]
+  (update acc :errors
+          (fnil conj [])
+          {:error message
+           :lineno (:lineno contentline)}))
+
+(defmethod add-contentline-to-model "BEGIN"
+  [acc contentline]
+  ;; BEGIN means place the current object in the stack, and start a
+  ;; new one
+  (cond-> acc
+    (:curr-object acc) (update :stack (fnil conj []) (:curr-object acc))
+    true (assoc :curr-object {:object (:value contentline)
+                              :lineno (:lineno contentline)})))
+
+(defmethod add-contentline-to-model "END"
+  [acc contentline]
+  ;; END means place the current object in the stack, and start a
+  ;; new one
+  (let [curr-object (:curr-object acc)
+        restore-object (last (:stack acc)) ; check if nil, bad state
+        restore-object (update restore-object :subobjects (fnil conj []) curr-object)]
+    (-> acc
+        (assoc :curr-object restore-object
+               :stack (vec (butlast (:stack acc)))))))
+
+(defn property [acc contentline]
+  (update-in acc [:curr-object :properties] (fnil conj []) contentline))
+
+(doseq [s ["VERSION" "PRODID" "CALSCALE" "METHOD" "CLASS" "CREATED" "DESCRIPTION"
+           "URL" "DTSTART" "DTEND" "DTSTAMP" "LOCATION"
+           "PRIORITY" "SEQUENCE" "SUMMARY" "TRANSP"
+           "X-WR-CALNAME" "X-WR-CALDESC" "X-MS-OLK-FORCEINSPECTOROPEN"
+           "X-MICROSOFT-CDO-BUSYSTATUS"
+           "X-MICROSOFT-CDO-IMPORTANCE"
+           "X-MICROSOFT-DISALLOW-COUNTER"
+           "X-MS-OLK-ALLOWEXTERNCHECK"
+           "X-MS-OLK-AUTOFILLLOCATION"
+           "X-MICROSOFT-CDO-ALLDAYEVENT"
+           "X-MICROSOFT-MSNCALENDAR-ALLDAYEVENT"
+           "X-MS-OLK-CONFTYPE"
+           "UID"]]
+  (defmethod add-contentline-to-model s [acc contentline] (property acc contentline)))
+
+(defmethod add-contentline-to-model :default
+  [acc contentline]
+  (throw (ex-info (str "Unhandled case " (:name contentline)) {:acc acc :contentline contentline})))

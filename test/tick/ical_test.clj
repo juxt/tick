@@ -9,19 +9,30 @@
    [clojure.test :refer :all]))
 
 (deftest parse-dtstart
-  (let [{:keys [name params value]} (ical/parse-contentline "DTSTART;TZID=US-EAST:20180116T140000")]
+  (let [{:keys [name params value]} (ical/line->contentline "DTSTART;TZID=US-EAST:20180116T140000")]
     (is (= "DTSTART" name))
     (is (= "US-EAST" (get params "TZID")))
     (is (= "20180116T140000" value))))
 
 (deftest parse-unicode
-  (let [{:keys [name params value]} (ical/parse-contentline "SUMMARY;LANGUAGE=en-us:United Kingdom: St Patrick�s Day (substitute day) (Regional)")]
+  (let [{:keys [name params value]} (ical/line->contentline "SUMMARY;LANGUAGE=en-us:United Kingdom: St Patrick�s Day (substitute day) (Regional)")]
     (is (= "SUMMARY" name))
     (is (= "en-us" (get params "LANGUAGE")))
     (is (= "United Kingdom: St Patrick�s Day (substitute day) (Regional)" value))))
 
 (deftest stress-test
-  (is (= 5322
+  (is (= 532
          (count
-           (for [line (ical/unfolding-line-seq (io/reader (io/resource "gb.ics")))]
-             (ical/parse-contentline line))))))
+           (for [line (map first (partition 10 (ical/unfolding-line-seq (io/reader (io/resource "gb.ics")))))]
+             (ical/line->contentline line))))))
+
+(deftest parse-file
+  (let [result
+        (reduce ical/add-contentline-to-model
+                {}
+                (map-indexed (fn [n o] (assoc o :lineno (inc n)))
+                             (map ical/line->contentline
+                                  (ical/unfolding-line-seq
+                                    (io/reader
+                                      (io/resource "gb.ics"))))))]
+    (is (= 231 (-> result :curr-object :subobjects first :subobjects count)))))
