@@ -7,7 +7,8 @@
    [tick.core :as t]
    )
   (:import
-   [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId]))
+   [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId]
+   [java.time.format DateTimeFormatter]))
 
 ;; Have considered wrapping ical4j. However, since ical4j does not
 ;; use Java 8 time (as of the time of writing), any appeals to
@@ -43,14 +44,12 @@
 (defprotocol ICalendarValue
   (serialize-value [_] ""))
 
-(def DATE-PATTERN (java.time.format.DateTimeFormatter/ofPattern "YYYYMMdd"))
-
-(def DATE-TIME-FORM-1-PATTERN (java.time.format.DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
+(def DATE-TIME-FORM-1-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
 
 ;; Only call with ZoneID of UTC otherwise produces invalid ICAL format
-(def DATE-TIME-FORM-2-PATTERN (java.time.format.DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmssX"))
+(def DATE-TIME-FORM-2-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmssX"))
 
-(def DATE-TIME-FORM-3-PATTERN (java.time.format.DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
+(def DATE-TIME-FORM-3-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
 
 (extend-protocol ICalendarValue
   String
@@ -58,7 +57,7 @@
   Instant
   (serialize-value [i] {:value (.format (ZonedDateTime/ofInstant i (ZoneId/of "UTC")) DATE-TIME-FORM-2-PATTERN)})
   LocalDate
-  (serialize-value [s] {:value (.format s DATE-PATTERN)})
+  (serialize-value [s] {:value (.format s DateTimeFormatter/BASIC_ISO_DATE)})
   LocalDateTime
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-1-PATTERN)})
   ZonedDateTime
@@ -269,13 +268,18 @@
 (defn line->contentline [s]
   (let [m (s/conform ::contentline (seq s))]
     (when-not (:name m) (throw (ex-info "No name" {:contentline s})))
-    {:name (-> m :name extract-name-as-string)
-     :params (->> m :params
-                  (map (juxt
-                         (comp extract-name-as-string :param-name :param)
-                         (comp extract-param-value-as-string :param-value :param)))
-                  (into {} ))
-     :value (-> m :value str/join)}))
+    (let [str-value (-> m :value str/join)]
+      {:name (-> m :name extract-name-as-string)
+       :params (->> m :params
+                    (map (juxt
+                           (comp extract-name-as-string :param-name :param)
+                           (comp extract-param-value-as-string :param-value :param)))
+                    (into {} ))
+       ;; We set to the string, but properties may replace this with
+       ;; another type
+       :value str-value
+       ;; We always retain the original string value
+       :string-value str-value})))
 
 ;; JCF tip
 ;;(s/conform (s/and (s/conformer seq) ::iana-token) "foobar")
@@ -291,6 +295,18 @@
           {:error message
            :lineno (:lineno contentline)}))
 
+(defrecord VCalendar [])
+(defn make-vcalendar [m] (map->VCalendar m))
+
+(defrecord VEvent [])
+(defn make-vevent [m] (map->VEvent m))
+
+(defn- instantiate [m]
+  (case (:object m)
+    "VCALENDAR" (make-vcalendar m)
+    "VEVENT" (make-vevent m)
+    m))
+
 (defmethod add-contentline-to-model "BEGIN"
   [acc contentline]
   ;; BEGIN means place the current object in the stack, and start a
@@ -302,33 +318,53 @@
 
 (defmethod add-contentline-to-model "END"
   [acc contentline]
-  ;; END means place the current object in the stack, and start a
-  ;; new one
-  (let [curr-object (:curr-object acc)
-        restore-object (last (:stack acc)) ; check if nil, bad state
+  ;; END means place the current object in the stack, and start a new
+  ;; one
+  (let [curr-object (instantiate (:curr-object acc))
+        restore-object (some-> (:stack acc) last) ; check if nil, bad state
         restore-object (update restore-object :subobjects (fnil conj []) curr-object)]
     (-> acc
         (assoc :curr-object restore-object
                :stack (vec (butlast (:stack acc)))))))
 
-(defn property [acc contentline]
-  (update-in acc [:curr-object :properties] (fnil conj []) contentline))
+(defmulti coerce-to-value (fn [value-type value] value-type))
+(defmethod coerce-to-value "DATE" [_ value] (LocalDate/parse value DateTimeFormatter/BASIC_ISO_DATE))
+(defmethod coerce-to-value nil [_ value] value)
 
-(doseq [s ["VERSION" "PRODID" "CALSCALE" "METHOD" "CLASS" "CREATED" "DESCRIPTION"
-           "URL" "DTSTART" "DTEND" "DTSTAMP" "LOCATION"
-           "PRIORITY" "SEQUENCE" "SUMMARY" "TRANSP"
-           "X-WR-CALNAME" "X-WR-CALDESC" "X-MS-OLK-FORCEINSPECTOROPEN"
-           "X-MICROSOFT-CDO-BUSYSTATUS"
-           "X-MICROSOFT-CDO-IMPORTANCE"
-           "X-MICROSOFT-DISALLOW-COUNTER"
-           "X-MS-OLK-ALLOWEXTERNCHECK"
-           "X-MS-OLK-AUTOFILLLOCATION"
-           "X-MICROSOFT-CDO-ALLDAYEVENT"
-           "X-MICROSOFT-MSNCALENDAR-ALLDAYEVENT"
-           "X-MS-OLK-CONFTYPE"
-           "UID"]]
-  (defmethod add-contentline-to-model s [acc contentline] (property acc contentline)))
+(defn add-property [acc contentline]
+  (update-in
+    acc [:curr-object :properties] (fnil conj [])
+    (update contentline
+            :value
+            #(coerce-to-value (get-in contentline [:params "VALUE"]) %))))
 
 (defmethod add-contentline-to-model :default
   [acc contentline]
-  (throw (ex-info (str "Unhandled case " (:name contentline)) {:acc acc :contentline contentline})))
+  (add-property acc contentline))
+
+(defn parse-icalendar [^java.io.BufferedReader r]
+  (->> r
+       unfolding-line-seq
+       (map line->contentline)
+       (map-indexed (fn [n o] (assoc o :lineno (inc n))))
+       (reduce add-contentline-to-model {})
+       :curr-object
+       :subobjects))
+
+(defn property [obj prop-name]
+  (filter #(= (:name %) (str/upper-case (name prop-name))) (:properties obj)))
+
+;; Now individual calendar sources
+
+(defn bank-holidays-in-england-and-wales [] nil)
+
+(defn events
+  "Given a vcalendar object, return only the events"
+  [vcalendar]
+  (filter #(= "VEVENT" (:object %)) (:subobjects vcalendar)))
+
+#_(parse-icalendar (io/reader (io/file "test.ics")))
+
+#_(parse-icalendar (io/reader (io/resource "ics/gov.uk/england-and-wales.ics")))
+
+#_(events (first (parse-icalendar (io/reader (io/resource "ics/gov.uk/england-and-wales.ics")))))
