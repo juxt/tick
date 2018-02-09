@@ -408,43 +408,49 @@
           ys s2
           result []]
      (if (and (not-empty xs) (not-empty ys))
-       (let [x (first xs) y (first ys)
+       (let [x (first xs)
+             y (first ys)
              code (code (relation x y))]
          (case code
            (\p \m) (recur (next xs) ys result)
            (\P \M) (recur xs (next ys) result)
-           \S (recur (cons (narrow x (t/end y) (t/end x))
-                           (next xs))
-                     (next ys)
-                     (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           \F (recur (next xs) (next ys) (clojure.core/conj result y))
-           \o (recur (cons (narrow x (t/beginning y) (t/end x))
-                           (next xs))
-                     (cons (narrow x (t/end x) (t/end y)) (next ys))
-                     (clojure.core/conj
-                       result
-                       (narrow x (t/beginning y) (t/end x))))
-           \O (recur (cons
-                       (narrow x (t/end y) (t/end x))
-                       (next xs))
-                     (next ys)
-                     (clojure.core/conj
-                       result
-                       (narrow x (t/beginning x) (t/end y))))
-           \D (recur (cons
-                       (narrow x (t/end y) (t/end x))
-                       (next xs))
-                     (next ys)
-                     (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           \d (recur (next xs) (cons (narrow x (t/end x) (t/end y))
-                                     (next ys))
-                     (clojure.core/conj result x))
-           \e (recur (next xs) (next ys) (clojure.core/conj result x))
-           \f (recur (next xs) (next ys) (clojure.core/conj result x))
-           \s (recur (next xs)
-                     (cons (narrow x (t/end x) (t/end y))
-                           (next ys))
-                     (clojure.core/conj result x))))
+           \S (recur
+                (cons (narrow x (t/end y) (t/end x)) (next xs))
+                (next ys)
+                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
+           \F (recur
+                (next xs)
+                (next ys)
+                (clojure.core/conj result y))
+           \o (recur
+                (cons (narrow x (t/beginning y) (t/end x)) (next xs))
+                (cons (narrow y (t/end x) (t/end y)) (next ys))
+                (clojure.core/conj result (narrow x (t/beginning y) (t/end x))))
+           \O (recur
+                (cons (narrow x (t/end y) (t/end x)) (next xs))
+                (next ys)
+                (clojure.core/conj result (narrow x (t/beginning x) (t/end y))))
+           \D (recur
+                (cons (narrow x (t/end y) (t/end x)) (next xs))
+                (next ys)
+                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
+           \d (recur
+                (next xs)
+                (cons (narrow y (t/end x) (t/end y)) (next ys))
+                (clojure.core/conj result x))
+           \e (recur
+                (next xs)
+                (next ys)
+                (clojure.core/conj result x))
+           \f (recur
+                (next xs)
+                (next ys)
+                (clojure.core/conj result x))
+           \s (recur
+                (next xs)
+                (cons (narrow y (t/end x) (t/end y))
+                      (next ys))
+                (clojure.core/conj result x))))
        result)))
   ([s1 s2 & sets]
    (reduce intersection s1 (clojure.core/conj sets s2))))
