@@ -27,10 +27,10 @@
 ;; When there is a mix, an error occurs.
 ;; The second interval must be after the first interval.
 
-(defrecord Interval [from to]
+(defrecord Interval [beginning end]
   t/ITimeSpan
-  (beginning [_] from)
-  (end [_] to))
+  (beginning [_] beginning)
+  (end [_] end))
 
 (defn interval
   "Make an interval from unordered arguments. Arguments must both be
