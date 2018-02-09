@@ -7,7 +7,7 @@
    [clojure.java.io :as io]
    [clojure.spec.alpha :as s]
    [tick.core :as t]
-   )
+   [tick.interval :as ival])
   (:import
    [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId]
    [java.time.format DateTimeFormatter]))
@@ -67,6 +67,14 @@
                         :params {:tzid (t/zone s)}}))
 
 (defprotocol ICalendarObject
+  (property-values [obj prop-name]
+    "Return the properties of an ICalendarObject with the given
+    name. Returns a sequence of values, since iCalendar properties may
+    have multiple values.")
+  (property-value [obj prop-name]
+    "Return the first property value of an ICalendarObject."))
+
+(defprotocol IPrintable
   (print-object [_] "Print as an iCalendar object"))
 
 (defmacro wrap-with [c & body]
@@ -76,7 +84,7 @@
      (print-cl "END:" ~c)))
 
 (defrecord Property [prop-name prop-value]
-  ICalendarObject
+  IPrintable
   (print-object [_]
     (let [{:keys [params value]} (serialize-value prop-value)]
       (print-cl
@@ -86,41 +94,58 @@
         ":"
         value))))
 
-(defn property [name value]
-  (->Property name value))
-
-(defrecord VEvent [beginning end properties]
+(defrecord VEvent []
   t/ITimeSpan
-  (beginning [_] beginning)
-  (end [_] end)
-  ICalendarObject
+  (beginning [this] (t/time (property-value this :dtstart)))
+  (end [this] (t/time (property-value this :dtend)))
+
+  IPrintable
   (print-object [this]
     (wrap-with
       "VEVENT"
-      (doseq [prop properties]
-        (print-object prop)))))
+      (doseq [prop (:properties this)]
+        (print-object prop))))
 
-(defn vevent [summary dtstart dtend & {:as props}]
-  (->VEvent
-    (t/beginning dtstart)
-    (t/end dtend)
-    (concat
-      [(property :summary summary)
-       (property :dtstart dtstart)
-       (property :dtend dtend)]
-      (for [[k v] props]
-        (property k v)))))
+  ICalendarObject
+  (property-values [this prop-name]
+    (->> this
+         :properties
+         (filter #(= (:name %) (str/upper-case (name prop-name))))
+         (mapv :value)))
+  (property-value [this prop-name]
+    (first (property-values this prop-name)))
+
+  t/IConstructors
+  (date [this] (t/date (property-value this :dtstart)))
+  (time [this] (t/time (property-value this :dtstart)))
+  (day [this] (t/day (property-value this :dtstart)))
+  (day-of-month [this] (t/day-of-month (property-value this :dtstart)))
+  (inst [this] (t/inst (property-value this :dtstart)))
+  (instant [this] (t/inst (property-value this :dtstart)))
+  (month [this] (t/month (property-value this :dtstart)))
+  (year [this] (t/year (property-value this :dtstart)))
+  (year-month [this] (t/year-month (property-value this :dtstart)))
+  (zone [this] (t/zone (property-value this :dtstart)))
+  (zoned-date-time [this] (t/zoned-date-time (property-value this :dtstart)))
+  (offset-date-time [this] (t/offset-date-time (property-value this :dtstart)))
+  (local-date-time [this] (t/local-date-time (property-value this :dtstart))))
 
 (defrecord VCalendar [objects]
-  ICalendarObject
+  ;; TODO: Add t/ITimeSpace
+  IPrintable
   (print-object [this]
     (wrap-with
       "VCALENDAR"
       (doseq [obj objects]
-        (print-object obj)))))
-
-(defn vcalendar [& objects]
-  (->VCalendar objects))
+        (print-object obj))))
+  ICalendarObject
+  (property-values [this prop-name]
+    (->> this
+         :properties
+         (filter #(= (:name %) (str/upper-case (name prop-name))))
+         (mapv :value)))
+  (property-value [this prop-name]
+    (first (property-values this prop-name))))
 
 (comment
   ;; Form 1: DATE WITH LOCAL TIME
@@ -297,16 +322,10 @@
           {:error message
            :lineno (:lineno contentline)}))
 
-(defrecord VCalendar [])
-(defn make-vcalendar [m] (map->VCalendar m))
-
-(defrecord VEvent [])
-(defn make-vevent [m] (map->VEvent m))
-
 (defn- instantiate [m]
   (case (:object m)
-    "VCALENDAR" (make-vcalendar m)
-    "VEVENT" (make-vevent m)
+    "VCALENDAR" (map->VCalendar m)
+    "VEVENT" (map->VEvent m)
     m))
 
 (defmethod add-contentline-to-model "BEGIN"
@@ -344,7 +363,7 @@
   [acc contentline]
   (add-property acc contentline))
 
-(defn parse-icalendar [^java.io.BufferedReader r]
+(defn parse-ical [^java.io.BufferedReader r]
   (->> r
        unfolding-line-seq
        (map line->contentline)
@@ -353,20 +372,7 @@
        :curr-object
        :subobjects))
 
-(defn property [obj prop-name]
-  (filter #(= (:name %) (str/upper-case (name prop-name))) (:properties obj)))
-
-;; Now individual calendar sources
-
-(defn bank-holidays-in-england-and-wales [] nil)
-
 (defn events
   "Given a vcalendar object, return only the events"
   [vcalendar]
   (filter #(= "VEVENT" (:object %)) (:subobjects vcalendar)))
-
-#_(parse-icalendar (io/reader (io/file "test.ics")))
-
-#_(parse-icalendar (io/reader (io/resource "ics/gov.uk/england-and-wales.ics")))
-
-#_(events (first (parse-icalendar (io/reader (io/resource "ics/gov.uk/england-and-wales.ics")))))
