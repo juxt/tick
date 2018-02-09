@@ -1,3 +1,5 @@
+;; Copyright © 2016-2018, JUXT LTD.
+
 (ns tick.ical
   (:require
    [clojure.set :as set]
