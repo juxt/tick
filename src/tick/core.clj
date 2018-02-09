@@ -44,6 +44,30 @@
     (LocalDate/now *clock*)
     (LocalDate/now)))
 
+(defprotocol ITimeArithmetic
+  (+ [_ _] "Add time")
+  (- [_ _] "Subtract time")
+  (inc [_] "Increment time")
+  (dec [_] "Decrement time")
+  (maximum [_ _] "Return maximum")
+  (minimum [_ _] "Return minimum"))
+
+(defn tomorrow []
+  (+ (today) 1))
+
+(defn yesterday []
+  (- (today) 1))
+
+(defprotocol ITimeAt
+  (on [_ _] "Set time be ON a date")
+  (at [_ _] "Set date to be AT a time")  )
+
+(defn midnight [^LocalDate date]
+  (at date (LocalTime/MIDNIGHT)))
+
+(defn noon [^LocalDate date]
+  (at date (LocalTime/NOON)))
+
 (defn epoch []
   (java.time.Instant/EPOCH))
 
@@ -178,6 +202,7 @@
   (year [n] (Year/of n))
 
   LocalDate
+  (time [d] (midnight d)) ; this helps iCalendar dates become intervals
   (date [d] d)
   (day [d] (.getDayOfWeek d))
   (day-of-month [d] (.getDayOfMonth d))
@@ -301,14 +326,6 @@
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y))))
-
-(defprotocol ITimeArithmetic
-  (+ [_ _] "Add time")
-  (- [_ _] "Subtract time")
-  (inc [_] "Increment time")
-  (dec [_] "Decrement time")
-  (maximum [_ _] "Return maximum")
-  (minimum [_ _] "Return minimum"))
 
 (defn max [arg & args]
   (reduce #(maximum %1 %2) arg args))
@@ -452,12 +469,6 @@
   IDivisible
   (/ [d x] (divide-duration x d)))
 
-(defn tomorrow []
-  (+ (today) 1))
-
-(defn yesterday []
-  (- (today) 1))
-
 (defprotocol ITimeSpan
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
@@ -503,6 +514,14 @@
   (beginning [i] i)
   (end [i] i)
 
+  ZonedDateTime
+  (beginning [i] i)
+  (end [i] i)
+
+  OffsetDateTime
+  (beginning [i] i)
+  (end [i] i)
+
   Date
   (beginning [i] (instant i))
   (end [i] (instant i))
@@ -519,10 +538,6 @@
   (beginning [_] nil)
   (end [_] nil))
 
-(defprotocol ITimeAt
-  (on [_ _] "Set time be ON a date")
-  (at [_ _] "Set date to be AT a time")  )
-
 (extend-protocol ITimeAt
   LocalTime
   (on [t date] (.atTime date t))
@@ -531,14 +546,7 @@
   LocalDate
   (at [date t] (.atTime date (time t))))
 
-(defn midnight [^LocalDate date]
-  (at date (LocalTime/MIDNIGHT)))
-
-(defn noon [^LocalDate date]
-  (at date (LocalTime/NOON)))
-
-(defn midnight? [^LocalDateTime t]
-  (.isZero (Duration/between t (beginning (date t)))))
+;; Not sure about at-zone - perhaps in-zone, as-global, etc.
 
 (defprotocol IAtZone
   (at-zone [t zone] "Put time at zone")
@@ -620,7 +628,6 @@
 
 ;; adjust
 
-
 ;; Conversions
 
 ;; Ago/hence
@@ -630,3 +637,6 @@
 
 (defn hence [dur]
   (+ (now) dur))
+
+(defn midnight? [^LocalDateTime t]
+  (.isZero (Duration/between t (beginning (date t)))))
