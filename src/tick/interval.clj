@@ -40,9 +40,11 @@
           (s/or :local (s/tuple t/local? t/local?)
                 :non-local (s/tuple (comp not t/local?) (comp not t/local?)))
           [v1 v2])]
-   ;; Post condition must hold, and it is intentional that is cannot be disabled.
+   ;; Post condition must hold, and it is intentional that it cannot be disabled.
    ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
    :post [(neg? (compare (t/beginning %) (t/end %)))]}
+  (when (= v1 v2)
+    (throw (ex-info "Zero length interval!" {:v1 v1 :v2 v2})))
   (if (neg? (compare v1 v2))
     (->Interval v1 v2)
     (->Interval v2 v1)))
@@ -251,6 +253,8 @@
 ;; intervals using the normal <, >, <=, >= operators.
 
 (defn as-interval [t]
+  (when (= (t/beginning t) (t/end t))
+    (throw (ex-info "t is a zero length interval!" {:t t})))
   (interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
