@@ -157,6 +157,7 @@
 ;; Durations
 
 (defn nanos [v] (core/nanos v))
+(defn micros [v] (core/micros v))
 (defn millis [v] (core/millis v))
 (defn seconds [v] (core/seconds v))
 (defn minutes [v] (core/minutes v))

@@ -251,6 +251,7 @@
 
 (defprotocol IDuration
   (nanos [_] "Return the given quantity in nanoseconds.")
+  (micros [_] "Return the given quantity in microseconds.")
   (millis [_] "Return the given quantity in milliseconds.")
   (seconds [_] "Return the given quantity in seconds.")
   (minutes [_] "Return the given quantity in minutes.")
@@ -260,6 +261,7 @@
 (extend-protocol IDuration
   Number
   (nanos [n] (Duration/ofNanos n))
+  (micros [n] (Duration/ofNanos (* n 1000)))
   (millis [n] (Duration/ofMillis n))
   (seconds [n] (Duration/ofSeconds n))
   (minutes [n] (Duration/ofMinutes n))
@@ -268,6 +270,7 @@
 
   Duration
   (nanos [d] (.toNanos d))
+  (micros [d] (Long/divideUnsigned (nanos d) 1000))
   (millis [d] (.toMillis d))
   (seconds [d] (.getSeconds d))
   (minutes [d] (.toMinutes d))
