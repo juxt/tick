@@ -164,6 +164,11 @@
 (defn hours [v] (core/hours v))
 (defn days [v] (core/days v))
 
+;; Periods
+(defn weeks [v] (core/weeks v))
+(defn months [v] (core/months v))
+(defn years [v] (core/years v))
+
 ;; Comparisons
 
 (defn <

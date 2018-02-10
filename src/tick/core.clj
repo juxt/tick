@@ -282,6 +282,17 @@
     (assert unit (str "Not a unit: " u))
     (Duration/of n unit)))
 
+(defprotocol IPeriod
+  (weeks [_] "Return the given quantity in weeks.")
+  (months [_] "Return the given quantity in months.")
+  (years [_] "Return the given quantity in years."))
+
+(extend-protocol IPeriod
+  Number
+  (weeks [n] (Period/ofWeeks n))
+  (months [n] (Period/ofMonths n))
+  (years [n] (Period/ofYears n)))
+
 (defn period [n u]
   (case u
     :days (Period/ofDays n)
