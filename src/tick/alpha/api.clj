@@ -20,7 +20,7 @@
 
 ;; Surfacing some useful constants
 
-(def units core/units)
+(def unit-map core/unit-map)
 
 ;; Fixing the clock used for `today` and `now`.
 

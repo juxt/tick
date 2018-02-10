@@ -11,7 +11,7 @@
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
-(def units
+(def unit-map
   {:nanos ChronoUnit/NANOS
    :micros ChronoUnit/MICROS
    :millis ChronoUnit/MILLIS
@@ -278,7 +278,7 @@
   (days [d] (.toDays d)))
 
 (defn duration [n u]
-  (let [unit (units u)]
+  (let [unit (unit-map u)]
     (assert unit (str "Not a unit: " u))
     (Duration/of n unit)))
 
