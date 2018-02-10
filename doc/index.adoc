@@ -1,0 +1,14 @@
+= Tick
+0.4-1, 2018-02-09
+Malcolm Sparks <malcolm@juxt.pro>
+:toc: left
+
+:leveloffset: +1
+
+[quote, Douglas Adams, The Hitchhiker's Guide to the Galaxy]
+____
+Time is an illusion. Lunchtime doubly so.
+____
+
+include::setup.adoc[]
+include::dates.adoc[]

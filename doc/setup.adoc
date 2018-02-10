@@ -1,0 +1,9 @@
+= Setup
+
+== Lein/Boot users
+
+Add to your lein or boot dependencies:
+
+```
+[tick "0.4.0"]
+```

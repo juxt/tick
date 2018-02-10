@@ -1,0 +1,20 @@
+= Dates and times
+
+== Constructors
+
+[%header,cols="m,a,m"]
+|===
+|Example|Description|Return type
+|(now)|Current time (millisecond granularity)|java.time.Instant
+|(just-now)|Current time (second granularity)|java.time.Instant
+|(today)|Today|java.time.LocalDate
+|===
+
+= Durations and periods
+
+[%header,cols="m,a,m"]
+|===
+|Code|Description|Return type
+|(seconds 1)|Duration of a second|java.time.Duration
+|(seconds 10)|Duration of 10 seconds|java.time.Duration
+|===
