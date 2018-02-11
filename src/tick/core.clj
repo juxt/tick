@@ -218,6 +218,8 @@
   (instant [zdt] (.toInstant zdt))
   (zone [zdt] (.getZone zdt)))
 
+;; Comparison
+
 (defprotocol ITimeComparison
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
@@ -225,49 +227,7 @@
   (>= [x y] "Is x after or at the same time as y?"))
 
 (extend-protocol ITimeComparison
-  Instant
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  LocalDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  LocalTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  LocalDate
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  OffsetDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  ZonedDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  YearMonth
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-
-  Year
+  Object
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
@@ -355,9 +315,16 @@
     :months (Period/ofMonths n)
     :years (Period/ofYears n)))
 
+;; Arithmetic
+
 (defprotocol ITimeArithmetic
-  (+ [_ _] "Add time")
-  (- [_ _] "Subtract time"))
+  (+ [_ _] "Add to time")
+  (- [_ _] "Subtract from time"))
+
+(extend-protocol ITimeArithmetic
+  Object
+  (+ [t d] (.plus t d))
+  (- [t d] (.minus t d)))
 
 (defprotocol ITimeIncDec
   (inc [_] "Increment time")
@@ -379,10 +346,6 @@
   (reduce #(lesser %1 %2) arg args))
 
 (extend-type Instant
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
@@ -396,10 +359,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type ZonedDateTime
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
@@ -413,10 +372,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type LocalDate
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (.plusDays t 1))
   (dec [t] (.minusDays t 1))
@@ -436,10 +391,6 @@
   (dec (today)))
 
 (extend-type LocalDateTime
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (+ t (seconds 1)))
   (dec [t] (- t (seconds 1)))
@@ -452,16 +403,7 @@
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
-(extend-type LocalTime
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x)))
-
 (extend-type YearMonth
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (.plusMonths t 1))
   (dec [t] (.minusMonths t 1))
@@ -475,10 +417,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type Year
-  ITimeArithmetic
-  (+ [t x] (.plus t x))
-  (- [t x] (.minus t x))
-
   ITimeIncDec
   (inc [t] (.plusYears t 1))
   (dec [t] (.minusYears t 1))
@@ -509,10 +447,6 @@
     (clojure.core// (.getSeconds duration) (.getSeconds divisor))))
 
 (extend-type Duration
-  ITimeArithmetic
-  (+ [d x] (.plus d x))
-  (- [d x] (.minus d x))
-
   ITimeIncDec
   (inc [d] (.plusSeconds d 1))
   (dec [d] (.minusSeconds d 1))
