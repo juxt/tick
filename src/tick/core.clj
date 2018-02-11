@@ -218,96 +218,6 @@
   (instant [zdt] (.toInstant zdt))
   (zone [zdt] (.getZone zdt)))
 
-(defprotocol IDuration
-  (nanos [_] "Return the given quantity in nanoseconds.")
-  (micros [_] "Return the given quantity in microseconds.")
-  (millis [_] "Return the given quantity in milliseconds.")
-  (seconds [_] "Return the given quantity in seconds.")
-  (minutes [_] "Return the given quantity in minutes.")
-  (hours [_] "Return the given quantity in hours.")
-  (days [_] "Return the given quantity in days."))
-
-(extend-protocol IDuration
-  Number
-  (nanos [n] (Duration/ofNanos n))
-  (micros [n] (Duration/ofNanos (* n 1000)))
-  (millis [n] (Duration/ofMillis n))
-  (seconds [n] (Duration/ofSeconds n))
-  (minutes [n] (Duration/ofMinutes n))
-  (hours [n] (Duration/ofHours n))
-  (days [n] (Duration/ofDays n))
-
-  Duration
-  (nanos [d] (.toNanos d))
-  (micros [d] (Long/divideUnsigned (nanos d) 1000))
-  (millis [d] (.toMillis d))
-  (seconds [d] (.getSeconds d))
-  (minutes [d] (.toMinutes d))
-  (hours [d] (.toHours d))
-  (days [d] (.toDays d)))
-
-(def unit-map
-  {:nanos ChronoUnit/NANOS
-   :micros ChronoUnit/MICROS
-   :millis ChronoUnit/MILLIS
-   :seconds ChronoUnit/SECONDS
-   :minutes ChronoUnit/MINUTES
-   :hours ChronoUnit/HOURS
-   :half-days ChronoUnit/HALF_DAYS
-   :days ChronoUnit/DAYS
-   :weeks ChronoUnit/WEEKS
-   :months ChronoUnit/MONTHS
-   :years ChronoUnit/YEARS
-   :decades ChronoUnit/DECADES
-   :centuries ChronoUnit/CENTURIES
-   :millennia ChronoUnit/MILLENNIA
-   :eras ChronoUnit/ERAS
-   :forever ChronoUnit/FOREVER})
-
-(defn duration [n u]
-  (let [unit (unit-map u)]
-    (assert unit (str "Not a unit: " u))
-    (Duration/of n unit)))
-
-(defprotocol IPeriod
-  (weeks [_] "Return the given quantity in weeks.")
-  (months [_] "Return the given quantity in months.")
-  (years [_] "Return the given quantity in years."))
-
-(extend-protocol IPeriod
-  Number
-  (weeks [n] (Period/ofWeeks n))
-  (months [n] (Period/ofMonths n))
-  (years [n] (Period/ofYears n)))
-
-(defn period [n u]
-  (case u
-    :days (Period/ofDays n)
-    :weeks (Period/ofWeeks n)
-    :months (Period/ofMonths n)
-    :years (Period/ofYears n)))
-
-;; Units
-
-(def reverse-unit-map (into {} (map vec (map reverse unit-map))))
-
-(defn units [x]
-  (into {}
-        (for [tu (.getUnits x)
-              :let [k (reverse-unit-map tu)]
-              :when k]
-          [k (.get x tu)])))
-
-;; Between
-
-(defprotocol ITimeBetween
-  (between [t1 t2] "Return the most appropriate type of value that
-  represents the gap between two times"))
-
-(extend-protocol ITimeBetween
-  Instant
-  (between [inst _] (throw (ex-info "TODO" {}))))
-
 (defprotocol ITimeComparison
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
@@ -363,15 +273,87 @@
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y))))
 
-(defprotocol ITimeRangeable
-  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
+;; Units
 
-(defprotocol IDivisible
-  (/ [_ _] "Divide time"))
+(def unit-map
+  {:nanos ChronoUnit/NANOS
+   :micros ChronoUnit/MICROS
+   :millis ChronoUnit/MILLIS
+   :seconds ChronoUnit/SECONDS
+   :minutes ChronoUnit/MINUTES
+   :hours ChronoUnit/HOURS
+   :half-days ChronoUnit/HALF_DAYS
+   :days ChronoUnit/DAYS
+   :weeks ChronoUnit/WEEKS
+   :months ChronoUnit/MONTHS
+   :years ChronoUnit/YEARS
+   :decades ChronoUnit/DECADES
+   :centuries ChronoUnit/CENTURIES
+   :millennia ChronoUnit/MILLENNIA
+   :eras ChronoUnit/ERAS
+   :forever ChronoUnit/FOREVER})
 
-(extend-protocol IDivisible
-  String
-  (/ [s d] (/ (parse s) d)))
+(def reverse-unit-map (into {} (map vec (map reverse unit-map))))
+
+(defn units [x]
+  (into {}
+        (for [tu (.getUnits x)
+              :let [k (reverse-unit-map tu)]
+              :when k]
+          [k (.get x tu)])))
+
+;; Durations
+
+(defprotocol IDuration
+  (nanos [_] "Return the given quantity in nanoseconds.")
+  (micros [_] "Return the given quantity in microseconds.")
+  (millis [_] "Return the given quantity in milliseconds.")
+  (seconds [_] "Return the given quantity in seconds.")
+  (minutes [_] "Return the given quantity in minutes.")
+  (hours [_] "Return the given quantity in hours.")
+  (days [_] "Return the given quantity in days."))
+
+(extend-protocol IDuration
+  Number
+  (nanos [n] (Duration/ofNanos n))
+  (micros [n] (Duration/ofNanos (* n 1000)))
+  (millis [n] (Duration/ofMillis n))
+  (seconds [n] (Duration/ofSeconds n))
+  (minutes [n] (Duration/ofMinutes n))
+  (hours [n] (Duration/ofHours n))
+  (days [n] (Duration/ofDays n))
+
+  Duration
+  (nanos [d] (.toNanos d))
+  (micros [d] (Long/divideUnsigned (nanos d) 1000))
+  (millis [d] (.toMillis d))
+  (seconds [d] (.getSeconds d))
+  (minutes [d] (.toMinutes d))
+  (hours [d] (.toHours d))
+  (days [d] (.toDays d)))
+
+(defn duration [n u]
+  (let [unit (unit-map u)]
+    (assert unit (str "Not a unit: " u))
+    (Duration/of n unit)))
+
+(defprotocol IPeriod
+  (weeks [_] "Return the given quantity in weeks.")
+  (months [_] "Return the given quantity in months.")
+  (years [_] "Return the given quantity in years."))
+
+(extend-protocol IPeriod
+  Number
+  (weeks [n] (Period/ofWeeks n))
+  (months [n] (Period/ofMonths n))
+  (years [n] (Period/ofYears n)))
+
+(defn period [n u]
+  (case u
+    :days (Period/ofDays n)
+    :weeks (Period/ofWeeks n)
+    :months (Period/ofMonths n)
+    :years (Period/ofYears n)))
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add time")
@@ -380,6 +362,9 @@
 (defprotocol ITimeIncDec
   (inc [_] "Increment time")
   (dec [_] "Decrement time"))
+
+(defprotocol ITimeRangeable
+  (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
 (defn greater [x y]
   (if (neg? (compare x y)) y x))
@@ -506,10 +491,17 @@
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
-(defprotocol IDivisbleDuration
+(defprotocol IDivisible
+  (/ [_ _] "Divide time"))
+
+(extend-protocol IDivisible
+  String
+  (/ [s d] (/ (parse s) d)))
+
+(defprotocol IDivisibleDuration
   (divide-duration [divisor duration] "Divide a duration"))
 
-(extend-protocol IDivisbleDuration
+(extend-protocol IDivisibleDuration
   Long
   (divide-duration [n duration] (.dividedBy duration n))
   Duration
@@ -531,6 +523,14 @@
 (defprotocol ITimeSpan
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
+
+(defprotocol ITimeBetween
+  (between [t1 t2] "Return the most appropriate type of value that
+  represents the gap between two times"))
+
+(extend-protocol ITimeBetween
+  Instant
+  (between [inst _] (throw (ex-info "TODO" {}))))
 
 (defn length
   "Return the distance between the beginning and end as a duration or
