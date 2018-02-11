@@ -169,6 +169,9 @@
 (defn months [v] (core/months v))
 (defn years [v] (core/years v))
 
+;; Units
+(def units core/units)
+
 ;; Comparisons
 
 (defn <

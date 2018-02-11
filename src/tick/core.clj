@@ -11,24 +11,6 @@
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit]))
 
-(def unit-map
-  {:nanos ChronoUnit/NANOS
-   :micros ChronoUnit/MICROS
-   :millis ChronoUnit/MILLIS
-   :seconds ChronoUnit/SECONDS
-   :minutes ChronoUnit/MINUTES
-   :hours ChronoUnit/HOURS
-   :half-days ChronoUnit/HALF_DAYS
-   :days ChronoUnit/DAYS
-   :weeks ChronoUnit/WEEKS
-   :months ChronoUnit/MONTHS
-   :years ChronoUnit/YEARS
-   :decades ChronoUnit/DECADES
-   :centuries ChronoUnit/CENTURIES
-   :millennia ChronoUnit/MILLENNIA
-   :eras ChronoUnit/ERAS
-   :forever ChronoUnit/FOREVER})
-
 (def ^{:dynamic true} *clock* nil)
 
 (defn now []
@@ -170,16 +152,17 @@
   (local-date-time [f] (local-date-time (f)))
 
   Instant
+  (date [i] (date (zoned-date-time i)))
+  (time [i] (time (zoned-date-time i)))
+  (day [i] (day (date i)))
   (inst [i] (Date/from i))
   (instant [i] i)
-  (date [i] (date (zoned-date-time i)))
-  (day [i] (day (date i)))
+  (int [i] (.getNano i))
+  (long [i] (.getEpochSecond i))
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
   (zoned-date-time [i] (.atZone i ZoneOffset/UTC))
-  (int [i] (.getNano i))
-  (long [i] (.getEpochSecond i))
 
   String
   (inst [s] (inst (instant s)))
@@ -244,9 +227,10 @@
   (zone [z] z)
 
   ZonedDateTime
+  (date [zdt] (.toLocalDate zdt))
+  (time [zdt] (.toLocalTime zdt))
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
-  (date [zdt] (.toLocalDate zdt))
   (zone [zdt] (.getZone zdt)))
 
 (defprotocol IDuration
@@ -277,6 +261,24 @@
   (hours [d] (.toHours d))
   (days [d] (.toDays d)))
 
+(def unit-map
+  {:nanos ChronoUnit/NANOS
+   :micros ChronoUnit/MICROS
+   :millis ChronoUnit/MILLIS
+   :seconds ChronoUnit/SECONDS
+   :minutes ChronoUnit/MINUTES
+   :hours ChronoUnit/HOURS
+   :half-days ChronoUnit/HALF_DAYS
+   :days ChronoUnit/DAYS
+   :weeks ChronoUnit/WEEKS
+   :months ChronoUnit/MONTHS
+   :years ChronoUnit/YEARS
+   :decades ChronoUnit/DECADES
+   :centuries ChronoUnit/CENTURIES
+   :millennia ChronoUnit/MILLENNIA
+   :eras ChronoUnit/ERAS
+   :forever ChronoUnit/FOREVER})
+
 (defn duration [n u]
   (let [unit (unit-map u)]
     (assert unit (str "Not a unit: " u))
@@ -299,6 +301,19 @@
     :weeks (Period/ofWeeks n)
     :months (Period/ofMonths n)
     :years (Period/ofYears n)))
+
+;; Units
+
+(def reverse-unit-map (into {} (map vec (map reverse unit-map))))
+
+(defn units [x]
+  (into {}
+        (for [tu (.getUnits x)
+              :let [k (reverse-unit-map tu)]
+              :when k]
+          [k (.get x tu)])))
+
+;; Between
 
 (defprotocol ITimeBetween
   (between [t1 t2] "Return the most appropriate type of value that
