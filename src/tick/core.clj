@@ -26,20 +26,6 @@
     (LocalDate/now *clock*)
     (LocalDate/now)))
 
-(defprotocol ITimeArithmetic
-  (+ [_ _] "Add time")
-  (- [_ _] "Subtract time")
-  (inc [_] "Increment time")
-  (dec [_] "Decrement time")
-  (maximum [_ _] "Return maximum")
-  (minimum [_ _] "Return minimum"))
-
-(defn tomorrow []
-  (+ (today) 1))
-
-(defn yesterday []
-  (- (today) 1))
-
 (defprotocol ITimeAt
   (on [_ _] "Set time be ON a date")
   (at [_ _] "Set date to be AT a time")  )
@@ -355,12 +341,6 @@
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y))))
 
-(defn max [arg & args]
-  (reduce #(maximum %1 %2) arg args))
-
-(defn min [arg & args]
-  (reduce #(minimum %1 %2) arg args))
-
 (defprotocol ITimeRangeable
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
 
@@ -370,6 +350,20 @@
 (extend-protocol IDivisible
   String
   (/ [s d] (/ (parse s) d)))
+
+(defprotocol ITimeArithmetic
+  (+ [_ _] "Add time")
+  (- [_ _] "Subtract time")
+  (inc [_] "Increment time")
+  (dec [_] "Decrement time")
+  (maximum [_ _] "Return maximum")
+  (minimum [_ _] "Return minimum"))
+
+(defn max [arg & args]
+  (reduce #(maximum %1 %2) arg args))
+
+(defn min [arg & args]
+  (reduce #(minimum %1 %2) arg args))
 
 (extend-type Instant
   ITimeArithmetic
@@ -405,8 +399,8 @@
 
 (extend-type LocalDate
   ITimeArithmetic
-  (+ [t x] (if (number? x) (.plusDays t x) (.plus t x)))
-  (- [t x] (if (number? x) (.minusDays t x) (.minus t x)))
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
   (inc [t] (.plusDays t 1))
   (dec [t] (.minusDays t 1))
   (maximum [x y] (if (neg? (compare x y)) y x))
@@ -418,6 +412,12 @@
                  to (take-while #(< % to) )))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(< % to))))))
+
+(defn tomorrow []
+  (inc (today)))
+
+(defn yesterday []
+  (dec (today)))
 
 (extend-type LocalDateTime
   ITimeArithmetic
@@ -446,8 +446,8 @@
 
 (extend-type YearMonth
   ITimeArithmetic
-  (+ [t x] (if (number? x) (.plusMonths t x) (.plus t x)))
-  (- [t x] (if (number? x) (.minusMonths t x) (.minus t x)))
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
   (inc [t] (.plusMonths t 1))
   (dec [t] (.minusMonths t 1))
   (maximum [x y] (if (neg? (compare x y)) y x))
@@ -462,8 +462,8 @@
 
 (extend-type Year
   ITimeArithmetic
-  (+ [t x] (if (number? x) (.plusYears t x) (.plus t x)))
-  (- [t x] (if (number? x) (.minusYears t x) (.minus t x)))
+  (+ [t x] (.plus t x))
+  (- [t x] (.minus t x))
   (inc [t] (.plusYears t 1))
   (dec [t] (.minusYears t 1))
   (maximum [x y] (if (neg? (compare x y)) y x))
