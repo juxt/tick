@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >=])
+  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -9,7 +9,7 @@
    [java.util Date]
    [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
    [java.time.format DateTimeFormatter]
-   [java.time.temporal ChronoUnit]))
+   [java.time.temporal ChronoUnit TemporalAdjusters]))
 
 (def ^{:dynamic true} *clock* nil)
 
@@ -217,6 +217,65 @@
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
   (zone [zdt] (.getZone zdt)))
+
+;; Adjusters
+
+(defn with
+  "Adjust a temporal with an adjuster"
+  [t adj]
+  (.with t adj))
+
+(defn day-of-week-in-month
+  ([ordinal day-of-week] (TemporalAdjusters/dayOfWeekInMonth ordinal (day day-of-week)))
+  ([t ordinal day-of-week] (with t (day-of-week-in-month ordinal day-of-week))))
+
+(defn first-day-of-month
+  ([] (TemporalAdjusters/firstDayOfMonth))
+  ([t] (with t (first-day-of-month))))
+
+(defn first-day-of-next-month
+  ([] (TemporalAdjusters/firstDayOfNextMonth))
+  ([t] (with t (first-day-of-next-month))))
+
+(defn first-day-of-next-year
+  ([] (TemporalAdjusters/firstDayOfNextYear))
+  ([t] (with t (first-day-of-next-year))))
+
+(defn first-day-of-year
+  ([] (TemporalAdjusters/firstDayOfYear))
+  ([t] (with t (first-day-of-year))))
+
+(defn first-in-month
+  ([day-of-week] (TemporalAdjusters/firstInMonth (day day-of-week)))
+  ([t day-of-week] (with t (first-in-month day-of-week))))
+
+(defn last-day-of-month
+  ([] (TemporalAdjusters/lastDayOfMonth))
+  ([t] (with t (last-day-of-month))))
+
+(defn last-day-of-year
+  ([] (TemporalAdjusters/lastDayOfYear))
+  ([t] (with t (last-day-of-year))))
+
+(defn last-in-month
+  ([day-of-week] (TemporalAdjusters/lastInMonth (day day-of-week)))
+  ([t day-of-week] (with t (last-in-month day-of-week))))
+
+(defn next
+  ([day-of-week] (TemporalAdjusters/next (day day-of-week)))
+  ([t day-of-week] (with t (next day-of-week))))
+
+(defn next-or-same
+  ([day-of-week] (TemporalAdjusters/nextOrSame (day day-of-week)))
+  ([t day-of-week] (with t (next-or-same day-of-week))))
+
+(defn previous
+  ([day-of-week] (TemporalAdjusters/previous (day day-of-week)))
+  ([t day-of-week] (with t (previous day-of-week))))
+
+(defn previous-or-same
+  ([day-of-week] (TemporalAdjusters/previousOrSame (day day-of-week)))
+  ([t day-of-week] (with t (previous-or-same day-of-week))))
 
 ;; Comparison
 
