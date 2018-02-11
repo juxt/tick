@@ -185,7 +185,6 @@
   (year [n] (Year/of n))
 
   LocalDate
-  (time [d] (midnight d)) ; this helps iCalendar dates become intervals
   (date [d] d)
   (day [d] (.getDayOfWeek d))
   (day-of-month [d] (.getDayOfMonth d))
