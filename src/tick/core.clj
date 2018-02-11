@@ -26,6 +26,9 @@
     (LocalDate/now *clock*)
     (LocalDate/now)))
 
+(defn epoch []
+  (java.time.Instant/EPOCH))
+
 (defprotocol ITimeAt
   (on [_ _] "Set time be ON a date")
   (at [_ _] "Set date to be AT a time")  )
@@ -35,9 +38,6 @@
 
 (defn noon [^LocalDate date]
   (at date (LocalTime/NOON)))
-
-(defn epoch []
-  (java.time.Instant/EPOCH))
 
 (s/def ::instant #(instance? Instant %))
 
