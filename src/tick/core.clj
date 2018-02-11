@@ -312,9 +312,7 @@
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
   (> [x y] "Is x after y?")
-  (>= [x y] "Is x after or at the same time as y?")
-  (maximum [_ _] "Return maximum")
-  (minimum [_ _] "Return minimum"))
+  (>= [x y] "Is x after or at the same time as y?"))
 
 (extend-protocol ITimeComparison
   Instant
@@ -322,69 +320,48 @@
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   LocalDateTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  ;; TODO: Rename maximum to 'greater' and minimum to 'lesser'
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   LocalTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   LocalDate
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   OffsetDateTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   ZonedDateTime
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   YearMonth
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
 
   Year
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y))
-
-  Duration
-  (maximum [x y] (if (neg? (compare x y)) y x))
-  (minimum [x y] (if (neg? (compare x y)) x y)))
+  (>= [x y] (not (.isBefore x y))))
 
 (defprotocol ITimeRangeable
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
@@ -404,11 +381,17 @@
   (inc [_] "Increment time")
   (dec [_] "Decrement time"))
 
+(defn greater [x y]
+  (if (neg? (compare x y)) y x))
+
 (defn max [arg & args]
-  (reduce #(maximum %1 %2) arg args))
+  (reduce #(greater %1 %2) arg args))
+
+(defn lesser [x y]
+  (if (neg? (compare x y)) x y))
 
 (defn min [arg & args]
-  (reduce #(minimum %1 %2) arg args))
+  (reduce #(lesser %1 %2) arg args))
 
 (extend-type Instant
   ITimeArithmetic
