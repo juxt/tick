@@ -31,7 +31,6 @@
 ;; Point-in-time 'demo' functions
 
 (defn now [] (core/now))
-(defn just-now [] (core/just-now))
 (defn today [] (core/today))
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))

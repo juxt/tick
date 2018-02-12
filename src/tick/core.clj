@@ -9,7 +9,8 @@
    [java.util Date]
    [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
    [java.time.format DateTimeFormatter]
-   [java.time.temporal ChronoUnit TemporalAdjusters]))
+   [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
+   [clojure.lang ILookup]))
 
 (def ^{:dynamic true} *clock* nil)
 
@@ -17,9 +18,6 @@
   (if *clock*
     (Instant/now *clock*)
     (Instant/now)))
-
-(defn just-now []
-  (.truncatedTo (now) (ChronoUnit/SECONDS)))
 
 (defn today []
   (if *clock*
@@ -218,12 +216,68 @@
   (instant [zdt] (.toInstant zdt))
   (zone [zdt] (.getZone zdt)))
 
-;; Adjusters
+;; Fields
+
+(def field-map
+  {:aligned-day-of-week-in-month ChronoField/ALIGNED_DAY_OF_WEEK_IN_MONTH
+   :aligned-day-of-week-in-year ChronoField/ALIGNED_DAY_OF_WEEK_IN_YEAR
+   :aligned-week-of-month ChronoField/ALIGNED_WEEK_OF_MONTH
+   :aligned-week-of-year ChronoField/ALIGNED_WEEK_OF_YEAR
+   :ampm-of-day ChronoField/AMPM_OF_DAY
+   :clock-hour-of-ampm ChronoField/CLOCK_HOUR_OF_AMPM
+   :clock-hour-of-day ChronoField/CLOCK_HOUR_OF_DAY
+   :day-of-month ChronoField/DAY_OF_MONTH
+   :day-of-week ChronoField/DAY_OF_WEEK
+   :day-of-year ChronoField/DAY_OF_YEAR
+   :epoch-day ChronoField/EPOCH_DAY
+   :era ChronoField/ERA
+   :hour-of-ampm ChronoField/HOUR_OF_AMPM
+   :hour-of-day ChronoField/HOUR_OF_DAY
+   :instant-seconds ChronoField/INSTANT_SECONDS
+   :micro-of-day ChronoField/MICRO_OF_DAY
+   :micro-of-second ChronoField/MICRO_OF_SECOND
+   :milli-of-day ChronoField/MILLI_OF_DAY
+   :milli-of-second ChronoField/MILLI_OF_SECOND
+   :minute-of-day ChronoField/MINUTE_OF_DAY
+   :minute-of-hour ChronoField/MINUTE_OF_HOUR
+   :month-of-year ChronoField/MONTH_OF_YEAR
+   :nano-of-day ChronoField/NANO_OF_DAY
+   :nano-of-second ChronoField/NANO_OF_SECOND
+   :offset-seconds ChronoField/OFFSET_SECONDS
+   :proleptic-month ChronoField/PROLEPTIC_MONTH
+   :second-of-day ChronoField/SECOND_OF_DAY
+   :second-of-minute ChronoField/SECOND_OF_MINUTE
+   :year ChronoField/YEAR
+   :year-of-era ChronoField/YEAR_OF_ERA})
+
+(deftype FieldsLookup [t]
+  ILookup
+  (valAt [_ fld]
+    (when-let [f (get field-map fld)]
+      (.getLong t f)))
+  (valAt [_ fld notfound]
+    (if-let [f (get field-map fld)]
+      (try
+        (.getLong t f)
+        (catch java.time.temporal.UnsupportedTemporalTypeException e
+          notfound))
+      notfound)))
+
+(defn fields [t]
+  (->FieldsLookup t))
+
+;; With
 
 (defn with
-  "Adjust a temporal with an adjuster"
-  [t adj]
-  (.with t adj))
+  "Adjust a temporal with an adjuster or field"
+  ([t adj]
+   (.with t adj)
+   )
+  ([t fld new-value]
+   (when-let [f (get field-map fld)]
+     (.with t f new-value))))
+
+;; Built-in adjusters
 
 (defn day-of-week-in-month
   ([ordinal day-of-week] (TemporalAdjusters/dayOfWeekInMonth ordinal (day day-of-week)))
@@ -320,6 +374,10 @@
               :let [k (reverse-unit-map tu)]
               :when k]
           [k (.get x tu)])))
+
+(defn truncate [x u]
+  (when-let [u (get unit-map u)]
+    (.truncatedTo x  u)))
 
 ;; Durations
 
