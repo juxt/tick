@@ -31,11 +31,15 @@
   (on [_ _] "Set time be ON a date")
   (at [_ _] "Set date to be AT a time")  )
 
-(defn midnight [^LocalDate date]
-  (at date (LocalTime/MIDNIGHT)))
+(defn midnight
+  ([] (LocalTime/MIDNIGHT))
+  ([^LocalDate date]
+   (at date (LocalTime/MIDNIGHT))))
 
-(defn noon [^LocalDate date]
-  (at date (LocalTime/NOON)))
+(defn noon
+  ([] (LocalTime/NOON))
+  ([^LocalDate date]
+   (at date (LocalTime/NOON))))
 
 (s/def ::instant #(instance? Instant %))
 
