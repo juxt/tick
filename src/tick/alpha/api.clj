@@ -109,6 +109,8 @@
 (defn midnight? [v] (core/midnight? v))
 (defn epoch [] (core/epoch))
 
+(def fields core/fields)
+(def with core/with)
 (def ago core/ago)
 (def hence core/hence)
 
@@ -170,6 +172,9 @@
 
 ;; Units
 (def units core/units)
+
+;; Truncation
+(def truncate core/truncate)
 
 ;; Comparisons
 
