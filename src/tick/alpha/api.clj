@@ -116,13 +116,6 @@
 
 ;; Zones
 
-(defn at-zone [t z]
-  (core/at-zone t (zone z)))
-
-(defn as-local
-  ([v] (core/as-local v))
-  ([v z] (core/as-local v (zone z))))
-
 (def UTC (zone "UTC"))
 (def LONDON (zone "Europe/London"))
 

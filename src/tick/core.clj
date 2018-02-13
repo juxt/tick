@@ -115,6 +115,7 @@
   (year [_] "Make a java.time.Year instance.")
   (year-month [_] "Make a java.time.YearMonth instance.")
   (zone [_] "Make a java.time.ZoneId instance.")
+  (zone-offset [_] "Make a java.time.ZoneOffset instance.")
   (zoned-date-time [_] "Make a java.time.ZonedDateTime instance.")
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (local-date-time [_] "Make a java.time.LocalDateTime instance."))
@@ -163,6 +164,7 @@
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
   (zone [s] (ZoneId/of s))
+  (zone-offset [s] (ZoneOffset/of s))
   (int [s] (.getNano (instant s)))
   (long [s] (.getEpochSecond (instant s)))
   (local-date-time [s] (local-date-time (parse s)))
@@ -653,39 +655,25 @@
   (beginning [_] nil)
   (end [_] nil))
 
+;; Private
+(defprotocol ILocalDateTimeReify
+  (in* [arg ldt] "Reify a LocalDateTime"))
+
 (extend-protocol ITimeReify
   LocalTime
   (on [t date] (.atTime date t))
   OffsetTime
   (on [t date] (.atTime date t))
   LocalDate
-  (at [date t] (.atTime date (time t))))
-
-(defprotocol IAtZone
-  (at-zone [t zone] "Put time at zone")
-  (as-local [t] [t zone] "Convert to local time at zone."))
-
-(extend-protocol IAtZone
+  (at [date t] (.atTime date (time t)))
   LocalDateTime
-  (at-zone [t z] (.atZone t (zone z)))
-  (as-local
-    ([t] t)
-    ([t z] (as-local (at-zone t (zone z)))))
+  (in [ldt z] (.atZone ldt (zone z)))
   Instant
-  (at-zone [t z] (.atZone t (zone z)))
-  (as-local
-    ([t] (throw (ex-info "Error, zone required" {})))
-    ([t z] (as-local (at-zone t (zone z)))))
+  (in [t z] (in [t z] (.atZone t (zone z))))
   ZonedDateTime
-  (at-zone [t z] (.withZoneSameInstant t (zone z)))
-  (as-local
-    ([t] (.toLocalDateTime t))
-    ([t z] (as-local (at-zone t (zone z)))))
+  (in [t z] (.withZoneSameInstant t (zone z)))
   Date
-  (at-zone [t z] (at-zone (instant t) (zone z)))
-  (as-local
-    ([t] (throw (ex-info "Error, zone required" {})))
-    ([t z] (as-local (at-zone t (zone z))))))
+  (in [t z] (in (instant t) (zone z))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
