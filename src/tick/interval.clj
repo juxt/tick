@@ -49,7 +49,7 @@
     (->Interval v1 v2)
     (->Interval v2 v1)))
 
-(extend-protocol t/ITimeAt
+(extend-protocol t/ITimeReify
   Interval
   (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date))))
 

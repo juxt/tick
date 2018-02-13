@@ -27,9 +27,10 @@
 (defn epoch []
   (java.time.Instant/EPOCH))
 
-(defprotocol ITimeAt
+(defprotocol ITimeReify
   (on [_ _] "Set time be ON a date")
-  (at [_ _] "Set date to be AT a time")  )
+  (at [_ _] "Set date to be AT a time")
+  (in [_ _] "Set a date-time to be in a time-zone"))
 
 (defn midnight
   ([] (LocalTime/MIDNIGHT))
@@ -652,15 +653,13 @@
   (beginning [_] nil)
   (end [_] nil))
 
-(extend-protocol ITimeAt
+(extend-protocol ITimeReify
   LocalTime
   (on [t date] (.atTime date t))
   OffsetTime
   (on [t date] (.atTime date t))
   LocalDate
   (at [date t] (.atTime date (time t))))
-
-;; Not sure about at-zone - perhaps in-zone, as-global, etc.
 
 (defprotocol IAtZone
   (at-zone [t zone] "Put time at zone")
@@ -719,9 +718,6 @@
   (min-of-type [_] (LocalDateTime/MIN))
   (max-of-type [_] (LocalDateTime/MAX))
   Instant
-  (min-of-type [_] (Instant/MIN))
-  (max-of-type [_] (Instant/MAX))
-  ZonedDateTime
   (min-of-type [_] (Instant/MIN))
   (max-of-type [_] (Instant/MAX))
   ;; TODO: This may cause surprises - see clojure/java-time. We should
