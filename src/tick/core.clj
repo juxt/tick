@@ -136,7 +136,7 @@
   (year [f] (year (f)))
   (year-month [f] (year-month (f)))
   (zone [f] (zone (f)))
-  (zoned-date-time [f] (zone (f)))
+  (zoned-date-time [f] (zoned-date-time (f)))
   (local-date-time [f] (local-date-time (f)))
 
   Instant
