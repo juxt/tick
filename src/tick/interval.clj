@@ -8,9 +8,11 @@
    [tick.core :as t])
   (:import
    [java.util Date]
-   [java.time Instant Duration Period ZoneId LocalDate LocalDateTime Year YearMonth ZoneId ZonedDateTime]))
+   [java.time Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth OffsetDateTime ZoneId ZonedDateTime]
+   [java.time.temporal Temporal TemporalAmount]))
 
-;; Use of Allen's Interval Algebra from an idea by Eric Evans.
+;; Use of Allen's Interval Algebra, inspired from a working
+;; demonstration of time-count by Eric Evans.
 
 (s/def ::local (s/and #(t/local? (t/beginning %)) #(t/local? (t/end %))))
 (s/def ::non-local (s/and #(not (t/local? (t/beginning %))) #(not (t/local? (t/end %)))))
@@ -23,38 +25,75 @@
              t2 (t/end t)]
          (t/< t1 t2)))))
 
-;; An interval can be between 2 local times or 2 non-local times.
-;; When there is a mix, an error occurs.
-;; The second interval must be after the first interval.
-
 (defrecord Interval [beginning end]
   t/ITimeSpan
   (beginning [_] beginning)
   (end [_] end))
 
-(defn interval
-  "Make an interval from unordered arguments. Arguments must both be
-  local, or both non-local (zoned)."
-  [v1 v2]
-  {:pre [(s/assert
-          (s/or :local (s/tuple t/local? t/local?)
-                :non-local (s/tuple (comp not t/local?) (comp not t/local?)))
-          [v1 v2])]
-   ;; Post condition must hold, and it is intentional that it cannot be disabled.
-   ;; Intervals must be non-zero as an axiom of Allen's Interval Algebra.
-   :post [(neg? (compare (t/beginning %) (t/end %)))]}
+;; Construction
+
+(defn- make-interval [v1 v2]
   (when (= v1 v2)
     (throw (ex-info "Zero length interval!" {:v1 v1 :v2 v2})))
   (if (neg? (compare v1 v2))
     (->Interval v1 v2)
     (->Interval v2 v1)))
 
-;; Derivation
+(defprotocol IIntervalConstructors
+  (absolute-interval [t0 t1] "Create an interval between t0 and t1")
+  (relative-interval [t0 dur] "Create an interval between t0 and t0+dur"))
 
+(extend-protocol IIntervalConstructors
+  Instant
+  (absolute-interval [t0 t1]
+    (make-interval t0 t1))
+  (relative-interval [t0 dur]
+    (make-interval t0 (.plus t0 dur)))
+  ZonedDateTime
+  (absolute-interval [t0 t1]
+    (make-interval t0 t1))
+  (relative-interval [t0 dur]
+    (make-interval t0 (.plus t0 dur)))
+  OffsetDateTime
+  (absolute-interval [t0 t1]
+    (make-interval t0 t1))
+  (relative-interval [t0 dur]
+    (make-interval t0 (.plus t0 dur)))
+  LocalDateTime
+  (absolute-interval [t0 t1]
+    (make-interval t0 t1))
+  (relative-interval [t0 dur]
+    (make-interval t0 (.plus t0 dur)))
+  LocalTime
+  (absolute-interval [t0 t1]
+    (make-interval t0 t1))
+  (relative-interval [t0 dur]
+    (make-interval t0 (.plus t0 dur)))
+  Date
+  (absolute-interval [t0 t1]
+    (make-interval (t/instant t0) (t/instant t1)))
+  (relative-interval [t0 dur]
+    (let [i (t/instant t0)]
+      (make-interval i (.plus i dur)))))
+
+(defn temporal? [o]
+  (instance? java.time.temporal.Temporal o))
+
+(defn temporal-amount? [o]
+  (instance? java.time.temporal.TemporalAmount o))
+
+;; interval
 ;; [t0 t1] interval between t0 and t1
 ;; [t1 t0] interval between t0 and t1
 ;; [t0 d] interval between t0 and t0+d, where d is a given duration
 ;; [d t1] interval between t1-d and t1, where d is a given duration
+(defn interval
+  [a b]
+  (cond
+    (every? temporal? [a b]) (absolute-interval a b)
+    (and (temporal? a) (temporal-amount? b)) (relative-interval a b)
+    (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/- a))
+    :else (throw (ex-info "Bad arguments for interval" {:arg0 a :arg1 b}))))
 
 ;; Adjustments
 

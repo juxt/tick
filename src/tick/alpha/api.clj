@@ -131,8 +131,10 @@
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
-(defn - [arg & args]
-  (reduce #(core/- %1 %2) arg args))
+(defn -
+  ([arg] (core/- arg))
+  ([arg & args]
+   (reduce #(core/- %1 %2) arg args)))
 
 (defn inc [arg]
   (core/inc arg))

@@ -443,11 +443,12 @@
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add to time")
-  (- [_ _] "Subtract from time"))
+  (- [_] [_ _] "Subtract from time, or negate"))
 
 (extend-protocol ITimeArithmetic
   Object
   (+ [t d] (.plus t d))
+  (- [d] (.negated d))
   (- [t d] (.minus t d)))
 
 (defprotocol ITimeIncDec
