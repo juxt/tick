@@ -49,6 +49,37 @@
     (->Interval v1 v2)
     (->Interval v2 v1)))
 
+;; Derivation
+
+;; [t0 t1] interval between t0 and t1
+;; [t1 t0] interval between t0 and t1
+;; [t0 d] interval between t0 and t0+d, where d is a given duration
+;; [d t1] interval between t1-d and t1, where d is a given duration
+
+;; Adjustments
+
+;; (extend _ & durations) to extend the interval, add durations to the end
+;; Durations can be negative, so a retraction is simply an extend with a negative duration.
+
+;; (scale _ &amounts) to extend the interval by multiples
+
+;; An interval of duration d to t1 can be constructed like this:
+;; (scale (interval t1 d) -1)
+
+;; (>> _ d) to shift the interval into the future by duration d
+;; (<< _ d) to shift the interval into the past by duration d
+
+;; (* _) to duplicate into meeting intervals, into a sequence (possibly need a record container for this, IntervalSeq)
+
+;; (interpose IntervalSeq d)
+
+;; / to divide into subintervals
+
+;; Finally, it should be possible to transduce IntervalSeqs
+
+
+;; Reification
+
 (extend-protocol t/ITimeReify
   Interval
   (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date))))
