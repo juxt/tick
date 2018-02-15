@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next])
+  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> <<])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -443,17 +443,62 @@
 
 (defprotocol ITimeArithmetic
   (+ [_ _] "Add to time")
-  (- [_] [_ _] "Subtract from time, or negate"))
+  (- [_ _] "Subtract from time, or negate"))
 
 (extend-protocol ITimeArithmetic
   Object
   (+ [t d] (.plus t d))
-  (- [d] (.negated d))
   (- [t d] (.minus t d)))
 
-(defprotocol ITimeIncDec
-  (inc [_] "Increment time")
-  (dec [_] "Decrement time"))
+(defn negated
+  "Return the duration as a negative duration"
+  [d]
+  (.negated d))
+
+(defprotocol ITimeShift
+  (forward-number [_ n] "Increment time")
+  (forward-duration [_ d] "Increment time")
+  (backward-number [_ n] "Decrement time")
+  (backward-duration [_ d] "Decrement time"))
+
+(extend-protocol ITimeShift
+  Instant
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
+  Date
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.plus t d))
+  LocalDate
+  (forward-number [t n] (.plusDays t n))
+  (backward-number [t n] (.minusDays t n))
+  LocalTime
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.plus t d))
+  LocalDateTime
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.plus t d))
+  OffsetDateTime
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.plus t d))
+  ZonedDateTime
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.plus t d))
+  Year
+  (forward-number [t n] (.plusYears t n))
+  (backward-number [t n] (.plusYears t n))
+  YearMonth
+  (forward-number [t n] (.plusMonths t n))
+  (backward-number [t n] (.plusMonths t n)))
+
+(defn >> [t n-or-d]
+  (if (number? n-or-d)
+    (forward-number t n-or-d)
+    (forward-duration t n-or-d)))
+
+(defn << [t n-or-d]
+  (if (number? n-or-d)
+    (backward-number t n-or-d)
+    (backward-duration t n-or-d)))
 
 (defprotocol ITimeRangeable
   (range [_] [_ _] [_ _ _] "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."))
@@ -471,10 +516,6 @@
   (reduce #(lesser %1 %2) arg args))
 
 (extend-type Instant
-  ITimeIncDec
-  (inc [t] (+ t (seconds 1)))
-  (dec [t] (- t (seconds 1)))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -484,10 +525,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type ZonedDateTime
-  ITimeIncDec
-  (inc [t] (+ t (seconds 1)))
-  (dec [t] (- t (seconds 1)))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -497,10 +534,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type LocalDate
-  ITimeIncDec
-  (inc [t] (.plusDays t 1))
-  (dec [t] (.minusDays t 1))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusDays % 1) from))
@@ -509,17 +542,16 @@
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(< % to))))))
 
+(defn inc [t] (forward-number t 1))
+(defn dec [t] (backward-number t 1))
+
 (defn tomorrow []
-  (inc (today)))
+  (forward-number (today) 1))
 
 (defn yesterday []
-  (dec (today)))
+  (backward-number (today) 1))
 
 (extend-type LocalDateTime
-  ITimeIncDec
-  (inc [t] (+ t (seconds 1)))
-  (dec [t] (- t (seconds 1)))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
@@ -529,10 +561,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type YearMonth
-  ITimeIncDec
-  (inc [t] (.plusMonths t 1))
-  (dec [t] (.minusMonths t 1))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusMonths % 1) from))
@@ -542,10 +570,6 @@
                       to (take-while #(< % to))))))
 
 (extend-type Year
-  ITimeIncDec
-  (inc [t] (.plusYears t 1))
-  (dec [t] (.minusYears t 1))
-
   ITimeRangeable
   (range
     ([from] (iterate #(.plusYears % 1) from))
@@ -572,24 +596,12 @@
     (clojure.core// (.getSeconds duration) (.getSeconds divisor))))
 
 (extend-type Duration
-  ITimeIncDec
-  (inc [d] (.plusSeconds d 1))
-  (dec [d] (.minusSeconds d 1))
-
   IDivisible
   (/ [d x] (divide-duration x d)))
 
 (defprotocol ITimeSpan
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
-
-(defprotocol ITimeBetween
-  (between [t1 t2] "Return the most appropriate type of value that
-  represents the gap between two times"))
-
-(extend-protocol ITimeBetween
-  Instant
-  (between [inst _] (throw (ex-info "TODO" {}))))
 
 (defn length
   "Return the distance between the beginning and end as a duration or
@@ -732,10 +744,10 @@
 ;; Ago/hence
 
 (defn ago [dur]
-  (- (now) dur))
+  (backward-duration (now) dur))
 
 (defn hence [dur]
-  (+ (now) dur))
+  (forward-duration (now) dur))
 
 (defn midnight? [^LocalDateTime t]
   (.isZero (Duration/between t (beginning (date t)))))

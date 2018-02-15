@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj extend])
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
@@ -92,7 +92,7 @@
   (cond
     (every? temporal? [a b]) (absolute-interval a b)
     (and (temporal? a) (temporal-amount? b)) (relative-interval a b)
-    (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/- a))
+    (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/negated a))
     :else (throw (ex-info "Bad arguments for interval" {:arg0 a :arg1 b}))))
 
 ;; Adjustments
@@ -100,10 +100,30 @@
 ;; (extend _ & durations) to extend the interval, add durations to the end
 ;; Durations can be negative, so a retraction is simply an extend with a negative duration.
 
-;; (scale _ &amounts) to extend the interval by multiples
+(defn extend [ival dur]
+  (make-interval
+    (t/beginning ival)
+    (t/forward-duration (t/end ival) dur)))
+
+(defn scale [ival factor]
+  (make-interval
+    (t/beginning ival)
+    (t/forward-duration (t/beginning ival) (.multipliedBy (t/length ival) factor))))
+
+(extend-protocol t/ITimeShift
+  Interval
+  (forward-duration [ival d]
+    (make-interval
+      (t/forward-duration (t/beginning ival) d)
+      (t/forward-duration (t/end ival) d)))
+  (backward-duration [ival d]
+    (make-interval
+      (t/backward-duration (t/beginning ival) d)
+      (t/backward-duration (t/end ival) d))))
 
 ;; An interval of duration d to t1 can be constructed like this:
 ;; (scale (interval t1 d) -1)
+
 
 ;; (>> _ d) to shift the interval into the future by duration d
 ;; (<< _ d) to shift the interval into the past by duration d
@@ -376,7 +396,7 @@
          (t/end ival)
          dur)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/+ % dur) (t/end ival))))))
+       (map (juxt identity #(t/min (t/forward-duration % dur) (t/end ival))))))
 
 (defn divide-by-period
   [ival period]
@@ -385,7 +405,7 @@
          (t/end ival)
          period)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/+ % period) (t/end ival))))))
+       (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
   (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))

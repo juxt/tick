@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >=])
+  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >= << >> extend])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
@@ -126,21 +126,26 @@
 ;; Arithmetic
 
 (defn +
-  ([] Duration/ZERO)
   ([arg] arg)
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
 (defn -
-  ([arg] (core/- arg))
+  ([arg] (core/negated arg))
   ([arg & args]
    (reduce #(core/- %1 %2) arg args)))
 
-(defn inc [arg]
-  (core/inc arg))
+(defn inc [t]
+  (core/inc t))
 
-(defn dec [arg]
-  (core/dec arg))
+(defn dec [t]
+  (core/dec t))
+
+(defn >> [t amt]
+  (core/>> t amt))
+
+(defn << [t amt]
+  (core/<< t amt))
 
 (def max core/max)
 (def min core/min)
@@ -216,6 +221,12 @@
 (defn interval [x y]
   (interval/interval x y))
 
+(defn extend [ival & durations]
+  (reduce interval/extend ival durations))
+
+(defn scale [ival & durations]
+  (reduce interval/extend ival durations))
+
 (def ^{:doc "Return an interval which forms the bounding-box of the given arguments."}
   bounds interval/bounds)
 
@@ -234,8 +245,6 @@
   (core/period v1 v2))
 
 (def length core/length)
-
-(def between core/between)
 
 (defn concur
   ([] nil)
