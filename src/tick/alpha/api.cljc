@@ -11,13 +11,22 @@
              second
              group-by])
   (:require
-   [clojure.spec.alpha :as s]
-   [tick.core :as core]
-   tick.file ; To ensure protocol extension
-   [tick.interval :as interval]
-   [clojure.set :as set])
-  (:import
-   [java.time Clock Duration ZoneId ZoneOffset LocalTime ZonedDateTime OffsetDateTime LocalDate DayOfWeek Month]))
+    [clojure.spec.alpha :as s]
+    [tick.core :as core]
+    [tick.interop :as t.i]
+    #?(:clj tick.file) ; To ensure protocol extension
+    #?(:clj [net.cgrand.macrovich :as macros])
+    [tick.interval :as interval]
+    [clojure.set :as set]
+    #?(:cljs
+       [tick.js-joda :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]))
+  #?(:cljs
+     (:require-macros
+       [net.cgrand.macrovich :as macros]
+       [tick.alpha.api :refer [with-clock]]))
+  #?(:clj
+     (:import
+       [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset])))
 
 ;; This API is optimises convenience, API stability and (type) safety
 ;; over performance. Where performance is critical, use tick.core and
@@ -39,26 +48,26 @@
 
 ;; Constants
 
-(def monday DayOfWeek/MONDAY)
-(def tuesday DayOfWeek/TUESDAY)
-(def wednesday DayOfWeek/WEDNESDAY)
-(def thursday DayOfWeek/THURSDAY)
-(def friday DayOfWeek/FRIDAY)
-(def saturday DayOfWeek/SATURDAY)
-(def sunday DayOfWeek/SUNDAY)
+(def monday (t.i/static-prop  DayOfWeek MONDAY))
+(def tuesday (t.i/static-prop  DayOfWeek TUESDAY))
+(def wednesday (t.i/static-prop  DayOfWeek WEDNESDAY))
+(def thursday (t.i/static-prop  DayOfWeek THURSDAY))
+(def friday (t.i/static-prop  DayOfWeek FRIDAY))
+(def saturday (t.i/static-prop  DayOfWeek SATURDAY))
+(def sunday (t.i/static-prop  DayOfWeek SUNDAY))
 
-(def january Month/JANUARY)
-(def february Month/FEBRUARY)
-(def march Month/MARCH)
-(def april Month/APRIL)
-(def may Month/MAY)
-(def june Month/JUNE)
-(def july Month/JULY)
-(def august Month/AUGUST)
-(def september Month/SEPTEMBER)
-(def october Month/OCTOBER)
-(def november Month/NOVEMBER)
-(def december Month/DECEMBER)
+(def january (t.i/static-prop  Month JANUARY))
+(def february (t.i/static-prop  Month FEBRUARY))
+(def march (t.i/static-prop  Month MARCH))
+(def april (t.i/static-prop  Month APRIL))
+(def may (t.i/static-prop  Month MAY))
+(def june (t.i/static-prop  Month JUNE))
+(def july (t.i/static-prop  Month JULY))
+(def august (t.i/static-prop  Month AUGUST))
+(def september (t.i/static-prop  Month SEPTEMBER))
+(def october (t.i/static-prop  Month OCTOBER))
+(def november (t.i/static-prop  Month NOVEMBER))
+(def december (t.i/static-prop  Month DECEMBER))
 
 ;; Construction and coercion
 
@@ -111,8 +120,8 @@
 
 (defn zone-offset
   ([offset] (core/zone-offset offset))
-  ([hours minutes] (ZoneOffset/ofHoursMinutes hours minutes))
-  ([hours minutes seconds] (ZoneOffset/ofHoursMinutesSeconds hours minutes seconds)))
+  ([hours minutes] (. ZoneOffset ofHoursMinutes hours minutes))
+  ([hours minutes seconds] (. ZoneOffset ofHoursMinutesSeconds hours minutes seconds)))
 
 (defn zoned-date-time
   ([] (core/zoned-date-time (now)))
@@ -151,7 +160,7 @@
 ;; Zones
 
 (def UTC (zone "UTC"))
-(def LONDON (zone "Europe/London"))
+;(def LONDON (zone "Europe/London"))
 
 ;; Parsing
 
@@ -264,7 +273,7 @@
   `(binding [tick.core/*clock* (core/clock ~clock)]
      ~@body))
 
-(def tick core/tick)
+;(def tick core/tick)
 (def atom core/atom)
 (def swap! core/swap!)
 (def swap-vals! core/swap-vals!)

@@ -3,12 +3,29 @@
 (ns tick.interval-test
   (:refer-clojure :exclude [contains? complement partition-by group-by conj extend group-by])
   (:require
-   [clojure.test :refer :all]
-   [clojure.spec.alpha :as s]
-   [tick.core :as t]
-   [tick.interval :refer :all])
-  (:import
-   [java.time.temporal ChronoUnit]))
+    [clojure.spec.alpha :as s]
+    [tick.core :as t]
+    #?(:clj
+    [clojure.test :refer :all]
+       :cljs
+       [cljs.test :refer-macros [deftest is testing run-tests]])
+    #?(:cljs
+       [tick.js-joda :refer [ChronoUnit]])
+    [tick.interval :refer [interval compose-r contains? divide-by-period relation concur
+                           union as-interval starts? basic-relations not-yet-implemented 
+                           complement-r  disjoint? temporal? 
+                           started-by? intersection concur? conj overlaps? equals? temporal-amount?
+                           meets? intersection-r met-by? extend finished-by? scale concurrencies
+                           make-relation preceded-by? precedes? during?
+                           ordered-disjoint-intervals? divide-by-duration overlapped-by? converse-r
+                            bounds am
+                            finishes? conv narrow
+                           difference pm divide-by-divisor
+                           complement code group-by]])
+  #?(:clj
+     (:import
+       [java.time.temporal ChronoUnit])))
+
 
 (s/check-asserts true)
 

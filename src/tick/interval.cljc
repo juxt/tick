@@ -1,16 +1,19 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by conj extend])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj extend divide])
   (:require
-   [clojure.pprint :refer [pprint]]
-   [clojure.set :as set]
-   [clojure.spec.alpha :as s]
-   [tick.core :as t])
-  (:import
-   [java.util Date]
-   [java.time Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth OffsetDateTime ZoneId ZonedDateTime]
-   [java.time.temporal Temporal TemporalAmount]))
+    [clojure.pprint :refer [pprint]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [tick.core :as t]
+    #?(:cljs
+       [tick.js-joda :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]))
+  #?(:clj
+     (:import
+       [java.util Date]
+       [java.time Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth OffsetDateTime ZoneId ZonedDateTime]
+       [java.time.temporal Temporal TemporalAmount])))
 
 ;; Use of Allen's Interval Algebra, inspired from a working
 ;; demonstration of time-count by Eric Evans.
@@ -38,10 +41,12 @@
   (->Interval v1 v2))
 
 (defn temporal? [o]
-  (instance? java.time.temporal.Temporal o))
+  #?(:clj (instance? Temporal o)
+     :cljs (.isPrototypeOf Temporal (type o))))
 
 (defn temporal-amount? [o]
-  (instance? java.time.temporal.TemporalAmount o))
+  #?(:clj (instance? TemporalAmount o)
+     :cljs (.isPrototypeOf TemporalAmount (type o))))
 
 ;; interval
 ;; [t0 t1] interval between t0 and t1
@@ -188,8 +193,8 @@
 ;; Allen's General Relations
 
 (defrecord GeneralRelation [relations]
-  clojure.lang.IFn
-  (invoke [_ x y]
+  #?(:clj clojure.lang.IFn :cljs cljs.core/IFn)
+  (#?(:clj invoke :cljs -invoke) [_ x y]
     #_(s/assert ::interval x)
     #_(s/assert ::interval y)
     (some (fn [f] (when (f x y) f)) relations)))
@@ -218,10 +223,14 @@
   [^GeneralRelation r]
   (assoc r :relations (remove (set (:relations r)) basic-relations)))
 
+(defn not-yet-implemented []
+  #?(:clj (new UnsupportedOperationException "Not yet implemented")
+     :cljs (js/Error. "Not yet implemented")))
+
 (defn compose-r
   "Return the composition of r and s"
   [r s]
-  (throw (new UnsupportedOperationException "Not yet implemented")))
+  (throw (not-yet-implemented)))
 
 (defn converse-r
   "Return the converse of the given general relation. The converse !r
@@ -235,7 +244,7 @@
   [^GeneralRelation r ^GeneralRelation s]
   (s/assert r #(instance? GeneralRelation %))
   (->GeneralRelation (set/intersection (set (:relations r))))
-  (throw (new UnsupportedOperationException "Not yet implemented")))
+  (throw (not-yet-implemented)))
 
 ;; Useful named general relations
 
@@ -568,13 +577,13 @@
   (divide-interval [divisor ival] "Divide an interval by a given divisor"))
 
 (extend-protocol IDivisibleInterval
-  clojure.lang.Fn
+  #?(:clj clojure.lang.Fn :cljs function)
   (divide-interval [f ival] (divide-by-apply ival f))
   Duration
   (divide-interval [dur ival] (divide-by-duration ival dur))
   Period
   (divide-interval [period ival] (divide-by-period ival period))
-  Long
+  #?(:clj Long :cljs number)
   (divide-interval [divisor ival] (divide-by-divisor ival divisor)))
 
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
@@ -698,7 +707,7 @@
   (group-by [grouping ivals]))
 
 (extend-protocol IGroupable
-  clojure.lang.Fn
+  #?(:clj clojure.lang.Fn :cljs function) 
   (group-by [f ivals]
     (if (empty? ivals)
       {}
@@ -707,6 +716,6 @@
             e (f (t/end r))
             groups (t/range b (t/inc e))]
         (group-by groups ivals))))
-  Iterable
+  #?(:clj Iterable :cljs ISequential) ; todo - this proto for cljs works?
   (group-by [groups ivals]
     (group-by-intervals groups ivals)))
