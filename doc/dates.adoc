@@ -1,20 +1,163 @@
-= Dates and times
+= API
 
-== Constructors
+_tick_ provides a single namespace containing a number of functions that make up the supported API to the library. You should try to restrict your usage of `tick` to these functions, since functions in other namespaces are liable to change.
+
+The code examples in this documentation assume that you have referred
+all _tick_'s API symbols into the current namespace. You can do this in
+the REPL with the following:
+
+----
+(use 'tick.api)
+----
+
+When you are using _tick_ in programs, it is recommended that you require _tick_'s api under the `t` alias as follows:
+
+----
+(require '[tick.alpha.api :as t])
+----
+
+If you choose to do this, then remember to prefix the symbols in this documentation with `t/`. For example, `(now)` would become `(t/now)`.
+
+
+= Times and dates
+
+In _tick_, times and dates are values from Java™'s `java.time` package.
+
+== Construction
+
+=== Times
+
+If you asked a stranger for the time, you'd hopefully get an answer,
+something like "15 minutes to midnight". It would be uncommon for them
+to tell you the date and timezone also, unless you asked for it.
+
+The idea of the 'local' time, that you might read on a wall clock, is
+still a useful concept. From a functional programming perspective, you
+might think of this as 'partial evaluation' as applied to time.
 
 [%header,cols="m,a,m"]
 |===
 |Example|Description|Return type
-|(now)|Current time (millisecond granularity)|java.time.Instant
-|(just-now)|Current time (second granularity)|java.time.Instant
-|(today)|Today|java.time.LocalDate
+|(time)|The time now, as local time|java.time.LocalTime
+|(time "4pm")|16:00, local time|java.time.LocalTime
+|(midnight)|Midnight|java.time.LocalTime
+|(noon)|Noon|java.time.LocalTime
 |===
 
+=== Dates
+
+To get the current date, call `(today)`. This will return a `java.time.LocalDate`.
+
+[%header,cols="m,a,m"]
+|===
+|Example|Description|Return type
+|(today)|Today's date|java.time.LocalDate
+|(date "2017-01-20")|The date 20th February 2017|java.time.LocalDate
+|===
+
+=== Date-times
+
+Date-times represent a particular time on a particular date.
+
+`(time "8pm")` gives a `java.time.LocalTime`, but for any date. Suppose you want that on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time.
+
+----
+(-> (time "8pm") (on "2018-02-14"))
+----
+
+The same idea works the other way around. If you have a date, say 2017-02-14, and want to fix a time on that date, say 8pm.
+
+----
+(-> (date "2018-02-14") (at "8pm"))
+----
+
+In both cases, a `java.time.LocalDateTime` is returned.
+
+
+
+NOTE: TODO ZonedDateTime, OffsetDateTime
+
+[%header,cols="m,a,m"]
+|===
+|Example|Description|Return type
+|(noon (today))|Noon today|java.time.LocalDateTime
+|(-> (time "8pm") (on "2018-02-14"))|8pm on 2018-02-14|java.time.LocalDateTime
+|(-> (date "2018-02-14") (at "8pm"))|8pm on 2018-02-14|java.time.LocalDateTime
+|===
+
+=== Instants
+
+Instants are points in time.
+
+To get the instant representing the current time, call `(now)`. This will return a `java.time.Instant` at the most precision possible on your platform (the nearest millisecond, microsecond or nanosecond).
+
+[%header,cols="m,a,m"]
+|===
+|Example|Description|Return type
+|(now)|The time now (millisecond granularity)|java.time.Instant
+|(epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant|java.time.Instant
+|===
+
+
+== Derivation
+
+=== Reification
+
+
+=== Adjustment
+
+NOTE: TODO Adjusters
+
+NOTE: Increment/decrement to create tomorrow,yesterday
+
+[%header,cols="m,a,m"]
+|===
+|Example|Description|Return type
+|(midnight (today))|Midnight, last night (since midnight is the start of the day)|java.time.LocalDateTime
+|(tomorrow)|Tomorrow's date|java.time.LocalDate
+|(yesterday)|Yesterday's date|java.time.LocalDate
+|===
+
+
+=== Truncation
+
+You might not need millisecond (or nanosecond) accuracy, so you can truncate to the nearest second `(truncate (now) :seconds)` (or nearest minute with `(truncate (now) :minutes)`).
+
+
+== Comparison
+
+TODO
+
 = Durations and periods
+
+== Construction
 
 [%header,cols="m,a,m"]
 |===
 |Code|Description|Return type
 |(seconds 1)|Duration of a second|java.time.Duration
 |(seconds 10)|Duration of 10 seconds|java.time.Duration
+|(nanos 1200)|Duration of 1200 nanoseconds|java.time.Duration
+|(days 100)|Duration of 100 days|java.time.Duration
+|(period 100 :days)|Period of 100 days|java.time.Period
+|(months 2)|Period of 2 months|java.time.Period
 |===
+
+== Derivation
+
+* Add durations to durations
+
+== Comparison
+
+= Intervals
+
+== Construction
+
+* Add durations to times
+* between
+
+== Derivation
+
+* Form intervals from times and durations
+
+== Comparison

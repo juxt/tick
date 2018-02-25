@@ -5,5 +5,5 @@
 Add to your lein or boot dependencies:
 
 ```
-[tick "0.4.0"]
+[tick "0.4.0-alpha"]
 ```
