@@ -8,18 +8,13 @@
   :dependencies [[cljsjs/js-joda "1.6.2-0"]
                  [net.cgrand/macrovich "0.2.0"]]
   :profiles {:dev
-             {:source-paths ["dev/src/cljs"]
-              :dependencies [[org.clojure/clojure "1.9.0"]
-                             [org.clojure/clojurescript "1.9.946"]
+             {:dependencies [[org.clojure/clojure "1.9.0"]
                              [lein-doo "0.1.8"]]
               :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
              :repl
              {:dependencies
-              [[cider/cider-nrepl "0.16.0"]
-               [org.clojure/clojurescript "1.10.238"]
-               [org.clojure/data.xml "0.2.0-alpha5"]
-               [org.apache.xmlgraphics/batik-swing "1.9"]
-               [henryw374/defoclock "0.1.1"]]
+              [[org.clojure/data.xml "0.2.0-alpha5"]
+               [org.apache.xmlgraphics/batik-swing "1.9"]]
               :source-paths ["dev/src"]}
              :codox {:dependencies [[codox-theme-rdash "0.1.2"]]
                      :plugins [[lein-codox "0.10.3"]]
