@@ -104,10 +104,10 @@
 (defn on [t d] (core/on t (date d)))
 (defn at [d t] (core/at d (time t)))
 
-(defn noon [v] (core/noon v))
-(defn midnight [v] (core/midnight v))
-(defn midnight? [v] (core/midnight? v))
-(defn epoch [] (core/epoch))
+(def noon core/noon)
+(def midnight core/midnight)
+(def midnight? core/midnight?)
+(def epoch core/epoch)
 
 (def fields core/fields)
 (def with core/with)
