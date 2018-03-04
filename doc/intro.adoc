@@ -1,0 +1,23 @@
+= Introduction
+
+Tick is designed as a comprehensive library of time utilities designed
+to make it easier to write Clojure programs that involve time and date
+calculations.
+
+== Comparison to other time libraries
+
+=== Java 8 time
+
+NOTE: TBD
+
+=== clj-time and Joda Time
+
+NOTE: TBD
+
+=== clojure.java-time
+
+NOTE: TBD
+
+== Status
+
+Tick is currently in _alpha_ status.

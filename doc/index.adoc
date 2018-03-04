@@ -10,7 +10,20 @@ ____
 Time is an illusion. Lunchtime doubly so.
 ____
 
+include::intro.adoc[]
+
 include::setup.adoc[]
+
+include::api.adoc[]
+
 include::dates.adoc[]
+
+include::durations.adoc[]
+
+include::clocks.adoc[]
+
+include::intervals.adoc[]
+
 include::calendars.adoc[]
+
 include::schedules.adoc[]

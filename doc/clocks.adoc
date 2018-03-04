@@ -1,0 +1,81 @@
+= Clocks
+
+In tick, clocks are used for getting the current time, in a given
+time-zone. You should prefer using clocks to making direct calls to
+`(System/currentTimeMillis)`, because this then allows you and others
+to plugin alternative clocks, perhaps for testing purposes.
+
+You create a clock that tracks the current time.
+
+----
+(clock)
+----
+
+With an argument, you can fix a clock to always report a fixed time.
+
+----
+(clock "1999-12-31T23:59:59")
+----
+
+
+
+== Construction
+
+[%header,cols="m,a,m"]
+|===
+|Code|Description|Return type
+|(clock)|Return a clock that will always return the current time|java.time.Clock
+|===
+
+== Derivation
+
+Just like times and dates, you can time-shift clocks forward and
+backward using the `>>` and `<<` functions respectively.
+
+----
+(<< (clock) (hours 2))
+----
+
+You can also create a clock from a base clock which reports time with granualarity given by a duration.
+
+----
+(def minute-clk (tick (clock) (minutes 1)))
+----
+
+[%header,cols="m,a,m"]
+|===
+|Code|Description|Return type
+|(<< (clock) (minutes 2))|Return a clock running 2 minutes slow|java.time.Clock
+|(>> (clock) (minutes 2))|Return a clock running 2 minutes fast|java.time.Clock
+|===
+
+== Comparison
+
+NOTE: TBD
+
+== Atomic clocks?
+
+In Clojure, an atom is a holder of a value at a particular time. Similarly, a _tick_ atom is a clock holding the clock's time, which is constantly changing.
+
+You create this atom with `(atom)`. Naturally, you can get the instant of the atom's clock by dereferencing, e.g. `@(atom)`
+
+----
+user> (def clk (atom))
+user> (println @clk)
+#object[java.time.Instant 0x2e014670 2018-02-28T07:52:52.302Z]
+(some time later)
+user> (println @clk)
+#object[java.time.Instant 0x6e5b1dca 2018-02-28T08:01:50.622Z]
+----
+
+You can also create an atom with a clock.
+
+----
+
+----
+
+[%header,cols="m,a,m"]
+|===
+|Code|Description|Return type
+|(atom)|Return a clock that tracks the current time|java.time.Clock
+|===

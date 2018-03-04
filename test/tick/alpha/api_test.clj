@@ -57,6 +57,14 @@
   (is (t/midnight? (t/beginning (t/year))))
   (is (t/midnight? (t/end (t/year)))))
 
+;; Units test
+
+(deftest units-test
+  (is
+    (=
+      {:years 10, :months 0, :days 0}
+      (t/units (t/years 10)))))
+
 ;; Comparison test
 
 (deftest comparison-test
@@ -292,3 +300,98 @@
       ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.
       (is (= 252 (- 365 113)))
       (is (= 252 (t/days (reduce t/+ (map t/length (t/difference [(t/bounds year)] non-working-days)))))))))
+
+
+;; Do not disturb tests
+
+;; Example: We mustn't disturb people between 10pm and 7am the following morning, in their locale.
+
+(defn moment [t]
+  (t/interval
+    t
+    (t/+ t (t/seconds 3))))
+
+;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
+
+;; Can we disturb?
+(deftest cannot-disturb-test
+  (let
+      [disturb-interval [(t/interval (t/time "07:00") (t/time "22:00"))]
+       no-disturb-interval (t/complement disturb-interval)
+       can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
+       ]
+      (is (not (can-disturb? (t/time "3:00"))))
+      (is (not (can-disturb? (t/time "7:00"))))
+      (is (can-disturb? (t/time "7:01")))
+      (is (can-disturb? (t/time "12:00")))
+      (is (can-disturb? (t/time "21:59")))
+      (is (not (can-disturb? (t/time "22:00"))))
+      (is (not (can-disturb? (t/time "00:00"))))))
+
+
+
+;; TODO: An 'on' test with an interval
+#_(t/on
+  (t/interval (t/time "07:00") (t/time "22:00"))
+  (t/today))
+
+
+;; Weekend
+#_(let
+    [disturb-interval [(t/interval (t/time "07:00") (t/time "21:00"))]
+     no-disturb-interval (t/complement disturb-interval)
+     t (t/time "6:00")]
+  (not (some #(t/coincident? % t) no-disturb-interval)))
+
+
+#_(t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])
+
+#_(t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])
+
+
+
+#_(not (some (partial t/concur (moment (t/time "21:59:57")))
+           (t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])))
+
+#_(t/at-zone (t/midnight (t/today)) "Europe/Berlin")
+
+
+#_(t/time (t/as-local (t/now) "Europe/Berlin"))
+
+
+#_(t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])
+
+
+#_(t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])
+
+
+
+#_(tick.interval/concur?
+  (t/complement [(t/interval (t/time "07:00") (t/time "22:00"))])
+  (moment (t/time (t/as-local (t/now) "Europe/Berlin"))))
+
+
+
+#_(.toLocalTime (t/as-local (t/now) "Europe/Berlin"))
+
+#_(t/time)
+
+
+;; TODO: 'Ago' tests
+
+
+;; Did something happen in the last ten minutes
+
+
+;;(t/between (t/now) (t/now))
+
+
+
+;; TODO: interval construction: since, until
+
+
+;; I think we should make an interval type
+
+;; TODO: +/- should NOT work for intervals, because +/- mean to 'add' an interval to another to make an interval set/seq.
+
+(t/>> (tick.interval/as-interval (t/today)) (t/minutes 4))

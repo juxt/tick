@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >= << >> extend])
+  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >= << >> extend atom swap! swap-vals! compare-and-set! reset! reset-vals!])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
@@ -9,7 +9,7 @@
    [tick.interval :as interval]
    [clojure.set :as set])
   (:import
-   [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month]))
+   [java.time Clock Duration ZoneId LocalTime LocalDate DayOfWeek Month]))
 
 ;; This API is optimises convenience, API stability and (type) safety
 ;; over performance. Where performance is critical, use tick.core and
@@ -21,12 +21,6 @@
 ;; Surfacing some useful constants
 
 (def unit-map core/unit-map)
-
-;; Fixing the clock used for `today` and `now`.
-
-(defmacro with-clock [^java.time.Clock clock & body]
-  `(binding [tick.core/*clock* ~clock]
-     ~@body))
 
 ;; Point-in-time 'demo' functions
 
@@ -90,10 +84,15 @@
 (defn year-month
   ([] (core/year-month (today)))
   ([v] (core/year-month v)))
-(defn zone [z] (core/zone z))
-(defn zoned-date-time [z] (core/zoned-date-time z))
-(defn local-date-time [z] (core/local-date-time z))
 
+(defn zone
+  ([] (ZoneId/systemDefault))
+  ([z] (core/zone z)))
+
+(defn zone-offset [offset] (core/zone-offset offset))
+
+(defn zoned-date-time [v] (core/zoned-date-time v))
+(defn local-date-time [v] (core/local-date-time v))
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
@@ -103,6 +102,8 @@
 
 (defn on [t d] (core/on t (date d)))
 (defn at [d t] (core/at d (time t)))
+(defn in [ldt z] (core/in ldt (zone z)))
+(defn offset-by [ldt offset] (core/offset-by ldt (zone-offset offset)))
 
 (def noon core/noon)
 (def midnight core/midnight)
@@ -215,6 +216,26 @@
                 false)))
 
 ;; TODO: Multiplication (of durations)
+
+;; Clocks
+
+;; Fixing the clock used for `today` and `now`.
+
+(defn clock
+  ([] (core/current-clock))
+  ([i] (core/clock i)))
+
+(defmacro with-clock [^java.time.Clock clock & body]
+  `(binding [tick.core/*clock* (core/clock ~clock)]
+     ~@body))
+
+(def tick core/tick)
+(def atom core/atom)
+(def swap! core/swap!)
+(def swap-vals! core/swap-vals!)
+(def compare-and-set! core/compare-and-set!)
+(def reset! core/reset!)
+(def reset-vals! core/reset-vals!)
 
 ;; Intervals
 

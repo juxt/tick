@@ -1,24 +1,3 @@
-= API
-
-_tick_ provides a single namespace containing a number of functions that make up the supported API to the library. You should try to restrict your usage of `tick` to these functions, since functions in other namespaces are liable to change.
-
-The code examples in this documentation assume that you have referred
-all _tick_'s API symbols into the current namespace. You can do this in
-the REPL with the following:
-
-----
-(use 'tick.api)
-----
-
-When you are using _tick_ in programs, it is recommended that you require _tick_'s api under the `t` alias as follows:
-
-----
-(require '[tick.alpha.api :as t])
-----
-
-If you choose to do this, then remember to prefix the symbols in this documentation with `t/`. For example, `(now)` would become `(t/now)`.
-
-
 = Times and dates
 
 In _tick_, times and dates are values from Java™'s `java.time` package.
@@ -35,7 +14,7 @@ The idea of the 'local' time, that you might read on a wall clock, is
 still a useful concept. From a functional programming perspective, you
 might think of this as 'partial evaluation' as applied to time.
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(time)|The time now, as local time|java.time.LocalTime
@@ -48,24 +27,24 @@ might think of this as 'partial evaluation' as applied to time.
 
 To get the current date, call `(today)`. This will return a `java.time.LocalDate`.
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(today)|Today's date|java.time.LocalDate
-|(date "2017-01-20")|The date 20th February 2017|java.time.LocalDate
+|(date "2017-01-20")|February 20th, 2017|java.time.LocalDate
 |===
 
 === Date-times
 
 Date-times represent a particular time on a particular date.
 
-`(time "8pm")` gives a `java.time.LocalTime`, but for any date. Suppose you want that on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time.
+While `(time "8pm")` gives a local-time on any date, you may want that time on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time. We can reify with `on` and `at`. For example:
 
 ----
 (-> (time "8pm") (on "2018-02-14"))
 ----
 
-The same idea works the other way around. If you have a date, say 2017-02-14, and want to fix a time on that date, say 8pm.
+And if starting with a date, we can use `at`:
 
 ----
 (-> (date "2018-02-14") (at "8pm"))
@@ -73,11 +52,7 @@ The same idea works the other way around. If you have a date, say 2017-02-14, an
 
 In both cases, a `java.time.LocalDateTime` is returned.
 
-
-
-NOTE: TODO ZonedDateTime, OffsetDateTime
-
-[%header,cols="m,a,m"]
+[%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(noon (today))|Noon today|java.time.LocalDateTime
@@ -85,13 +60,16 @@ NOTE: TODO ZonedDateTime, OffsetDateTime
 |(-> (date "2018-02-14") (at "8pm"))|8pm on 2018-02-14|java.time.LocalDateTime
 |===
 
+NOTE: TODO ZonedDateTime, OffsetDateTime
+
+
 === Instants
 
 Instants are points in time.
 
 To get the instant representing the current time, call `(now)`. This will return a `java.time.Instant` at the most precision possible on your platform (the nearest millisecond, microsecond or nanosecond).
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(now)|The time now (millisecond granularity)|java.time.Instant
@@ -110,7 +88,7 @@ NOTE: TODO Adjusters
 
 NOTE: Increment/decrement to create tomorrow,yesterday
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(midnight (today))|Midnight, last night (since midnight is the start of the day)|java.time.LocalDateTime
@@ -127,37 +105,3 @@ You might not need millisecond (or nanosecond) accuracy, so you can truncate to 
 == Comparison
 
 TODO
-
-= Durations and periods
-
-== Construction
-
-[%header,cols="m,a,m"]
-|===
-|Code|Description|Return type
-|(seconds 1)|Duration of a second|java.time.Duration
-|(seconds 10)|Duration of 10 seconds|java.time.Duration
-|(nanos 1200)|Duration of 1200 nanoseconds|java.time.Duration
-|(days 100)|Duration of 100 days|java.time.Duration
-|(period 100 :days)|Period of 100 days|java.time.Period
-|(months 2)|Period of 2 months|java.time.Period
-|===
-
-== Derivation
-
-* Add durations to durations
-
-== Comparison
-
-= Intervals
-
-== Construction
-
-* Add durations to times
-* between
-
-== Derivation
-
-* Form intervals from times and durations
-
-== Comparison

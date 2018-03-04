@@ -26,13 +26,16 @@
            (for [line (map first (partition 10 (ical/unfolding-line-seq (io/reader (io/resource "gb.ics")))))]
              (ical/line->contentline line))))))
 
-(deftest parse-file
-  (let [result
-        (reduce ical/add-contentline-to-model
-                {}
-                (map-indexed (fn [n o] (assoc o :lineno (inc n)))
-                             (map ical/line->contentline
-                                  (ical/unfolding-line-seq
-                                    (io/reader
-                                      (io/resource "gb.ics"))))))]
-    (is (= 231 (-> result :curr-object :subobjects first :subobjects count)))))
+(deftest ^:tick.test/slow parse-icalendar-test
+  (let [result (ical/parse-ical (io/reader (io/resource "gb.ics")))]
+    (is (= 231 (-> result first :subobjects count)))))
+
+
+#_(for [obj (:subobjects (first (ical/parse-icalendar (io/reader (io/resource "ics/gov.uk/england-and-wales.ics")))))]
+  [(:object obj)
+   (:value (first (ical/property obj :summary)))
+   (:value (first (ical/property obj :dtstart)))
+   ;; obj
+   ;; (:value (first (ical/property obj :summary)))
+   ]
+  )

@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> <<])
+  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str])
@@ -30,7 +30,8 @@
 (defprotocol ITimeReify
   (on [_ _] "Set time be ON a date")
   (at [_ _] "Set date to be AT a time")
-  (in [_ _] "Set a date-time to be in a time-zone"))
+  (in [_ _] "Set a date-time to be in a time-zone")
+  (offset-by [_ _] "Set a date-time to be offset by an amount"))
 
 (defn midnight
   ([] (LocalTime/MIDNIGHT))
@@ -102,9 +103,14 @@
       :>> (fn [s] (Year/parse s))
       (throw (ex-info "Unparseable time string" {:input s})))))
 
+;; TODO: Feels like this should ICoercions
 (defprotocol IConstructors
   (date [_] "Make a java.time.LocalDate instance.")
   (time [_] "Make a java.time.LocalTime instance.")
+  (millisecond [_] "Return the millisecond field of the given time")
+  (second [_] "Return the second field of the given time")
+  (minute [_] "Return the minute field of the given time")
+  (hour [_] "Return the hour field of the given time")
   (day [_] "Make a java.time.DayOfWeek instance.")
   (day-of-month [_] "Return value of the day in the month as an integer.")
   (inst [_] "Make a java.util.Date instance.")
@@ -144,6 +150,7 @@
   Instant
   (date [i] (date (zoned-date-time i)))
   (time [i] (time (zoned-date-time i)))
+  (second [i] (.get i ChronoField/SECOND_OF_MINUTE))
   (day [i] (day (date i)))
   (inst [i] (Date/from i))
   (instant [i] i)
@@ -197,6 +204,8 @@
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
   (local-date-time [ldt] ldt)
+  (offset-date-time [ldt] (.atOffset ldt (ZoneOffset/systemDefault)))
+  (zoned-date-time [ldt] (.atZone ldt (ZoneId/systemDefault)))
 
   Date
   (inst [d] d)
@@ -216,11 +225,18 @@
   ZoneId
   (zone [z] z)
 
+  OffsetDateTime
+  (time [odt] (.toLocalTime odt))
+  (local-date-time [odt] (.toLocalDateTime odt))
+  (offset-date-time [odt] odt)
+  (zoned-date-time [odt] (.toZonedDateTime odt))
+
   ZonedDateTime
   (date [zdt] (.toLocalDate zdt))
   (time [zdt] (.toLocalTime zdt))
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
+  (offset-date-time [zdt] (.toOffsetDateTime zdt))
   (zone [zdt] (.getZone zdt)))
 
 ;; Fields
@@ -439,6 +455,75 @@
     :months (Period/ofMonths n)
     :years (Period/ofYears n)))
 
+;; Clocks
+
+(defn current-clock []
+  (or
+    tick.core/*clock*
+    (Clock/systemDefaultZone)))
+
+(defprotocol IClock
+  (clock [_] "Make a clock"))
+
+(extend-protocol IClock
+  Instant
+  (clock [i] (Clock/fixed i (ZoneId/systemDefault)))
+
+  ZonedDateTime
+  (clock [zdt] (Clock/fixed (.toInstant zdt) (.getZone zdt)))
+
+  Object
+  (clock [o] (clock (zoned-date-time o)))
+
+  Clock
+  (clock [clk] clk)
+
+  ZoneId
+  (clock [z] (Clock/system z))
+
+  String
+  (clock [s] (clock (parse s))))
+
+(defn tick
+  ([clk]
+   (tick clk (seconds 1)))
+  ([clk dur]
+   (Clock/tick clk dur)))
+
+(extend-protocol IConstructors
+  Clock
+  (instant [clk] (.instant clk))
+  (zone [clk] (.getZone clk)))
+
+;; Atomic clocks :)
+
+(defrecord AtomicClock [*clock]
+  clojure.lang.IDeref
+  (deref [_] (instant @*clock))
+  IClock
+  (clock [_] @*clock))
+
+(prefer-method print-method clojure.lang.IPersistentMap clojure.lang.IDeref)
+
+(defn atom
+  ([clk] (->AtomicClock (clojure.core/atom clk)))
+  ([] (atom (current-clock))))
+
+(defn swap! [at f & args]
+  (apply clojure.core/swap! (:*clock at) f args))
+
+(defn swap-vals! [at f & args]
+  (apply clojure.core/swap-vals! (:*clock at) f args))
+
+(defn compare-and-set! [at oldval newval]
+  (apply clojure.core/compare-and-set! (:*clock at) oldval newval))
+
+(defn reset! [at newval]
+  (apply clojure.core/reset! (:*clock at) newval))
+
+(defn reset-vals! [at newval]
+  (apply clojure.core/reset-vals! (:*clock at) newval))
+
 ;; Arithmetic
 
 (defprotocol ITimeArithmetic
@@ -488,7 +573,10 @@
   (backward-number [t n] (.plusYears t n))
   YearMonth
   (forward-number [t n] (.plusMonths t n))
-  (backward-number [t n] (.plusMonths t n)))
+  (backward-number [t n] (.plusMonths t n))
+  Clock
+  (forward-duration [clk d] (Clock/offset clk d))
+  (backward-duration [clk d] (Clock/offset clk (negated d))))
 
 (defn >> [t n-or-d]
   (if (number? n-or-d)
@@ -668,10 +756,6 @@
   (beginning [_] nil)
   (end [_] nil))
 
-;; Private
-(defprotocol ILocalDateTimeReify
-  (in* [arg ldt] "Reify a LocalDateTime"))
-
 (extend-protocol ITimeReify
   LocalTime
   (on [t date] (.atTime date t))
@@ -680,9 +764,11 @@
   LocalDate
   (at [date t] (.atTime date (time t)))
   LocalDateTime
-  (in [ldt z] (.atZone ldt (zone z)))
+  (in [ldt z] (.atZone ldt z))
+  (offset-by [ldt offset] (.atOffset ldt offset))
   Instant
-  (in [t z] (in [t z] (.atZone t (zone z))))
+  (in [t z] (in [t z] (.atZone t z)))
+  (offset-by [t offset] (.atOffset t offset))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
   Date
