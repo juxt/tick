@@ -16,7 +16,7 @@
 (def T0 (-> "2012-12-04T05:21:00" LocalDateTime/parse (.atZone LONDON)))
 (def T1 (.plusSeconds T0 10))
 
-(deftest periodic-seq-test
+(deftest ^:deprecated periodic-seq-test
   (let [sq (periodic-seq T0 (minutes 1))]
     (testing "sq starts with start time"
       (is (= T0 (first sq))))
@@ -28,14 +28,14 @@
   (let [h (.getHour zdt)]
     (<= 7 h 21)))
 
-(deftest composition-test
+(deftest ^:deprecated composition-test
   (testing "Filter by acceptable hours"
     (is (= 62 (count
                (->> (periodic-seq T0 (hours 1))
                     (take 100)
                     (filter acceptable-hours)))))))
 
-(deftest interleave-timelines-test
+(deftest ^:deprecated interleave-timelines-test
   (let [merged
         (interleave-timelines
          (take 10 (timeline (periodic-seq (.plus (just-now) (seconds 10)) (minutes 1))))
@@ -43,7 +43,7 @@
     (is (distinct? merged))
     (is (= 20 (count merged)))))
 
-(deftest sequencer-test
+(deftest ^:deprecated sequencer-test
   (is (= 0 (:tick/seq (first (sequence (sequencer)
                                        (interleave-timelines
                                         (timeline (map cal/easter-monday (iterate inc 2012)))

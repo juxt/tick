@@ -8,7 +8,7 @@
    [tick.deprecated.clock :refer [clock-ticking-in-seconds just-now]]
    [tick.deprecated.schedule :as sched]))
 
-(deftest schedule-test
+(deftest ^:deprecated schedule-test
   (let [a (atom 0)
         f (fn [dt] (swap! a inc))
         clk (clock-ticking-in-seconds)
@@ -17,7 +17,7 @@
     @(sched/start (sched/schedule f timeline) clk)
     (is (= @a 10))))
 
-(deftest simulate-test
+(deftest ^:deprecated simulate-test
   (let [a (atom 0)
         f (fn [dt] (swap! a inc))
         clk (clock-ticking-in-seconds)

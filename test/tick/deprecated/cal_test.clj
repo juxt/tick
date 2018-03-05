@@ -10,7 +10,7 @@
 ;; https://www.gov.uk/bank-holidays
 ;; https://en.wikipedia.org/wiki/Bank_holiday
 
-(deftest holidays
+(deftest ^:deprecated holidays
   (is (= {:name "New Year's Day"
           :date (LocalDate/parse "2012-01-02")
           :substitute-day true}
