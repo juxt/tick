@@ -69,6 +69,8 @@
   ([] (core/time (now)))
   ([v] (core/time v)))
 
+(defn nanosecond [t] (core/nanosecond t))
+(defn microsecond [t] (core/microsecond t))
 (defn millisecond [t] (core/millisecond t))
 (defn second [t] (core/second t))
 (defn minute [t] (core/minute t))

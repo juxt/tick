@@ -106,6 +106,8 @@
 (defprotocol ICoercions
   (date [_] "Make a java.time.LocalDate instance.")
   (time [_] "Make a java.time.LocalTime instance.")
+  (nanosecond [_] "Return the millisecond field of the given time")
+  (microsecond [_] "Return the millisecond field of the given time")
   (millisecond [_] "Return the millisecond field of the given time")
   (second [_] "Return the second field of the given time")
   (minute [_] "Return the minute field of the given time")
@@ -149,7 +151,12 @@
   Instant
   (date [i] (date (zoned-date-time i)))
   (time [i] (time (zoned-date-time i)))
-  (second [i] (.get i ChronoField/SECOND_OF_MINUTE))
+  (nanosecond [t] (nanosecond (zoned-date-time t)))
+  (microsecond [t] (microsecond (zoned-date-time t)))
+  (millisecond [t] (millisecond (zoned-date-time t)))
+  (second [t] (second (zoned-date-time t)))
+  (minute [t] (minute (zoned-date-time t)))
+  (hour [t] (hour (zoned-date-time t)))
   (day [i] (day (date i)))
   (inst [i] (Date/from i))
   (instant [i] i)
@@ -191,6 +198,12 @@
 
   LocalTime
   (time [t] t)
+  (nanosecond [t] (.getField t ChronoField/NANO_OF_SECOND))
+  (microsecond [t] (.getField t ChronoField/MICRO_OF_SECOND))
+  (millisecond [t] (.getField t ChronoField/MILLI_OF_SECOND))
+  (second [t] (.getSecond t))
+  (minute [t] (.getMinute t))
+  (hour [t] (.getHour t))
 
   Month
   (int [m] (.getValue m))
@@ -233,8 +246,17 @@
   ZonedDateTime
   (date [zdt] (.toLocalDate zdt))
   (time [zdt] (.toLocalTime zdt))
+  (nanosecond [t] (.get t ChronoField/NANO_OF_SECOND))
+  (microsecond [t] (.get t ChronoField/MICRO_OF_SECOND))
+  (millisecond [t] (.get t ChronoField/MILLI_OF_SECOND))
+  (second [t] (.getSecond t))
+  (minute [t] (.getMinute t))
+  (hour [t] (.getHour t))
+  (day [t] (.getDayOfWeek t))
+  (day-of-month [t] (.getDayOfMonth t))
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
+  (month [zdt] (.getMonth zdt))
   (offset-date-time [zdt] (.toOffsetDateTime zdt))
   (zone [zdt] (.getZone zdt)))
 
@@ -276,7 +298,10 @@
   Seqable
   (seq [_]
     (->> field-map
-         (filter (fn [[k v]] (.isSupported t (get field-map k))))
+         (keep (fn [[k v]]
+                 (let [cf (get field-map k)]
+                   (when (.isSupported t cf)
+                     [k (.getLong t cf)]))))
          (into {})
          seq))
   ILookup
