@@ -8,7 +8,13 @@ calculations.
 
 === Java 8 time
 
-NOTE: TBD
+Most Clojure time libraries use clj-time, but tick uses
+http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[**java.time**]
+which means that it requires Java 8 or higher.
+
+Java 8's `java.time` API is both influenced by, and an improvement on, Joda
+Time. It is a modern immutable API that supports functional
+programming.
 
 === clj-time and Joda Time
 
@@ -17,6 +23,10 @@ NOTE: TBD
 === clojure.java-time
 
 NOTE: TBD
+
+=== Quartz
+
+See https://dzone.com/articles/why-you-shouldnt-use-quartz
 
 == Status
 
