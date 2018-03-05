@@ -115,7 +115,7 @@
   (property-value [this prop-name]
     (first (property-values this prop-name)))
 
-  t/IConstructors
+  t/ICoercions
   (date [this] (t/date (property-value this :dtstart)))
   (time [this] (t/time (property-value this :dtstart)))
   (day [this] (t/day (property-value this :dtstart)))

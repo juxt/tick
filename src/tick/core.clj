@@ -103,8 +103,7 @@
       :>> (fn [s] (Year/parse s))
       (throw (ex-info "Unparseable time string" {:input s})))))
 
-;; TODO: Feels like this should ICoercions
-(defprotocol IConstructors
+(defprotocol ICoercions
   (date [_] "Make a java.time.LocalDate instance.")
   (time [_] "Make a java.time.LocalTime instance.")
   (millisecond [_] "Return the millisecond field of the given time")
@@ -126,7 +125,7 @@
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (local-date-time [_] "Make a java.time.LocalDateTime instance."))
 
-(extend-protocol IConstructors
+(extend-protocol ICoercions
   Object
   (int [v] (clojure.core/int v))
   (long [v] (clojure.core/long v))
@@ -490,7 +489,7 @@
   ([clk dur]
    (Clock/tick clk dur)))
 
-(extend-protocol IConstructors
+(extend-protocol ICoercions
   Clock
   (instant [clk] (.instant clk))
   (zone [clk] (.getZone clk)))
