@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2018, JUXT LTD.
 
 (ns tick.alpha.api.dates-test
-  (:refer-clojure :exclude [dec < range <= min long int > extend - time / >= inc + max complement atom swap-vals! reset-vals! compare-and-set! reset! swap!])
+  (:refer-clojure :exclude [dec < range <= min long int > extend - time / >= inc + max complement atom swap-vals! reset-vals! compare-and-set! reset! swap! second])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.test :refer :all]
