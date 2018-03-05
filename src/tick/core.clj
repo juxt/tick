@@ -10,7 +10,7 @@
    [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
-   [clojure.lang ILookup]))
+   [clojure.lang ILookup Seqable]))
 
 (def ^{:dynamic true} *clock* nil)
 
@@ -273,6 +273,12 @@
    :year-of-era ChronoField/YEAR_OF_ERA})
 
 (deftype FieldsLookup [t]
+  Seqable
+  (seq [_]
+    (->> field-map
+         (filter (fn [[k v]] (.isSupported t (get field-map k))))
+         (into {})
+         seq))
   ILookup
   (valAt [_ fld]
     (when-let [f (get field-map fld)]
