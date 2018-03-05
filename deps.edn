@@ -1,0 +1,22 @@
+{:paths ["src"]
+ :deps
+ {hiccup
+  {:mvn/version "2.0.0-alpha1"}}
+
+ :aliases
+ {:dev
+  {:extra-deps
+   {cider/cider-nrepl {:mvn/version "0.16.0"}
+    org.clojure/data.xml {:mvn/version "0.2.0-alpha5"}
+    org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}}
+
+   :extra-paths ["dev/src" "test"]
+   :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
+
+  :test {:extra-paths
+         ["test"]
+         :extra-deps
+         {com.cognitect/test-runner
+          {:git/url "git@github.com:cognitect-labs/test-runner"
+           :sha "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}}
+         :main-opts ["-m" "cognitect.test-runner"]}}}

@@ -10,112 +10,25 @@ Add to your lein or boot dependencies:
 [tick "0.3.5"]
 ```
 
-=== Dependencies
+== Development
 
-Tick is dependent on Clojure 1.9, since it uses +clojure.spec+.
+REPL with nrepl server
+
+----
+clj -Adev
+----
+
+Port is written to `.nrepl-port`.
+
+Run tests with:
+
+----
+clj -Atest -e deprecated
+----
 
 == Documentation
 
 - https://juxt.github.io/tick[Generated API docs]
-
-== Timelines
-
-Tick adds the concept of immutable *timelines* to java.time. A
-timeline is a lazy but orderered sequence of maps, each containing a
-`java.time.ZonedDateTime` entry (under the key `:tick/date`.
-
-Timelines are easy to generate. One generator is `periodic-seq`, which
-generates a uniform series of times separated by a fixed period.
-
-[source,clojure]
-----
-(require '[tick.core :refer [minutes]]
-         '[tick.timeline :refer [timeline periodic-seq]]
-         '[tick.clock :refer [now]])
-
-;; A timeline of 15 minute intervals
-(take 10
-  (timeline (periodic-seq (now) (minutes 15))))
-----
-
-Timelines are sequences of ticks, and ticks are Clojure maps. Here's one:
-
-[source,clojure]
-----
-{:tick/date #object[java.time.ZonedDateTime 0x5a56528d "2012-12-04T05:21Z[Europe/London]"]}
-----
-
-Timelines can be finite or, or of course, infinite so
-
-[source,clojure]
-----
-(set! *print-length* 16)
-----
-
-to avoid eternal waits.
-
-== Interleaving timelines
-
-Multiple timelines can be interleaved into a consolidated timeline.
-
-`interleave-timelines` takes any number of timelines and returns a
-conslidated time-ordered timeline.  amalgamation.
-
-[source,clojure]
-----
-(require '[tick.cal])
-
-(def holidays
-  (interleave-timelines
-    (timeline (tick.cal/bank-holiday-mondays))
-    (timeline (tick.cal/easter-fridays))))
-----
-
-== Schedules
-
-Clojure's `map` takes a function and applies it to every item in a
-sequence. Similarly, tick's `schedule` takes a function and applies it
-to timelines.
-
-Schedules can be run by starting them with a clock.
-
-[source,clojure]
-----
-(def schedule (tick.schedule/schedule println timeline))
-;; note that the scheduled function   ^^^^^^^   takes one argument
-
-(tick.schedule/start schedule (tick.clock/clock-ticking-in-seconds))
-----
-
-You can `stop`, `pause` and `resume` schedules too.
-
-== Testing
-
-A type of schdule, useful for testing, can be created with `simulate`.
-
-[source,clojure]
-----
-(def simulator (tick.schedule/simulate println timeline))
-
-(tick.schedule/start simulator (tick.clock/fixed-clock ...))
-----
-
-If you want to wait for a ticker to complete its journey over a
-timeline, `deref` the result of `start`.
-
-At any time after starting a ticker you can find out its future
-timeline with `remaining`, while inspecting its clock with `clock`.
-
-== java.time
-
-Most Clojure time libraries use clj-time, but tick uses
-http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[**java.time**]
-which means that it requires Java 8.
-
-Java 8's `java.time` API is both influenced by, and superior to, Joda
-Time. It is a modern immutable API that supports functional
-programming. Unless you're stuck on Java 7 or ambivalent about library
-choice, you should be using `java.time`.
 
 == Discussion
 
@@ -141,15 +54,11 @@ link:https://github.com/domainlanguage/time-count[his Clojure library].
 Thanks also to my esteemed colleague Patrik Kårlin for his redesign of
 the interval constructor function.
 
-== Comparison to Quartz
-
-See https://dzone.com/articles/why-you-shouldnt-use-quartz
-
 == Copyright & License
 
 The MIT License (MIT)
 
-Copyright © 2016 JUXT LTD.
+Copyright © 2016-2018 JUXT LTD.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
