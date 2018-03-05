@@ -1,7 +1,15 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.alpha.api
-  (:refer-clojure :exclude [+ - * / inc dec max min range time int long complement < <= > >= << >> extend atom swap! swap-vals! compare-and-set! reset! reset-vals!])
+  (:refer-clojure
+   :exclude [+ - * / inc dec max min
+             range time int long complement
+             < <= > >= << >>
+             extend
+             atom swap! swap-vals! compare-and-set!
+             reset! reset-vals!
+             second
+             ])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]
@@ -52,7 +60,7 @@
 (def november Month/NOVEMBER)
 (def december Month/DECEMBER)
 
-;; Constructors
+;; Construction and coercion
 
 (defn date
   ([] (core/date (today)))
@@ -60,6 +68,12 @@
 (defn time
   ([] (core/time (now)))
   ([v] (core/time v)))
+
+(defn millisecond [t] (core/millisecond t))
+(defn second [t] (core/second t))
+(defn minute [t] (core/minute t))
+(defn hour [t] (core/hour t))
+
 (defn day
   ([] (core/day (today)))
   ([v] (core/day v)))
