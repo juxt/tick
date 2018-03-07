@@ -17,7 +17,7 @@
    [tick.interval :as interval]
    [clojure.set :as set])
   (:import
-   [java.time Clock Duration ZoneId LocalTime LocalDate DayOfWeek Month]))
+   [java.time Clock Duration ZoneId ZoneOffset LocalTime LocalDate DayOfWeek Month]))
 
 ;; This API is optimises convenience, API stability and (type) safety
 ;; over performance. Where performance is critical, use tick.core and
@@ -105,7 +105,10 @@
   ([] (ZoneId/systemDefault))
   ([z] (core/zone z)))
 
-(defn zone-offset [offset] (core/zone-offset offset))
+(defn zone-offset
+  ([offset] (core/zone-offset offset))
+  ([hours minutes] (ZoneOffset/ofHoursMinutes hours minutes))
+  ([hours minutes seconds] (ZoneOffset/ofHoursMinutesSeconds hours minutes seconds)))
 
 (defn zoned-date-time [v] (core/zoned-date-time v))
 (defn local-date-time [v] (core/local-date-time v))

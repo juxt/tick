@@ -13,8 +13,28 @@
 |(months 2)|Period of 2 months|java.time.Period
 |===
 
+=== Days, Months, Years…
+
+Instances of other `java.time` types are readily constructed with _tick_.
+
+[%header,cols="l,a,m"]
+|===
+|Example|Description|Return type
+|(day "mon")|Monday|java.time.DayOfWeek
+|(month "August")|August|java.time.Month
+|(month 12)|December|java.time.Month
+|(year-month "2012-12")|December 2012|java.time.YearMonth
+|(year 1999)|The year 1999|java.time.Year
+|===
+
 == Derivation
 
 * Add durations to durations
 
 == Comparison
+
+NOTE: TBD
+
+== Misc
+
+NOTE: TODO Don't forget you can create zone-offsets from durations!

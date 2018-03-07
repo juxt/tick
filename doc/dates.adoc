@@ -52,15 +52,32 @@ And if starting with a date, we can use `at`:
 
 In both cases, a `java.time.LocalDateTime` is returned.
 
+We can extend the reification options with the `in` function.
+
+----
+(-> (time "8pm") (on "2018-02-14") (in "America/New_York"))
+----
+
+This gives us a `java.time.ZonedDateTime`, which is a date-time with a time-zone.
+
+TIP: `ZonedDateTime` instances are particularly useful in programs because they incorporate Daylight Savings Time rules in the given time-zone, so convert well to both instants and local times.
+
+Likewise, we can use `offset-by` in place of `in` if we want to produce a `java.time.OffsetDateTime`.
+
+----
+(-> (time "8pm") (on "2018-02-14") (offset-by -5))
+----
+
 [%header,cols="l,a,m"]
 |===
 |Example|Description|Return type
 |(noon (today))|Noon today|java.time.LocalDateTime
 |(-> (time "8pm") (on "2018-02-14"))|8pm on 2018-02-14|java.time.LocalDateTime
 |(-> (date "2018-02-14") (at "8pm"))|8pm on 2018-02-14|java.time.LocalDateTime
+|(-> (date "2018-02-14") (at "8pm"))|8pm on 2018-02-14|java.time.LocalDateTime
+|(-> (noon) (on "2018-12-25") (in "America/New_York"))|Noon on Christmas Day 2018, New York|java.time.ZonedDateTime
+|(-> (time "4pm") (on "2018-02-14") (offset-by "+04:30")|4pm localtime, on 2018-02-14, in Kabul, no DST|java.time.OffsetDateTime
 |===
-
-NOTE: TODO ZonedDateTime, OffsetDateTime
 
 
 === Instants
@@ -76,11 +93,7 @@ To get the instant representing the current time, call `(now)`. This will return
 |(epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant|java.time.Instant
 |===
 
-
 == Derivation
-
-=== Reification
-
 
 === Adjustment
 
@@ -100,6 +113,46 @@ NOTE: Increment/decrement to create tomorrow,yesterday
 === Truncation
 
 You might not need millisecond (or nanosecond) accuracy, so you can truncate to the nearest second `(truncate (now) :seconds)` (or nearest minute with `(truncate (now) :minutes)`).
+
+=== Extraction
+
+Field values can be extracted from times and dates.
+
+[%header,cols="l,a,m"]
+|===
+|Example|Description|Return type
+|(day-of-month "2017-03-06")
+|6
+|java.lang.Integer
+
+|(year (epoch))
+|1970
+|java.time.Year
+
+|(day "1970-09-18")
+|What was the day on this date? (Friday)
+|java.time.DayOfWeek
+
+|(hour (noon))
+|What is the hour at noon? (12)
+|java.lang.Integer
+|===
+
+You can also extract any supported field from any time instance by calling the `fields` function and extracting the field value with a keyword.
+
+----
+(:epoch-day (fields (today)))
+----
+
+Since `fields` returns something that behaves like a readable map, you can ask it which fields are available:
+
+----
+(clojure.core/keys (fields (today)))
+
+=> (:proleptic-month :aligned-week-of-month :epoch-day :aligned-week-of-year :era :day-of-week :month-of-year :aligned-day-of-week-in-month :day-of-month :year :day-of-year :year-of-era :aligned-day-of-week-in-year)
+----
+
+NOTE: Beware that there are not many fields available for a `java.time.Instant`. You may want to first coerce the instant to a `java.time.ZonedDateTime` with `(zoned-date-time …)`.
 
 
 == Comparison

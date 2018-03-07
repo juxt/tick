@@ -7,7 +7,7 @@
    [clojure.string :as str])
   (:import
    [java.util Date]
-   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
+   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
    [clojure.lang ILookup Seqable]))
@@ -158,6 +158,7 @@
   (minute [t] (minute (zoned-date-time t)))
   (hour [t] (hour (zoned-date-time t)))
   (day [i] (day (date i)))
+  (day-of-month [i] (day-of-month (date i)))
   (inst [i] (Date/from i))
   (instant [i] i)
   (int [i] (.getNano i))
@@ -171,9 +172,10 @@
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
   (day [s] (or (parse-day s) (day (date s))))
+  (day-of-month [s] (day-of-month (date s)))
   (date [s] (date (parse s)))
   (time [s] (time (parse s)))
-  (month [s] (parse-month s))
+  (month [s] (or (parse-month s) (month (date s))))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
   (zone [s] (ZoneId/of s))
@@ -187,6 +189,7 @@
   (month [n] (Month/of n))
   (instant [n] (Instant/ofEpochMilli n))
   (year [n] (Year/of n))
+  (zone-offset [s] (ZoneOffset/ofHours s))
 
   LocalDate
   (date [d] d)
@@ -236,6 +239,9 @@
 
   ZoneId
   (zone [z] z)
+
+  ZoneOffset
+  (zone-offset [z] z)
 
   OffsetDateTime
   (time [odt] (.toLocalTime odt))
@@ -484,6 +490,12 @@
     :weeks (Period/ofWeeks n)
     :months (Period/ofMonths n)
     :years (Period/ofYears n)))
+
+;; Coercions
+
+(extend-protocol ICoercions
+  Duration
+  (zone-offset [d] (ZoneOffset/ofTotalSeconds (seconds d))))
 
 ;; Clocks
 
@@ -795,10 +807,10 @@
   (at [date t] (.atTime date (time t)))
   LocalDateTime
   (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset] (.atOffset ldt offset))
+  (offset-by [ldt offset] (.atOffset ldt (zone-offset offset)))
   Instant
   (in [t z] (in [t z] (.atZone t z)))
-  (offset-by [t offset] (.atOffset t offset))
+  (offset-by [t offset] (.atOffset t (zone-offset offset)))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
   Date

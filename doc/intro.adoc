@@ -1,20 +1,28 @@
 = Introduction
 
-Tick is designed as a comprehensive library of time utilities designed
-to make it easier to write Clojure programs that involve time and date
-calculations.
+Tick is a comprehensive Clojure library designed to make it easier to
+write programs that involve time and date calculations:
+
+* Functions to manipulating time, easily and succinctly
+* Powerful functions for slicing and dicing time intervals
+* Implementation of Allen's Interval Algebra
+* Support for iCalendar serialization
+* Scheduling
 
 == Comparison to other time libraries
 
 === Java 8 time
 
-Most Clojure time libraries use clj-time, but tick uses
-http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[**java.time**]
-which means that it requires Java 8 or higher.
+Java 8's `java.time` API is both influenced by, and an improvement on,
+Joda Time.
 
-Java 8's `java.time` API is both influenced by, and an improvement on, Joda
-Time. It is a modern immutable API that supports functional
-programming.
+Many Clojure applications use clj-time which is based on Joda Time, but tick uses
+http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[**java.time**].
+
+CAUTION: Because _tick_ is built on `java.time`, it requires Java 8 or higher.
+
+Unlike older JDK dates and calendars, instances in
+`java.time` are immutable so can be considered values in Clojure. For this reason, there is no reason to wrap these values. Consequently, there is full interoperability between _tick_ and `java.time`. Where _tick_ does not provide a part of java.time's functionality, `java.time` can be called directly.
 
 === clj-time and Joda Time
 
