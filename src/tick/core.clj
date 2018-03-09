@@ -7,7 +7,7 @@
    [clojure.string :as str])
   (:import
    [java.util Date]
-   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]
+   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime ZoneId]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
    [clojure.lang ILookup Seqable]))
@@ -166,7 +166,7 @@
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
-  (zoned-date-time [i] (.atZone i ZoneOffset/UTC))
+  (zoned-date-time [i] (ZonedDateTime/ofInstant i (ZoneId/systemDefault)))
 
   String
   (inst [s] (inst (instant s)))
@@ -182,7 +182,9 @@
   (zone-offset [s] (ZoneOffset/of s))
   (int [s] (.getNano (instant s)))
   (long [s] (.getEpochSecond (instant s)))
-  (local-date-time [s] (local-date-time (parse s)))
+  (local-date-time [s] (java.time.LocalDateTime/parse s))
+  (zoned-date-time [s] (java.time.ZonedDateTime/parse s))
+  (offset-date-time [s] (java.time.OffsetDateTime/parse s))
 
   Number
   (day [n] (DayOfWeek/of n))

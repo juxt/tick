@@ -5,7 +5,7 @@ write programs that involve time and date calculations:
 
 * Functions to manipulating time, easily and succinctly
 * Powerful functions for slicing and dicing time intervals
-* Implementation of Allen's Interval Algebra
+* Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra]
 * Support for iCalendar serialization
 * Scheduling
 

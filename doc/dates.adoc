@@ -38,6 +38,16 @@ To get the current date, call `(today)`. This will return a `java.time.LocalDate
 
 Date-times represent a particular time on a particular date.
 
+Let's construct one with a string:
+
+----
+(local-date-time "2016-12-12T11:30")
+
+=> #object[java.time.LocalDateTime 0x26eb53b6 "2016-12-12T11:30"]
+----
+
+==== Reification
+
 While `(time "8pm")` gives a local-time on any date, you may want that time on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time. We can reify with `on` and `at`. For example:
 
 ----
@@ -77,8 +87,10 @@ Likewise, we can use `offset-by` in place of `in` if we want to produce a `java.
 |(-> (date "2018-02-14") (at "8pm"))|8pm on 2018-02-14|java.time.LocalDateTime
 |(-> (noon) (on "2018-12-25") (in "America/New_York"))|Noon on Christmas Day 2018, New York|java.time.ZonedDateTime
 |(-> (time "4pm") (on "2018-02-14") (offset-by "+04:30")|4pm localtime, on 2018-02-14, in Kabul, no DST|java.time.OffsetDateTime
+|(local-date-time "2016-12-12T11:30")|Explicit construction in ISO 8601 format|java.time.LocalDateTime
+|(zoned-date-time "2016-12-12T11:30Z")|A ZonedDateTime in UTC|java.time.ZonedDateTime
+|(zoned-date-time "2016-12-12T11:30:00Z[Europe/Paris]")|A ZonedDateTime in Paris, the Z is ignored|java.time.ZonedDateTime
 |===
-
 
 === Instants
 
@@ -94,6 +106,12 @@ To get the instant representing the current time, call `(now)`. This will return
 |===
 
 == Derivation
+
+Now we have the foundational building blocks of time values, we can now move on to the many ways in which new time values can be derived.
+
+=== Coercion
+
+NOTE: TBD
 
 === Adjustment
 
