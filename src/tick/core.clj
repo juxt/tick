@@ -127,6 +127,13 @@
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (local-date-time [_] "Make a java.time.LocalDateTime instance."))
 
+(defn current-zone
+  "Return the current zone, which can be overridden by the *clock* dynamic var"
+  []
+  (if-let [clk *clock*]
+    (.getZone clk)
+    (ZoneId/systemDefault)))
+
 (extend-protocol ICoercions
   Object
   (int [v] (clojure.core/int v))
@@ -166,7 +173,8 @@
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
-  (zoned-date-time [i] (ZonedDateTime/ofInstant i (ZoneId/systemDefault)))
+  (zoned-date-time [i] (ZonedDateTime/ofInstant i (current-zone)))
+  (offset-date-time [i] (OffsetDateTime/ofInstant i (current-zone)))
 
   String
   (inst [s] (inst (instant s)))
@@ -503,7 +511,7 @@
 
 (defn current-clock []
   (or
-    tick.core/*clock*
+    *clock*
     (Clock/systemDefaultZone)))
 
 (defprotocol IClock
@@ -539,6 +547,10 @@
   (instant [clk] (.instant clk))
   (zone [clk] (.getZone clk)))
 
+(extend-protocol ITimeReify
+  Clock
+  (in [clk zone] (.withZone clk zone)))
+
 ;; Atomic clocks :)
 
 (defrecord AtomicClock [*clock]
@@ -548,6 +560,7 @@
   (clock [_] @*clock))
 
 (prefer-method print-method clojure.lang.IPersistentMap clojure.lang.IDeref)
+(prefer-method print-method java.util.Map clojure.lang.IDeref)
 
 (defn atom
   ([clk] (->AtomicClock (clojure.core/atom clk)))

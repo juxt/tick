@@ -105,7 +105,7 @@
   ([v] (core/year-month v)))
 
 (defn zone
-  ([] (ZoneId/systemDefault))
+  ([] (core/current-zone))
   ([z] (core/zone z)))
 
 (defn zone-offset
