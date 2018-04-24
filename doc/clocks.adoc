@@ -17,8 +17,6 @@ With an argument, you can fix a clock to always report a fixed time.
 (clock "1999-12-31T23:59:59")
 ----
 
-
-
 == Construction
 
 [%header,cols="m,a,m"]
@@ -71,7 +69,7 @@ user> (println @clk)
 You can also create an atom with a clock.
 
 ----
-
+(atom (clock))
 ----
 
 [%header,cols="m,a,m"]
@@ -79,3 +77,25 @@ You can also create an atom with a clock.
 |Code|Description|Return type
 |(atom)|Return a clock that tracks the current time|java.time.Clock
 |===
+
+
+== Substitution
+
+A clock can be used to callibrate tick to a particular time and time-zone, if system defaults are not desired.
+
+As I'm currently writing this in London, on my system I get the following when I use '(zone)'.
+
+----
+(zone)
+
+=> #object[java.time.ZoneRegion 0x744a6545 "Europe/London"]
+----
+
+However, if we wanted to test in New York, we can set the clock to exist in that time-zone:
+
+----
+(t/with-clock (-> (t/clock) (t/in "America/New_York"))
+  (t/zone))
+
+=> #object[java.time.ZoneRegion 0x5a9d412 "America/New_York"]
+----

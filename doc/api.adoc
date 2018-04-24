@@ -1,6 +1,8 @@
 = API
 
-_tick_ provides a single namespace—`tick.api`—containing the functions that make up the library's API. Try to restrict your use of `tick` to this namespace, since functions in other namespaces are not part of the official API and could change.
+_tick_ provides a single namespace—`tick.api`—containing the functions that make up the library's API.
+
+CAUTION: Try to restrict your use of `tick` to the `tick.api` namespace. Functions in other namespaces, which may not be marked private, are not part of the official API and could change.
 
 The code examples in this documentation assume that you have referred
 all _tick_'s API symbols into the current namespace. You can do this in
