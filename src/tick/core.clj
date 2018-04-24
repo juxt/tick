@@ -751,6 +751,7 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
+;; TODO: Consider using between for this?
 (defn length
   "Return the distance between the beginning and end as a duration or
   period"
