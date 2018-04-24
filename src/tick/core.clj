@@ -563,6 +563,7 @@
   (clock [_] @*clock))
 
 (prefer-method print-method clojure.lang.IPersistentMap clojure.lang.IDeref)
+(prefer-method print-method java.util.Map clojure.lang.IDeref)
 
 (defn atom
   ([clk] (->AtomicClock (clojure.core/atom clk)))
