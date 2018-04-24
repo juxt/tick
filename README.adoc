@@ -54,6 +54,11 @@ link:https://github.com/domainlanguage/time-count[his Clojure library].
 Thanks also to my esteemed colleague Patrik Kårlin for his redesign of
 the interval constructor function.
 
+== References
+
+* https://clojuresync.com/emily-ashley/
+* https://github.com/aphyr/tea-time
+
 == Copyright & License
 
 The MIT License (MIT)
