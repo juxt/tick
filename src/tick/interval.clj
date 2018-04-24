@@ -87,12 +87,14 @@
 ;; [t1 t0] interval between t0 and t1
 ;; [t0 d] interval between t0 and t0+d, where d is a given duration
 ;; [d t1] interval between t1-d and t1, where d is a given duration
+
 (defn interval
   [a b]
   (cond
     (every? temporal? [a b]) (absolute-interval a b)
     (and (temporal? a) (temporal-amount? b)) (relative-interval a b)
     (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/negated a))
+    (and (instance? java.util.Date a) (instance? java.util.Date b)) (interval (t/instant a) (t/instant b))
     :else (throw (ex-info "Bad arguments for interval" {:arg0 a :arg1 b}))))
 
 ;; Adjustments
@@ -515,7 +517,7 @@
            \F (recur
                 (next xs)
                 (next ys)
-                (clojure.core/conj result y))
+                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
            \o (recur
                 (cons (narrow x (t/beginning y) (t/end x)) (next xs))
                 (cons (narrow y (t/end x) (t/end y)) (next ys))
@@ -569,12 +571,11 @@
              (\P \M) (recur xs (next ys) result)
              (\f \d \e) (recur (next xs) (next ys) result)
              \s (recur (next xs) ys result)
-             (\S \O) (recur (cons (interval (t/end y) (t/end x)) (next xs)) (next ys) result)
+             (\S \O)
+             (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
              \F (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
              \o (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-             ;; TODO: Replace interval (lossy) with type
-             ;; preserving choice of IIntervalOps operation
-             \D (recur (cons (interval (t/end y) (t/end x)) (next xs))
+             \D (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
                        (next ys)
                        (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
          (apply clojure.core/conj result xs))
