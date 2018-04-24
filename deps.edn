@@ -29,4 +29,9 @@
               {cider/cider-nrepl {:mvn/version "0.16.0"}
                refactor-nrepl {:mvn/version "2.3.1"}
                com.cemerick/piggieback {:mvn/version "0.2.2"}
-               org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}}}
+               org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
+
+  :dev/rebel {:extra-paths ["aliases/rebel"]
+              :extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.1"}
+                           io.aviso/pretty {:mvn/version "0.1.34"}}
+              :main-opts ["-m" "tick.rebel.main"]}}}
