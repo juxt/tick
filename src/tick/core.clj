@@ -7,7 +7,7 @@
    [clojure.string :as str])
   (:import
    [java.util Date]
-   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
+   [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime ZoneId]
    [java.time.format DateTimeFormatter]
    [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
    [clojure.lang ILookup Seqable]))
@@ -127,6 +127,13 @@
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (local-date-time [_] "Make a java.time.LocalDateTime instance."))
 
+(defn current-zone
+  "Return the current zone, which can be overridden by the *clock* dynamic var"
+  []
+  (if-let [clk *clock*]
+    (.getZone clk)
+    (ZoneId/systemDefault)))
+
 (extend-protocol ICoercions
   Object
   (int [v] (clojure.core/int v))
@@ -165,7 +172,8 @@
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
-  (zoned-date-time [i] (.atZone i ZoneOffset/UTC))
+  (zoned-date-time [i] (ZonedDateTime/ofInstant i (current-zone)))
+  (offset-date-time [i] (OffsetDateTime/ofInstant i (current-zone)))
 
   String
   (inst [s] (inst (instant s)))
@@ -180,13 +188,16 @@
   (zone-offset [s] (ZoneOffset/of s))
   (int [s] (.getNano (instant s)))
   (long [s] (.getEpochSecond (instant s)))
-  (local-date-time [s] (local-date-time (parse s)))
+  (local-date-time [s] (java.time.LocalDateTime/parse s))
+  (zoned-date-time [s] (java.time.ZonedDateTime/parse s))
+  (offset-date-time [s] (java.time.OffsetDateTime/parse s))
 
   Number
   (day [n] (DayOfWeek/of n))
   (month [n] (Month/of n))
   (instant [n] (Instant/ofEpochMilli n))
   (year [n] (Year/of n))
+  (zone-offset [s] (ZoneOffset/ofHours s))
 
   LocalDate
   (date [d] d)
@@ -237,6 +248,9 @@
   ZoneId
   (zone [z] z)
 
+  ZoneOffset
+  (zone-offset [z] z)
+
   OffsetDateTime
   (time [odt] (.toLocalTime odt))
   (local-date-time [odt] (.toLocalDateTime odt))
@@ -257,7 +271,9 @@
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
   (month [zdt] (.getMonth zdt))
+  (local-date-time [zdt] (.toLocalDateTime zdt))
   (offset-date-time [zdt] (.toOffsetDateTime zdt))
+  (zoned-date-time [zdt] zdt)
   (zone [zdt] (.getZone zdt)))
 
 ;; Fields
@@ -485,11 +501,17 @@
     :months (Period/ofMonths n)
     :years (Period/ofYears n)))
 
+;; Coercions
+
+(extend-protocol ICoercions
+  Duration
+  (zone-offset [d] (ZoneOffset/ofTotalSeconds (seconds d))))
+
 ;; Clocks
 
 (defn current-clock []
   (or
-    tick.core/*clock*
+    *clock*
     (Clock/systemDefaultZone)))
 
 (defprotocol IClock
@@ -524,6 +546,10 @@
   Clock
   (instant [clk] (.instant clk))
   (zone [clk] (.getZone clk)))
+
+(extend-protocol ITimeReify
+  Clock
+  (in [clk zone] (.withZone clk zone)))
 
 ;; Atomic clocks :)
 
@@ -795,10 +821,10 @@
   (at [date t] (.atTime date (time t)))
   LocalDateTime
   (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset] (.atOffset ldt offset))
+  (offset-by [ldt offset] (.atOffset ldt (zone-offset offset)))
   Instant
-  (in [t z] (in [t z] (.atZone t z)))
-  (offset-by [t offset] (.atOffset t offset))
+  (in [t z] (.atZone t z))
+  (offset-by [t offset] (.atOffset t (zone-offset offset)))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
   Date
