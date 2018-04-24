@@ -131,7 +131,7 @@
   (local-date-time [this] (t/local-date-time (property-value this :dtstart))))
 
 (defrecord VCalendar [objects]
-  ;; TODO: Add t/ITimeSpace
+  ;; TODO: Add t/ITimeSpan
   IPrintable
   (print-object [this]
     (wrap-with
