@@ -96,8 +96,11 @@
 
 (defrecord VEvent []
   t/ITimeSpan
-  (beginning [this] (t/time (property-value this :dtstart)))
-  (end [this] (t/time (property-value this :dtend)))
+  (beginning [this] (t/beginning (property-value this :dtstart)))
+  ;; This might seem wrong but we use t/beginning to convert a
+  ;; date-time to the same date-time, and a date to midnight (the
+  ;; start of that date). TODO: Is this explained in the RFC anywhere?
+  (end [this] (t/beginning (property-value this :dtend)))
 
   IPrintable
   (print-object [this]
