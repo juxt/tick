@@ -93,6 +93,7 @@
     (every? temporal? [a b]) (absolute-interval a b)
     (and (temporal? a) (temporal-amount? b)) (relative-interval a b)
     (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/negated a))
+    (and (instance? java.util.Date a) (instance? java.util.Date b)) (interval (t/instant a) (t/instant b))
     :else (throw (ex-info "Bad arguments for interval" {:arg0 a :arg1 b}))))
 
 ;; Adjustments
