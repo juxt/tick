@@ -7,6 +7,9 @@
    [infra])
   (:import [java.time DayOfWeek]))
 
+(when (System/getProperty "nrepl.load")
+  (require 'nrepl))
+
 (defn test-all []
   (require
     'tick.alpha.api-test
@@ -15,5 +18,3 @@
     'tick.interval-test
     'tick.ical-test)
   (clojure.test/run-all-tests #"(tick).*test$"))
-
-(println "port is" (read-string (slurp ".nrepl-port")))
