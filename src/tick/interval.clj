@@ -1,8 +1,9 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj extend])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj extend])
   (:require
+   [clojure.pprint :refer [pprint]]
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
    [tick.core :as t])
@@ -282,38 +283,55 @@
 ;; Functions that make use of Allens' Interval Algebra
 
 (defprotocol IIntervalOps
+  ;; TODO: Rename? Not always narrow, sometimes widen, or generally modify - perhaps 'derive'
   (narrow [_ beginning end] "Narrow the interval to the new given bounds")
-  (combine [ival1 ival2] "Combine two intervals"))
+  (splice [ival1 ival2] "Splice two intervals together")
+  (split [ival t] "Split ival into 2 intervals, at t"))
+
+(defn split-with-assert [ival t]
+  (assert
+    (and (t/< (t/beginning ival) t)
+         (t/< t (t/end ival))))
+  (split ival t))
 
 (extend-protocol IIntervalOps
   Interval
   (narrow [_ beginning end] (interval beginning end))
-  (combine [ival1 ival2] (interval
-                           (t/min (t/beginning ival1) (t/beginning ival2))
-                           (t/max (t/end ival1) (t/end ival2))))
+  (splice [ival1 ival2] (interval
+                          (t/min (t/beginning ival1) (t/beginning ival2))
+                          (t/max (t/end ival1) (t/end ival2))))
+  (split [ival t]
+    [(interval (t/beginning ival) t) (interval t (t/end ival))])
+
   LocalDate
   (narrow [date beginning end]
     (assert (t/<= (t/beginning date) beginning))
     (assert (t/>= (t/end date) end))
     (interval beginning end))
-  (combine [ival1 ival2]
+  (splice [ival1 ival2]
     (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+  (split [ival t]
+    [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
   YearMonth
   (narrow [ym beginning end]
     (assert (t/<= (t/beginning ym) beginning))
     (assert (t/>= (t/end ym) end))
     (interval beginning end))
-  (combine [ival1 ival2]
+  (splice [ival1 ival2]
     (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+  (split [ival t]
+    [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
   Year
   (narrow [yr beginning end]
     (assert (t/<= (t/beginning yr) beginning))
     (assert (t/>= (t/end yr) end))
     (interval beginning end))
-  (combine [ival1 ival2]
-    (throw (ex-info "Not implemented" {:args [ival1 ival2]}))))
+  (splice [ival1 ival2]
+    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+  (split [ival t]
+    [(interval (t/beginning ival) t) (interval t (t/end ival))]))
 
 (defn concur
   "Return the interval representing the interval, if there is one,
@@ -371,90 +389,6 @@
   (> [x y] (#{preceded-by? met-by?} (relation x y)))
   (>= [x y] (#{preceded-by? met-by? equals? started-by? overlapped-by? finishes?} (relation x y))))
 
-;; Division
-
-(defn divide-by
-  "Return a lazy sequence of java.time.Temporal instances over the
-  given (local) interval."
-  [ival f]
-  (cond->
-      (t/range
-        (f (t/beginning ival))
-        (f (t/end ival)))
-    ;; Since range is exclusive, we must add one more value, but only
-    ;; if it concurs rather than merely meets.
-    (concur (f (t/end ival)) ival)
-    (concat [(f (t/end ival))])))
-
-(defn divide-by-duration
-  "Divide an interval by a duration, returning a sequence of
-  intervals. If the interval cannot be wholly sub-divided by the
-  duration divisor, the last interval will represent the 'remainder'
-  of the division and not be as long as the other preceeding
-  intervals."
-  [ival dur]
-  (->> (t/range
-         (t/beginning ival)
-         (t/end ival)
-         dur)
-       ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/forward-duration % dur) (t/end ival))))))
-
-(defn divide-by-period
-  [ival period]
-  (->> (t/range
-         (t/beginning ival)
-         (t/end ival)
-         period)
-       ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
-
-(defn divide-by-divisor [ival divisor]
-  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
-
-(defprotocol IDivisibleInterval
-  (divide [divisor ival] "Divide an interval by a given divisor"))
-
-(defmulti divide-by-keyword ""
-  (fn [ival k] k))
-
-(defmethod divide-by-keyword :hours [ival _]
-  (divide-by-duration ival (t/duration 1 :hours)))
-
-(defmethod divide-by-keyword :minutes [ival _]
-  (divide-by-duration ival (t/duration 1 :minutes)))
-
-(defmethod divide-by-keyword :days [ival _]
-  (divide-by ival t/date))
-
-(defmethod divide-by-keyword :months [ival _]
-  (divide-by ival t/year-month))
-
-(defmethod divide-by-keyword :years [ival _]
-  (divide-by ival t/year))
-
-(extend-protocol IDivisibleInterval
-  clojure.lang.Keyword
-  (divide [kw ival] (divide-by-keyword ival kw))
-  Duration
-  (divide [dur ival] (divide-by-duration ival dur))
-  Period
-  (divide [period ival] (divide-by-period ival period))
-  Long
-  (divide [divisor ival] (divide-by-divisor ival divisor)))
-
-;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
-
-(extend-protocol t/IDivisible
-  LocalDate
-  (/ [ld d] (divide d ld))
-  Year
-  (/ [n d] (divide d n))
-  YearMonth
-  (/ [n d] (divide d n))
-  Interval
-  (/ [ival o] (divide o ival)))
-
 ;; Interval sets - sequences of mutually disjoint intervals
 
 (defn ordered-disjoint-intervals?
@@ -469,6 +403,12 @@
        (if (or (nil? x) (nil? (first xs))) true
            (when (rel x (first xs))
              (recur xs)))))))
+
+;; If we ever want to create a wrapper type of ordered disjoint
+;; interval sets...
+#_(deftype OrderedDisjointIntervalSet [s]
+  clojure.lang.Seqable
+  (seq [_] (seq s)))
 
 (defn union
   "Combine multiple collections of intervals into a single ordered
@@ -485,7 +425,7 @@
 
             (recur (apply list
                           (next c1)
-                          (clojure.core/concat [(combine (first c1) (first c2))]
+                          (clojure.core/concat [(splice (first c1) (first c2))]
                                                (next c2))
                           r)
                    result)))))))
@@ -551,8 +491,8 @@
   ([s1 s2 & sets]
    (reduce intersection s1 (clojure.core/conj sets s2))))
 
-(defn intersect? [coll interval]
-  (not-empty (intersection coll [interval])))
+(defn intersects? [ivals interval]
+  (not-empty (intersection ivals [interval])))
 
 (defn difference
   "Return an interval set that is the first set without elements of
@@ -583,9 +523,6 @@
   ([s1 s2 & sets]
    (reduce difference s1 (clojure.core/conj sets s2))))
 
-(defn disj [coll interval]
-  (difference coll [interval]))
-
 (defn complement [coll]
   (if (empty? coll)
     [(interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
@@ -596,3 +533,210 @@
         (#(concat [(interval (t/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))
         (not= (t/end (last coll)) (t/max-of-type (t/end (last coll))))
         (#(concat % [(interval (t/end (last coll)) (t/max-of-type (t/end (last coll))))]))))))
+
+(defn disjoin
+  "Split s1 across the grating defined by s2"
+  ([s1] s1)
+  ([s1 s2]
+   (loop [xs s1
+          ys s2
+          result []]
+     (if (not-empty xs)
+       (if (not-empty ys)
+         (let [x (first xs) y (first ys)
+               code (code (relation x y))]
+           (case code
+             (\p \m) (recur (next xs) ys (clojure.core/conj result x))
+;; TODO:
+;;             (\P \M) (recur xs (next ys) result)
+;;             (\f \d \e) (recur (next xs) (next ys) result)
+;;             \s (recur (next xs) ys result)
+;;             (\S \O)
+;;             (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
+;;             \F (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+;;            \o (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+;;            \D
+             #_(recur (cons (narrow x (t/end y) (t/end x)) (next xs))
+                    (next ys)
+                    (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
+         (apply clojure.core/conj result xs))
+       result)))
+  ([s1 s2 & sets]
+   (reduce difference s1 (clojure.core/conj sets s2))))
+
+;; Division
+
+(defn divide-by
+  "Return a lazy sequence of java.time.Temporal instances over the
+  given (local) interval."
+  [ival f]
+  (cond->
+      (t/range
+        (f (t/beginning ival))
+        (f (t/end ival)))
+    ;; Since range is exclusive, we must add one more value, but only
+    ;; if it concurs rather than merely meets.
+    (concur (f (t/end ival)) ival)
+    (concat [(f (t/end ival))])))
+
+(defn divide-by-duration
+  "Divide an interval by a duration, returning a sequence of
+  intervals. If the interval cannot be wholly sub-divided by the
+  duration divisor, the last interval will represent the 'remainder'
+  of the division and not be as long as the other preceeding
+  intervals."
+  [ival dur]
+  (->> (t/range
+         (t/beginning ival)
+         (t/end ival)
+         dur)
+       ;; Bound by given interval, last will become a remainder.
+       (map (juxt identity #(t/min (t/forward-duration % dur) (t/end ival))))))
+
+(defn divide-by-period
+  [ival period]
+  (->> (t/range
+         (t/beginning ival)
+         (t/end ival)
+         period)
+       ;; Bound by given interval, last will become a remainder.
+       (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
+
+(defn divide-by-divisor [ival divisor]
+  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
+
+(defprotocol IDivisibleInterval
+  (divide [divisor ival] "Divide an interval by a given divisor"))
+
+(defmulti divide-by-keyword ""
+  (fn [ival k] k))
+
+;; TODO: Replace keywords with singular
+
+(defmethod divide-by-keyword :hours [ival _]
+  (divide-by-duration ival (t/duration 1 :hours)))
+
+(defmethod divide-by-keyword :minutes [ival _]
+  (divide-by-duration ival (t/duration 1 :minutes)))
+
+(defmethod divide-by-keyword :days [ival _]
+  (divide-by ival t/date))
+
+(defmethod divide-by-keyword :months [ival _]
+  (divide-by ival t/year-month))
+
+(defmethod divide-by-keyword :years [ival _]
+  (divide-by ival t/year))
+
+(extend-protocol IDivisibleInterval
+  clojure.lang.Keyword
+  (divide [kw ival] (divide-by-keyword ival kw))
+  Duration
+  (divide [dur ival] (divide-by-duration ival dur))
+  Period
+  (divide [period ival] (divide-by-period ival period))
+  Long
+  (divide [divisor ival] (divide-by-divisor ival divisor)))
+
+;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
+
+(extend-protocol t/IDivisible
+  LocalDate
+  (/ [ld d] (divide d ld))
+  Year
+  (/ [n d] (divide d n))
+  YearMonth
+  (/ [n d] (divide d n))
+  Interval
+  (/ [ival o] (divide o ival)))
+
+;; Grouping (similar to Division)
+
+;; TODO: tag literals data_readers.clj for tick?
+;; #tick/instant ""
+;; #tick/local-date-time ""
+;; #tick/local-date ""
+
+;; TODO: Normalise - splice intervals that touch - opposite of disjoin
+
+(defn group-by-intervals
+  "Divide intervals in s1 by (disjoint ordered) intervals in s2,
+  splitting if necessary, grouping by s2. Complexity is O(n) rather
+  than O(n^2)"
+  [s1 s2]
+  (loop [intervals s1
+         groups s2
+         result {}
+         current-intervals []]
+    (if (not-empty intervals)
+      (if (not-empty groups)
+        (let [ival (first intervals)
+              group (first groups)
+              code (code (relation ival group))]
+
+          (case code
+            ;; If precedes or meets, discard ival
+            (\p \m) (recur (next intervals) groups result current-intervals)
+            (\P \M) (recur
+                      intervals (next groups)
+                      (assoc result group current-intervals)
+                      [])
+
+            (\e \f) (recur
+                      (next intervals)
+                      (next groups)
+                      (assoc result group [ival])
+                      [])
+
+            (\F) (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
+                   (recur
+                     (next intervals)
+                     (next groups)
+                     (assoc result group [seg2])
+                     []))
+
+            (\S) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+                   (recur
+                     (cons seg2 (next intervals))
+                     (next groups)
+                     (assoc result group [seg1])
+                     []))
+
+            (\O) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+                   (recur
+                     (cons seg2 (next intervals))
+                     (next groups)      ; end of this group
+                     (assoc result group (clojure.core/conj current-intervals seg1))
+                     []))
+
+            (\s \d) (recur
+                      (next intervals)
+                      groups
+                      result
+                      (clojure.core/conj current-intervals ival))
+
+            (\D) (recur
+                   (next intervals)
+                   (next groups)
+                   (assoc result group [(narrow ival (t/beginning group) (t/end group))])
+                   [])
+
+            (\o) (recur
+                   (next intervals)
+                   groups
+                   result
+                   (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))
+
+            (throw (ex-info
+                     "Unsupported code"
+                     {:code code :ival ival :group group}))))
+
+        ;; No more groups
+        result)
+
+      ;; No more intervals
+      (cond-> result
+        (first groups) (assoc (first groups) current-intervals)
+        (not-empty (rest groups))
+        ((fn add-remaining-groups [result]
+           (reduce (fn [acc group] (assoc acc group [])) result (rest groups))))))))
