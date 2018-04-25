@@ -374,3 +374,6 @@
 (defn complement [coll]
   {:pre [(s/assert ordered-disjoint-intervals? coll)]}
   (interval/complement coll))
+
+(defn group-by [ivals groups]
+  (interval/group-by ivals groups))

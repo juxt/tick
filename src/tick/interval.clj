@@ -740,3 +740,24 @@
         (not-empty (rest groups))
         ((fn add-remaining-groups [result]
            (reduce (fn [acc group] (assoc acc group [])) result (rest groups))))))))
+
+(defprotocol IGroupable
+  (group-by-grouping [grouping ivals]))
+
+(defmulti group-by-keyword "" (fn [ivals k] k))
+
+(defmethod group-by-keyword :years
+  [ivals _]
+  (let [r (apply bounds ivals)
+        b (t/year (t/beginning r))
+        e (t/year (t/end r))
+        groups (t/range b (t/inc e))]
+    (group-by-intervals ivals groups)))
+
+(extend-protocol IGroupable
+  clojure.lang.Keyword
+  (group-by-grouping [k ivals]
+    (group-by-keyword ivals k)))
+
+(defn group-by [ivals grouping]
+  (group-by-grouping grouping ivals))
