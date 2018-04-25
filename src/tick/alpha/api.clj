@@ -65,6 +65,7 @@
 (defn date
   ([] (core/date (today)))
   ([v] (core/date v)))
+
 (defn time
   ([] (core/time (now)))
   ([v] (core/time v)))
@@ -117,7 +118,9 @@
   ([] (core/zoned-date-time (now)))
   ([v] (core/zoned-date-time v)))
 
-(defn local-date-time [v] (core/local-date-time v))
+(defn local-date-time
+  ([] (core/local-date-time (now)))
+  ([v] (core/local-date-time v)))
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))

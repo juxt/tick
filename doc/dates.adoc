@@ -51,6 +51,12 @@ To get the current date, call `(today)`. This will return a `java.time.LocalDate
 
 Date-times represent a particular time on a particular date.
 
+To get the local time right now, with today's date, call `local-date-time` without any arguments:
+
+----
+(local-date-time)
+----
+
 Let's construct one with a string:
 
 ----

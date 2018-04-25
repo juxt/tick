@@ -174,6 +174,7 @@
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
+  (local-date-time [i] (local-date-time (zoned-date-time i)))
   (zoned-date-time [i] (ZonedDateTime/ofInstant i (current-zone)))
   (offset-date-time [i] (OffsetDateTime/ofInstant i (current-zone)))
 
@@ -239,6 +240,9 @@
   (date [d] (date (zoned-date-time (instant d)))) ; implicit conversion to UTC
   (year-month [d] (year-month (date d)))
   (year [d] (year (date d)))
+  (local-date-time [d] (local-date-time (instant d)))
+  (zoned-date-time [d] (zoned-date-time (instant d)))
+  (offset-date-time [d] (offset-date-time (instant d)))
 
   YearMonth
   (year-month [ym] ym)
