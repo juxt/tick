@@ -34,11 +34,8 @@
 ;; Construction
 
 (defn- make-interval [v1 v2]
-  (when (= v1 v2)
-    (throw (ex-info "Zero length interval!" {:v1 v1 :v2 v2})))
-  (if (neg? (compare v1 v2))
-    (->Interval v1 v2)
-    (->Interval v2 v1)))
+  (assert (t/< v1 v2))
+  (->Interval v1 v2))
 
 (defprotocol IIntervalConstructors
   (absolute-interval [t0 t1] "Create an interval between t0 and t1")
