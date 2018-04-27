@@ -9,8 +9,7 @@
              atom swap! swap-vals! compare-and-set!
              reset! reset-vals!
              second
-             group-by
-             ])
+             group-by])
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as core]

@@ -454,7 +454,7 @@
 ;; Division test
 
 (deftest divistion-test
-  (is (= 7 (count (t// (bounds (t/year 2012) (t/year 2018)) :years)))))
+  (is (= 7 (count (t// (bounds (t/year 2012) (t/year 2018)) :year)))))
 
 (deftest group-by-intervals-test
   (testing "p and s"
@@ -472,7 +472,7 @@
         (group-by-intervals
           [(interval (t/local-date-time #inst "2017-12-20")
                      (t/local-date-time #inst "2018-01-10"))]
-          (t// (bounds (t/year 2016) (t/year 2019)) :years)))))
+          (t// (bounds (t/year 2016) (t/year 2019)) :year)))))
 
   (testing "O"
     (is
@@ -484,7 +484,7 @@
          (t/year 2018) []}
         (group-by-intervals
           [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))]
-          (t// (bounds (t/year 2014) (t/year 2018)) :years)))))
+          (t// (bounds (t/year 2014) (t/year 2018)) :year)))))
 
   (testing "M and e"
     (is
@@ -494,8 +494,8 @@
          (t/year 2016) [(t/year 2016)]
          (t/year 2017) []}
         (group-by-intervals
-          (t// (bounds (t/year 2015) (t/year 2016)) :years)
-          (t// (bounds (t/year 2014) (t/year 2017)) :years)))))
+          (t// (bounds (t/year 2015) (t/year 2016)) :year)
+          (t// (bounds (t/year 2014) (t/year 2017)) :year)))))
 
   (testing "s"
     (is (=
@@ -505,7 +505,7 @@
            (t/year 2017) []}
           (group-by-intervals
             [(bounds (t/year 2015) (t/year 2016))]
-            (t// (bounds (t/year 2014) (t/year 2017)) :years)))))
+            (t// (bounds (t/year 2014) (t/year 2017)) :year)))))
 
   (testing "f"
     (is
@@ -552,5 +552,5 @@
           (t/year "2016")
           (bounds (t/year-month "2017-01") (t/year-month "2017-06"))]}
         (group-by-intervals
-          (t// (bounds (t/year 2014) (t/year 2018)) :years)
+          (t// (bounds (t/year 2014) (t/year 2018)) :year)
           [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))])))))

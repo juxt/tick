@@ -613,19 +613,19 @@
 
 ;; TODO: Replace keywords with singular
 
-(defmethod divide-by-keyword :hours [ival _]
+(defmethod divide-by-keyword :hour [ival _]
   (divide-by-duration ival (t/duration 1 :hours)))
 
-(defmethod divide-by-keyword :minutes [ival _]
+(defmethod divide-by-keyword :minute [ival _]
   (divide-by-duration ival (t/duration 1 :minutes)))
 
-(defmethod divide-by-keyword :days [ival _]
+(defmethod divide-by-keyword :date [ival _]
   (divide-by ival t/date))
 
-(defmethod divide-by-keyword :months [ival _]
+(defmethod divide-by-keyword :year-month [ival _]
   (divide-by ival t/year-month))
 
-(defmethod divide-by-keyword :years [ival _]
+(defmethod divide-by-keyword :year [ival _]
   (divide-by ival t/year))
 
 (extend-protocol IDivisibleInterval
@@ -746,7 +746,7 @@
 
 (defmulti group-by-keyword "" (fn [ivals k] k))
 
-(defmethod group-by-keyword :years
+(defmethod group-by-keyword :year
   [ivals _]
   (let [r (apply bounds ivals)
         b (t/year (t/beginning r))
