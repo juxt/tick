@@ -1,0 +1,25 @@
+
+= Interval Algebra
+ <<https://en.wikipedia.org/wiki/Allen%27s_interval_algebra,On Wikipedia>>
+ 
+ 
+= Cross Platform
+ 
+ In many business domains, dates are as fundamental as numbers and strings. It's often useful to have date-heavy 
+ business logic portable across platforms and whilst sometimes we can get away with just switching the clj(s)-time 
+ import for the compilation target, the fact that cljs-time doesn't have complete fidelity with clj-time often leaks out.
+ 
+== vs cljs-time
+  
+  clj-time is a wrapper over the great joda-time, but cljs-time is a wrapper over goog.date which
+  in turn is a wrapper over mutable js Date objects. 
+  
+  This works ok as a proxy for Instant, but is not a great foundation for  Local dates etc. 
+  
+  The author of cljs-time, Andrew McVeigh, has said he would ideally move cljs-time off goog.date but is unlikely to
+  do so at this point. For one thing, there could be more than a few current users relying on the JS Date nature
+  of the cljs-time objects.
+  
+  Taking a fresh look at the date/time landscape, we now have JSR-310 and implementations in both Java and Javascript
+  and so it is possible to create tick, which combines the greatness of JSR-310 with an expressive, cross-platform 
+  Clojure api.

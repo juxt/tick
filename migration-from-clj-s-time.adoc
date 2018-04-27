@@ -1,0 +1,25 @@
+
+ITimeSpan
+day, year, month, hour etc
+
+
+
+`(require '[tick.alpha.api :as t])`
+
+= Shifting 
+
+(t/>> (t/now) (t/nanos 100))
+
+(t/<< (t/now) (t/hours 3))
+
+for local dates, duration arg means days
+forward 3 days
+(t/>> (t/today) 3)
+
+; inc,dec and some convenience fns today,tomorrow,yesterday
+(= (t/inc (t/today)) (t/tomorrow))
+
+= Formatting
+
+
+
