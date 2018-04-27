@@ -37,43 +37,6 @@
   (assert (t/< v1 v2))
   (->Interval v1 v2))
 
-(defprotocol IIntervalConstructors
-  (absolute-interval [t0 t1] "Create an interval between t0 and t1")
-  (relative-interval [t0 dur] "Create an interval between t0 and t0+dur"))
-
-(extend-protocol IIntervalConstructors
-  Instant
-  (absolute-interval [t0 t1]
-    (make-interval t0 t1))
-  (relative-interval [t0 dur]
-    (make-interval t0 (.plus t0 dur)))
-  ZonedDateTime
-  (absolute-interval [t0 t1]
-    (make-interval t0 t1))
-  (relative-interval [t0 dur]
-    (make-interval t0 (.plus t0 dur)))
-  OffsetDateTime
-  (absolute-interval [t0 t1]
-    (make-interval t0 t1))
-  (relative-interval [t0 dur]
-    (make-interval t0 (.plus t0 dur)))
-  LocalDateTime
-  (absolute-interval [t0 t1]
-    (make-interval t0 t1))
-  (relative-interval [t0 dur]
-    (make-interval t0 (.plus t0 dur)))
-  LocalTime
-  (absolute-interval [t0 t1]
-    (make-interval t0 t1))
-  (relative-interval [t0 dur]
-    (make-interval t0 (.plus t0 dur)))
-  Date
-  (absolute-interval [t0 t1]
-    (make-interval (t/instant t0) (t/instant t1)))
-  (relative-interval [t0 dur]
-    (let [i (t/instant t0)]
-      (make-interval i (.plus i dur)))))
-
 (defn temporal? [o]
   (instance? java.time.temporal.Temporal o))
 
@@ -87,13 +50,11 @@
 ;; [d t1] interval between t1-d and t1, where d is a given duration
 
 (defn interval
-  [a b]
-  (cond
-    (every? temporal? [a b]) (absolute-interval a b)
-    (and (temporal? a) (temporal-amount? b)) (relative-interval a b)
-    (and (temporal-amount? a) (temporal? b)) (relative-interval b (t/negated a))
-    (and (instance? java.util.Date a) (instance? java.util.Date b)) (interval (t/instant a) (t/instant b))
-    :else (throw (ex-info "Bad arguments for interval" {:arg0 a :arg1 b}))))
+  [v1 v2]
+  (let [t1 (t/temporal-value v1)
+        t2 (t/temporal-value v2)]
+    (assert (t/< t1 t2))
+    (->Interval t1 t2)))
 
 ;; Adjustments
 

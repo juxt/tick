@@ -126,7 +126,8 @@
   (zone-offset [_] "Make a java.time.ZoneOffset instance.")
   (zoned-date-time [_] "Make a java.time.ZonedDateTime instance.")
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
-  (local-date-time [_] "Make a java.time.LocalDateTime instance."))
+  (local-date-time [_] "Make a java.time.LocalDateTime instance.")
+  (temporal-value [_] "Coerce to a preferred value"))
 
 (defn current-zone
   "Return the current zone, which can be overridden by the *clock* dynamic var"
@@ -155,6 +156,7 @@
   (zone [f] (zone (f)))
   (zoned-date-time [f] (zoned-date-time (f)))
   (local-date-time [f] (local-date-time (f)))
+  (temporal-value [f] (temporal-value (f)))
 
   Instant
   (date [i] (date (zoned-date-time i)))
@@ -177,6 +179,7 @@
   (local-date-time [i] (local-date-time (zoned-date-time i)))
   (zoned-date-time [i] (ZonedDateTime/ofInstant i (current-zone)))
   (offset-date-time [i] (OffsetDateTime/ofInstant i (current-zone)))
+  (temporal-value [i] i)
 
   String
   (inst [s] (inst (instant s)))
@@ -195,6 +198,7 @@
   (local-date-time [s] (java.time.LocalDateTime/parse s))
   (zoned-date-time [s] (java.time.ZonedDateTime/parse s))
   (offset-date-time [s] (java.time.OffsetDateTime/parse s))
+  (temporal-value [s] (temporal-value (parse s)))
 
   Number
   (day [n] (DayOfWeek/of n))
@@ -210,6 +214,7 @@
   (month [d] (Month/from d))
   (year-month [d] (YearMonth/of (.getYear d) (.getMonthValue d)))
   (year [d] (Year/of (.getYear d)))
+  (temporal-value [d] d)
 
   LocalTime
   (time [t] t)
@@ -219,6 +224,7 @@
   (second [t] (.getSecond t))
   (minute [t] (.getMinute t))
   (hour [t] (.getHour t))
+  (temporal-value [t] t)
 
   Month
   (int [m] (.getValue m))
@@ -233,6 +239,7 @@
   (local-date-time [ldt] ldt)
   (offset-date-time [ldt] (.atOffset ldt (ZoneOffset/systemDefault)))
   (zoned-date-time [ldt] (.atZone ldt (ZoneId/systemDefault)))
+  (temporal-value [ldt] ldt)
 
   Date
   (inst [d] d)
@@ -243,14 +250,17 @@
   (local-date-time [d] (local-date-time (instant d)))
   (zoned-date-time [d] (zoned-date-time (instant d)))
   (offset-date-time [d] (offset-date-time (instant d)))
+  (temporal-value [d] (instant d))
 
   YearMonth
   (year-month [ym] ym)
   (year [ym] (year (.getYear ym)))
+  (temporal-value [ym] ym)
 
   Year
   (year [y] y)
   (int [y] (.getValue y))
+  (temporal-value [y] y)
 
   ZoneId
   (zone [z] z)
@@ -263,6 +273,7 @@
   (local-date-time [odt] (.toLocalDateTime odt))
   (offset-date-time [odt] odt)
   (zoned-date-time [odt] (.toZonedDateTime odt))
+  (temporal-value [odt] odt)
 
   ZonedDateTime
   (date [zdt] (.toLocalDate zdt))
@@ -281,7 +292,8 @@
   (local-date-time [zdt] (.toLocalDateTime zdt))
   (offset-date-time [zdt] (.toOffsetDateTime zdt))
   (zoned-date-time [zdt] zdt)
-  (zone [zdt] (.getZone zdt)))
+  (zone [zdt] (.getZone zdt))
+  (temporal-value [zdt] zdt))
 
 ;; Fields
 
