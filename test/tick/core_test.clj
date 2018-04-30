@@ -22,7 +22,6 @@
     ;; Duration -> Duration -> Long
     (= 63 (t// (t/duration 21 :days) (t/duration 8 :hours)))))
 
-
 (deftest construction-test
   (is (= (t/date "2018-01-11")
          (t/date (t/instant 1515691416624)))))
