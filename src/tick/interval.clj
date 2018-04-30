@@ -622,9 +622,9 @@
   "Divide intervals in s1 by (disjoint ordered) intervals in s2,
   splitting if necessary, grouping by s2. Complexity is O(n) rather
   than O(n^2)"
-  [s1 s2]
-  (loop [intervals s1
-         groups s2
+  [intervals-to-group-by ivals]
+  (loop [intervals ivals
+         groups intervals-to-group-by
          result {}
          current-intervals []]
     (if (not-empty intervals)
@@ -701,22 +701,23 @@
            (reduce (fn [acc group] (assoc acc group [])) result (rest groups))))))))
 
 (defprotocol IGroupable
-  (group-by-grouping [grouping ivals]))
+  (group-by [grouping ivals]))
 
-(defmulti group-by-keyword "" (fn [ivals k] k))
+(defmulti group-by-keyword "" (fn [k ivals] k))
 
 (defmethod group-by-keyword :year
-  [ivals _]
+  [_ ivals]
   (let [r (apply bounds ivals)
         b (t/year (t/beginning r))
         e (t/year (t/end r))
         groups (t/range b (t/inc e))]
-    (group-by-intervals ivals groups)))
+    (group-by groups ivals)))
 
 (extend-protocol IGroupable
   clojure.lang.Keyword
-  (group-by-grouping [k ivals]
-    (group-by-keyword ivals k)))
-
-(defn group-by [ivals grouping]
-  (group-by-grouping grouping ivals))
+  (group-by [k ivals]
+    (group-by-keyword k ivals))
+  Iterable
+  (group-by [groups ivals]
+    (assert (ordered-disjoint-intervals? groups))
+    (group-by-intervals groups ivals)))

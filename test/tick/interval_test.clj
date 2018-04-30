@@ -469,10 +469,10 @@
                           (t/local-date-time "2018-01-10T00:00"))]
          (t/year 2019) []}
 
-        (group-by-intervals
+        (group-by
+          (t// (bounds (t/year 2016) (t/year 2019)) :year)
           [(interval (t/local-date-time #inst "2017-12-20")
-                     (t/local-date-time #inst "2018-01-10"))]
-          (t// (bounds (t/year 2016) (t/year 2019)) :year)))))
+                     (t/local-date-time #inst "2018-01-10"))]))))
 
   (testing "O"
     (is
@@ -482,9 +482,9 @@
          (t/year 2016) [(bounds (t/year 2016))]
          (t/year 2017) [(bounds (t/year-month "2017-01") (t/year-month "2017-06"))]
          (t/year 2018) []}
-        (group-by-intervals
-          [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))]
-          (t// (bounds (t/year 2014) (t/year 2018)) :year)))))
+        (group-by
+          (t// (bounds (t/year 2014) (t/year 2018)) :year)
+          [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))]))))
 
   (testing "M and e"
     (is
@@ -493,9 +493,9 @@
          (t/year 2015) [(t/year 2015)]
          (t/year 2016) [(t/year 2016)]
          (t/year 2017) []}
-        (group-by-intervals
-          (t// (bounds (t/year 2015) (t/year 2016)) :year)
-          (t// (bounds (t/year 2014) (t/year 2017)) :year)))))
+        (group-by
+          (t// (bounds (t/year 2014) (t/year 2017)) :year)
+          (t// (bounds (t/year 2015) (t/year 2016)) :year)))))
 
   (testing "s"
     (is (=
@@ -503,9 +503,9 @@
            (t/year 2015) [(bounds (t/year 2015))]
            (t/year 2016) [(bounds (t/year 2016))]
            (t/year 2017) []}
-          (group-by-intervals
-            [(bounds (t/year 2015) (t/year 2016))]
-            (t// (bounds (t/year 2014) (t/year 2017)) :year)))))
+          (group-by
+            (t// (bounds (t/year 2014) (t/year 2017)) :year)
+            [(bounds (t/year 2015) (t/year 2016))]))))
 
   (testing "f"
     (is
@@ -514,8 +514,9 @@
          (t/year 2015) [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]
          (t/year 2016) []}
 
-        (group-by-intervals [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]
-                            [(t/year 2014) (t/year 2015) (t/year 2016)]))))
+        (group-by
+          [(t/year 2014) (t/year 2015) (t/year 2016)]
+          [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]))))
 
   (testing "F"
     (is
@@ -523,8 +524,9 @@
         {(bounds (t/year-month "2015-06") (t/year-month "2015-12"))
          [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]}
 
-        (group-by-intervals [(t/year 2014) (t/year 2015) (t/year 2016)]
-                            [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]))))
+        (group-by
+          [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))]
+          [(t/year 2014) (t/year 2015) (t/year 2016)]))))
 
   (testing "d"
     (is
@@ -532,8 +534,9 @@
         {(t/year 2014) []
          (t/year 2015) [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]
          (t/year 2016) []}
-        (group-by-intervals [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]
-                            [(t/year 2014) (t/year 2015) (t/year 2016)]))))
+        (group-by
+          [(t/year 2014) (t/year 2015) (t/year 2016)]
+          [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]))))
 
   (testing "D"
     (is
@@ -541,8 +544,9 @@
         {(bounds (t/year-month "2015-03") (t/year-month "2015-09"))
          [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]}
 
-        (group-by-intervals [(t/year 2014) (t/year 2015) (t/year 2016)]
-                            [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]))))
+        (group-by
+          [(bounds (t/year-month "2015-03") (t/year-month "2015-09"))]
+          [(t/year 2014) (t/year 2015) (t/year 2016)]))))
 
   (testing "o"
     (is
@@ -551,6 +555,6 @@
          [(bounds (t/year-month "2015-06") (t/year-month "2015-12"))
           (t/year "2016")
           (bounds (t/year-month "2017-01") (t/year-month "2017-06"))]}
-        (group-by-intervals
-          (t// (bounds (t/year 2014) (t/year 2018)) :year)
-          [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))])))))
+        (group-by
+          [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))]
+          (t// (bounds (t/year 2014) (t/year 2018)) :year))))))
