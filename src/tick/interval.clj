@@ -102,7 +102,8 @@
 
 (extend-protocol t/ITimeReify
   Interval
-  (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date))))
+  (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
+  (in [i zone] (interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
 (defn bounds [& args]
   (interval
