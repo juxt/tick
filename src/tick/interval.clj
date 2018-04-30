@@ -623,6 +623,8 @@
   splitting if necessary, grouping by s2. Complexity is O(n) rather
   than O(n^2)"
   [intervals-to-group-by ivals]
+  {:pre [(ordered-disjoint-intervals? intervals-to-group-by)
+         (ordered-disjoint-intervals? ivals)]}
   (loop [intervals ivals
          groups intervals-to-group-by
          result {}
@@ -638,7 +640,9 @@
             (\p \m) (recur (next intervals) groups result current-intervals)
             (\P \M) (recur
                       intervals (next groups)
-                      (assoc result group current-intervals)
+                      (cond-> result
+                        (not-empty current-intervals)
+                        (assoc group current-intervals))
                       [])
 
             (\e \f) (recur
@@ -695,10 +699,8 @@
 
       ;; No more intervals
       (cond-> result
-        (first groups) (assoc (first groups) current-intervals)
-        (not-empty (rest groups))
-        ((fn add-remaining-groups [result]
-           (reduce (fn [acc group] (assoc acc group [])) result (rest groups))))))))
+        (and (first groups) (not-empty current-intervals))
+        (assoc (first groups) current-intervals)))))
 
 (defprotocol IGroupable
   (group-by [grouping ivals]))
@@ -717,7 +719,13 @@
   clojure.lang.Keyword
   (group-by [k ivals]
     (group-by-keyword k ivals))
+  clojure.lang.Fn
+  (group-by [f ivals]
+    (let [r (apply bounds ivals)
+          b (f (t/beginning r))
+          e (f (t/end r))
+          groups (t/range b (t/inc e))]
+      (group-by groups ivals)))
   Iterable
   (group-by [groups ivals]
-    (assert (ordered-disjoint-intervals? groups))
     (group-by-intervals groups ivals)))
