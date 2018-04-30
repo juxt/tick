@@ -588,6 +588,8 @@
   (divide-by ival t/year))
 
 (extend-protocol IDivisibleInterval
+  clojure.lang.Fn
+  (divide [f ival] (divide-by ival f))
   clojure.lang.Keyword
   (divide [kw ival] (divide-by-keyword ival kw))
   Duration
