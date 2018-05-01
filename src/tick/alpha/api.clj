@@ -2,7 +2,7 @@
 
 (ns tick.alpha.api
   (:refer-clojure
-   :exclude [+ - * / inc dec max min
+   :exclude [+ - * inc dec max min
              range time int long complement
              < <= > >= << >>
              extend
@@ -303,8 +303,8 @@
 
 ;; Divisions
 
-(defn / [x divisor]
-  (core// x divisor))
+(defn divide-by [divisor t]
+  (core/divide-by* t divisor))
 
 ;; Temporal adjusters
 

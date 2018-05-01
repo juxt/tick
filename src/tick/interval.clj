@@ -565,29 +565,29 @@
   (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
 
 (defprotocol IDivisibleInterval
-  (divide [divisor ival] "Divide an interval by a given divisor"))
+  (divide-interval [divisor ival] "Divide an interval by a given divisor"))
 
 (extend-protocol IDivisibleInterval
   clojure.lang.Fn
-  (divide [f ival] (divide-by ival f))
+  (divide-interval [f ival] (divide-by ival f))
   Duration
-  (divide [dur ival] (divide-by-duration ival dur))
+  (divide-interval [dur ival] (divide-by-duration ival dur))
   Period
-  (divide [period ival] (divide-by-period ival period))
+  (divide-interval [period ival] (divide-by-period ival period))
   Long
-  (divide [divisor ival] (divide-by-divisor ival divisor)))
+  (divide-interval [divisor ival] (divide-by-divisor ival divisor)))
 
 ;; TODO: hours-over, minutes-over, seconds-over, millis-over?,
 
 (extend-protocol t/IDivisible
   LocalDate
-  (/ [ld d] (divide d ld))
+  (divide-by* [ld d] (divide-interval d ld))
   Year
-  (/ [n d] (divide d n))
+  (divide-by* [n d] (divide-interval d n))
   YearMonth
-  (/ [n d] (divide d n))
+  (divide-by* [n d] (divide-interval d n))
   Interval
-  (/ [ival o] (divide o ival)))
+  (divide-by* [ival o] (divide-interval o ival)))
 
 ;; Grouping (similar to Division)
 

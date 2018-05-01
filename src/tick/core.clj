@@ -746,11 +746,11 @@
                       to (take-while #(< % to))))))
 
 (defprotocol IDivisible
-  (/ [_ _] "Divide time"))
+  (divide-by* [t divisor] "Divide time"))
 
 (extend-protocol IDivisible
   String
-  (/ [s d] (/ (parse s) d)))
+  (divide-by* [s d] (divide-by* (parse s) d)))
 
 (defprotocol IDivisibleDuration
   (divide-duration [divisor duration] "Divide a duration"))
@@ -764,7 +764,7 @@
 
 (extend-type Duration
   IDivisible
-  (/ [d x] (divide-duration x d)))
+  (divide-by* [d x] (divide-duration x d)))
 
 (defprotocol ITimeSpan
   (beginning [_] "Return the beginning of a span of time")
