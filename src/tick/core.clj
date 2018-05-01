@@ -232,6 +232,9 @@
   LocalDateTime
   (date [dt] (.toLocalDate dt))
   (time [dt] (.toLocalTime dt))
+  (second [t] (.getSecond t))
+  (minute [t] (.getMinute t))
+  (hour [t] (.getHour t))
   (day [dt] (day (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
