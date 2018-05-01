@@ -304,7 +304,7 @@
 ;; Divisions
 
 (defn divide-by [divisor t]
-  (core/divide-by* t divisor))
+  (core/divide t divisor))
 
 ;; Temporal adjusters
 

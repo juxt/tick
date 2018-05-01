@@ -525,7 +525,7 @@
 
 ;; Division
 
-(defn divide-by
+(defn- divide-by-apply
   "Return a lazy sequence of java.time.Temporal instances over the
   given (local) interval."
   [ival f]
@@ -569,7 +569,7 @@
 
 (extend-protocol IDivisibleInterval
   clojure.lang.Fn
-  (divide-interval [f ival] (divide-by ival f))
+  (divide-interval [f ival] (divide-by-apply ival f))
   Duration
   (divide-interval [dur ival] (divide-by-duration ival dur))
   Period
@@ -581,13 +581,13 @@
 
 (extend-protocol t/IDivisible
   LocalDate
-  (divide-by* [ld d] (divide-interval d ld))
+  (divide [ld d] (divide-interval d ld))
   Year
-  (divide-by* [n d] (divide-interval d n))
+  (divide [n d] (divide-interval d n))
   YearMonth
-  (divide-by* [n d] (divide-interval d n))
+  (divide [n d] (divide-interval d n))
   Interval
-  (divide-by* [ival o] (divide-interval o ival)))
+  (divide [ival o] (divide-interval o ival)))
 
 ;; Grouping (similar to Division)
 
