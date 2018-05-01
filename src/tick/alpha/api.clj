@@ -306,6 +306,10 @@
 (defn divide-by [divisor t]
   (core/divide t divisor))
 
+;; Alternative useful for -> threading
+(defn divide [divisor t]
+  (core/divide divisor t))
+
 ;; Temporal adjusters
 
 #_(defn adjust [t adjuster]
