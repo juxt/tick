@@ -567,31 +567,9 @@
 (defprotocol IDivisibleInterval
   (divide [divisor ival] "Divide an interval by a given divisor"))
 
-(defmulti divide-by-keyword ""
-  (fn [ival k] k))
-
-;; TODO: Replace keywords with singular
-
-(defmethod divide-by-keyword :hour [ival _]
-  (divide-by-duration ival (t/duration 1 :hours)))
-
-(defmethod divide-by-keyword :minute [ival _]
-  (divide-by-duration ival (t/duration 1 :minutes)))
-
-(defmethod divide-by-keyword :date [ival _]
-  (divide-by ival t/date))
-
-(defmethod divide-by-keyword :year-month [ival _]
-  (divide-by ival t/year-month))
-
-(defmethod divide-by-keyword :year [ival _]
-  (divide-by ival t/year))
-
 (extend-protocol IDivisibleInterval
   clojure.lang.Fn
   (divide [f ival] (divide-by ival f))
-  clojure.lang.Keyword
-  (divide [kw ival] (divide-by-keyword ival kw))
   Duration
   (divide [dur ival] (divide-by-duration ival dur))
   Period
@@ -707,20 +685,7 @@
 (defprotocol IGroupable
   (group-by [grouping ivals]))
 
-(defmulti group-by-keyword "" (fn [k ivals] k))
-
-(defmethod group-by-keyword :year
-  [_ ivals]
-  (let [r (apply bounds ivals)
-        b (t/year (t/beginning r))
-        e (t/year (t/end r))
-        groups (t/range b (t/inc e))]
-    (group-by groups ivals)))
-
 (extend-protocol IGroupable
-  clojure.lang.Keyword
-  (group-by [k ivals]
-    (group-by-keyword k ivals))
   clojure.lang.Fn
   (group-by [f ivals]
     (let [r (apply bounds ivals)
