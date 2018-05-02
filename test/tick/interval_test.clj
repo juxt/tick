@@ -544,10 +544,13 @@
           [(bounds (t/year-month "2015-06") (t/year-month "2017-06"))]
           (t/divide (bounds (t/year 2014) (t/year 2018)) t/year))))))
 
-(deftest group-by-fn-test
+(deftest group-by-test
   (is
     (= 31
        (count
          (group-by
            t/date
            [(t/date "2015-05-20") (t/year-month "2015-06")])))))
+
+(deftest group-by-empty-test
+  (is (= {} (group-by t/date []))))

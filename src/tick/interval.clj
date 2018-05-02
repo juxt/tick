@@ -683,11 +683,13 @@
 (extend-protocol IGroupable
   clojure.lang.Fn
   (group-by [f ivals]
-    (let [r (apply bounds ivals)
-          b (f (t/beginning r))
-          e (f (t/end r))
-          groups (t/range b (t/inc e))]
-      (group-by groups ivals)))
+    (if (empty? ivals)
+      {}
+      (let [r (apply bounds ivals)
+            b (f (t/beginning r))
+            e (f (t/end r))
+            groups (t/range b (t/inc e))]
+        (group-by groups ivals))))
   Iterable
   (group-by [groups ivals]
     (group-by-intervals groups ivals)))
