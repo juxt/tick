@@ -301,6 +301,9 @@
   ([x & args]
    (reduce interval/concur x args)))
 
+(defn concurrencies [& intervals]
+  (apply interval/concurrencies intervals))
+
 ;; Divisions
 
 (defn divide-by [divisor t]
