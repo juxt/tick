@@ -124,6 +124,11 @@
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
+
+(defn timespan-map [v]
+  {:tick/beginning (core/beginning v)
+   :tick/end (core/end v)})
+
 (def coincident? core/coincident?)
 
 ;; Time

@@ -770,6 +770,11 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
+(extend-protocol ITimeSpan
+  clojure.lang.APersistentMap
+  (beginning [m] (:tick/beginning m))
+  (end [m] (:tick/end m)))
+
 ;; TODO: Consider using between for this?
 (defn length
   "Return the distance between the beginning and end as a duration or
