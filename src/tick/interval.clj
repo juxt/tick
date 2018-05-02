@@ -319,7 +319,7 @@
                 y (get intervals yi)
                 conc (concur x y)]
           :when conc]
-      {:x x :y y :concur concur})))
+      {:x x :y y :relation (relation x y) :concur conc})))
 
 ;; Comparison. We have now built up the capability of comparing
 ;; intervals using the normal <, >, <=, >= operators.
