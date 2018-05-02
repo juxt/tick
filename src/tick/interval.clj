@@ -166,19 +166,19 @@
 (defn contains? [x y] ((conv during?) x y))
 (defn started-by? [x y] ((conv starts?) x y))
 
-(def code {precedes? \p
-           meets? \m
-           overlaps? \o
-           finished-by? \F
-           contains? \D
-           starts? \s
-           equals? \e
-           started-by? \S
-           during? \d
-           finishes? \f
-           overlapped-by? \O
-           met-by? \M
-           preceded-by? \P})
+(def relation->kw {precedes? :precedes
+           meets? :meets
+           starts? :starts
+           during? :during
+           finishes? :finishes
+           overlaps? :overlaps
+           equals? :equals
+           contains? :contains
+           started-by? :started-by
+           finished-by? :finished-by
+           overlapped-by? :overlapped-by
+           met-by? :met-by
+           preceded-by? :preceded-by})
 
 (def basic-relations
   [precedes? meets? overlaps? finished-by? contains?
@@ -203,8 +203,11 @@
   (->GeneralRelation basic-relations))
 
 (def ^{:doc "A function to determine the (basic) relation between two intervals."}
-  relation
+  basic-relation
   (apply make-relation basic-relations))
+
+(defn relation [x y]
+  (relation->kw (basic-relation x y)))
 
 ;; Operations on relations
 
@@ -297,11 +300,11 @@
   representing the interval of time the given intervals are
   concurrent."
   [x y]
-  (case (code (relation x y))
-    \o (narrow x (t/beginning y) (t/end x))
-    \O (narrow x (t/beginning x) (t/end y))
-    (\s \f \d \e) x
-    (\S \F \D) (narrow x (t/beginning y) (t/end y))
+  (case (relation x y)
+    :overlaps (narrow x (t/beginning y) (t/end x))
+    :overlapped-by (narrow x (t/beginning x) (t/end y))
+    (:starts :finishes :during :equals) x
+    (:started-by :finished-by :contains) (narrow x (t/beginning y) (t/end y))
     nil))
 
 (defn ^:experimental concurrencies
@@ -343,10 +346,10 @@
   (> [x y] (t/> (as-interval x) (as-interval y)))
   (>= [x y] (t/>= (as-interval x) (as-interval y)))
   Interval
-  (< [x y] (#{precedes? meets?} (relation x y)))
-  (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (relation x y)))
-  (> [x y] (#{preceded-by? met-by?} (relation x y)))
-  (>= [x y] (#{preceded-by? met-by? equals? started-by? overlapped-by? finishes?} (relation x y))))
+  (< [x y] (#{precedes? meets?} (basic-relation x y)))
+  (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
+  (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
+  (>= [x y] (#{preceded-by? met-by? equals? started-by? overlapped-by? finishes?} (basic-relation x y))))
 
 ;; Interval sets - sequences of mutually disjoint intervals
 
@@ -404,44 +407,43 @@
           result []]
      (if (and (not-empty xs) (not-empty ys))
        (let [x (first xs)
-             y (first ys)
-             code (code (relation x y))]
-         (case code
-           (\p \m) (recur (next xs) ys result)
-           (\P \M) (recur xs (next ys) result)
-           \S (recur
+             y (first ys)]
+         (case (relation x y)
+           (:precedes :meets) (recur (next xs) ys result)
+           (:preceded-by :met-by) (recur xs (next ys) result)
+           :started-by (recur
                 (cons (narrow x (t/end y) (t/end x)) (next xs))
                 (next ys)
                 (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           \F (recur
+           :finished-by (recur
                 (next xs)
                 (next ys)
                 (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           \o (recur
+           :overlaps (recur
                 (cons (narrow x (t/beginning y) (t/end x)) (next xs))
                 (cons (narrow y (t/end x) (t/end y)) (next ys))
                 (clojure.core/conj result (narrow x (t/beginning y) (t/end x))))
-           \O (recur
+           :overlapped-by (recur
                 (cons (narrow x (t/end y) (t/end x)) (next xs))
                 (next ys)
                 (clojure.core/conj result (narrow x (t/beginning x) (t/end y))))
-           \D (recur
+           :contains (recur
                 (cons (narrow x (t/end y) (t/end x)) (next xs))
                 (next ys)
                 (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           \d (recur
+           :during (recur
                 (next xs)
                 (cons (narrow y (t/end x) (t/end y)) (next ys))
                 (clojure.core/conj result x))
-           \e (recur
+           :equals (recur
                 (next xs)
                 (next ys)
                 (clojure.core/conj result x))
-           \f (recur
+           :finishes (recur
                 (next xs)
                 (next ys)
                 (clojure.core/conj result x))
-           \s (recur
+           :starts (recur
                 (next xs)
                 (cons (narrow y (t/end x) (t/end y))
                       (next ys))
@@ -463,18 +465,17 @@
           result []]
      (if (not-empty xs)
        (if (not-empty ys)
-         (let [x (first xs) y (first ys)
-               code (code (relation x y))]
-           (case code
-             (\p \m) (recur (next xs) ys (clojure.core/conj result x))
-             (\P \M) (recur xs (next ys) result)
-             (\f \d \e) (recur (next xs) (next ys) result)
-             \s (recur (next xs) ys result)
-             (\S \O)
+         (let [x (first xs) y (first ys)]
+           (case (relation x y)
+             (:precedes :meets) (recur (next xs) ys (clojure.core/conj result x))
+             (:preceded-by :met-by) (recur xs (next ys) result)
+             (:finishes :during :equals) (recur (next xs) (next ys) result)
+             :starts (recur (next xs) ys result)
+             (:started-by :overlapped-by)
              (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
-             \F (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-             \o (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-             \D (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
+             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+             :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+             :contains (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
                        (next ys)
                        (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
          (apply clojure.core/conj result xs))
@@ -502,19 +503,18 @@
           result []]
      (if (not-empty xs)
        (if (not-empty ys)
-         (let [x (first xs) y (first ys)
-               code (code (relation x y))]
-           (case code
-             (\p \m) (recur (next xs) ys (clojure.core/conj result x))
+         (let [x (first xs) y (first ys)]
+           (case (relation x y)
+             (:precedes :meets) (recur (next xs) ys (clojure.core/conj result x))
 ;; TODO:
-;;             (\P \M) (recur xs (next ys) result)
-;;             (\f \d \e) (recur (next xs) (next ys) result)
-;;             \s (recur (next xs) ys result)
-;;             (\S \O)
+;;             (:preceded-by :met-by) (recur xs (next ys) result)
+;;             (:finishes :during :equals) (recur (next xs) (next ys) result)
+;;             :starts (recur (next xs) ys result)
+;;             (:started-by :overlapped-by)
 ;;             (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
-;;             \F (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-;;            \o (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-;;            \D
+;;             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+;;            :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+;;            :contains
              #_(recur (cons (narrow x (t/end y) (t/end x)) (next xs))
                     (next ys)
                     (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
@@ -612,67 +612,62 @@
     (if (not-empty intervals)
       (if (not-empty groups)
         (let [ival (first intervals)
-              group (first groups)
-              code (code (relation ival group))]
+              group (first groups)]
 
-          (case code
+          (case (relation ival group)
             ;; If precedes or meets, discard ival
-            (\p \m) (recur (next intervals) groups result current-intervals)
-            (\P \M) (recur
+            (:precedes :meets) (recur (next intervals) groups result current-intervals)
+            (:preceded-by :met-by) (recur
                       intervals (next groups)
                       (cond-> result
                         (not-empty current-intervals)
                         (assoc group current-intervals))
                       [])
 
-            (\e \f) (recur
+            (:equals :finishes) (recur
                       (next intervals)
                       (next groups)
                       (assoc result group [ival])
                       [])
 
-            (\F) (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
+            (:finished-by) (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
                    (recur
                      (next intervals)
                      (next groups)
                      (assoc result group [seg2])
                      []))
 
-            (\S) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+            (:started-by) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
                    (recur
                      (cons seg2 (next intervals))
                      (next groups)
                      (assoc result group [seg1])
                      []))
 
-            (\O) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+            (:overlapped-by) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
                    (recur
                      (cons seg2 (next intervals))
                      (next groups)      ; end of this group
                      (assoc result group (clojure.core/conj current-intervals seg1))
                      []))
 
-            (\s \d) (recur
+            (:starts :during) (recur
                       (next intervals)
                       groups
                       result
                       (clojure.core/conj current-intervals ival))
 
-            (\D) (recur
+            (:contains) (recur
                    (next intervals)
                    (next groups)
                    (assoc result group [(narrow ival (t/beginning group) (t/end group))])
                    [])
 
-            (\o) (recur
+            (:overlaps) (recur
                    (next intervals)
                    groups
                    result
-                   (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))
-
-            (throw (ex-info
-                     "Unsupported code"
-                     {:code code :ival ival :group group}))))
+                   (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))))
 
         ;; No more groups
         result)

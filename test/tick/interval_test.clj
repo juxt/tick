@@ -57,7 +57,7 @@
                     y (interval y1 y2)]]
           ;; For each combination, count how many relations are true
           ;; (should be just one each time)
-          (code (relation x y))))))))
+          (relation x y)))))))
 
 
 (deftest disjoint-test []
