@@ -13,7 +13,9 @@
               :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
              :repl
              {:dependencies
-              [[org.clojure/data.xml "0.2.0-alpha5"]
+              [[cider/cider-nrepl "0.16.0"]
+               [org.clojure/clojurescript "1.9.946"]
+               [org.clojure/data.xml "0.2.0-alpha5"]
                [org.apache.xmlgraphics/batik-swing "1.9"]]
               :source-paths ["dev/src"]}
              :codox {:dependencies [[codox-theme-rdash "0.1.2"]]
