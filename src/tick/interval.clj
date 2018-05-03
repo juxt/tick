@@ -616,58 +616,75 @@
 
           (case (relation ival group)
             ;; If precedes or meets, discard ival
-            (:precedes :meets) (recur (next intervals) groups result current-intervals)
-            (:preceded-by :met-by) (recur
-                      intervals (next groups)
-                      (cond-> result
-                        (not-empty current-intervals)
-                        (assoc group current-intervals))
-                      [])
+            (:precedes :meets)
+            (recur (next intervals) groups result current-intervals)
 
-            (:equals :finishes) (recur
-                      (next intervals)
-                      (next groups)
-                      (assoc result group [ival])
-                      [])
+            (:preceded-by :met-by)
+            (recur
+              intervals (next groups)
+              (cond-> result
+                (not-empty current-intervals)
+                (assoc group current-intervals))
+              [])
 
-            (:finished-by) (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
-                   (recur
-                     (next intervals)
-                     (next groups)
-                     (assoc result group [seg2])
-                     []))
+            :finishes
+            (recur
+              (next intervals)
+              (next groups)
+              (assoc result group (clojure.core/conj current-intervals ival))
+              [])
 
-            (:started-by) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
-                   (recur
-                     (cons seg2 (next intervals))
-                     (next groups)
-                     (assoc result group [seg1])
-                     []))
+            :equals
+            (recur
+              (next intervals)
+              (next groups)
+              (assoc result group (clojure.core/conj current-intervals ival))
+              [])
 
-            (:overlapped-by) (let [[seg1 seg2] (split-with-assert ival (t/end group))]
-                   (recur
-                     (cons seg2 (next intervals))
-                     (next groups)      ; end of this group
-                     (assoc result group (clojure.core/conj current-intervals seg1))
-                     []))
+            :finished-by
+            (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
+              (recur
+                (next intervals)
+                (next groups)
+                (assoc result group (clojure.core/conj current-intervals seg2))
+                []))
 
-            (:starts :during) (recur
-                      (next intervals)
-                      groups
-                      result
-                      (clojure.core/conj current-intervals ival))
+            :started-by
+            (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+              (recur
+                (cons seg2 (next intervals))
+                (next groups)
+                (assoc result group (clojure.core/conj current-intervals seg1))
+                []))
 
-            (:contains) (recur
-                   (next intervals)
-                   (next groups)
-                   (assoc result group [(narrow ival (t/beginning group) (t/end group))])
-                   [])
+            :overlapped-by
+            (let [[seg1 seg2] (split-with-assert ival (t/end group))]
+              (recur
+                (cons seg2 (next intervals))
+                (next groups)           ; end of this group
+                (assoc result group (clojure.core/conj current-intervals seg1))
+                []))
 
-            (:overlaps) (recur
-                   (next intervals)
-                   groups
-                   result
-                   (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))))
+            (:starts :during)
+            (recur
+              (next intervals)
+              groups
+              result
+              (clojure.core/conj current-intervals ival))
+
+            (:contains)
+            (recur
+              (next intervals)
+              (next groups)
+              (assoc result group [(narrow ival (t/beginning group) (t/end group))])
+              [])
+
+            (:overlaps)
+            (recur
+              (next intervals)
+              groups
+              result
+              (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))))
 
         ;; No more groups
         result)
