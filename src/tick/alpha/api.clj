@@ -160,11 +160,13 @@
 ;; Arithmetic
 
 (defn +
+  ([] Duration/ZERO)
   ([arg] arg)
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
 (defn -
+  ([] Duration/ZERO)
   ([arg] (core/negated arg))
   ([arg & args]
    (reduce #(core/- %1 %2) arg args)))
