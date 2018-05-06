@@ -83,16 +83,19 @@
      ~@body
      (print-cl "END:" ~c)))
 
+(defn print-property [prop-name prop-value]
+  (let [{:keys [params value]} (serialize-value prop-value)]
+    (print-cl
+      (str/upper-case (name prop-name))
+      (apply str (for [[k v] params]
+                   (str ";" (str/upper-case (name k)) "=" v)))
+      ":"
+      value)))
+
 (defrecord Property [prop-name prop-value]
   IPrintable
   (print-object [_]
-    (let [{:keys [params value]} (serialize-value prop-value)]
-      (print-cl
-        (str/upper-case (name prop-name))
-        (apply str (for [[k v] params]
-                     (str ";" (str/upper-case (name k)) "=" v)))
-        ":"
-        value))))
+    (print-property prop-name prop-value)))
 
 (defrecord VEvent []
   t/ITimeSpan
