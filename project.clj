@@ -6,15 +6,23 @@
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[cljsjs/js-joda "1.6.2-0"]
-                 [net.cgrand/macrovich "0.2.0"]]
+                 [org.clojure/clojurescript "1.10.238"]
+                 [net.cgrand/macrovich "0.2.0" :exclusions [org.clojure/clojurescript]]]
+  :cljsbuild
+  {:builds [{:id "test"
+             :source-paths ["src" "test"]
+             :compiler {:output-to "target/testable.js"
+                        :main tick.all-tests
+                        :output-dir "target"
+                        :optimizations :none
+                        :target :nodejs}}]}
   :profiles {:dev
-             {:dependencies [[org.clojure/clojure "1.9.0"]
-                             [lein-doo "0.1.8"]]
+             {:dependencies [[org.clojure/clojure "1.9.0"]]
+              :plugins [[lein-doo "0.1.10"]]
               :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
              :repl
              {:dependencies
               [[cider/cider-nrepl "0.16.0"]
-               [org.clojure/clojurescript "1.9.946"]
                [org.clojure/data.xml "0.2.0-alpha5"]
                [org.apache.xmlgraphics/batik-swing "1.9"]]
               :source-paths ["dev/src"]}

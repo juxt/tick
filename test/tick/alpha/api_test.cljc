@@ -96,7 +96,7 @@
           (t/+ (t/now) (t/seconds 20))
           (t/+ (t/now) (t/seconds 10)))))
   (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/seconds 1))))
-  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/seconds 1)))))
+  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/seconds 10)))))
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)

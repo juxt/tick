@@ -9,7 +9,7 @@
              atom swap! swap-vals! compare-and-set!
              reset! reset-vals!
              second
-             group-by])
+             group-by divide] )
   (:require
     [clojure.spec.alpha :as s]
     [tick.core :as core]
@@ -169,13 +169,13 @@
 ;; Arithmetic
 
 (defn +
-  ([] Duration/ZERO)
+  ([] (t.i/static-prop Duration ZERO))
   ([arg] arg)
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
 (defn -
-  ([] Duration/ZERO)
+  ([] (t.i/static-prop Duration ZERO))
   ([arg] (core/negated arg))
   ([arg & args]
    (reduce #(core/- %1 %2) arg args)))
