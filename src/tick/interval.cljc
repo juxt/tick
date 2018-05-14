@@ -716,6 +716,10 @@
             e (f (t/end r))
             groups (t/range b (t/inc e))]
         (group-by groups ivals))))
-  #?(:clj Iterable :cljs ISequential) ; todo - this proto for cljs works?
+  #?(:clj Iterable :cljs LazySeq) 
   (group-by [groups ivals]
-    (group-by-intervals groups ivals)))
+    (group-by-intervals groups ivals))
+  #?(:cljs PersistentVector) 
+  #?(:cljs
+     (group-by [groups ivals]
+       (group-by-intervals groups ivals))))

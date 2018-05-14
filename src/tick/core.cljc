@@ -255,7 +255,7 @@
 
   Date
   (inst [d] d)
-  (instant [d] (.toInstant d))
+  (instant [d] #?(:clj (.toInstant d) :cljs (.ofEpochMilli Instant (.getTime d))))
   (date [d] (date (zoned-date-time (instant d)))) ; implicit conversion to UTC
   (year-month [d] (year-month (date d)))
   (year [d] (year (date d)))
