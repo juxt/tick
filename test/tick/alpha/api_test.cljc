@@ -25,7 +25,7 @@
 
 (deftest constructor-test
   (is (= Year (type (t/year 2017))))
-  (is (= 2017 (t.i/prop value (t/year 2017))))
+  (is (= 2017 (t.i/getter value (t/year 2017))))
   (is (= Month (type (t/month 12))))
   (is (= t/december (t/month 12))))
 

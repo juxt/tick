@@ -4,7 +4,7 @@
      :cljs
      (:require-macros 
        [net.cgrand.macrovich :as macros]
-       [tick.interop :refer [static-prop prop]])))
+       [tick.interop :refer [static-prop getter]])))
 
 (macros/deftime
 
@@ -15,7 +15,7 @@
         :cljs
         `(goog.object/get ~target ~(str prop))))
   
-(defmacro prop [p t & args]
+(defmacro getter [p t & args]
   (macros/case
     :clj (let [[start & remainder] (str p)]
            (apply list (symbol (str ".get" (clojure.string/upper-case start) (apply str remainder))) t args))

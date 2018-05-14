@@ -179,8 +179,8 @@
   (day-of-month [i] (day-of-month (date i)))
   (inst [i] #?(:clj (Date/from i) :cljs (new Date. (.toEpochMilli i))))
   (instant [i] i)
-  (int [i] (t.i/prop nano i))
-  (long [i] (t.i/prop epochSecond i))
+  (int [i] (t.i/getter nano i))
+  (long [i] (t.i/getter epochSecond i))
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
@@ -201,8 +201,8 @@
   (year-month [s] (year-month (parse s)))
   (zone [s] (. ZoneId of s))
   (zone-offset [s] (. ZoneOffset of s))
-  (int [s] ((t.i/prop nano (instant s))))
-  (long [s] ((t.i/prop epochSecond (instant s))))
+  (int [s] ((t.i/getter nano (instant s))))
+  (long [s] ((t.i/getter epochSecond (instant s))))
   (local-date-time [s] (. LocalDateTime parse s))
   (zoned-date-time [s] (. ZonedDateTime parse s))
   (offset-date-time [s] (. OffsetDateTime parse s))
@@ -218,11 +218,11 @@
 
   LocalDate
   (date [d] d)
-  (day [d] (t.i/prop dayOfWeek d))
-  (day-of-month [d] (t.i/prop dayOfMonth d))
+  (day [d] (t.i/getter dayOfWeek d))
+  (day-of-month [d] (t.i/getter dayOfMonth d))
   (month [d] (. Month from d))
-  (year-month [d] (. YearMonth of (t.i/prop year d) (t.i/prop monthValue d)))
-  (year [d] (. Year of (t.i/prop year d)))
+  (year-month [d] (. YearMonth of (t.i/getter year d) (t.i/getter monthValue d)))
+  (year [d] (. Year of (t.i/getter year d)))
   (temporal-value [d] d)
 
   LocalTime
@@ -230,20 +230,20 @@
   (nanosecond [t] (.get t (t.i/static-prop ChronoField NANO_OF_SECOND)))
   (microsecond [t] (.get t (t.i/static-prop ChronoField MICRO_OF_SECOND)))
   (millisecond [t] (.get t (t.i/static-prop ChronoField MILLI_OF_SECOND)))
-  (second [t] (t.i/prop second t))
-  (minute [t] (t.i/prop minute t))
-  (hour [t] (t.i/prop hour t))
+  (second [t] (t.i/getter second t))
+  (minute [t] (t.i/getter minute t))
+  (hour [t] (t.i/getter hour t))
   (temporal-value [t] t)
 
   Month
-  (int [m] (t.i/prop value m)) ;todo
+  (int [m] (t.i/getter value m)) ;todo
 
   LocalDateTime
   (date [dt] (.toLocalDate dt))
   (time [dt] (.toLocalTime dt))
-  (second [t] (t.i/prop second t))
-  (minute [t] (t.i/prop minute t))
-  (hour [t] (t.i/prop hour t))
+  (second [t] (t.i/getter second t))
+  (minute [t] (t.i/getter minute t))
+  (hour [t] (t.i/getter hour t))
   (day [dt] (day (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
@@ -266,12 +266,12 @@
 
   YearMonth
   (year-month [ym] ym)
-  (year [ym] (year (t.i/prop year ym)))
+  (year [ym] (year (t.i/getter year ym)))
   (temporal-value [ym] ym)
 
   Year
   (year [y] y)
-  (int [y] (t.i/prop value y))
+  (int [y] (t.i/getter value y))
   (temporal-value [y] y)
 
   ZoneId
@@ -293,18 +293,18 @@
   (nanosecond [t] (.get t (t.i/static-prop ChronoField NANO_OF_SECOND)))
   (microsecond [t] (.get t (t.i/static-prop ChronoField MICRO_OF_SECOND)))
   (millisecond [t] (.get t (t.i/static-prop ChronoField MILLI_OF_SECOND)))
-  (second [t] (t.i/prop second t))
-  (minute [t] (t.i/prop minute t))
-  (hour [t] (t.i/prop hour t))
-  (day [t] (t.i/prop dayOfWeek t))
-  (day-of-month [t] (t.i/prop dayOfMonth t))
+  (second [t] (t.i/getter second t))
+  (minute [t] (t.i/getter minute t))
+  (hour [t] (t.i/getter hour t))
+  (day [t] (t.i/getter dayOfWeek t))
+  (day-of-month [t] (t.i/getter dayOfMonth t))
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
-  (month [zdt] (t.i/prop month zdt))
+  (month [zdt] (t.i/getter month zdt))
   (local-date-time [zdt] (.toLocalDateTime zdt))
   (offset-date-time [zdt] (.toOffsetDateTime zdt))
   (zoned-date-time [zdt] zdt)
-  (zone [zdt] (t.i/prop zone zdt))
+  (zone [zdt] (t.i/getter zone zdt))
   (temporal-value [zdt] zdt))
 
 ;; Fields
@@ -348,17 +348,17 @@
          (keep (fn [[k v]]
                  (let [cf (get field-map k)]
                    (when (.isSupported t cf)
-                     [k (t.i/prop long t cf)]))))
+                     [k (t.i/getter long t cf)]))))
          (into {})
          seq))
   ILookup
   (#?(:clj valAt :cljs -lookup) [_ fld]
     (when-let [f (get field-map fld)]
-      (t.i/prop long t f)))
+      (t.i/getter long t f)))
   (#?(:clj valAt :cljs -lookup) [_ fld notfound]
     (if-let [f (get field-map fld)]
       (try
-        (t.i/prop long t f)
+        (t.i/getter long t f)
         (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) e
           notfound))
       notfound)))
@@ -560,7 +560,7 @@
 
 (defn units [x]
   (into {}
-        (for [tu (t.i/prop units x)
+        (for [tu (t.i/getter units x)
               :let [k (reverse-unit-map tu)]
               :when k]
           [k (.get x tu)])))
@@ -594,7 +594,7 @@
   (nanos [d] (.toNanos d))
   (micros [d] (#?(:clj Long/divideUnsigned :cljs cljs.core//) (nanos d) 1000))
   (millis [d] (.toMillis d))
-  (seconds [d] (t.i/prop seconds d))
+  (seconds [d] (t.i/getter seconds d))
   (minutes [d] (.toMinutes d))
   (hours [d] (.toHours d))
   (days [d] (.toDays d)))
@@ -643,7 +643,7 @@
   (clock [i] (. Clock fixed i (. ZoneId systemDefault)))
 
   ZonedDateTime
-  (clock [zdt] (. Clock fixed (.toInstant zdt) (t.i/prop zone zdt)))
+  (clock [zdt] (. Clock fixed (.toInstant zdt) (t.i/getter zone zdt)))
 
   #?(:clj Object :cljs object)
   (clock [o] (clock (zoned-date-time o)))
@@ -666,7 +666,7 @@
 (extend-protocol ICoercions
   Clock
   (instant [clk] (.instant clk))
-  (zone [clk] (t.i/prop zone clk)))
+  (zone [clk] (t.i/getter zone clk)))
 
 (extend-protocol ITimeReify
   Clock
@@ -867,7 +867,7 @@
        (divide-duration [n duration] (.dividedBy duration n))
        Duration
        (divide-duration [divisor duration]
-          #?(:clj (clojure.core// (t.i/prop seconds duration) (t.i/prop seconds divisor)) 
+          #?(:clj (clojure.core// (t.i/getter seconds duration) (t.i/getter seconds divisor)) 
              :cljs (cljs.core// (.seconds duration) (.seconds divisor))) ))
 
 (extend-type Duration
