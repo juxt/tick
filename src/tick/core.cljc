@@ -879,7 +879,7 @@
   (end [_] "Return the end of a span of time"))
 
 (extend-protocol ITimeSpan
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentHashMap)
   (beginning [m] (:tick/beginning m))
   (end [m] (:tick/end m)))
 
