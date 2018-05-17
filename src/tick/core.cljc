@@ -6,7 +6,7 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [tick.interop :as t.i]
-    #?(:cljs 
+    #?(:cljs
        [tick.js-joda :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]))
   #?(:clj
      (:import
@@ -149,7 +149,7 @@
   (int [v] (#?(:clj clojure.core/int :cljs parse-int)  v))
   (long [v] (#?(:clj clojure.core/long :cljs parse-int) v))
 
-  #?(:clj clojure.lang.Fn :cljs function) 
+  #?(:clj clojure.lang.Fn :cljs function)
   (date [f] (date (f)))
   (time [f] (time (f)))
   (day [f] (day (f)))
@@ -488,9 +488,9 @@
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y))))
 
-#?(:cljs 
-   (extend-protocol IComparable 
-     Instant 
+#?(:cljs
+   (extend-protocol IComparable
+     Instant
      (-compare [x y] (.compareTo x y))
      LocalDateTime
      (-compare [x y] (.compareTo x y))
@@ -654,7 +654,7 @@
   ZoneId
   (clock [z] (. Clock system z))
 
-  #?(:clj String :cljs string) 
+  #?(:clj String :cljs string)
   (clock [s] (clock (parse s))))
 
 (defn advance
@@ -675,7 +675,7 @@
 ;; Atomic clocks :)
 
 (defrecord AtomicClock [*clock]
-  #?(:clj clojure.lang.IDeref :cljs IDeref) 
+  #?(:clj clojure.lang.IDeref :cljs IDeref)
   (#?(:clj deref :cljs -deref) [_] (instant @*clock))
   IClock
   (clock [_] @*clock))
@@ -867,7 +867,7 @@
        (divide-duration [n duration] (.dividedBy duration n))
        Duration
        (divide-duration [divisor duration]
-          #?(:clj (clojure.core// (t.i/getter seconds duration) (t.i/getter seconds divisor)) 
+          #?(:clj (clojure.core// (t.i/getter seconds duration) (t.i/getter seconds divisor))
              :cljs (cljs.core// (.seconds duration) (.seconds divisor))) ))
 
 (extend-type Duration
