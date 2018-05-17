@@ -17,8 +17,7 @@
    :extra-paths ["dev/src" "test"]
    :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
 
-  :test {:extra-paths
-         ["test"]
+  :test {:extra-paths ["test"]
          :extra-deps
          {com.cognitect/test-runner
           {:git/url "git@github.com:cognitect-labs/test-runner"
