@@ -18,17 +18,6 @@
 ;; Use of Allen's Interval Algebra, inspired from a working
 ;; demonstration of time-count by Eric Evans.
 
-(s/def ::local (s/and #(t/local? (t/beginning %)) #(t/local? (t/end %))))
-(s/def ::non-local (s/and #(not (t/local? (t/beginning %))) #(not (t/local? (t/end %)))))
-
-(s/def ::interval
-  (s/and
-    (s/or :local ::local :non-local ::non-local)
-    #(let [[_ t] %]
-       (let [t1 (t/beginning t)
-             t2 (t/end t)]
-         (t/< t1 t2)))))
-
 (defrecord Interval [beginning end]
   t/ITimeSpan
   (beginning [_] beginning)
@@ -195,8 +184,6 @@
 (defrecord GeneralRelation [relations]
   #?(:clj clojure.lang.IFn :cljs cljs.core/IFn)
   (#?(:clj invoke :cljs -invoke) [_ x y]
-    #_(s/assert ::interval x)
-    #_(s/assert ::interval y)
     (some (fn [f] (when (f x y) f)) relations)))
 
 ;; Relations are 'basic relations' in [ALSPAUGH-2009]. Invoking a
@@ -707,7 +694,7 @@
   (group-by [grouping ivals]))
 
 (extend-protocol IGroupable
-  #?(:clj clojure.lang.Fn :cljs function) 
+  #?(:clj clojure.lang.Fn :cljs function)
   (group-by [f ivals]
     (if (empty? ivals)
       {}
@@ -716,10 +703,10 @@
             e (f (t/end r))
             groups (t/range b (t/inc e))]
         (group-by groups ivals))))
-  #?(:clj Iterable :cljs LazySeq) 
+  #?(:clj Iterable :cljs LazySeq)
   (group-by [groups ivals]
     (group-by-intervals groups ivals))
-  #?(:cljs PersistentVector) 
+  #?(:cljs PersistentVector)
   #?(:cljs
      (group-by [groups ivals]
        (group-by-intervals groups ivals))))
