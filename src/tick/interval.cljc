@@ -45,10 +45,11 @@
 
 (defn interval
   [v1 v2]
-  (let [t1 (t/temporal-value v1)
-        t2 (t/temporal-value v2)]
-    (assert (t/< t1 t2))
-    (->Interval t1 t2)))
+  (let [t1 (t/beginning (t/temporal-value v1))
+        t2 (t/end (t/temporal-value v2))]
+    (if (t/< t1 t2)
+      (->Interval t1 t2)
+      (throw (ex-info "Interval must span between two times, the first must be before the second" {})))))
 
 ;; Adjustments
 
