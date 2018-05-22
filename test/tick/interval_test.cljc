@@ -194,17 +194,69 @@
          (ti/interval (t/instant "2017-07-30T09:00:00Z")
                       (t/instant "2017-07-30T10:00:00Z"))]))))
 
+(deftest unite-test
+  (testing "Unite meeting intervals"
+    (is
+      (=
+        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+         (ti/interval (t/date "2017-06-26") (t/date "2017-06-30"))]
+        (let [intervals
+              [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+               (ti/interval (t/date "2017-06-26") (t/date "2017-06-30"))]]
+          (ti/unite intervals)))))
+  (testing "Unite overlapping intervals"
+    (is
+      (=
+        [(ti/interval (t/date "2017-06-10") (t/date "2017-06-25"))
+         (ti/interval (t/date "2017-07-01") (t/date "2017-07-10"))]
+
+        (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+                   (ti/interval (t/date "2017-06-10") (t/date "2017-06-20"))
+                   (ti/interval (t/date "2017-07-01") (t/date "2017-07-10"))]))))
+  (testing "Unite containing intervals"
+    (is
+      (=
+        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))]
+        (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+                   (ti/interval (t/date "2017-06-17") (t/date "2017-06-20"))])))))
+
+(deftest normalize-test
+  (let [intervals
+        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+         (ti/interval (t/date "2017-06-26") (t/date "2017-06-28"))
+         (ti/interval (t/date "2017-06-30") (t/date "2017-07-04"))]]
+    (is
+      (=
+        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-28"))
+         (ti/interval (t/date "2017-06-30") (t/date "2017-07-04"))]
+        (ti/normalize intervals)))))
+
 (deftest union-test
-  (let [coll1 [(ti/interval (t/instant "2017-07-30T09:00:00Z")
-                            (t/instant "2017-07-30T12:00:00Z"))]
-        coll2 [(ti/interval (t/instant "2017-07-30T11:00:00Z")
-                            (t/instant "2017-07-30T15:00:00Z"))]
-        coll3 [(ti/interval (t/instant "2017-07-30T17:00:00Z")
-                            (t/instant "2017-07-30T19:00:00Z"))]]
-    (is (= 1 (count (ti/union coll1 coll2))))
-    (is (ti/ordered-disjoint-intervals? (ti/union coll1 coll2)))
-    (is (= 2 (count (ti/union coll1 coll2 coll3))))
-    (is (ti/ordered-disjoint-intervals? (ti/union coll1 coll2 coll3)))))
+  (testing "counts"
+    (let [coll1 [(ti/interval (t/instant "2017-07-30T09:00:00Z")
+                              (t/instant "2017-07-30T12:00:00Z"))]
+          coll2 [(ti/interval (t/instant "2017-07-30T11:00:00Z")
+                              (t/instant "2017-07-30T15:00:00Z"))]
+          coll3 [(ti/interval (t/instant "2017-07-30T17:00:00Z")
+                              (t/instant "2017-07-30T19:00:00Z"))]]
+      (is (= 1 (count (ti/union coll1 coll2))))
+      (is (ti/ordered-disjoint-intervals? (ti/union coll1 coll2)))
+      (is (= 2 (count (ti/union coll1 coll2 coll3))))
+      (is (ti/ordered-disjoint-intervals? (ti/union coll1 coll2 coll3)))))
+
+  (testing "union"
+    (let [ival1 (ti/interval (t/instant "2017-07-30T09:00:00Z")
+                             (t/instant "2017-07-30T10:00:00Z"))
+          ival2 (ti/interval (t/instant "2017-07-30T10:00:00Z")
+                             (t/instant "2017-07-30T11:00:00Z"))
+          ival3 (ti/interval (t/instant "2017-07-30T11:00:00Z")
+                             (t/instant "2017-07-30T12:00:00Z"))
+          ival4  (ti/interval (t/instant "2017-07-30T12:00:00Z")
+                              (t/instant "2017-07-30T13:00:00Z"))
+          ival5 (ti/interval (t/instant "2017-07-30T13:00:00Z")
+                             (t/instant "2017-07-30T14:00:00Z"))
+          res (ti/union [ival2 ival4] [ival1 ival3 ival5])]
+      (is (= res [ival1 ival2 ival3 ival4 ival5])))))
 
 (deftest intersection-test
   (let [coll1 [(ti/interval (t/instant "2017-01-01T06:00:00Z")
@@ -268,7 +320,6 @@
                             (t/instant "2017-01-01T12:00:00Z"))
                (ti/interval (t/instant "2017-01-01T17:00:00Z")
                             (t/instant "2017-01-01T19:00:00Z"))]
-
 
         coll2 [(ti/interval (t/instant "2017-01-01T08:00:00Z")
                             (t/instant "2017-01-01T18:00:00Z"))]]
@@ -341,14 +392,11 @@
                    (ti/interval (t/instant "2017-01-01T14:00:00Z")
                                 (t/instant "2017-01-01T18:00:00Z"))]]
         (is
-          (= []
-             (ti/intersection coll1 coll2)))
+          (empty? (ti/intersection coll1 coll2)))
         (is
-          (= []
-             (ti/intersection coll2 coll1)))
+          (empty? (ti/intersection coll2 coll1)))
         (is
-          (= []
-             (ti/intersection [] [])))))))
+          (empty? (ti/intersection [] [])))))))
 
 (deftest difference-test
   (let [coll1 [(ti/interval (t/instant "2017-01-01T08:00:00Z")
@@ -424,6 +472,22 @@
       (is
         (= []
            (ti/difference [] []))))))
+
+(deftest difference-invariant-test
+  (let [coll1 [(ti/interval (t/instant "2017-01-01T14:00:00Z")
+                            (t/instant "2017-01-01T16:00:00Z"))
+               (ti/interval (t/instant "2017-01-01T08:00:00Z")
+                            (t/instant "2017-01-01T12:00:00Z"))
+               ]
+
+        coll2 [(ti/interval (t/instant "2017-01-01T09:00:00Z")
+                            (t/instant "2017-01-01T11:00:00Z"))
+               (ti/interval (t/instant "2017-01-01T13:00:00Z")
+                            (t/instant "2017-01-01T17:00:00Z"))]]
+    (is
+      (thrown?
+        clojure.lang.ExceptionInfo
+        (ti/difference coll1 coll2)))))
 
 ;; We are reclaiming 'disjoin' to mean to 'end the joining of' or 'to become disjoint'.
 

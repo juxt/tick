@@ -161,19 +161,20 @@
 (defn contains? [x y] ((conv during?) x y))
 (defn started-by? [x y] ((conv starts?) x y))
 
-(def relation->kw {precedes? :precedes
-           meets? :meets
-           starts? :starts
-           during? :during
-           finishes? :finishes
-           overlaps? :overlaps
-           equals? :equals
-           contains? :contains
-           started-by? :started-by
-           finished-by? :finished-by
-           overlapped-by? :overlapped-by
-           met-by? :met-by
-           preceded-by? :preceded-by})
+(def relation->kw
+  {precedes? :precedes
+   meets? :meets
+   starts? :starts
+   during? :during
+   finishes? :finishes
+   overlaps? :overlaps
+   equals? :equals
+   contains? :contains
+   started-by? :started-by
+   finished-by? :finished-by
+   overlapped-by? :overlapped-by
+   met-by? :met-by
+   preceded-by? :preceded-by})
 
 (def basic-relations
   [precedes? meets? overlaps? finished-by? contains?
@@ -238,6 +239,7 @@
 
 (def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
 (def concur? (complement-r disjoint?))
+(def precedes-or-meets? (make-relation precedes? meets?))
 
 ;; Functions that make use of Allens' Interval Algebra
 
@@ -268,7 +270,7 @@
     (assert (t/>= (t/end date) end))
     (interval beginning end))
   (splice [ival1 ival2]
-    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
@@ -278,7 +280,7 @@
     (assert (t/>= (t/end ym) end))
     (interval beginning end))
   (splice [ival1 ival2]
-    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
@@ -288,7 +290,7 @@
     (assert (t/>= (t/end yr) end))
     (interval beginning end))
   (splice [ival1 ival2]
-    (throw (ex-info "Not implemented" {:args [ival1 ival2]})))
+    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))]))
 
@@ -348,10 +350,10 @@
   (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
   (>= [x y] (#{preceded-by? met-by? equals? started-by? overlapped-by? finishes?} (basic-relation x y))))
 
-;; Interval sets - sequences of mutually disjoint intervals
+;; Interval sequences - time-ordered sequences of disjoint intervals
 
 (defn ordered-disjoint-intervals?
-  "Are all the intervals in the given set temporarily ordered and
+  "Are all the intervals in the given set time-ordered and
   disjoint? This is a useful property of a collection of
   intervals. The given collection must contain proper intervals (that
   is, intervals that have finite greater-than-zero durations)."
@@ -363,89 +365,163 @@
            (when (rel x (first xs))
              (recur xs)))))))
 
-;; If we ever want to create a wrapper type of ordered disjoint
-;; interval sets...
-#_(deftype OrderedDisjointIntervalSet [s]
-  clojure.lang.Seqable
-  (seq [_] (seq s)))
+(defn- assert-proper-head
+  "Is the first interval in a sequence time-ordered and disjoint with
+  respect to the second? Note, only compares first two in a
+  sequence. Used by functions to ensure the head of sequence satisfies
+  an assumed invariant."
+  [s]
+  (let [[initial subsequent] s]
+    (when (and (nil? initial) subsequent)
+      (throw (ex-info "Unexpected nil in sequence" {:nil-before subsequent})))
+    (when subsequent
+      (when-not (precedes-or-meets? initial subsequent)
+        (throw
+          (ex-info
+            "Intervals in sequence do not satisfy required invariant that intervals are time-ordered and disjoint"
+            {:interval1 initial
+             :interval2 subsequent}))))
+    s))
+
+(defn unite
+  "Unite concurrent intervals. Returns a time-ordered sequence of disjoint intervals"
+  [intervals]
+  (letfn [(unite [intervals]
+            (lazy-seq
+              (let [[ival1 ival2 & r] intervals]
+                (cond
+                  (nil? ival2) (if ival1 (list ival1) (list))
+                  :else
+                  (case (relation ival1 ival2)
+                    (:precedes :meets)
+                    (cons ival1 (unite (rest intervals)))
+                    (:overlaps :contains :starts :started-by)
+                    (unite (cons (splice ival1 ival2) r)))))))]
+    ;; We sort because there might be some overlapping intervals out
+    ;; of sequence - the purpose of this function is to produce a
+    ;; time-ordered sequence of disjoint intervals.
+    (unite (sort-by t/beginning intervals))))
+
+(defn normalize
+  "Splice meeting intervals into a single interval across a time-ordered sequence of disjoint intervals."
+  [intervals]
+  (letfn [(normalize [intervals]
+            (lazy-seq
+              (let [[ival1 ival2 & r] intervals]
+                (if (nil? ival2) (if ival1 (list ival1) (list))
+                    (case (relation ival1 ival2)
+                      :meets (normalize (cons (splice ival1 ival2) r))
+                      (cons ival1 (normalize (assert-proper-head (rest intervals)))))))))]
+    (normalize (assert-proper-head intervals))))
 
 (defn union
-  "Combine multiple collections of intervals into a single ordered
-  collection of ordered disjoint intervals."
+  "Merge multiple time-ordered sequences of disjoint intervals into a
+  single sequence of time-ordered disjoint intervals."
   [& colls]
-  (loop [colls colls result []]
-    (let [colls (remove nil? colls)]
-      (if (<= (count colls) 1)
-        (clojure.core/concat result (first colls))
-
-        (let [[c1 c2 & r] (sort-by (comp t/beginning first) colls)]
-          (if (disjoint? (first c1) (first c2))
-            (recur (apply list (next c1) c2 r) (clojure.core/conj result (first c1)))
-
-            (recur (apply list
-                          (next c1)
-                          (clojure.core/concat [(splice (first c1) (first c2))]
-                                               (next c2))
-                          r)
-                   result)))))))
+  (letfn [(union [colls]
+            (lazy-seq
+              (if (<= (count colls) 1)
+                (first colls)
+                (let [[c1 c2 & r] (sort-by #(t/beginning (first %)) (remove nil? colls))]
+                  (if (nil? c2)
+                    c1
+                    (if (disjoint? (first c1) (first c2))
+                      (cons (first c1) (union (apply list (next c1) c2 r)))
+                      (union (apply list
+                                    (cons (splice (first c1) (first c2))
+                                          (next c1))
+                                    (next c2)
+                                    r))))))))]
+    (union (for [coll colls :when coll] (sort-by t/beginning coll)))))
 
 (defn conj [coll interval]
   (union coll [interval]))
 
 (defn intersection
-  "Return an interval set that is the intersection of the input
-  interval sets."
+  "Return a time-ordered sequence of disjoint intervals where two or
+  more intervals of the given sequences are concurrent. Arguments must
+  be time-ordered sequences of disjoint intervals."
   ;; Single arity
   ([s1] s1)
   ;; 2-arity
   ([s1 s2]
-   (loop [xs s1
-          ys s2
-          result []]
-     (if (and (not-empty xs) (not-empty ys))
-       (let [x (first xs)
-             y (first ys)]
-         (case (relation x y)
-           (:precedes :meets) (recur (next xs) ys result)
-           (:preceded-by :met-by) (recur xs (next ys) result)
-           :started-by (recur
-                (cons (narrow x (t/end y) (t/end x)) (next xs))
-                (next ys)
-                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           :finished-by (recur
-                (next xs)
-                (next ys)
-                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           :overlaps (recur
-                (cons (narrow x (t/beginning y) (t/end x)) (next xs))
-                (cons (narrow y (t/end x) (t/end y)) (next ys))
-                (clojure.core/conj result (narrow x (t/beginning y) (t/end x))))
-           :overlapped-by (recur
-                (cons (narrow x (t/end y) (t/end x)) (next xs))
-                (next ys)
-                (clojure.core/conj result (narrow x (t/beginning x) (t/end y))))
-           :contains (recur
-                (cons (narrow x (t/end y) (t/end x)) (next xs))
-                (next ys)
-                (clojure.core/conj result (narrow x (t/beginning y) (t/end y))))
-           :during (recur
-                (next xs)
-                (cons (narrow y (t/end x) (t/end y)) (next ys))
-                (clojure.core/conj result x))
-           :equals (recur
-                (next xs)
-                (next ys)
-                (clojure.core/conj result x))
-           :finishes (recur
-                (next xs)
-                (next ys)
-                (clojure.core/conj result x))
-           :starts (recur
-                (next xs)
-                (cons (narrow y (t/end x) (t/end y))
-                      (next ys))
-                (clojure.core/conj result x))))
-       result)))
+   (letfn
+       [(intersection [xs ys]
+          (lazy-seq
+            (let [x (first xs)
+                  y (first ys)]
+              (if (and x y)
+                (case (relation x y)
+                  (:precedes :meets)
+                  (intersection (assert-proper-head (next xs)) ys)
+
+                  (:preceded-by :met-by)
+                  (intersection xs (assert-proper-head (next ys)))
+
+                  :started-by
+                  (cons (narrow x (t/beginning y) (t/end y))
+                        (intersection
+                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (next ys))))
+
+                  :finished-by
+                  (cons (narrow x (t/beginning y) (t/end y))
+                        (intersection
+                          (assert-proper-head (next xs))
+                          (assert-proper-head (next ys))))
+
+                  :overlaps
+                  (cons (narrow x (t/beginning y) (t/end x))
+                        (intersection
+                          (assert-proper-head (cons (narrow x (t/beginning y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (narrow y (t/end x) (t/end y)) (next ys)))))
+
+
+                  :overlapped-by
+                  (cons (narrow x (t/beginning x) (t/end y))
+                        (intersection
+                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (next ys))))
+
+                  :contains
+                  (cons (narrow x (t/beginning y) (t/end y))
+                        (intersection
+                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (next ys))))
+
+                  :during
+                  (cons x
+                        (intersection
+                          (assert-proper-head (next xs))
+                          (assert-proper-head (cons (narrow y (t/end x) (t/end y)) (next ys)))))
+
+                  :equals
+                  (cons x
+                        (intersection
+                          (assert-proper-head (next xs))
+                          (assert-proper-head (next ys))))
+
+                  :finishes
+                  (cons x
+                        (intersection
+                          (assert-proper-head (next xs))
+                          (assert-proper-head (next ys))))
+
+                  :starts
+                  (cons x
+                        (intersection
+                          (assert-proper-head (next xs))
+                          (assert-proper-head (cons (narrow y (t/end x) (t/end y))
+                                                    (next ys))))))
+
+                ;; List of nothing because one of the collections is
+                ;; empty, so the intersection must be empty too.
+                (list)))))]
+
+       (intersection
+         (assert-proper-head s1)
+         (assert-proper-head s2))))
+
   ([s1 s2 & sets]
    (reduce intersection s1 (clojure.core/conj sets s2))))
 
@@ -457,26 +533,83 @@
   the remaining sets."
   ([s1] s1)
   ([s1 s2]
-   (loop [xs s1
-          ys s2
-          result []]
-     (if (not-empty xs)
-       (if (not-empty ys)
-         (let [x (first xs) y (first ys)]
-           (case (relation x y)
-             (:precedes :meets) (recur (next xs) ys (clojure.core/conj result x))
-             (:preceded-by :met-by) (recur xs (next ys) result)
-             (:finishes :during :equals) (recur (next xs) (next ys) result)
-             :starts (recur (next xs) ys result)
-             (:started-by :overlapped-by)
-             (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
-             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-             :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-             :contains (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
-                       (next ys)
-                       (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
-         (apply clojure.core/conj result xs))
-       result)))
+
+   (letfn [(difference [xs ys]
+             (let [[x] xs [y] ys]
+               (if x
+                 (if y
+                   (lazy-seq
+                     (case (relation x y)
+                       (:precedes :meets)
+                       (cons x (difference (assert-proper-head (next xs)) ys))
+
+                       (:preceded-by :met-by)
+                       (difference xs (assert-proper-head (next ys)))
+
+                       (:finishes :during :equals)
+                       (difference
+                         (assert-proper-head (next xs))
+                         (assert-proper-head (next ys)))
+
+                       :starts
+                       (difference
+                         (assert-proper-head (next xs))
+                         ys)
+
+                       (:started-by :overlapped-by)
+                       (difference
+                         (assert-proper-head
+                           (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                         (assert-proper-head (next ys)))
+
+                       :finished-by
+                       (cons (narrow x (t/beginning x) (t/beginning y))
+                             (difference
+                               (assert-proper-head (next xs))
+                               (assert-proper-head (next ys))))
+
+                       :overlaps
+                       (cons (narrow x (t/beginning x) (t/beginning y))
+                             (difference
+                               (assert-proper-head (next xs))
+                               ys))
+
+                       :contains
+                       (cons (narrow x (t/beginning x) (t/beginning y))
+                             (difference
+                               (assert-proper-head
+                                 (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                               (assert-proper-head (next ys))))))
+                   ;; If xs but no ys
+                   xs)
+                 ;; If no xs or ys
+                 (list))))]
+
+     (assert-proper-head s1)
+     (assert-proper-head s2)
+
+     (difference s1 s2))
+
+   #_(loop [xs s1
+            ys s2
+            result []]
+       (if (not-empty xs)
+         (if (not-empty ys)
+           (let [x (first xs) y (first ys)]
+             (case (relation x y)
+               (:precedes :meets) (recur (next xs) ys (clojure.core/conj result x))
+               (:preceded-by :met-by) (recur xs (next ys) result)
+               (:finishes :during :equals) (recur (next xs) (next ys) result)
+               :starts (recur (next xs) ys result)
+               (:started-by :overlapped-by)
+               (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
+               :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+               :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+               :contains (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
+                                (next ys)
+                                (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
+           )
+         result)))
   ([s1 s2 & sets]
    (reduce difference s1 (clojure.core/conj sets s2))))
 
@@ -592,8 +725,6 @@
 ;; #tick/instant ""
 ;; #tick/local-date-time ""
 ;; #tick/local-date ""
-
-;; TODO: Normalise - splice intervals that touch - opposite of disjoin
 
 (defn group-by-intervals
   "Divide intervals in s1 by (disjoint ordered) intervals in s2,
