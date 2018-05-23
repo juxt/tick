@@ -372,7 +372,7 @@
 ;; Interval sets
 
 (def ordered-disjoint-intervals? interval/ordered-disjoint-intervals?)
-(def unit interval/unite)
+(def unite interval/unite)
 (def normalize interval/normalize)
 (def union interval/union)
 (def conj interval/conj)
