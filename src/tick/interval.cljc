@@ -247,7 +247,7 @@
   ;; TODO: Rename? Not always narrow, sometimes widen, or generally modify - perhaps 'derive'
   (narrow [_ beginning end] "Narrow the interval to the new given bounds")
   (splice [ival1 ival2] "Splice two intervals together")
-  (split [ival t] "Split ival into 2 intervals at t, returned as a vector"))
+  (split [ival t] "Split ival into 2 intervals at t, returned as a 2-element vector"))
 
 (defn split-with-assert [ival t]
   (assert
