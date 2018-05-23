@@ -2,7 +2,7 @@
 
 (ns tick.alpha.api
   (:refer-clojure
-   :exclude [+ - * inc dec max min
+   :exclude [+ - * inc dec max min conj
              range time int long complement
              < <= > >= << >>
              extend
@@ -371,32 +371,13 @@
 
 ;; Interval sets
 
-(defn ordered-disjoint-intervals?
-  "An interval set is an ordered collection of disjoint
-  intervals. This predicate can be used to ensure a value conforms to
-  this definition, because some functions depend on this property
-  holding."
-  [s]
-  (interval/ordered-disjoint-intervals? s))
-
-(defn union [& colls]
-  "Return a set that is the union of the input interval sets"
-  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
-  (apply interval/union colls))
-
-(defn intersection [& colls]
-  "Return a set that is the intersection of the input interval sets"
-  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
-  (apply interval/intersection colls))
-
-(defn difference [& colls]
-  "Return a set that is the intersection of the input interval sets"
-  {:pre [(s/assert (s/coll-of ordered-disjoint-intervals?) colls)]}
-  (apply interval/difference colls))
-
-(defn complement [coll]
-  {:pre [(s/assert ordered-disjoint-intervals? coll)]}
-  (interval/complement coll))
-
-(defn group-by [ivals groups]
-  (interval/group-by ivals groups))
+(def ordered-disjoint-intervals? interval/ordered-disjoint-intervals?)
+(def unit interval/unite)
+(def normalize interval/normalize)
+(def union interval/union)
+(def conj interval/conj)
+(def intersection interval/intersection)
+(def intersects? interval/intersects?)
+(def difference interval/difference)
+(def complement interval/complement)
+(def group-by interval/group-by)
