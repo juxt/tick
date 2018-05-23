@@ -244,8 +244,7 @@
 ;; Functions that make use of Allens' Interval Algebra
 
 (defprotocol IIntervalOps
-  ;; TODO: Rename? Not always narrow, sometimes widen, or generally modify - perhaps 'derive'
-  (narrow [_ beginning end] "Narrow the interval to the new given bounds")
+  (slice [_ beginning end] "Fit the interval between beginning and end, slicing off one or both ends as necessary")
   (splice [ival1 ival2] "Splice two intervals together")
   (split [ival t] "Split ival into 2 intervals at t, returned as a 2-element vector"))
 
@@ -255,40 +254,42 @@
          (t/< t (t/end ival))))
   (split ival t))
 
+(defn slice-interval [ival beginning end]
+  (let [from (t/max (t/beginning ival) beginning)
+        to (t/min (t/end ival) end)]
+    (when (t/< from to)
+      (interval from to))))
+
 (extend-protocol IIntervalOps
   Interval
-  (narrow [_ beginning end] (interval beginning end))
-  (splice [ival1 ival2] (interval
-                          (t/min (t/beginning ival1) (t/beginning ival2))
-                          (t/max (t/end ival1) (t/end ival2))))
+  (slice [this beginning end]
+    (slice-interval this beginning end))
+  (splice [ival1 ival2]
+    (interval
+      (t/min (t/beginning ival1) (t/beginning ival2))
+      (t/max (t/end ival1) (t/end ival2))))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
   LocalDate
-  (narrow [date beginning end]
-    (assert (t/<= (t/beginning date) beginning))
-    (assert (t/>= (t/end date) end))
-    (interval beginning end))
+  (slice [this beginning end]
+    (slice-interval this beginning end))
   (splice [ival1 ival2]
     (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
   YearMonth
-  (narrow [ym beginning end]
-    (assert (t/<= (t/beginning ym) beginning))
-    (assert (t/>= (t/end ym) end))
-    (interval beginning end))
+  (slice [this beginning end]
+    (slice-interval this beginning end))
   (splice [ival1 ival2]
     (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
     [(interval (t/beginning ival) t) (interval t (t/end ival))])
 
   Year
-  (narrow [yr beginning end]
-    (assert (t/<= (t/beginning yr) beginning))
-    (assert (t/>= (t/end yr) end))
-    (interval beginning end))
+  (slice [this beginning end]
+    (slice-interval this beginning end))
   (splice [ival1 ival2]
     (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
   (split [ival t]
@@ -300,10 +301,10 @@
   concurrent."
   [x y]
   (case (relation x y)
-    :overlaps (narrow x (t/beginning y) (t/end x))
-    :overlapped-by (narrow x (t/beginning x) (t/end y))
+    :overlaps (slice x (t/beginning y) (t/end x))
+    :overlapped-by (slice x (t/beginning x) (t/end y))
     (:starts :finishes :during :equals) x
-    (:started-by :finished-by :contains) (narrow x (t/beginning y) (t/end y))
+    (:started-by :finished-by :contains) (slice x (t/beginning y) (t/end y))
     nil))
 
 (defn ^:experimental concurrencies
@@ -459,41 +460,41 @@
                   (intersection xs (assert-proper-head (next ys)))
 
                   :started-by
-                  (cons (narrow x (t/beginning y) (t/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :finished-by
-                  (cons (narrow x (t/beginning y) (t/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
                           (assert-proper-head (next xs))
                           (assert-proper-head (next ys))))
 
                   :overlaps
-                  (cons (narrow x (t/beginning y) (t/end x))
+                  (cons (slice x (t/beginning y) (t/end x))
                         (intersection
-                          (assert-proper-head (cons (narrow x (t/beginning y) (t/end x)) (next xs)))
-                          (assert-proper-head (cons (narrow y (t/end x) (t/end y)) (next ys)))))
+                          (assert-proper-head (cons (slice x (t/beginning y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y)) (next ys)))))
 
 
                   :overlapped-by
-                  (cons (narrow x (t/beginning x) (t/end y))
+                  (cons (slice x (t/beginning x) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :contains
-                  (cons (narrow x (t/beginning y) (t/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :during
                   (cons x
                         (intersection
                           (assert-proper-head (next xs))
-                          (assert-proper-head (cons (narrow y (t/end x) (t/end y)) (next ys)))))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y)) (next ys)))))
 
                   :equals
                   (cons x
@@ -511,7 +512,7 @@
                   (cons x
                         (intersection
                           (assert-proper-head (next xs))
-                          (assert-proper-head (cons (narrow y (t/end x) (t/end y))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y))
                                                     (next ys))))))
 
                 ;; List of nothing because one of the collections is
@@ -558,26 +559,26 @@
                        (:started-by :overlapped-by)
                        (difference
                          (assert-proper-head
-                           (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                           (cons (slice x (t/end y) (t/end x)) (next xs)))
                          (assert-proper-head (next ys)))
 
                        :finished-by
-                       (cons (narrow x (t/beginning x) (t/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head (next xs))
                                (assert-proper-head (next ys))))
 
                        :overlaps
-                       (cons (narrow x (t/beginning x) (t/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head (next xs))
                                ys))
 
                        :contains
-                       (cons (narrow x (t/beginning x) (t/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head
-                                 (cons (narrow x (t/end y) (t/end x)) (next xs)))
+                                 (cons (slice x (t/end y) (t/end x)) (next xs)))
                                (assert-proper-head (next ys))))))
                    ;; If xs but no ys
                    xs)
@@ -620,13 +621,13 @@
 ;;             (:finishes :during :equals) (recur (next xs) (next ys) result)
 ;;             :starts (recur (next xs) ys result)
 ;;             (:started-by :overlapped-by)
-;;             (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
-;;             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-;;            :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
+;;             (recur (cons (slice x (t/end y) (t/end x)) (next xs)) (next ys) result)
+;;             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))
+;;            :overlaps (recur (next xs) ys (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))
 ;;            :contains
-             #_(recur (cons (narrow x (t/end y) (t/end x)) (next xs))
+             #_(recur (cons (slice x (t/end y) (t/end x)) (next xs))
                     (next ys)
-                    (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
+                    (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))))
          (apply clojure.core/conj result xs))
        result)))
   ([s1 s2 & sets]
@@ -783,7 +784,7 @@
             (recur
               (next intervals)
               (next groups)
-              (assoc result group [(narrow ival (t/beginning group) (t/end group))])
+              (assoc result group [(slice ival (t/beginning group) (t/end group))])
               [])
 
             (:overlaps)
@@ -791,7 +792,7 @@
               (next intervals)
               groups
               result
-              (clojure.core/conj current-intervals (narrow ival (t/beginning group) (t/end ival))))))
+              (clojure.core/conj current-intervals (slice ival (t/beginning group) (t/end ival))))))
 
         ;; No more groups
         result)
