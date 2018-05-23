@@ -18,16 +18,12 @@
 ;; Use of Allen's Interval Algebra, inspired from a working
 ;; demonstration of time-count by Eric Evans.
 
-(defrecord Interval [beginning end]
-  t/ITimeSpan
-  (beginning [_] beginning)
-  (end [_] end))
-
 ;; Construction
 
-(defn- make-interval [v1 v2]
-  (assert (t/< v1 v2))
-  (->Interval v1 v2))
+(defn- make-interval [beginning end]
+  (assert (t/< beginning end))
+  {:tick/beginning beginning
+   :tick/end end})
 
 (defn temporal? [o]
   #?(:clj (instance? Temporal o)
@@ -48,7 +44,8 @@
   (let [t1 (t/beginning (t/temporal-value v1))
         t2 (t/end (t/temporal-value v2))]
     (if (t/< t1 t2)
-      (->Interval t1 t2)
+      {:tick/beginning t1
+       :tick/end t2}
       (throw (ex-info "Interval must span between two times, the first must be before the second" {})))))
 
 ;; Adjustments
@@ -67,19 +64,18 @@
     (t/forward-duration (t/beginning ival) (.multipliedBy (t/length ival) factor))))
 
 (extend-protocol t/ITimeShift
-  Interval
+  clojure.lang.APersistentMap
   (forward-duration [ival d]
-    (make-interval
-      (t/forward-duration (t/beginning ival) d)
-      (t/forward-duration (t/end ival) d)))
+    (-> ival
+        (update :tick/beginning #(t/forward-duration % d))
+        (update :tick/end #(t/forward-duration % d))))
   (backward-duration [ival d]
-    (make-interval
-      (t/backward-duration (t/beginning ival) d)
-      (t/backward-duration (t/end ival) d))))
+    (-> ival
+        (update :tick/beginning #(t/backward-duration % d))
+        (update :tick/end #(t/backward-duration % d)))))
 
 ;; An interval of duration d to t1 can be constructed like this:
 ;; (scale (interval t1 d) -1)
-
 
 ;; (>> _ d) to shift the interval into the future by duration d
 ;; (<< _ d) to shift the interval into the past by duration d
@@ -96,7 +92,7 @@
 ;; Reification
 
 (extend-protocol t/ITimeReify
-  Interval
+  clojure.lang.APersistentMap
   (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
   (in [i zone] (interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
@@ -244,9 +240,9 @@
 ;; Functions that make use of Allens' Interval Algebra
 
 (defprotocol IIntervalOps
-  (slice [_ beginning end] "Fit the interval between beginning and end, slicing off one or both ends as necessary")
-  (splice [ival1 ival2] "Splice two intervals together")
-  (split [ival t] "Split ival into 2 intervals at t, returned as a 2-element vector"))
+  (slice [this beginning end] "Fit the interval between beginning and end, slicing off one or both ends as necessary")
+  (splice [this ival] "Splice another interval on to this one")
+  (split [this t] "Split ival into 2 intervals at t, returned as a 2-element vector"))
 
 (defn split-with-assert [ival t]
   (assert
@@ -255,45 +251,51 @@
   (split ival t))
 
 (defn slice-interval [ival beginning end]
-  (let [from (t/max (t/beginning ival) beginning)
-        to (t/min (t/end ival) end)]
-    (when (t/< from to)
-      (interval from to))))
+  (let [beginning (t/max (t/beginning ival) beginning)
+        end (t/min (t/end ival) end)]
+    (when (t/< beginning end)
+      (if (associative? ival)
+        (assoc ival :tick/beginning beginning :tick/end end)
+        (make-interval beginning end)))))
+
+(defn split-interval [ival t]
+  [(slice-interval ival (t/beginning ival) t)
+   (slice-interval ival t (t/end ival))])
 
 (extend-protocol IIntervalOps
-  Interval
+  clojure.lang.APersistentMap
   (slice [this beginning end]
     (slice-interval this beginning end))
-  (splice [ival1 ival2]
-    (interval
-      (t/min (t/beginning ival1) (t/beginning ival2))
-      (t/max (t/end ival1) (t/end ival2))))
-  (split [ival t]
-    [(interval (t/beginning ival) t) (interval t (t/end ival))])
+  (splice [this ival]
+    (assoc this
+           :tick/beginning (t/min (t/beginning this) (t/beginning ival))
+           :tick/end (t/max (t/end this) (t/end ival))))
+  (split [this t]
+    (split-interval this t))
 
   LocalDate
   (slice [this beginning end]
     (slice-interval this beginning end))
-  (splice [ival1 ival2]
-    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
-  (split [ival t]
-    [(interval (t/beginning ival) t) (interval t (t/end ival))])
+  (splice [this ival]
+    (throw (ex-info "splice not implemented" {:this this :interval ival})))
+  (split [this t]
+    (split-interval this t))
 
   YearMonth
   (slice [this beginning end]
     (slice-interval this beginning end))
-  (splice [ival1 ival2]
-    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
-  (split [ival t]
-    [(interval (t/beginning ival) t) (interval t (t/end ival))])
+  (splice [this ival]
+    (throw (ex-info "splice not implemented" {:this this :interval ival})))
+  (split [this t]
+    (split-interval this t))
 
   Year
   (slice [this beginning end]
     (slice-interval this beginning end))
-  (splice [ival1 ival2]
-    (throw (ex-info "splice not implemented" {:args [ival1 ival2]})))
-  (split [ival t]
-    [(interval (t/beginning ival) t) (interval t (t/end ival))]))
+  (splice [this ival]
+    (throw (ex-info "splice not implemented" {:this this :interval ival})))
+  (split [this t]
+    (split-interval this t)))
 
 (defn concur
   "Return the interval representing the interval, if there is one,
@@ -345,7 +347,7 @@
   (<= [x y] (t/<= (as-interval x) (as-interval y)))
   (> [x y] (t/> (as-interval x) (as-interval y)))
   (>= [x y] (t/>= (as-interval x) (as-interval y)))
-  Interval
+  clojure.lang.APersistentMap
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
   (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
@@ -696,7 +698,7 @@
   (divide [n d] (divide-interval d n))
   YearMonth
   (divide [n d] (divide-interval d n))
-  Interval
+  clojure.lang.APersistentMap
   (divide [ival o] (divide-interval o ival)))
 
 ;; Grouping (similar to Division)
