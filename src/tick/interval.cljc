@@ -533,7 +533,6 @@
   the remaining sets."
   ([s1] s1)
   ([s1 s2]
-
    (letfn [(difference [xs ys]
              (let [[x] xs [y] ys]
                (if x
@@ -588,28 +587,8 @@
      (assert-proper-head s1)
      (assert-proper-head s2)
 
-     (difference s1 s2))
+     (difference s1 s2)))
 
-   #_(loop [xs s1
-            ys s2
-            result []]
-       (if (not-empty xs)
-         (if (not-empty ys)
-           (let [x (first xs) y (first ys)]
-             (case (relation x y)
-               (:precedes :meets) (recur (next xs) ys (clojure.core/conj result x))
-               (:preceded-by :met-by) (recur xs (next ys) result)
-               (:finishes :during :equals) (recur (next xs) (next ys) result)
-               :starts (recur (next xs) ys result)
-               (:started-by :overlapped-by)
-               (recur (cons (narrow x (t/end y) (t/end x)) (next xs)) (next ys) result)
-               :finished-by (recur (next xs) (next ys) (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-               :overlaps (recur (next xs) ys (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))
-               :contains (recur (cons (narrow x (t/end y) (t/end x)) (next xs))
-                                (next ys)
-                                (clojure.core/conj result (narrow x (t/beginning x) (t/beginning y))))))
-           )
-         result)))
   ([s1 s2 & sets]
    (reduce difference s1 (clojure.core/conj sets s2))))
 
