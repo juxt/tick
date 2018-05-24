@@ -97,7 +97,7 @@
   (in [i zone] (interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
 (defn bounds [& args]
-  (interval
+  (make-interval
     (apply t/min (map t/beginning args))
     (apply t/max (map t/end args))))
 
