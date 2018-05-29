@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by conj disj extend divide])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide])
   (:require
     [clojure.pprint :refer [pprint]]
     [clojure.set :as set]
@@ -33,14 +33,7 @@
   #?(:clj (instance? TemporalAmount o)
      :cljs (.isPrototypeOf TemporalAmount (type o))))
 
-;; interval
-;; [t0 t1] interval between t0 and t1
-;; [t1 t0] interval between t0 and t1
-;; [t0 d] interval between t0 and t0+d, where d is a given duration
-;; [d t1] interval between t1-d and t1, where d is a given duration
-
-(defn interval
-  [v1 v2]
+(defn interval [v1 v2]
   (let [t1 (t/beginning (t/temporal-value v1))
         t2 (t/end (t/temporal-value v2))]
     (if (t/< t1 t2)
@@ -262,16 +255,47 @@
   [(slice-interval ival (t/beginning ival) t)
    (slice-interval ival t (t/end ival))])
 
+;; Maps either represent single intervals, having :tick/beginning and
+;; :tick/end, or with a :tick/intervals entry containing groups of
+;; time-ordered disjoint intervals. Support groups using plain maps
+;; helps preserve data in both maps being spliced together.
+;;
+;; Recursive structures not yet possible.
+
+;; I'm unhappy that I haven't been able to write a recursive
+;; implementation of flatten.
+(defn flatten [s]
+  (mapcat
+    (fn [x]
+      (if-let [ivals (:tick/intervals x)]
+        ivals [x]))
+    s))
+
 (extend-protocol IIntervalOps
   clojure.lang.APersistentMap
   (slice [this beginning end]
-    (slice-interval this beginning end))
-  (splice [this ival]
-    (assoc this
-           :tick/beginning (t/min (t/beginning this) (t/beginning ival))
-           :tick/end (t/max (t/end this) (t/end ival))))
+    (if-let [intervals (:tick/intervals this)]
+      (assoc this :tick/intervals (vec (keep #(slice % beginning end) intervals)))
+      (slice-interval this beginning end)))
+  (splice [this other]
+    (let [this-intervals (:tick/intervals this)
+          other-intervals (:tick/intervals other)]
+      (cond
+        (and this-intervals other-intervals)
+        (update this :tick/intervals concat other-intervals)
+        this-intervals
+        (update this :tick/intervals clojure.core/conj other)
+        other-intervals
+        (update other :tick/intervals clojure.core/conj this)
+        :else
+        {:tick/intervals [this other]})))
   (split [this t]
-    (split-interval this t))
+    (if-let [intervals (:tick/intervals this)]
+      [(assoc this :tick/intervals
+              (vec (keep #(slice % (t/beginning this) t) intervals)))
+       (assoc this :tick/intervals
+              (vec (keep #(slice % t (t/end this)) intervals)))]
+      (split-interval this t)))
 
   LocalDate
   (slice [this beginning end]
@@ -371,8 +395,8 @@
 (defn- assert-proper-head
   "Is the first interval in a sequence time-ordered and disjoint with
   respect to the second? Note, only compares first two in a
-  sequence. Used by functions to ensure the head of sequence satisfies
-  an assumed invariant."
+  sequence. Used by functions to ensure the head of the (possibly
+  lazy) sequence satisfies this invariant."
   [s]
   (let [[initial subsequent] s]
     (when (and (nil? initial) subsequent)
@@ -381,13 +405,16 @@
       (when-not (precedes-or-meets? initial subsequent)
         (throw
           (ex-info
-            "Intervals in sequence do not satisfy required invariant that intervals are time-ordered and disjoint"
+            "Intervals in sequence violate requirement that intervals are time-ordered and disjoint"
             {:interval1 initial
              :interval2 subsequent}))))
     s))
 
 (defn unite
-  "Unite concurrent intervals. Returns a time-ordered sequence of disjoint intervals"
+  "Unite concurrent intervals. Intervals must be ordered by beginning
+  but not necessarily disjoint (the purpose of this function is to
+  splice together intervals that are concurrent resulting in a
+  time-ordered sequence of disjoint intervals that is returned."
   [intervals]
   (letfn [(unite [intervals]
             (lazy-seq
@@ -398,23 +425,35 @@
                   (case (relation ival1 ival2)
                     (:precedes :meets)
                     (cons ival1 (unite (rest intervals)))
-                    (:overlaps :contains :starts :started-by)
-                    (unite (cons (splice ival1 ival2) r)))))))]
-    ;; We sort because there might be some overlapping intervals out
-    ;; of sequence - the purpose of this function is to produce a
-    ;; time-ordered sequence of disjoint intervals.
-    (unite (sort-by t/beginning intervals))))
+                    (:overlaps :contains :starts :started-by :finished-by)
+                    (unite (cons (splice ival1 ival2) r))
+                    (throw
+                      (ex-info "Intervals in sequence violate requirement that intervals are time-ordered" {:interval1 ival1
+                                                                                                            :interval2 ival2
+                                                                                                            :relation (relation ival1 ival2)})))))))]
+    (unite intervals)))
+
+(defn as-interval-group
+  "Return an interval group. Interval groups are maps with
+  a :tick/intervals entry that contain a time-ordered sequence of
+  disjoint intervals."
+  [x]
+  (if (:tick/intervals x)
+    x
+    {:tick/intervals [x]}))
 
 (defn normalize
-  "Splice meeting intervals into a single interval across a time-ordered sequence of disjoint intervals."
+  "Within a time-ordered sequence of disjoint intervals, return a
+  sequence of interval groups, splicing together meeting intervals."
   [intervals]
   (letfn [(normalize [intervals]
             (lazy-seq
               (let [[ival1 ival2 & r] intervals]
-                (if (nil? ival2) (if ival1 (list ival1) (list))
+                (if (nil? ival2) (if ival1 (list (as-interval-group ival1)) (list))
                     (case (relation ival1 ival2)
                       :meets (normalize (cons (splice ival1 ival2) r))
-                      (cons ival1 (normalize (assert-proper-head (rest intervals)))))))))]
+                      (cons (as-interval-group ival1)
+                            (normalize (assert-proper-head (rest intervals)))))))))]
     (normalize (assert-proper-head intervals))))
 
 (defn union

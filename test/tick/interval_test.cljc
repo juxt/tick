@@ -210,26 +210,51 @@
         [(ti/interval (t/date "2017-06-10") (t/date "2017-06-25"))
          (ti/interval (t/date "2017-07-01") (t/date "2017-07-10"))]
 
-        (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
-                   (ti/interval (t/date "2017-06-10") (t/date "2017-06-20"))
-                   (ti/interval (t/date "2017-07-01") (t/date "2017-07-10"))]))))
+        (map ti/bounds
+             (ti/unite [(ti/interval (t/date "2017-06-10") (t/date "2017-06-20"))
+                        (ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+                        (ti/interval (t/date "2017-07-01") (t/date "2017-07-10"))])))))
   (testing "Unite containing intervals"
     (is
       (=
         [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))]
-        (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
-                   (ti/interval (t/date "2017-06-17") (t/date "2017-06-20"))])))))
+        (map ti/bounds
+             (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+                        (ti/interval (t/date "2017-06-17") (t/date "2017-06-20"))])))))
+
+  (testing "Unite finished-by intervals"
+    (is
+      (=
+        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))]
+        (map ti/bounds
+             (ti/unite [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+                        (ti/interval (t/date "2017-06-17") (t/date "2017-06-20"))
+                        (ti/interval (t/date "2017-06-18") (t/date "2017-06-25"))]))))))
+
+(deftest flatten-test
+  (let [ivals [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
+               (ti/interval (t/date "2017-06-17") (t/date "2017-06-20"))
+               (ti/interval (t/date "2017-06-18") (t/date "2017-06-25"))
+               (ti/interval (t/date "2017-07-18") (t/date "2017-07-25"))
+               (ti/interval (t/date "2017-08-18") (t/date "2017-08-25"))]]
+    (is (= ivals (ti/flatten (ti/unite ivals))))))
 
 (deftest normalize-test
   (let [intervals
         [(ti/interval (t/date "2017-06-15") (t/date "2017-06-25"))
          (ti/interval (t/date "2017-06-26") (t/date "2017-06-28"))
          (ti/interval (t/date "2017-06-30") (t/date "2017-07-04"))]]
-    (is
-      (=
-        [(ti/interval (t/date "2017-06-15") (t/date "2017-06-28"))
-         (ti/interval (t/date "2017-06-30") (t/date "2017-07-04"))]
-        (ti/normalize intervals)))))
+    (=
+      [{:tick/intervals
+        [{:tick/beginning (t/local-date-time "2017-06-15T00:00")
+          :tick/end (t/local-date-time "2017-06-26T00:00")}
+         {:tick/beginning (t/local-date-time "2017-06-26T00:00")
+          :tick/end (t/local-date-time "2017-06-29T00:00")}]}
+       {:tick/intervals
+        [{:tick/beginning (t/local-date-time "2017-06-30T00:00")
+          :tick/end (t/local-date-time "2017-07-05T00:00")}]}]
+
+      (ti/normalize intervals))))
 
 (deftest union-test
   (testing "counts"

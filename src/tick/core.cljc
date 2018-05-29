@@ -880,8 +880,16 @@
 
 (extend-protocol ITimeSpan
   #?(:clj clojure.lang.APersistentMap :cljs PersistentHashMap)
-  (beginning [m] (:tick/beginning m))
-  (end [m] (:tick/end m)))
+  (beginning [m]
+    (let [{:tick/keys [beginning intervals]} m]
+      (if intervals
+        (apply min (map :tick/beginning intervals))
+        beginning)))
+  (end [m]
+    (let [{:tick/keys [end intervals]} m]
+      (if intervals
+        (apply max (map :tick/end intervals))
+        end))))
 
 ;; TODO: Consider using between for this?
 (defn length
