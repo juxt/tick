@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.interval
-  (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide])
+  (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide flatten])
   (:require
     [clojure.pprint :refer [pprint]]
     [clojure.set :as set]
@@ -57,7 +57,7 @@
     (t/forward-duration (t/beginning ival) (.multipliedBy (t/length ival) factor))))
 
 (extend-protocol t/ITimeShift
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (forward-duration [ival d]
     (-> ival
         (update :tick/beginning #(t/forward-duration % d))
@@ -85,7 +85,7 @@
 ;; Reification
 
 (extend-protocol t/ITimeReify
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (on [i date] (interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
   (in [i zone] (interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
@@ -272,7 +272,7 @@
     s))
 
 (extend-protocol IIntervalOps
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (slice [this beginning end]
     (if-let [intervals (:tick/intervals this)]
       (assoc this :tick/intervals (vec (keep #(slice % beginning end) intervals)))
@@ -371,7 +371,7 @@
   (<= [x y] (t/<= (as-interval x) (as-interval y)))
   (> [x y] (t/> (as-interval x) (as-interval y)))
   (>= [x y] (t/>= (as-interval x) (as-interval y)))
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
   (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
@@ -713,7 +713,7 @@
        (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
-  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
+  (divide-by-duration ival (.dividedBy (t/length ival) divisor)))
 
 (defprotocol IDivisibleInterval
   (divide-interval [divisor ival] "Divide an interval by a given divisor"))
@@ -737,7 +737,7 @@
   (divide [n d] (divide-interval d n))
   YearMonth
   (divide [n d] (divide-interval d n))
-  clojure.lang.APersistentMap
+  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (divide [ival o] (divide-interval o ival)))
 
 ;; Grouping (similar to Division)

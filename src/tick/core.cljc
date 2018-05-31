@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second])
+  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
   (:require
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
@@ -878,18 +878,37 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
-(extend-protocol ITimeSpan
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentHashMap)
-  (beginning [m]
-    (let [{:tick/keys [beginning intervals]} m]
-      (if intervals
-        (apply min (map :tick/beginning intervals))
-        beginning)))
-  (end [m]
-    (let [{:tick/keys [end intervals]} m]
-      (if intervals
-        (apply max (map :tick/end intervals))
-        end))))
+(defn- beginning-composite [m]
+  (let [{:tick/keys [beginning intervals]} m]
+    (if intervals
+      (apply min (map :tick/beginning intervals))
+      beginning)))
+
+(defn- end-composite [m]
+  (let [{:tick/keys [end intervals]} m]
+    (if intervals
+      (apply max (map :tick/end intervals))
+      end)))
+
+`(println "foo")
+
+#?(:clj
+   (extend-protocol ITimeSpan
+     clojure.lang.APersistentMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
+
+#?(:cljs
+   (extend-protocol ITimeSpan
+     PersistentArrayMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
+
+#?(:cljs
+   (extend-protocol ITimeSpan
+     PersistentHashMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
 
 ;; TODO: Consider using between for this?
 (defn length

@@ -502,8 +502,7 @@
   (let [coll1 [(ti/interval (t/instant "2017-01-01T14:00:00Z")
                             (t/instant "2017-01-01T16:00:00Z"))
                (ti/interval (t/instant "2017-01-01T08:00:00Z")
-                            (t/instant "2017-01-01T12:00:00Z"))
-               ]
+                            (t/instant "2017-01-01T12:00:00Z"))]
 
         coll2 [(ti/interval (t/instant "2017-01-01T09:00:00Z")
                             (t/instant "2017-01-01T11:00:00Z"))
@@ -511,7 +510,8 @@
                             (t/instant "2017-01-01T17:00:00Z"))]]
     (is
       (thrown?
-        clojure.lang.ExceptionInfo
+        #?(:clj clojure.lang.ExceptionInfo
+           :cljs ExceptionInfo)
         (ti/difference coll1 coll2)))))
 
 ;; We are reclaiming 'disjoin' to mean to 'end the joining of' or 'to become disjoint'.

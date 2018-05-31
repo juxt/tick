@@ -44,14 +44,6 @@
 (deftest epoch-test
   (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))
 
-;; Durations. Simple constructors to create durations of specific
-;; units.
-
-(deftest duration-test
-  (is (= (t/nanos 1e6) (t/millis 1)))
-  (is (= (t/nanos 1e9) (t/seconds 1)))
-  (is (= (t/millis 1000) (t/seconds 1))))
-
 ;; Period arithmetic
 
 (deftest addition-test
@@ -107,12 +99,19 @@
              (t/local-date-time "2017-08-09T00:00:00"))
           (t/pm (t/today))))))
 
+;; Durations. Simple constructors to create durations of specific
+;; units.
+
 (deftest duration-test
+  (is (= (t/nanos 1e6) (t/millis 1)))
+  (is (= (t/nanos 1e9) (t/seconds 1)))
+  (is (= (t/millis 1000) (t/seconds 1)))
+
   (is (= 24 (t/hours (t/length (t/tomorrow))))))
 
 ;; TODO: Interval testing
 
-   (deftest division-test
+(deftest division-test
   (is (= 365 (count (t/divide-by t/date (t/year 2017)))))
   (is (= 12 (count (t/divide-by t/year-month (t/year 2017)))))
   (is (= 30 (count (t/divide-by t/date "2017-09"))))
