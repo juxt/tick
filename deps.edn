@@ -2,6 +2,7 @@
  :deps
  {
   hiccup {:mvn/version "2.0.0-alpha1"}
+  cljsjs/js-joda {:mvn/version "1.6.2-0"}
   net.cgrand/macrovich
   {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}}
 
