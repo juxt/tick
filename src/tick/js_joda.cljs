@@ -1,5 +1,9 @@
 (ns tick.js-joda
-  (:require [cljsjs.js-joda]))
+  (:require
+    [cljsjs.js-joda]
+    [cljsjs.js-joda-timezone]
+    ;[cljsjs.js-joda-locale]
+    ))
 
 
 (def Date js/Date)
@@ -26,3 +30,7 @@
 ;; todo - get these from threeten-extra? https://github.com/js-joda/js-joda/issues/165
 (def OffsetDateTime (.. js/JSJoda -ZonedDateTime))
 (def OffsetTime (.. js/JSJoda -LocalTime))
+
+
+(def DateTimeFormatter (.. js/JSJoda -DateTimeFormatter))
+(def ResolverStyle (.. js/JSJoda -ResolverStyle))
