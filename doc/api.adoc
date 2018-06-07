@@ -4,18 +4,8 @@ _tick_ provides a single namespace—`tick.api`—containing the functions that 
 
 CAUTION: Try to restrict your use of `tick` to the `tick.api` namespace. Functions in other namespaces, which may not be marked private, are not part of the official API and could change.
 
-The code examples in this documentation assume that you have referred
-all _tick_'s API symbols into the current namespace. You can do this in
-the REPL with the following:
-
-----
-(use 'tick.api)
-----
-
 When you are using _tick_ in programs, it is a recommended idiom that you require _tick_'s api under the `t` alias as follows:
 
 ----
 (require '[tick.alpha.api :as t])
 ----
-
-If you choose to do this, then remember to prefix the symbols in this documentation with `t/`. For example, `(now)` would become `(t/now)`.

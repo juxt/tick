@@ -1,6 +1,6 @@
 = Introduction
 
-Tick is a comprehensive Clojure(Script) library designed to make it
+_Tick_ is a comprehensive Clojure(Script) library designed to make it
 easier to write programs that involve time and date calculations:
 
 * Functions to manipulating time, easily and succinctly (stable)
@@ -15,8 +15,8 @@ portable across platforms.
 
 == Status
 
-Tick is currently in _alpha_ status. By _alpha_, we mean that the
-library's API may change in future. The quality of tick is deemed
+_Tick_ is currently in _alpha_ status. By _alpha_, we mean that the
+library's API may change in future. The quality of _tick_ is deemed
 adequate for real-world use but do let us know if you come across
 any unexpected behaviour and bugs.
 
@@ -48,7 +48,7 @@ relying on the JS Date nature of the cljs-time objects.
 
 Taking a fresh look at the date/time landscape, we now have JSR-310
 and implementations in both Java and Javascript and so it is possible
-to create tick, which combines the excellent JSR-310 with an
+to create _tick_, which combines the excellent JSR-310 with an
 expressive, cross-platform Clojure(Script) API.
 
 Sometimes we can get away with just switching the clj(s)-time import
