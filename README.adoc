@@ -16,7 +16,9 @@ Add to your lein or boot dependencies:
 
 == Development
 
-REPL with nrepl server
+=== with Clojure
+
+REPL with nREPL server
 
 ----
 clj -Adev
@@ -28,6 +30,16 @@ Run tests with:
 
 ----
 clj -Atest -e deprecated
+----
+
+=== with ClojureScript
+
+From the Clojure REPL type `(node)`.
+
+For testing, we are still using Leiningen:
+
+----
+lein doo node test
 ----
 
 == Documentation
@@ -55,8 +67,8 @@ interval algebra and pointing out its potential usefulness,
 demonstrating a working implementation of Allen's ideas in
 link:https://github.com/domainlanguage/time-count[his Clojure library].
 
-Thanks also to my esteemed colleague Patrik Kårlin for his redesign of
-the interval constructor function.
+Thanks also to my esteemed colleagues Patrik Kårlin for his redesign of
+the interval constructor function, and Henry Widd for porting to cljc.
 
 == References
 

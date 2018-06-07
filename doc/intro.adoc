@@ -1,63 +1,60 @@
 = Introduction
 
-Tick is a comprehensive Clojure library designed to make it easier to
-write programs that involve time and date calculations:
+Tick is a comprehensive Clojure(Script) library designed to make it
+easier to write programs that involve time and date calculations:
 
-* Functions to manipulating time, easily and succinctly
-* Powerful functions for slicing and dicing time intervals
-* Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra]
-* Support for iCalendar serialization
-* Scheduling
+* Functions to manipulating time, easily and succinctly (stable)
+* Powerful functions for slicing and dicing time intervals (stable)
+* Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra] (stable)
+* Support for iCalendar serialization (work-in-progress)
+* Scheduling (work-in-progress)
 
-== Cross Platform
- 
- In many business domains, dates are as fundamental as numbers and strings. It's often useful to have date-heavy 
- business logic portable across platforms and whilst sometimes we can get away with just switching the clj(s)-time 
- import for the compilation target, the fact that cljs-time doesn't have complete fidelity with clj-time often leaks out.
- 
+In many business domains, dates are as fundamental as numbers and
+strings. It's often desirable to have date-heavy business logic
+portable across platforms.
+
+== Status
+
+Tick is currently in _alpha_ status. By _alpha_, we mean that the
+library's API may change in future. The quality of tick is deemed
+adequate for real-world use but do let us know if you come across
+any unexpected behaviour and bugs.
+
 == Comparison to other time libraries
 
 === Java 8 time
 
-Java 8's `java.time` API is both influenced by, and an improvement on,
+Java 8's link:http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[`java.time`] API is both influenced by, and an improvement on,
 Joda Time.
-
-Many Clojure applications use clj-time which is based on Joda Time, but tick uses
-http://www.oracle.com/technetwork/articles/java/jf14-date-time-2125367.html[**java.time**].
-
-CAUTION: Because _tick_ is built on `java.time`, it requires Java 8 or higher.
 
 Unlike older JDK dates and calendars, instances in
 `java.time` are immutable so can be considered values in Clojure. For this reason, there is no reason to wrap these values. Consequently, there is full interoperability between _tick_ and `java.time`. Where _tick_ does not provide a part of java.time's functionality, `java.time` can be called directly.
 
-=== clj-time and Joda Time
+CAUTION: Because _tick_ is built on `java.time`, Clojure programs must run on Java 8 or higher.
 
-NOTE: TBD
+=== clj-time and cljs-time
 
-== cljs-time
-  
-  clj-time is a wrapper over the great joda-time, but cljs-time is a wrapper over goog.date which
-  in turn is a wrapper over mutable js Date objects. 
-  
-  This works ok as a proxy for Instant, but is not a great foundation for  Local dates etc. 
-  
-  The author of cljs-time, Andrew McVeigh, has said he would ideally move cljs-time off goog.date but is unlikely to
-  do so at this point. For one thing, there could be more than a few current users relying on the JS Date nature
-  of the cljs-time objects.
-  
-  Taking a fresh look at the date/time landscape, we now have JSR-310 and implementations in both Java and Javascript
-  and so it is possible to create tick, which combines the greatness of JSR-310 with an expressive, cross-platform 
-  Clojure api.
+Most Clojure applications use `clj-time` which is based on Joda
+Time. However, `cljs-time` is a wrapper over goog.date which in turn
+is a wrapper over mutable JavaScript Date objects.
 
+This works OK as a proxy for Instant, but is not a great foundation
+for local dates etc.
 
-=== clojure.java-time
+The author of cljs-time, Andrew McVeigh, has said he would ideally
+move `cljs-time` off `goog.date` but is unlikely to do so at this
+point. For one thing, there could be more than a few current users
+relying on the JS Date nature of the cljs-time objects.
 
-NOTE: TBD
+Taking a fresh look at the date/time landscape, we now have JSR-310
+and implementations in both Java and Javascript and so it is possible
+to create tick, which combines the excellent JSR-310 with an
+expressive, cross-platform Clojure(Script) API.
+
+Sometimes we can get away with just switching the clj(s)-time import
+for the compilation target, the fact that cljs-time doesn't have
+complete fidelity with clj-time often leaks out.
 
 === Quartz
 
 See https://dzone.com/articles/why-you-shouldnt-use-quartz
-
-== Status
-
-Tick is currently in _alpha_ status.
