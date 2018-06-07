@@ -2,6 +2,10 @@
 
 A Clojure library for dealing with time.
 
+== Status
+
+The latest master branch of tick is still a work-in-progress and is moving towards a stable alpha soon.
+
 == Install
 
 Add to your lein or boot dependencies:
