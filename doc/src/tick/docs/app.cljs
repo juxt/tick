@@ -72,11 +72,13 @@
         now (t/now)
         ->time #(t/+ now (t/make-duration (inc %) :seconds))
 
-        ival1 {:tick/beginning (->time value)
-               :tick/end (->time (+ value block-width-in-cells))}
+        ival1 (t/make-interval
+                (->time value)
+                (->time (+ value block-width-in-cells)))
 
-        ival2 {:tick/beginning (->time (- (/ x-cells 2) (/ fixed-block-width-in-cells 2)))
-               :tick/end (->time (+ (/ x-cells 2) (/ fixed-block-width-in-cells 2)))}]
+        ival2 (t/make-interval
+                (->time (- (/ x-cells 2) (/ fixed-block-width-in-cells 2)))
+                (->time (+ (/ x-cells 2) (/ fixed-block-width-in-cells 2))))]
 
     [:div
      [:div
