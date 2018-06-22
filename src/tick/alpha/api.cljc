@@ -127,9 +127,9 @@
   ([] (core/zoned-date-time (now)))
   ([v] (core/zoned-date-time v)))
 
-(defn local-date-time
-  ([] (core/local-date-time (now)))
-  ([v] (core/local-date-time v)))
+(defn date-time
+  ([] (core/date-time (now)))
+  ([v] (core/date-time v)))
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))

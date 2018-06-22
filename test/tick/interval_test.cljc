@@ -246,13 +246,13 @@
          (ti/interval (t/date "2017-06-30") (t/date "2017-07-04"))]]
     (=
       [{:tick/intervals
-        [{:tick/beginning (t/local-date-time "2017-06-15T00:00")
-          :tick/end (t/local-date-time "2017-06-26T00:00")}
-         {:tick/beginning (t/local-date-time "2017-06-26T00:00")
-          :tick/end (t/local-date-time "2017-06-29T00:00")}]}
+        [{:tick/beginning (t/date-time "2017-06-15T00:00")
+          :tick/end (t/date-time "2017-06-26T00:00")}
+         {:tick/beginning (t/date-time "2017-06-26T00:00")
+          :tick/end (t/date-time "2017-06-29T00:00")}]}
        {:tick/intervals
-        [{:tick/beginning (t/local-date-time "2017-06-30T00:00")
-          :tick/end (t/local-date-time "2017-07-05T00:00")}]}]
+        [{:tick/beginning (t/date-time "2017-06-30T00:00")
+          :tick/end (t/date-time "2017-07-05T00:00")}]}]
 
       (ti/normalize intervals))))
 
@@ -518,10 +518,10 @@
 
 #_(deftest disj-test
     (is (=
-          [(ti/interval (t/local-date-time "2017-01-01T00:00")
-                        (t/local-date-time "2017-07-04T00:00"))
-           (ti/interval (t/local-date-time "2017-07-05T00:00")
-                        (t/local-date-time "2018-01-01T00:00"))]
+          [(ti/interval (t/date-time "2017-01-01T00:00")
+                        (t/date-time "2017-07-04T00:00"))
+           (ti/interval (t/date-time "2017-07-05T00:00")
+                        (t/date-time "2018-01-01T00:00"))]
           (disj [(bounds "2017")] (bounds (t/date "2017-07-04"))))))
 
 #_(deftest complement-test
@@ -555,15 +555,15 @@
     (is
       (=
         {(t/year 2017) [(ti/interval
-                          (t/local-date-time "2017-12-20T00:00")
-                          (t/local-date-time "2018-01-01T00:00"))]
+                          (t/date-time "2017-12-20T00:00")
+                          (t/date-time "2018-01-01T00:00"))]
          (t/year 2018) [(ti/interval
-                          (t/local-date-time "2018-01-01T00:00")
-                          (t/local-date-time "2018-01-10T00:00"))]}
+                          (t/date-time "2018-01-01T00:00")
+                          (t/date-time "2018-01-10T00:00"))]}
         (ti/group-by
           (t/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
-          [(ti/interval (t/local-date-time #inst "2017-12-20")
-                        (t/local-date-time #inst "2018-01-10"))]))))
+          [(ti/interval (t/date-time #inst "2017-12-20")
+                        (t/date-time #inst "2018-01-10"))]))))
 
   (testing "O"
     (is

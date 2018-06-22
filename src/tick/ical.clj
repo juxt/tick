@@ -134,7 +134,7 @@
   (zone [this] (t/zone (property-value this :dtstart)))
   (zoned-date-time [this] (t/zoned-date-time (property-value this :dtstart)))
   (offset-date-time [this] (t/offset-date-time (property-value this :dtstart)))
-  (local-date-time [this] (t/local-date-time (property-value this :dtstart))))
+  (date-time [this] (t/date-time (property-value this :dtstart))))
 
 (defrecord VCalendar [objects]
   ;; TODO: Add t/ITimeSpan

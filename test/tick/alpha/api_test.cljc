@@ -38,8 +38,8 @@
     (is (= (t/date "2017-08-09") (t/tomorrow)))
     (is (= 8 (t/day-of-month (t/today))))
     (is (= 2017 (t/int (t/year))))
-    (is (= (t/local-date-time "2017-08-08T12:00:00") (t/noon (t/today))))
-    (is (= (t/local-date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
+    (is (= (t/date-time "2017-08-08T12:00:00") (t/noon (t/today))))
+    (is (= (t/date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
 (deftest epoch-test
   (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))
@@ -92,11 +92,11 @@
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/interval (t/local-date-time "2017-08-08T00:00:00")
-             (t/local-date-time "2017-08-08T12:00:00"))
+    (is (= (t/interval (t/date-time "2017-08-08T00:00:00")
+             (t/date-time "2017-08-08T12:00:00"))
           (t/am (t/today))))
-    (is (= (t/interval (t/local-date-time "2017-08-08T12:00:00")
-             (t/local-date-time "2017-08-09T00:00:00"))
+    (is (= (t/interval (t/date-time "2017-08-08T12:00:00")
+             (t/date-time "2017-08-09T00:00:00"))
           (t/pm (t/today))))))
 
 ;; Durations. Simple constructors to create durations of specific
