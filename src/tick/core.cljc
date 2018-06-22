@@ -607,12 +607,12 @@
   (months [p] (.getMonths p))
   (years [p] (.getYears p)))
 
-(defn duration [n u]
+(defn make-duration [n u]
   (let [unit (unit-map u)]
     (assert unit (str "Not a unit: " u))
     (. Duration of n unit)))
 
-(defn period [n u]
+(defn make-period [n u]
   (case u
     :days (. Period ofDays n)
     :weeks (. Period ofWeeks n)
@@ -623,7 +623,7 @@
 
 (extend-protocol ICoercions
   Duration
-  (zone-offset [d] (. ZoneOffset ofTotalSeconds (duration 1 :seconds))))
+  (zone-offset [d] (. ZoneOffset ofTotalSeconds (make-duration 1 :seconds))))
 
 ;; Clocks
 
@@ -656,7 +656,7 @@
 
 (defn advance
   ([clk]
-   (advance clk (duration 1 :seconds)))
+   (advance clk (make-duration 1 :seconds)))
   ([clk dur]
     (. Clock tick clk dur)))
 

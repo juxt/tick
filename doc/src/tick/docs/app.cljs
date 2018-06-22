@@ -70,7 +70,7 @@
         max (- x-cells block-width-in-cells)
 
         now (t/now)
-        ->time #(t/+ now (t/duration (inc %) :seconds))
+        ->time #(t/+ now (t/make-duration (inc %) :seconds))
 
         ival1 {:tick/beginning (->time value)
                :tick/end (->time (+ value block-width-in-cells))}

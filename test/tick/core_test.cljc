@@ -6,7 +6,7 @@
    [tick.core :as t]
    #?(:clj
       [clojure.test :refer :all]
-      :cljs 
+      :cljs
       [cljs.test :refer-macros [deftest is testing run-tests]])
     #?(:cljs
        [tick.js-joda :refer [LocalDate Instant]]))
@@ -23,9 +23,9 @@
 (deftest divide-test
   (is
     ;; Duration -> Long -> Duration
-    (= (t/duration 6 :hours) (t/divide (t/duration 6 :days) 24))
+    (= (t/make-duration 6 :hours) (t/divide (t/make-duration 6 :days) 24))
     ;; Duration -> Duration -> Long
-    (= 63 (t/divide (t/duration 21 :days) (t/duration 8 :hours)))))
+    (= 63 (t/divide (t/make-duration 21 :days) (t/make-duration 8 :hours)))))
 
 (deftest construction-test
   (is (= (t/date "2018-01-11")
