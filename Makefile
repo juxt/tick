@@ -1,7 +1,4 @@
-.PHONY: repl test
+.PHONY: watch
 
-repl:
-	clj -Adev
-
-test:
-	clj -Atest -e deprecated
+watch:
+	shadow-cljs watch doc bootstrap-support

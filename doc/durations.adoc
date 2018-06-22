@@ -2,7 +2,7 @@
 
 == Construction
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
 |(seconds 1)|Duration of a second|java.time.Duration
@@ -17,7 +17,7 @@
 
 Instances of other `java.time` types are readily constructed with _tick_.
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(day "mon")|Monday|java.time.DayOfWeek

@@ -1,20 +1,30 @@
 = Times and dates
 
-In _tick_, times and dates are values from Java™'s `java.time` package.
+Let's begin by exploring times and dates with _tick_.
 
 == Construction
 
+To get started we should be able to create times and dates.
+
 === Instants
 
-Instants are points in time, and the recommended replacement for Java's `java.util.Date.`
+Instants are precise points in time.
 
-To get the instant representing the current time, call `(t/now)`. This will return a `java.time.Instant` at the most precision possible on your platform (the nearest millisecond, microsecond or nanosecond).
+.Getting the current time
+====
+To get the instant representing the current time, call `(t/now)`.
 
-[%header,cols="l,a,m"]
+[source.code#now,clojure]
+----
+(t/now)
+----
+====
+
+[%header,cols="1l,3a"]
 |===
-|Example|Description|Return type
-|(t/now)|The time now (millisecond granularity)|java.time.Instant
-|(t/epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant|java.time.Instant
+|Example|Description
+|(t/now)|The time now
+|(t/epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant. Returns a java.time.Instant
 |===
 
 === Times
@@ -27,7 +37,7 @@ The idea of the 'local' time, that you might read on a wall clock, is
 still a useful concept. From a functional programming perspective, you
 might think of this as 'partial evaluation' as applied to time.
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(t/time)|The time now, as local time|java.time.LocalTime
@@ -36,11 +46,12 @@ might think of this as 'partial evaluation' as applied to time.
 |(t/noon)|Noon|java.time.LocalTime
 |===
 
+[[dates]]
 === Dates
 
 To get the current date, call `(t/today)`. This will return a `java.time.LocalDate`.
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(t/today)|Today's date|java.time.LocalDate
@@ -57,6 +68,7 @@ To get the local time right now, with today's date, call `local-date-time` witho
 (t/local-date-time)
 ----
 
+====
 Let's construct one with a string:
 
 ----
@@ -64,44 +76,57 @@ Let's construct one with a string:
 
 => #object[java.time.LocalDateTime 0x26eb53b6 "2016-12-12T11:30"]
 ----
+====
 
 Local date-times are relative to the location where you are, due to the spherical rotating nature of our planet. If we need to compare times from different places, we need to use supplement the local date-time with some location information.
 
-We can use an offset to create an `OffsetDateTime`:
+We can use an offset to create an `OffsetDateTime`.
 
+====
 ----
 (t/offset-date-time "2017-12-15T12:00:00+04:30")
 ----
+====
 
 However, most cities in the world change their clocks biannually, shifting their clocks into Daylight Savings Time. Each region (or zone) has its own rules as to when clocks shift and by how much. These rules are incorporated into a timezone database which can be exploited via the use of `java.time.ZonedDateTime`.
 
-We can create a `java.time.ZonedDateTime` instance explicitly like this:
+We can create a `java.time.ZonedDateTime` instance explicitly, with `zoned-date-time`.
 
+====
 ----
 (t/zoned-date-time "2017-12-15T12:00:00Z[America/New_York]")
 ----
+====
 
 ==== Reification
 
-While `(t/time "8pm")` gives a local-time on any date, you may want that time on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time. We can reify with `t/on` and `t/at`. For example:
+While `(t/time "8pm")` gives a local-time on any date, you may want that time on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time. We can reify with `t/on` and `t/at`.
+
+====
+For example:
 
 ----
 (-> (t/time "8pm") (t/on "2018-02-14"))
 ----
+====
 
-And if starting with a date, we can use `at`:
+And if starting with a date, we can use `at`.
 
+====
 ----
 (-> (t/date "2018-02-14") (t/at "8pm"))
 ----
+====
 
 In both cases, a `java.time.LocalDateTime` is returned.
 
 We can extend the reification options with the `t/in` function.
 
+====
 ----
 (-> (t/time "8pm") (t/on "2018-02-14") (t/in "America/New_York"))
 ----
+====
 
 This gives us a `java.time.ZonedDateTime`.
 
@@ -117,7 +142,7 @@ Likewise, we can use `t/offset-by` in place of `t/in` if we want to produce a `j
 
 Here is a cheat-sheet with various ways of constructing date-times.
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(t/noon (t/today))|Noon today|java.time.LocalDateTime
@@ -146,7 +171,7 @@ NOTE: (TODO) Adjusters
 
 NOTE: Increment/decrement to create tomorrow,yesterday
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(t/midnight (t/today))|Midnight, last night (since midnight is the start of the day)|java.time.LocalDateTime
@@ -162,7 +187,7 @@ You might not need millisecond (or nanosecond) accuracy, so you can truncate to 
 
 Field values can be extracted from times and dates.
 
-[%header,cols="l,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
 |(t/day-of-month "2017-03-06")
@@ -184,17 +209,21 @@ Field values can be extracted from times and dates.
 
 You can also extract any supported field from any time instance by calling the `fields` function and extracting the field value with a keyword.
 
+====
 ----
 (:epoch-day (t/fields (t/today)))
 ----
+====
 
 Since `t/fields` returns something that behaves like a readable map, you can ask it which fields are available:
 
+====
 ----
 (keys (t/fields (t/today)))
 
 => (:proleptic-month :aligned-week-of-month :epoch-day :aligned-week-of-year :era :day-of-week :month-of-year :aligned-day-of-week-in-month :day-of-month :year :day-of-year :year-of-era :aligned-day-of-week-in-year)
 ----
+====
 
 NOTE: Beware that there are not many fields available for a `java.time.Instant`. You may want to first coerce the instant to a `java.time.ZonedDateTime` with `(zoned-date-time …)`.
 

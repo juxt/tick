@@ -12,3 +12,11 @@ pom.xml.asc
 gh-pages
 /doc/index.html
 .cpcache/
+/DELETE_ME
+/.dir-locals.el
+/.shadow-cljs/
+/doc/js/
+/todo.org
+/project.clj.bak
+/bin/test-cljs
+node_modules/

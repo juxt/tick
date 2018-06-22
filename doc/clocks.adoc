@@ -19,7 +19,7 @@ With an argument, you can fix a clock to always report a fixed time.
 
 == Construction
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
 |(clock)|Return a clock that will always return the current time|java.time.Clock
@@ -40,7 +40,7 @@ You can also create a clock from a base clock which reports time with granualari
 (def minute-clk (tick (clock) (minutes 1)))
 ----
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
 |(<< (clock) (minutes 2))|Return a clock running 2 minutes slow|java.time.Clock
@@ -72,7 +72,7 @@ You can also create an atom with a clock.
 (atom (clock))
 ----
 
-[%header,cols="m,a,m"]
+[%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
 |(atom)|Return a clock that tracks the current time|java.time.Clock

@@ -3,6 +3,7 @@ Malcolm Sparks, Henry Widd
 0.4-1, 2018-02-09
 :toc: left
 :toclevels: 4
+:docinfo: shared
 
 :leveloffset: +1
 

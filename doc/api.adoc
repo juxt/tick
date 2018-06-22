@@ -1,11 +1,11 @@
 = API
 
-_tick_ provides a single namespace—`tick.api`—containing the functions that make up the library's API.
-
-CAUTION: Try to restrict your use of `tick` to the `tick.api` namespace. Functions in other namespaces, which may not be marked private, are not part of the official API and could change.
+_Tick_ provides a single namespace—`tick.api`—containing the functions that make up the library's API.
 
 When you are using _tick_ in programs, it is a recommended idiom that you require _tick_'s api under the `t` alias as follows:
 
 ----
 (require '[tick.alpha.api :as t])
 ----
+
+CAUTION: Try to restrict your use of _tick_ to the `tick.api` namespace. Functions in other namespaces, which may not be marked private, are not part of the official API and could change.

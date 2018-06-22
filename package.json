@@ -1,0 +1,14 @@
+{
+    "name": "tick",
+    "version": "1.0.0",
+    "private": true,
+    "devDependencies": {
+        "shadow-cljs": "^2.4.2"
+    },
+    "dependencies": {
+        "create-react-class": "^15.6.3",
+        "js-joda": "^1.8.2",
+        "react": "^16.4.0",
+        "react-dom": "^16.4.0"
+    }
+}
