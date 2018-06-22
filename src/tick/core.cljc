@@ -875,6 +875,9 @@
   (beginning [_] "Return the beginning of a span of time")
   (end [_] "Return the end of a span of time"))
 
+(defn duration [x]
+  (. Duration between (beginning x) (end x)))
+
 (defn- beginning-composite [m]
   (let [{:tick/keys [beginning intervals]} m]
     (if intervals
@@ -905,11 +908,20 @@
      (beginning [m] (beginning-composite m))
      (end [m] (end-composite m))))
 
-;; TODO: Consider using between for this?
-(defn length
-  "Return the distance between the beginning and end as a duration or
-  period"
-  [v] (. Duration between (beginning v) (end v)))
+;; Periods
+
+(defprotocol IBetween
+  (between [v1 v2] "Return the duration (or period) between two times"))
+
+(extend-protocol IBetween
+  LocalDate
+  (between [v1 v2] (. Period between v1 (date v2)))
+  Instant
+  (between [v1 v2] (. Duration between v1 (instant v2)))
+  LocalTime
+  (between [v1 v2] (. Duration between v1 (local-time v2)))
+  #?(:clj String :cljs string)
+  (between [v1 v2] (between (parse v1) v2)))
 
 ;; TODO: Test concurrent? in tick.core-test
 

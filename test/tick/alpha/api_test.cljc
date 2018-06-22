@@ -107,7 +107,7 @@
   (is (= (t/make-duration 1e9 :nanos) (t/make-duration 1 :seconds)))
   (is (= (t/make-duration 1000 :millis) (t/make-duration 1 :seconds)))
 
-  (is (= (t/make-duration 24 :hours) (t/length (t/tomorrow)))))
+  (is (= (t/make-duration 24 :hours) (t/duration (t/tomorrow)))))
 
 ;; TODO: Interval testing
 
@@ -134,7 +134,7 @@
   (is
     (= 2
        (t/hours
-         (t/length
+         (t/duration
            (t/concur (t/interval (t/at (t/today) "16:00")
                                  (t/end (t/today)))
                      (t/today)
@@ -155,7 +155,7 @@
      ;; Let's take a vacation
      (let [vacation (t/bounds (t/date "2017-04-11") (t/date "2017-04-19"))]
        ;; This is normally 9 days
-       (is (= 9 (t/days (t/length vacation))))
+       (is (= 9 (t/days (t/duration vacation))))
 
        (let [year (t/year 2017)
              public-holidays (map :date (cal/holidays-in-england-and-wales year))
@@ -164,7 +164,7 @@
              ;;_ (println "weekends:" weekends)
              non-working-days (t/union public-holidays weekends)
              vacation-set (t/difference [vacation] non-working-days)
-             working-days-absent (t/days (apply t/+ (map t/length vacation-set)))]
+             working-days-absent (t/days (apply t/+ (map t/duration vacation-set)))]
 
          ;; But really it's just the Tues, Weds, Thurs of the first week (because Good Friday is a holiday in England, and Monday being a bank holiday, just the following Tuesday and Wednesday count. That totals 5.
          (is (= 5 working-days-absent))
@@ -194,7 +194,7 @@
 
            ;; The festive vacation days in 2017 are 20th, 21th, 22nd, 27th, 28th, 29th.
            ;; Added to the 5 days we've already taken, that makes 11
-           (is (= (+ 5 6) (t/days (apply t/+ (map t/length vacation-set))))))))))
+           (is (= (+ 5 6) (t/days (apply t/+ (map t/duration vacation-set))))))))))
 
 #_(t/partition-by-date)
 
@@ -310,8 +310,8 @@
 
          ;; 252 is the number of working days in 2017 in England & Wales.
          ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.
-         (is (= 252 (- 365 113)))
-      (is (= 252 (t/days (reduce t/+ (map t/length (t/difference [(t/bounds year)] non-working-days))))))))))
+      (is (= 252 (- 365 113)))
+      (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/bounds year)] non-working-days))))))))))
 
 
 ;; Do not disturb tests

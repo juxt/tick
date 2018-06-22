@@ -137,8 +137,9 @@
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
+(defn duration [v] (core/duration v))
 
-(defn timespan-map [v]
+#_(defn timespan-map [v]
   {:tick/beginning (core/beginning v)
    :tick/end (core/end v)})
 
@@ -310,7 +311,7 @@
   [n u]
   (core/make-period n u))
 
-(def length core/length)
+(defn between [v1 v2] (core/between v1 v2))
 
 (defn concur
   ([] nil)

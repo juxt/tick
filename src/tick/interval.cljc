@@ -54,7 +54,7 @@
 (defn scale [ival factor]
   (make-interval
     (t/beginning ival)
-    (t/forward-duration (t/beginning ival) (.multipliedBy (t/length ival) factor))))
+    (t/forward-duration (t/beginning ival) (.multipliedBy (t/duration ival) factor))))
 
 (extend-protocol t/ITimeShift
   #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
@@ -713,7 +713,7 @@
        (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
-  (divide-by-duration ival (.dividedBy (t/length ival) divisor)))
+  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
 
 (defprotocol IDivisibleInterval
   (divide-interval [divisor ival] "Divide an interval by a given divisor"))
