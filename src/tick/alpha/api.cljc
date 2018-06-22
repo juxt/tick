@@ -204,7 +204,7 @@
 (defn int [arg] (core/int arg))
 (defn long [arg] (core/long arg))
 
-;; Durations
+;; Lengths of time (durations & periods)
 
 (defn nanos [v] (core/nanos v))
 (defn micros [v] (core/micros v))
@@ -213,9 +213,6 @@
 (defn minutes [v] (core/minutes v))
 (defn hours [v] (core/hours v))
 (defn days [v] (core/days v))
-
-;; Periods
-(defn weeks [v] (core/weeks v))
 (defn months [v] (core/months v))
 (defn years [v] (core/years v))
 
@@ -306,12 +303,12 @@
   (interval/relation i1 i2))
 
 (defn duration
-  [v1 v2]
-  (core/duration v1 v2))
+  [n u]
+  (core/duration n u))
 
 (defn period
-  [v1 v2]
-  (core/period v1 v2))
+  [n u]
+  (core/period n u))
 
 (def length core/length)
 

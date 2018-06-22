@@ -4,7 +4,6 @@
   (:require
    [clojure.test :refer :all]
    [tick.deprecated.timeline :refer [periodic-seq timeline]]
-   [tick.core :refer [seconds millis]]
    [tick.deprecated.clock :refer [clock-ticking-in-seconds just-now]]
    [tick.deprecated.schedule :as sched]))
 

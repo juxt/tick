@@ -47,11 +47,11 @@
 ;; Period arithmetic
 
 (deftest addition-test
-  (is (= (t/seconds 5) (t/+ (t/seconds 2) (t/seconds 3))))
-  (is (= (t/minutes 2) (t/+ (t/seconds 90) (t/seconds 30)))))
+  (is (= (t/duration 5 :seconds) (t/+ (t/duration 2 :seconds) (t/duration 3 :seconds))))
+  (is (= (t/duration 2 :minutes) (t/+ (t/duration 90 :seconds) (t/duration 30 :seconds)))))
 
 (deftest subtraction-test
-  (is (= (t/seconds 3) (t/- (t/seconds 5) (t/seconds 2)))))
+  (is (= (t/duration 3 :seconds) (t/- (t/duration 5 :seconds) (t/duration 2 :seconds)))))
 
 ;; Range test
 
@@ -67,7 +67,7 @@
   (is
     (=
       {:years 10, :months 0, :days 0}
-      (t/units (t/years 10)))))
+      (t/units (t/period 10 :years)))))
 
 ;; Comparison test
 
@@ -75,20 +75,20 @@
   (is
     (t/<
       (t/now)
-      (t/+ (t/now) (t/seconds 10))
-      (t/+ (t/now) (t/seconds 20))))
+      (t/+ (t/now) (t/duration 10 :seconds))
+      (t/+ (t/now) (t/duration 20 :seconds))))
   (is
     (t/>
-      (t/+ (t/now) (t/seconds 20))
-      (t/+ (t/now) (t/seconds 10))
+      (t/+ (t/now) (t/duration 20 :seconds))
+      (t/+ (t/now) (t/duration 10 :seconds))
       (t/now)))
   (is (not
         (t/<
           (t/now)
-          (t/+ (t/now) (t/seconds 20))
-          (t/+ (t/now) (t/seconds 10)))))
-  (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/seconds 1))))
-  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/seconds 10)))))
+          (t/+ (t/now) (t/duration 20 :seconds))
+          (t/+ (t/now) (t/duration 10 :seconds)))))
+  (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/duration 1 :seconds))))
+  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/duration 10 :seconds)))))
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
@@ -103,11 +103,11 @@
 ;; units.
 
 (deftest duration-test
-  (is (= (t/nanos 1e6) (t/millis 1)))
-  (is (= (t/nanos 1e9) (t/seconds 1)))
-  (is (= (t/millis 1000) (t/seconds 1)))
+  (is (= (t/duration 1e6 :nanos) (t/duration 1 :millis)))
+  (is (= (t/duration 1e9 :nanos) (t/duration 1 :seconds)))
+  (is (= (t/duration 1000 :millis) (t/duration 1 :seconds)))
 
-  (is (= 24 (t/hours (t/length (t/tomorrow))))))
+  (is (= (t/duration 24 :hours) (t/length (t/tomorrow)))))
 
 ;; TODO: Interval testing
 
@@ -124,7 +124,7 @@
   (is (= 2 (count (t/divide-by t/year-month (t/bounds "2017-09-10" "2017-10-10")))))
   (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019")))))
   (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019-02")))))
-  (is (= 24 (count (t/divide-by (t/hours 1) (t/date "2017-09-10"))))))
+  (is (= 24 (count (t/divide-by (t/duration 1 :hours) (t/date "2017-09-10"))))))
 
 ;; TODO: Divide by duration
 
@@ -133,16 +133,16 @@
 (deftest concur-test
   (is
     (= 2
-      (t/hours
-        (t/length
-          (t/concur (t/interval (t/at (t/today) "16:00")
-                      (t/end (t/today)))
-            (t/today)
-            (t/interval (t/at (t/today) "20:00")
-              (t/at (t/today) "22:00"))))))))
+       (t/hours
+         (t/length
+           (t/concur (t/interval (t/at (t/today) "16:00")
+                                 (t/end (t/today)))
+                     (t/today)
+                     (t/interval (t/at (t/today) "20:00")
+                                 (t/at (t/today) "22:00"))))))))
 
 ;; Let's count some days over Easter 2017.
-#?(:clj ;cal not in cljs
+#?(:clj                                 ;cal not in cljs
    (deftest holiday-counting-test
      (is (=
            ;; Easter is mid-April
@@ -160,7 +160,7 @@
        (let [year (t/year 2017)
              public-holidays (map :date (cal/holidays-in-england-and-wales year))
              ;;_ (println "public-holidays:" public-holidays)
-          weekends (filter cal/weekend? (t/divide-by t/date year))
+             weekends (filter cal/weekend? (t/divide-by t/date year))
              ;;_ (println "weekends:" weekends)
              non-working-days (t/union public-holidays weekends)
              vacation-set (t/difference [vacation] non-working-days)
@@ -321,7 +321,7 @@
 (defn moment [t]
   (t/interval
     t
-    (t/+ t (t/seconds 3))))
+    (t/+ t (t/duration 3 :seconds))))
 
 ;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
 
@@ -406,4 +406,4 @@
 
 ;; TODO: +/- should NOT work for intervals, because +/- mean to 'add' an interval to another to make an interval set/seq.
 
-(t/>> (tick.interval/as-interval (t/today)) (t/minutes 4))
+;; (t/>> (tick.interval/as-interval (t/today)) (t/minutes 4))

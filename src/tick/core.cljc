@@ -579,27 +579,20 @@
   (when-let [u (get unit-map u)]
     (.truncatedTo x  u)))
 
-;; Durations
+;; Durations & Periods
 
-(defprotocol IDuration
+(defprotocol ITimeLength
   (nanos [_] "Return the given quantity in nanoseconds.")
   (micros [_] "Return the given quantity in microseconds.")
   (millis [_] "Return the given quantity in milliseconds.")
   (seconds [_] "Return the given quantity in seconds.")
   (minutes [_] "Return the given quantity in minutes.")
   (hours [_] "Return the given quantity in hours.")
-  (days [_] "Return the given quantity in days."))
+  (days [_] "Return the given quantity in days.")
+  (months [_] "Return the given quantity in months.")
+  (years [_] "Return the given quantity in years."))
 
-(extend-protocol IDuration
-  #?(:clj Number :cljs number)
-  (nanos [n] (. Duration ofNanos n))
-  (micros [n] (. Duration ofNanos (* n 1000)))
-  (millis [n] (. Duration ofMillis n))
-  (seconds [n] (. Duration ofSeconds n))
-  (minutes [n] (. Duration ofMinutes n))
-  (hours [n] (. Duration ofHours n))
-  (days [n] (. Duration ofDays n))
-
+(extend-protocol ITimeLength
   Duration
   (nanos [d] (.toNanos d))
   (micros [d] (#?(:clj Long/divideUnsigned :cljs cljs.core//) (nanos d) 1000))
@@ -607,23 +600,17 @@
   (seconds [d] (t.i/getter seconds d))
   (minutes [d] (.toMinutes d))
   (hours [d] (.toHours d))
-  (days [d] (.toDays d)))
+  (days [d] (.toDays d))
+
+  Period
+  (days [p] (.getDays p))
+  (months [p] (.getMonths p))
+  (years [p] (.getYears p)))
 
 (defn duration [n u]
   (let [unit (unit-map u)]
     (assert unit (str "Not a unit: " u))
     (. Duration of n unit)))
-
-(defprotocol IPeriod
-  (weeks [_] "Return the given quantity in weeks.")
-  (months [_] "Return the given quantity in months.")
-  (years [_] "Return the given quantity in years."))
-
-(extend-protocol IPeriod
-  #?(:clj Number :cljs number)
-  (weeks [n] (. Period ofWeeks n))
-  (months [n] (. Period ofMonths n))
-  (years [n] (. Period ofYears n)))
 
 (defn period [n u]
   (case u
@@ -636,7 +623,7 @@
 
 (extend-protocol ICoercions
   Duration
-  (zone-offset [d] (. ZoneOffset ofTotalSeconds (seconds d))))
+  (zone-offset [d] (. ZoneOffset ofTotalSeconds (duration 1 :seconds))))
 
 ;; Clocks
 
@@ -669,7 +656,7 @@
 
 (defn advance
   ([clk]
-   (advance clk (seconds 1)))
+   (advance clk (duration 1 :seconds)))
   ([clk dur]
     (. Clock tick clk dur)))
 

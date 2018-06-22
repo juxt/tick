@@ -6,7 +6,7 @@
    [tick.deprecated.timeline :refer [interleave-timelines periodic-seq timeline sequencer]]
    [tick.deprecated.clock :refer [just-now]]
    [tick.deprecated.cal :as cal]
-   [tick.core :refer [seconds minutes hours]])
+   [tick.core :refer [duration]])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate LocalDateTime]
    [java.time.temporal ChronoField ChronoUnit]))
@@ -17,7 +17,7 @@
 (def T1 (.plusSeconds T0 10))
 
 (deftest ^:deprecated periodic-seq-test
-  (let [sq (periodic-seq T0 (minutes 1))]
+  (let [sq (periodic-seq T0 (duration 1 :minutes))]
     (testing "sq starts with start time"
       (is (= T0 (first sq))))
     (testing "sq moves forward by 10 minutes"
@@ -31,15 +31,15 @@
 (deftest ^:deprecated composition-test
   (testing "Filter by acceptable hours"
     (is (= 62 (count
-               (->> (periodic-seq T0 (hours 1))
+               (->> (periodic-seq T0 (duration 1 :hours))
                     (take 100)
                     (filter acceptable-hours)))))))
 
 (deftest ^:deprecated interleave-timelines-test
   (let [merged
         (interleave-timelines
-         (take 10 (timeline (periodic-seq (.plus (just-now) (seconds 10)) (minutes 1))))
-         (take 10 (timeline (periodic-seq (just-now) (minutes 1)))))]
+         (take 10 (timeline (periodic-seq (.plus (just-now) (duration 10 :seconds)) (duration 1 :minutes))))
+         (take 10 (timeline (periodic-seq (just-now) (duration 1 :minutes)))))]
     (is (distinct? merged))
     (is (= 20 (count merged)))))
 
