@@ -887,8 +887,6 @@
       (apply max (map :tick/end intervals))
       end)))
 
-`(println "foo")
-
 #?(:clj
    (extend-protocol ITimeSpan
      clojure.lang.APersistentMap
