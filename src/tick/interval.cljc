@@ -350,27 +350,25 @@
 ;; Comparison. We have now built up the capability of comparing
 ;; intervals using the normal <, >, <=, >= operators.
 
-(defn as-interval [t]
-  (when (= (t/beginning t) (t/end t))
-    (throw (ex-info "t is a zero length interval!" {:t t})))
+(defn interval [t]
   (make-interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
   LocalDate
-  (< [x y] (t/< (as-interval x) (as-interval y)))
-  (<= [x y] (t/<= (as-interval x) (as-interval y)))
-  (> [x y] (t/> (as-interval x) (as-interval y)))
-  (>= [x y] (t/>= (as-interval x) (as-interval y)))
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
   YearMonth
-  (< [x y] (t/< (as-interval x) (as-interval y)))
-  (<= [x y] (t/<= (as-interval x) (as-interval y)))
-  (> [x y] (t/> (as-interval x) (as-interval y)))
-  (>= [x y] (t/>= (as-interval x) (as-interval y)))
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
   Year
-  (< [x y] (t/< (as-interval x) (as-interval y)))
-  (<= [x y] (t/<= (as-interval x) (as-interval y)))
-  (> [x y] (t/> (as-interval x) (as-interval y)))
-  (>= [x y] (t/>= (as-interval x) (as-interval y)))
+  (< [x y] (t/< (interval x) (interval y)))
+  (<= [x y] (t/<= (interval x) (interval y)))
+  (> [x y] (t/> (interval x) (interval y)))
+  (>= [x y] (t/>= (interval x) (interval y)))
   #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
@@ -433,7 +431,7 @@
                                                                                                             :relation (relation ival1 ival2)})))))))]
     (unite intervals)))
 
-(defn as-interval-group
+(defn make-interval-group
   "Return an interval group. Interval groups are maps with
   a :tick/intervals entry that contain a time-ordered sequence of
   disjoint intervals."
@@ -449,10 +447,10 @@
   (letfn [(normalize [intervals]
             (lazy-seq
               (let [[ival1 ival2 & r] intervals]
-                (if (nil? ival2) (if ival1 (list (as-interval-group ival1)) (list))
+                (if (nil? ival2) (if ival1 (list (make-interval-group ival1)) (list))
                     (case (relation ival1 ival2)
                       :meets (normalize (cons (splice ival1 ival2) r))
-                      (cons (as-interval-group ival1)
+                      (cons (make-interval-group ival1)
                             (normalize (assert-proper-head (rest intervals)))))))))]
     (normalize (assert-proper-head intervals))))
 
