@@ -72,7 +72,7 @@
 ;; Construction and coercion
 
 (defn date
-  ([] (core/date (today)))
+  ([] (today))
   ([v] (core/date v)))
 
 (defn time
