@@ -74,13 +74,13 @@
 
 ;; Construction and coercion
 
-(defn date
-  ([] (today))
-  ([v] (core/date v)))
-
 (defn time
   ([] (core/time (now)))
   ([v] (core/time v)))
+
+(defn date
+  ([] (today))
+  ([v] (core/date v)))
 
 (defn nanosecond [t] (core/nanosecond t))
 (defn microsecond [t] (core/microsecond t))
