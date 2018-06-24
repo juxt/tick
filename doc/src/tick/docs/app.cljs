@@ -34,28 +34,26 @@
 
 (defn button [label cb]
   [:button
-   {:class "code-button"
-    :key label
+   {:key label
     :onClick cb}
    label])
 
 (defn code-component [code result label]
   [:div
-   [:div.listingblock
-    [:div.content
-     [:pre code (when-let [v @result] (str " => " v))]]
-    [:div {:style {:text-align "right"}}
-     (let [m {}]
-       (list
-         (button "Eval" (fn [ev]
-                      (eval-code code
-                                 (fn [x]
-                                   (println (pr-str x))
-                                   (reset! result (str (:value x))))
-                                 label)))
-         (button "Clr" (fn [ev]
-                           (reset! result nil)
-                         ))))]]])
+   [:div.content
+    [:pre.highlight
+     [:code.language-clojure {:data-lang "clojure"} code (when-let [v @result] (str " => " v))]
+     [:div.code-buttons
+      (list
+        (button "Eval" (fn [ev]
+                         (eval-code code
+                                    (fn [x]
+                                      (println (pr-str x))
+                                      (reset! result (str (:value x))))
+                                    label)))
+        (button "Clr" (fn [ev]
+                        (reset! result nil)
+                        )))]]]])
 
 (defn interval-relations [config *value]
   (let [value (js/parseInt @*value 10) ; sometimes we get passed strings!
@@ -80,7 +78,7 @@
                 (->time (- (/ x-cells 2) (/ fixed-block-width-in-cells 2)))
                 (->time (+ (/ x-cells 2) (/ fixed-block-width-in-cells 2))))]
 
-    [:div
+    [:div.diagram
      [:div
       [:p
        [:input {:style {:width "100%"}
@@ -90,15 +88,13 @@
                 :onChange (fn [ev]
                             (reset! *value (.-value (.-target ev))))}]]]
 
-     [:div {:style {:border "0px dotted grey"
-                    :margin-bottom "24pt"}}
-      [:svg {:viewBox [0 0 width 40]}
-       [:rect
-        {:x (* cell-width value) :y 10 :width block-width :height 8 :fill "orange"}]
+     [:svg {:viewBox [0 0 width 40]}
+      [:rect
+       {:x (* cell-width value) :y 10 :width block-width :height 8 :fill "orange"}]
 
-       ;; fixed
-       [:rect
-        {:x (- (/ width 2) (/ fixed-block-width 2)) :y 30 :width fixed-block-width :height 8 :fill "#444"}]]]
+      ;; fixed
+      [:rect
+       {:x (- (/ width 2) (/ fixed-block-width 2)) :y 30 :width fixed-block-width :height 8 :fill "#444"}]]
 
      (letfn [(f [rel] (case rel
                         :precedes "precedes"
@@ -143,7 +139,7 @@
      :value (r/atom 0)}))
 
 (defn init []
-  (.log js/console "Starting up2…")
+  (.log js/console "Starting up…")
 
   (r/render [two-days-from-today]
             (.getElementById js/document "eval-two-days-from-today"))
