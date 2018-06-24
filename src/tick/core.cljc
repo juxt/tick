@@ -282,6 +282,8 @@
   OffsetDateTime
   (time [odt] (.toLocalTime odt))
   (date-time [odt] (.toLocalDateTime odt))
+  (inst [zdt] (inst (instant zdt)))
+  (instant [zdt] (.toInstant zdt))
   (offset-date-time [odt] odt)
   (zoned-date-time [odt] (.toZonedDateTime odt))
   (temporal-value [odt] odt)
