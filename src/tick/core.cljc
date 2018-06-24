@@ -16,19 +16,6 @@
        [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
        [clojure.lang ILookup Seqable])))
 
-(defn new-time
-  ([hour minute] (. LocalTime of hour minute))
-  ([hour minute second] (. LocalTime of hour minute second))
-  ([hour minute second nano] (. LocalTime of hour minute second nano)))
-
-(defn new-date
-  ([year month day-of-month]
-   (. LocalDate of year month day-of-month))
-  ([year day-of-year]
-   (. LocalDate ofYearDay year day-of-year))
-  ([epoch-day]
-   (. LocalDate ofEpochDay epoch-day)))
-
 (def ^{:dynamic true} *clock* nil)
 
 (defn now []
@@ -149,6 +136,21 @@
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (date-time [_] "Make a java.time.LocalDateTime instance.")
   (temporal-value [_] "Coerce to a preferred value"))
+
+(defn new-time
+  ([] (time (now)))
+  ([hour minute] (. LocalTime of hour minute))
+  ([hour minute second] (. LocalTime of hour minute second))
+  ([hour minute second nano] (. LocalTime of hour minute second nano)))
+
+(defn new-date
+  ([] (today))
+  ([year month day-of-month]
+   (. LocalDate of year month day-of-month))
+  ([year day-of-year]
+   (. LocalDate ofYearDay year day-of-year))
+  ([epoch-day]
+   (. LocalDate ofEpochDay epoch-day)))
 
 (defn current-zone
   "Return the current zone, which can be overridden by the *clock* dynamic var"
