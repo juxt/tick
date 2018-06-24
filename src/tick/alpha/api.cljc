@@ -35,6 +35,9 @@
 ;; clojure.spec assertions are used to check correctness, but these
 ;; are disabled by default (except when testing).
 
+(def new-time core/new-time)
+(def new-date core/new-date)
+
 ;; Surfacing some useful constants
 
 (def unit-map core/unit-map)

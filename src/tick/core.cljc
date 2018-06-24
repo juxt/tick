@@ -16,6 +16,19 @@
        [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
        [clojure.lang ILookup Seqable])))
 
+(defn new-time
+  ([hour minute] (. LocalTime of hour minute))
+  ([hour minute second] (. LocalTime of hour minute second))
+  ([hour minute second nano] (. LocalTime of hour minute second nano)))
+
+(defn new-date
+  ([year month day-of-month]
+   (. LocalDate of year month day-of-month))
+  ([year day-of-year]
+   (. LocalDate ofYearDay year day-of-year))
+  ([epoch-day]
+   (. LocalDate ofEpochDay epoch-day)))
+
 (def ^{:dynamic true} *clock* nil)
 
 (defn now []
