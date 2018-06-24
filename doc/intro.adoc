@@ -1,5 +1,10 @@
 = Introduction
 
+[quote, Douglas Adams, The Hitchhiker's Guide to the Galaxy]
+____
+Time is an illusion. Lunchtime doubly so.
+____
+
 _Tick_ is a comprehensive Clojure(Script) library designed to make it
 easier to write programs that involve time and date calculations:
 

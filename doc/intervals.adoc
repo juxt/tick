@@ -84,9 +84,9 @@ If the two intervals touch each other, in the case of 'today' and 'tomorrow', th
 (t/relation (t/today) (t/tomorrow))
 ----
 
-To see other possible relations, use the slider below to move the top interval along:
+To see other possible relations, use the slider in the diagram below to move the top interval along:
 
-[source.interval-relations]
+[.interval-relations]
 ----
 abc
 ----

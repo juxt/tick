@@ -1,4 +1,4 @@
-= Durations and periods
+= Durations & periods
 
 == Construction
 

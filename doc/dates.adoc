@@ -1,18 +1,269 @@
-= Times and dates
+= Times & dates
 
-Let's begin by exploring times and dates with _tick_.
+In this chapter we introduce times & dates and how we can manipulate
+them.
+
+== Introduction
+
+If we asked a stranger for the time they'd likely respond with the just time of day, for example, "a quarter to eight". It would be uncommon for them to tell you the date and timezone also, unless you asked for it. This is the same time that we learn to read as children, on analog watches and wall-clocks.
+
+So let's start with asking _tick_ for the time of day, with the `time` function. We demonstate this with our first example:
+
+.Getting the time
+====
+To get the current time, call `(t/time)` with no arguments:
+
+[source.code#time,clojure]
+----
+(t/time)
+----
+====
+
+NOTE: If you have enabled JavaScript, you'll see a button labelled `Eval` on the right of the code snippet. Press this button to instruct your browser to evaluate the _tick_ code and display the result. You can clear the result by pressing the button labelled `Clr`. Many of the code examples in this documentation can be evaluated like this.
+
+But so we can continue with our time-telling story, let's get a _specific_ time of "a quarter to eight":
+
+.Getting a specific time
+====
+To get a specific time of day, call `(t/time)` with a string argument:
+
+[source.code#specific-time,clojure]
+----
+(t/time "19:45")
+----
+====
+
+If we wanted to know the name of the day today, we might ask "what's the day today". In _tick_, we'd use the `day` function.
+
+.Getting the name of the day
+====
+We can get the name of the day today like this:
+
+[source.code,clojure]
+----
+(t/day (t/today))
+----
+
+Or, even just:
+
+[source.code,clojure]
+----
+(t/day)
+----
+
+Or, the day tomorrow:
+
+[source.code,clojure]
+----
+(t/day (t/tomorrow))
+----
+====
+
+The time "a-quarter-to-eight tomorrow" is useful, but if we wanted to record events we'd soon want to ask the date too. In _tick_, dates are specific calendar dates in the Gregorian calendar and include a day, month and year. We can ask the date with the `date` function:
+
+.Getting today's date
+====
+To get today's date, we use the `date` function without arguments:
+
+[source.code#date,clojure]
+----
+(t/date)
+----
+
+Alternatively we can call `today`:
+
+[source.code#today,clojure]
+----
+(t/today)
+----
+====
+
+NOTE: On the Java platform a _tick_ date corresponds to a `java.time.LocalDate` instance, while in a JavaScript environment it corresponds to js-joda's `LocalDate`.
+
+Like with `time`, we can get particular dates by calling `date` with a
+string argument:
+
+.Getting a specific date
+====
+To get June 21st (or 21st June! footnote:[iso-8601,Dates are so often subject to regional conventions. Therefore in _tick_, we always parse and format dates according to <<ISO8601,ISO 8601>>.]) in 2018:
+
+[source.code,clojure]
+----
+(t/date "2018-06-21")
+----
+====
+
+Now we can ask for both time and date, we can combine them into a _date-time_.
+
+We can use the function `date-time` with no arguments to get the current time at the current date:
+
+.Getting the current date-time
+====
+To get the current date-time, call `t/date-time` with no arguments:
+
+[source.code,clojure]
+----
+(t/date-time)
+----
+====
+
+As with `time` and `date`, we can use a string argument with `date-time`, as shown in <<example-specific-datetime>>.
+
+[[example-specific-datetime]]
+.Getting a specific date-time
+====
+To get the time of the  link:https://en.wikipedia.org/wiki/Armistice_of_11_November_1918[Armistice of Compiègne], use <<ISO8601,ISO 8601>>:
+
+[source.code,clojure]
+----
+(t/date-time "1918-11-11T11:00")
+----
+====
+
+A *date-time* is the time at a specific location on a specific calendar date. Since noon is established as the point at which the Sun crosses the meridian, and since the Earth is spherical and rotating, noon is the same time for everyone. Consequently, the world is split into time-zones, each at an offset to Coordinated Universal Time (UTC).
+
+If we wish to compare times in different places, we need to capture
+the local offset, as shown in <<example-datetime-local-offset>>.
+
+[[example-datetime-local-offset]]
+.Getting a specific date-time with a local offset.
+====
+The Armistice of Compiègne was agreed at 11:00 am Paris time. On November 11th, 1918, Paris was one hour ahead of UTC. To capture this offset we can use `offset-date-time`:
+
+[source.code,clojure]
+----
+(t/offset-date-time "1918-11-11T11:00:00+01:00")
+----
+====
+
+There is a problem with using time offsets—they can change for a given time zone, especially since many time zones practice Daylight Savings Time (link:https://www.timeanddate.com/time/dst/[DST]). To capture the actual time zone, rather than the offset in effect on a given date, we can use `zoned-date-time`, as shown in <<example-datetime-time-zone>>.
+
+.Why not local-date?
+****
+Java and js-joda name classes representing dates and date-times with a prefix of 'Local'. Why doesn't _tick_ maintain this convention? The reason is that date-times (and dates especially) are _always_ local, so the use of this prefix is superfluous. However, in Java, it is useful to distinguish between `java.time.LocalDate` and `java.util.Date`, or in JavaScript, between js-joda's `LocalDate` and JavaScript's built-in `Date`. In these contexts, the 'Local' prefix makes sense.
+
+In, _tick_, instances of Java's `java.util.Date` and JavaScript's `Date` are termed **inst**s, so the term *date* is unambiguous (i.e. _always_ local).
+****
+
+[[example-datetime-time-zone]]
+.Getting a specific date-time in a time zone.
+====
+The Armistice of Compiègne was agreed at 11:00 am Paris time.
+In the summer, Paris time moves one hour forward for Daylight Savings Time (DST). Although Paris did use Daylight Savings Time in 1918, link:https://www.timeanddate.com/time/change/france/paris[the clocks had already moved back (at midnight on 8th October)]. To capture the time zone, along with its various rules for calculating offsets, we can use `zoned-date-time`:
+
+[source.code,clojure]
+----
+(t/zoned-date-time
+ "1918-11-11T11:00:00Z[Europe/Paris]")
+----
+====
+
+Rather than using **offset-date-time**s and **zoned-date-time**s, you should use **instant**s when you want UTC-based date-times and don't care about time-zones and 'local' time.
+
+Since a *zoned-date-time* (and *offset-date-time*) captures the offset from UTC, we can convert these into **instant**s, as show in <<example-instant>>.
+
+NOTE: On the Java platform, an *instant* is a `java.time.Instant` and replaces the flawed `java.util.Date`. In a JavaScript environment, js-joda provides an identical class.
+
+[[example-instant]]
+.Converting an *offset-date-time* to an *instant*
+====
+To convert an *offset-date-time* to an *instant*, call `instant`:
+
+For example:
+
+[source.code,clojure]
+----
+(t/instant (t/offset-date-time "1918-11-11T11:00:00+01:00"))
+----
+====
+
+If you want to get an instant representing the current time in UTC, call `instant` without arguments.
+
+.Get the current instant in UTC
+====
+To get the current *instant*, do this:
+
+[source.code,clojure]
+----
+(t/instant)
+----
+
+Alternatively, you can just call `now`:
+
+[source.code,clojure]
+----
+(t/now)
+----
+====
+
+If you do need a `java.util.Date` or JavaScript Date, for instance, for interoperating with an existing library, use the `inst` function.
+
+====
+To coerce the current *instant* to an *inst*:
+
+[source,clojure]
+----
+(t/inst (t/now))
+----
+====
+
+That's it for our introduction. Now we'll return to constructing times
+and dates.
 
 == Construction
 
-To get started we should be able to create times and dates.
+TBD
 
-=== Instants
+== Reification
 
-Instants are precise points in time.
+TBD
 
-.Getting the current time
+== Coercion
+
+TBD
+
+== Truncation
+
+TBD
+
+== Extraction
+
+TBD
+
+== Comparison
+
+TBD
+
+
+
+
+
+== Recap and further examples
+
+[%header,cols="1l,3a"]
+|===
+|Example|Description
+|(t/time)|The time now, as 'local' time
+|(t/time "04:00")|4am, local time
+|(t/now)|The time now, as an instant
+|(t/epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant
+|(t/midnight)|Midnight
+|(t/noon)|Noon
+|(t/today)|Today's date
+|(t/date "2017-01-20")|February 20th, 2017
+|===
+
+
+
+== Construction
+
+To get started we should be able to create times and dates. Let's start with `(t/now)` which returns an instant at this precise point in time.
+
+We'll demonstrate this with our first example, like this:
+
+.Getting the current instant
 ====
-To get the instant representing the current time, call `(t/now)`.
+To get the current instant, call `(t/now)`.
 
 [source.code#now,clojure]
 ----
@@ -20,43 +271,13 @@ To get the instant representing the current time, call `(t/now)`.
 ----
 ====
 
-[%header,cols="1l,3a"]
-|===
-|Example|Description
-|(t/now)|The time now
-|(t/epoch)|Constant for the 1970-01-01T00:00:00Z epoch instant. Returns a java.time.Instant
-|===
+An instant captures the current time and date in UTC.
 
-=== Times
 
-If you asked a stranger for the time, you'd hopefully get an answer,
-something like "15 minutes to midnight". It would be uncommon for them
-to tell you the date and timezone also, unless you asked for it.
 
-The idea of the 'local' time, that you might read on a wall clock, is
-still a useful concept. From a functional programming perspective, you
-might think of this as 'partial evaluation' as applied to time.
-
-[%header,cols="l,a,l"]
-|===
-|Example|Description|Return type
-|(t/time)|The time now, as local time|java.time.LocalTime
-|(t/time "4pm")|16:00, local time|java.time.LocalTime
-|(t/midnight)|Midnight|java.time.LocalTime
-|(t/noon)|Noon|java.time.LocalTime
-|===
 
 [[dates]]
 === Dates
-
-To get the current date, call `(t/today)`. This will return a `java.time.LocalDate`.
-
-[%header,cols="l,a,l"]
-|===
-|Example|Description|Return type
-|(t/today)|Today's date|java.time.LocalDate
-|(t/date "2017-01-20")|February 20th, 2017|java.time.LocalDate
-|===
 
 === Date-times
 
@@ -65,7 +286,7 @@ Date-times represent a particular time on a particular date.
 To get the local time right now, with today's date, call `local-date-time` without any arguments:
 
 ----
-(t/local-date-time)
+(t/date-time)
 ----
 
 ====
@@ -84,7 +305,7 @@ We can use an offset to create an `OffsetDateTime`.
 
 ====
 ----
-(t/offset-date-time "2017-12-15T12:00:00+04:30")
+(t/offset-date-time "1918-11-11T11:00:00+01:00")
 ----
 ====
 
@@ -99,6 +320,25 @@ We can create a `java.time.ZonedDateTime` instance explicitly, with `zoned-date-
 ====
 
 ==== Reification
+
+Alternatively, we can use `on` to reify from an existing time with a date, or `at` to reify an existing date with a time,
+
+====
+Alternatively, we can start with the date of `1918-11-11` and set the time of 11am with `at`:
+
+[source.code,clojure]
+----
+(-> (t/date "1918-11-11") (t/at "11:00"))
+----
+
+Or, the other way around with `on`:
+
+[source.code,clojure]
+----
+(-> (t/time "11:00") (t/on "1918-11-11"))
+----
+====
+
 
 While `(t/time "8pm")` gives a local-time on any date, you may want that time on a particular date, say Valentine's Day in 2018. You need to reify (a word meaning to 'make concrete') that time with a date to make a date-time. We can reify with `t/on` and `t/at`.
 

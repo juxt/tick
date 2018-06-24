@@ -4,13 +4,11 @@ Malcolm Sparks, Henry Widd
 :toc: left
 :toclevels: 4
 :docinfo: shared
+:sectnums: true
+:sectnumlevels: 2
+:xrefstyle: short
 
 :leveloffset: +1
-
-[quote, Douglas Adams, The Hitchhiker's Guide to the Galaxy]
-____
-Time is an illusion. Lunchtime doubly so.
-____
 
 include::intro.adoc[]
 
@@ -29,3 +27,5 @@ include::intervals.adoc[]
 include::calendars.adoc[]
 
 include::schedules.adoc[]
+
+include::bibliography.adoc[]

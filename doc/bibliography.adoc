@@ -1,0 +1,4 @@
+[bibliography]
+= References
+
+- [[[ISO8601]]] link:https://en.wikipedia.org/wiki/ISO_8601[ISO 8601: Data elements and interchange formats – Information interchange – Representation of dates and times]

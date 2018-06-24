@@ -1,7 +1,5 @@
 = Setup
 
-== Lein/Boot users
-
 Add to your lein or boot dependencies:
 
 ```
