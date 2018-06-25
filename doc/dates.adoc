@@ -198,12 +198,20 @@ Alternatively, you can just call `now`:
 
 If you do need a `java.util.Date` or JavaScript Date, for instance, for interoperating with an existing library, use the `inst` function.
 
+.Converting an *instant* to an *inst*
 ====
 To convert the current *instant* to an *inst*:
 
 [source.code,clojure]
 ----
 (t/inst (t/now))
+----
+
+In this case, the same could be achieved with the zero-argument form of `inst`:
+
+[source.code,clojure]
+----
+(t/inst)
 ----
 ====
 
@@ -214,6 +222,7 @@ and dates.
 
 Time values are constructed with `new-time`.
 
+.Creating a time value
 ====
 To create the time 11 o'clock am:
 
@@ -252,6 +261,7 @@ These conventions have been taken from a link:https://stuartsierra.com/2016/01/0
 
 Similarly, dates are constructed with `new-date`, a function which has 3 forms. The first, and most common form, requires 3 arguments: the year, month and day (of the month).
 
+.Creating a date value
 ====
 JUXT was incorporated on March 22nd, 2013. We can create this date with `new-date` like this:
 
@@ -267,11 +277,16 @@ While `t/time` and `t/new-time` return a time, you may want to provide a date fo
 
 .reify
 ****
-The word 'reify' means to 'make concrete'.
++[+**ree**-__uh__-fahy, **rey**-+]+ footnote:[From link:http://www.dictionary.com/browse/reify[reify at dictionary.com]]
 
-You can think of a *time* (or a *date*) as being a partially defined *date-time*.
+verb (used with object), re·i·fied, re·i·fy·ing.
+
+. to convert into or regard as a concrete thing: _to reify a concept_.
 ****
 
+You can think of a *time* (or a *date*) as being a partially defined *date-time*.
+
+.Reifying a **date-time** from dates and times
 ====
 If we have a date of `1918-11-11`, we can construct a *date-time* by giving the time of 11am with `at`:
 
@@ -292,6 +307,7 @@ We can also use reification to provide the location, with `in`. This
 allows us to take a local *date-time* and produce either a
 *zoned-date-time* or an *offset-date-time*.
 
+.Reifying a **zoned-date-time** from dates and times
 ====
 To construct the *zoned-date-time* of the Armistice of Compiègne with `time`, `on` and `in`:
 
