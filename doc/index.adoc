@@ -7,6 +7,7 @@ Malcolm Sparks, Henry Widd
 :sectnums: true
 :sectnumlevels: 2
 :xrefstyle: short
+:nofooter:
 
 :leveloffset: +1
 
