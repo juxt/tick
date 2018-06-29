@@ -293,8 +293,8 @@
 
 ;; Intervals
 
-(defn make-interval [x y]
-  (interval/make-interval x y))
+(defn new-interval [x y]
+  (interval/new-interval x y))
 
 (defn extend [ival & durations]
   (reduce interval/extend ival durations))

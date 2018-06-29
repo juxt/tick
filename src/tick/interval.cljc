@@ -20,7 +20,7 @@
 
 ;; Construction
 
-(defn- make-interval* [beginning end]
+(defn- make-interval [beginning end]
   (assert (t/< beginning end))
   {:tick/beginning beginning
    :tick/end end})
@@ -33,7 +33,7 @@
   #?(:clj (instance? TemporalAmount o)
      :cljs (.isPrototypeOf TemporalAmount (type o))))
 
-(defn make-interval [v1 v2]
+(defn new-interval [v1 v2]
   (let [t1 (t/beginning (t/temporal-value v1))
         t2 (t/end (t/temporal-value v2))]
     (if (t/< t1 t2)
@@ -47,12 +47,12 @@
 ;; Durations can be negative, so a retraction is simply an extend with a negative duration.
 
 (defn extend [ival dur]
-  (make-interval*
+  (make-interval
     (t/beginning ival)
     (t/forward-duration (t/end ival) dur)))
 
 (defn scale [ival factor]
-  (make-interval*
+  (make-interval
     (t/beginning ival)
     (t/forward-duration (t/beginning ival) (.multipliedBy (t/duration ival) factor))))
 
@@ -86,19 +86,19 @@
 
 (extend-protocol t/ITimeReify
   #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
-  (on [i date] (make-interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
-  (in [i zone] (make-interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
+  (on [i date] (new-interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
+  (in [i zone] (new-interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
 (defn bounds [& args]
-  (make-interval*
+  (make-interval
     (apply t/min (map t/beginning args))
     (apply t/max (map t/end args))))
 
 (defn am [^LocalDate date]
-  (make-interval (t/beginning date) (t/noon date)))
+  (new-interval (t/beginning date) (t/noon date)))
 
 (defn pm [^LocalDate date]
-  (make-interval (t/noon date) (t/end date)))
+  (new-interval (t/noon date) (t/end date)))
 
 ;; Allen's Basic Relations
 
@@ -249,7 +249,7 @@
     (when (t/< beginning end)
       (if (associative? ival)
         (assoc ival :tick/beginning beginning :tick/end end)
-        (make-interval* beginning end)))))
+        (make-interval beginning end)))))
 
 (defn split-interval [ival t]
   [(slice-interval ival (t/beginning ival) t)
@@ -351,7 +351,7 @@
 ;; intervals using the normal <, >, <=, >= operators.
 
 (defn interval [t]
-  (make-interval (t/beginning t) (t/end t)))
+  (new-interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
   LocalDate
@@ -431,7 +431,7 @@
                                                                                                             :relation (relation ival1 ival2)})))))))]
     (unite intervals)))
 
-(defn make-interval-group
+(defn new-interval-group
   "Return an interval group. Interval groups are maps with
   a :tick/intervals entry that contain a time-ordered sequence of
   disjoint intervals."
@@ -447,10 +447,10 @@
   (letfn [(normalize [intervals]
             (lazy-seq
               (let [[ival1 ival2 & r] intervals]
-                (if (nil? ival2) (if ival1 (list (make-interval-group ival1)) (list))
+                (if (nil? ival2) (if ival1 (list (new-interval-group ival1)) (list))
                     (case (relation ival1 ival2)
                       :meets (normalize (cons (splice ival1 ival2) r))
-                      (cons (make-interval-group ival1)
+                      (cons (new-interval-group ival1)
                             (normalize (assert-proper-head (rest intervals)))))))))]
     (normalize (assert-proper-head intervals))))
 
@@ -634,14 +634,14 @@
 
 (defn complement [coll]
   (if (empty? coll)
-    [(make-interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
-    (let [r (map (fn [[x y]] (make-interval (t/end x) (t/beginning y)))
+    [(new-interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
+    (let [r (map (fn [[x y]] (new-interval (t/end x) (t/beginning y)))
                  (partition 2 1 coll))]
       (cond-> r
         (not= (t/beginning (first coll)) (t/min-of-type (t/beginning (first coll))))
-        (#(concat [(make-interval (t/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))
+        (#(concat [(new-interval (t/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))
         (not= (t/end (last coll)) (t/max-of-type (t/end (last coll))))
-        (#(concat % [(make-interval (t/end (last coll)) (t/max-of-type (t/end (last coll))))]))))))
+        (#(concat % [(new-interval (t/end (last coll)) (t/max-of-type (t/end (last coll))))]))))))
 
 (defn disjoin
   "Split s1 across the grating defined by s2"

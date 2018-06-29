@@ -92,10 +92,10 @@
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/make-interval (t/date-time "2017-08-08T00:00:00")
+    (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")
              (t/date-time "2017-08-08T12:00:00"))
           (t/am (t/today))))
-    (is (= (t/make-interval (t/date-time "2017-08-08T12:00:00")
+    (is (= (t/new-interval (t/date-time "2017-08-08T12:00:00")
              (t/date-time "2017-08-09T00:00:00"))
           (t/pm (t/today))))))
 
@@ -135,11 +135,11 @@
     (= 2
        (t/hours
          (t/duration
-           (t/concur (t/make-interval (t/at (t/today) "16:00")
-                                 (t/end (t/today)))
+           (t/concur (t/new-interval (t/at (t/today) "16:00")
+                                     (t/end (t/today)))
                      (t/today)
-                     (t/make-interval (t/at (t/today) "20:00")
-                                 (t/at (t/today) "22:00"))))))))
+                     (t/new-interval (t/at (t/today) "20:00")
+                                     (t/at (t/today) "22:00"))))))))
 
 ;; Let's count some days over Easter 2017.
 #?(:clj                                 ;cal not in cljs
@@ -198,21 +198,21 @@
 
 #_(t/partition-by-date)
 
-#_((t/at-zone (t/make-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
+#_((t/at-zone (t/new-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
 
-#_(t/make-interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
+#_(t/new-interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
 
 #_(t/partition-by-date
-    (t/make-interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
+    (t/new-interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
     )
 
-#_(t/make-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"])
+#_(t/new-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"])
 
-#_(t/dates (t/make-interval "2017-09-10T12:00" "2017-09-11T14:00"))
+#_(t/dates (t/new-interval "2017-09-10T12:00" "2017-09-11T14:00"))
 
-#_(t/make-interval "2017-09-10T12:00" "2017-09-10T14:00")
+#_(t/new-interval "2017-09-10T12:00" "2017-09-10T14:00")
 
-#_(t/dates (t/make-interval "2017-09-10T12:00" "2017-09-10T14:00"))
+#_(t/dates (t/new-interval "2017-09-10T12:00" "2017-09-10T14:00"))
 
 
 #_(t/time "2017-08-19T02:00:00Z")
@@ -226,7 +226,7 @@
     )
 
 
-#_(dates (make-interval (t/year-month "2017-12") (t/year-month "2018-03")))
+#_(dates (new-interval (t/year-month "2017-12") (t/year-month "2018-03")))
 
 #_(t/time "2017-07-30T12:00:00")
 
@@ -234,24 +234,24 @@
 
 ;;(t/midnight? (t/date (t/at (t/date "2017-07-30") (t/time "4pm"))))
 
-#_(make-interval (t/date "2017-07-30")
+#_(new-interval (t/date "2017-07-30")
     (t/date "2017-08-11"))
 
-#_(make-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
+#_(new-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
     (t/date "2017-08-11"))
 
-#_(dates (make-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
+#_(dates (new-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
            (t/date "2017-08-11")))
 
 #_(sort-by first
     (group-by-date
-      (make-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
+      (new-interval (t/at (t/date "2017-07-30") (t/time "4pm"))
         (t/date "2017-08-11"))))
 
 #_(t/beginning
     (t/year-month "2017-09"))
 
-#_(make-interval
+#_(new-interval
     (t/beginning
       (t/year-month "2017-09"))
     (t/end
@@ -259,38 +259,38 @@
 
 
 
-#_(t/make-interval "2017-09-10T14:00" "2017-10-30T08:00")
+#_(t/new-interval "2017-09-10T14:00" "2017-10-30T08:00")
 
-#_(t/inc (t/date (second (t/make-interval "2017-09-10T14:00" "2017-10-30T08:00"))))
+#_(t/inc (t/date (second (t/new-interval "2017-09-10T14:00" "2017-10-30T08:00"))))
 
-#_(t/year-months (t/make-interval "2017-09-10T14:00" "2017-10-30T08:00"))
+#_(t/year-months (t/new-interval "2017-09-10T14:00" "2017-10-30T08:00"))
 
-#_(t/group-by t/dates (t/make-interval "2017-09-10T14:00" "2017-10-30T08:00"))
+#_(t/group-by t/dates (t/new-interval "2017-09-10T14:00" "2017-10-30T08:00"))
 
 #_(t/group-by t/dates "2017-10")
 
 #_(t/dates (t/year-month "2017-09"))
 
-#_(t/partition-by-date (t/make-interval (t/year-month "2017-09")))
+#_(t/partition-by-date (t/new-interval (t/year-month "2017-09")))
 
-#_(t/group-by-date (t/make-interval (t/year-month "2017-09")))
+#_(t/group-by-date (t/new-interval (t/year-month "2017-09")))
 
-#_(t/make-interval (t/make-interval (t/year-month "2017-09")))
+#_(t/new-interval (t/new-interval (t/year-month "2017-09")))
 
-#_(tick.interval/dates (t/make-interval (t/year-month "2017-09")))
+#_(tick.interval/dates (t/new-interval (t/year-month "2017-09")))
 
 
 ;;(partition-by-date )
 
 
-#_(-> (t/year-month "2017-09") t/make-interval second t/year-month t/inc t/beginning)
+#_(-> (t/year-month "2017-09") t/new-interval second t/year-month t/inc t/beginning)
 
-#_(t/beginning (second (t/make-interval "2017-09")))
+#_(t/beginning (second (t/new-interval "2017-09")))
 
 
-#_(t/year-months (t/make-interval "2017-09"))
+#_(t/year-months (t/new-interval "2017-09"))
 
-#_(t/dates (t/make-interval "2017-09"))
+#_(t/dates (t/new-interval "2017-09"))
 
 #_(range 10 10)
 
@@ -319,7 +319,7 @@
 ;; Example: We mustn't disturb people between 10pm and 7am the following morning, in their locale.
 
 (defn moment [t]
-  (t/make-interval
+  (t/new-interval
     t
     (t/+ t (t/make-duration 3 :seconds))))
 
@@ -328,7 +328,7 @@
 ;; Can we disturb?
 (deftest cannot-disturb-test
   (let
-      [disturb-interval [(t/make-interval (t/time "07:00") (t/time "22:00"))]
+      [disturb-interval [(t/new-interval (t/time "07:00") (t/time "22:00"))]
        no-disturb-interval (t/complement disturb-interval)
        can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
        ]
@@ -344,26 +344,26 @@
 
 ;; TODO: An 'on' test with an interval
 #_(t/on
-  (t/make-interval (t/time "07:00") (t/time "22:00"))
+  (t/new-interval (t/time "07:00") (t/time "22:00"))
   (t/today))
 
 
 ;; Weekend
 #_(let
-    [disturb-interval [(t/make-interval (t/time "07:00") (t/time "21:00"))]
+    [disturb-interval [(t/new-interval (t/time "07:00") (t/time "21:00"))]
      no-disturb-interval (t/complement disturb-interval)
      t (t/time "6:00")]
   (not (some #(t/coincident? % t) no-disturb-interval)))
 
 
-#_(t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])
+#_(t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
 
-#_(t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])
+#_(t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
 
 
 
 #_(not (some (partial t/concur (moment (t/time "21:59:57")))
-           (t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])))
+           (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])))
 
 #_(t/at-zone (t/midnight (t/today)) "Europe/Berlin")
 
@@ -371,15 +371,15 @@
 #_(t/time (t/as-local (t/now) "Europe/Berlin"))
 
 
-#_(t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])
+#_(t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
 
 
-#_(t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])
+#_(t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
 
 
 
 #_(tick.interval/concur?
-  (t/complement [(t/make-interval (t/time "07:00") (t/time "22:00"))])
+  (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
   (moment (t/time (t/as-local (t/now) "Europe/Berlin"))))
 
 
