@@ -35,6 +35,8 @@
 ;; clojure.spec assertions are used to check correctness, but these
 ;; are disabled by default (except when testing).
 
+;; Construction
+
 (def new-time core/new-time)
 (def new-date core/new-date)
 
@@ -49,31 +51,6 @@
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
 
-;; Constants
-
-(def monday (t.i/static-prop  DayOfWeek MONDAY))
-(def tuesday (t.i/static-prop  DayOfWeek TUESDAY))
-(def wednesday (t.i/static-prop  DayOfWeek WEDNESDAY))
-(def thursday (t.i/static-prop  DayOfWeek THURSDAY))
-(def friday (t.i/static-prop  DayOfWeek FRIDAY))
-(def saturday (t.i/static-prop  DayOfWeek SATURDAY))
-(def sunday (t.i/static-prop  DayOfWeek SUNDAY))
-
-(def january (t.i/static-prop  Month JANUARY))
-(def february (t.i/static-prop  Month FEBRUARY))
-(def march (t.i/static-prop  Month MARCH))
-(def april (t.i/static-prop  Month APRIL))
-(def may (t.i/static-prop  Month MAY))
-(def june (t.i/static-prop  Month JUNE))
-(def july (t.i/static-prop  Month JULY))
-(def august (t.i/static-prop  Month AUGUST))
-(def september (t.i/static-prop  Month SEPTEMBER))
-(def october (t.i/static-prop  Month OCTOBER))
-(def november (t.i/static-prop  Month NOVEMBER))
-(def december (t.i/static-prop  Month DECEMBER))
-
-;; Construction and coercion
-
 (defn time
   ([] (core/time (now)))
   ([v] (core/time v)))
@@ -81,6 +58,8 @@
 (defn date
   ([] (today))
   ([v] (core/date v)))
+
+;; Conversion
 
 (defn nanosecond [t] (core/nanosecond t))
 (defn microsecond [t] (core/microsecond t))
@@ -92,15 +71,19 @@
 (defn day
   ([] (core/day (today)))
   ([v] (core/day v)))
+
 (defn day-of-month
   ([] (core/day-of-month (today)))
   ([v] (core/day-of-month v)))
+
 (defn inst
   ([] (core/inst (now)))
   ([v] (core/inst v)))
+
 (defn instant
   ([] (core/instant (now)))
   ([v] (core/instant v)))
+
 (defn offset-date-time
   ([] (core/offset-date-time (now)))
   ([v] (core/offset-date-time v)))
@@ -133,6 +116,32 @@
 (defn date-time
   ([] (core/date-time (now)))
   ([v] (core/date-time v)))
+
+
+
+;; Constants
+
+(def monday (t.i/static-prop DayOfWeek MONDAY))
+(def tuesday (t.i/static-prop DayOfWeek TUESDAY))
+(def wednesday (t.i/static-prop DayOfWeek WEDNESDAY))
+(def thursday (t.i/static-prop DayOfWeek THURSDAY))
+(def friday (t.i/static-prop DayOfWeek FRIDAY))
+(def saturday (t.i/static-prop DayOfWeek SATURDAY))
+(def sunday (t.i/static-prop DayOfWeek SUNDAY))
+
+(def january (t.i/static-prop Month JANUARY))
+(def february (t.i/static-prop Month FEBRUARY))
+(def march (t.i/static-prop Month MARCH))
+(def april (t.i/static-prop Month APRIL))
+(def may (t.i/static-prop Month MAY))
+(def june (t.i/static-prop Month JUNE))
+(def july (t.i/static-prop Month JULY))
+(def august (t.i/static-prop Month AUGUST))
+(def september (t.i/static-prop Month SEPTEMBER))
+(def october (t.i/static-prop Month OCTOBER))
+(def november (t.i/static-prop Month NOVEMBER))
+(def december (t.i/static-prop Month DECEMBER))
+
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
