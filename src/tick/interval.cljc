@@ -68,7 +68,7 @@
         (update :tick/end #(t/backward-duration % d)))))
 
 ;; An interval of duration d to t1 can be constructed like this:
-;; (scale (make-interval t1 d) -1)
+;; (scale (new-interval t1 d) -1)
 
 ;; (>> _ d) to shift the interval into the future by duration d
 ;; (<< _ d) to shift the interval into the past by duration d
@@ -182,12 +182,12 @@
 ;; causes the general relation to hold. Note there can only be one
 ;; such basic relation due to the relations being distinct.
 
-(defn make-relation [& basic-relations]
+(defn new-relation [& basic-relations]
   (->GeneralRelation basic-relations))
 
 (def ^{:doc "A function to determine the (basic) relation between two intervals."}
   basic-relation
-  (apply make-relation basic-relations))
+  (apply new-relation basic-relations))
 
 (defn relation [x y]
   (relation->kw (basic-relation x y)))
@@ -226,9 +226,9 @@
 
 ;; Useful named general relations
 
-(def disjoint? (make-relation precedes? preceded-by? meets? met-by?))
+(def disjoint? (new-relation precedes? preceded-by? meets? met-by?))
 (def concur? (complement-r disjoint?))
-(def precedes-or-meets? (make-relation precedes? meets?))
+(def precedes-or-meets? (new-relation precedes? meets?))
 
 ;; Functions that make use of Allens' Interval Algebra
 
@@ -383,7 +383,7 @@
   intervals. The given collection must contain proper intervals (that
   is, intervals that have finite greater-than-zero durations)."
   [s]
-  (let [rel (make-relation precedes? meets?)]
+  (let [rel (new-relation precedes? meets?)]
     (some?
      (loop [[x & xs] s]
        (if (or (nil? x) (nil? (first xs))) true

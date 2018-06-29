@@ -47,11 +47,11 @@
 ;; Period arithmetic
 
 (deftest addition-test
-  (is (= (t/make-duration 5 :seconds) (t/+ (t/make-duration 2 :seconds) (t/make-duration 3 :seconds))))
-  (is (= (t/make-duration 2 :minutes) (t/+ (t/make-duration 90 :seconds) (t/make-duration 30 :seconds)))))
+  (is (= (t/new-duration 5 :seconds) (t/+ (t/new-duration 2 :seconds) (t/new-duration 3 :seconds))))
+  (is (= (t/new-duration 2 :minutes) (t/+ (t/new-duration 90 :seconds) (t/new-duration 30 :seconds)))))
 
 (deftest subtraction-test
-  (is (= (t/make-duration 3 :seconds) (t/- (t/make-duration 5 :seconds) (t/make-duration 2 :seconds)))))
+  (is (= (t/new-duration 3 :seconds) (t/- (t/new-duration 5 :seconds) (t/new-duration 2 :seconds)))))
 
 ;; Range test
 
@@ -67,7 +67,7 @@
   (is
     (=
       {:years 10, :months 0, :days 0}
-      (t/units (t/make-period 10 :years)))))
+      (t/units (t/new-period 10 :years)))))
 
 ;; Comparison test
 
@@ -75,20 +75,20 @@
   (is
     (t/<
       (t/now)
-      (t/+ (t/now) (t/make-duration 10 :seconds))
-      (t/+ (t/now) (t/make-duration 20 :seconds))))
+      (t/+ (t/now) (t/new-duration 10 :seconds))
+      (t/+ (t/now) (t/new-duration 20 :seconds))))
   (is
     (t/>
-      (t/+ (t/now) (t/make-duration 20 :seconds))
-      (t/+ (t/now) (t/make-duration 10 :seconds))
+      (t/+ (t/now) (t/new-duration 20 :seconds))
+      (t/+ (t/now) (t/new-duration 10 :seconds))
       (t/now)))
   (is (not
         (t/<
           (t/now)
-          (t/+ (t/now) (t/make-duration 20 :seconds))
-          (t/+ (t/now) (t/make-duration 10 :seconds)))))
-  (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/make-duration 1 :seconds))))
-  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/make-duration 10 :seconds)))))
+          (t/+ (t/now) (t/new-duration 20 :seconds))
+          (t/+ (t/now) (t/new-duration 10 :seconds)))))
+  (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/new-duration 1 :seconds))))
+  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/new-duration 10 :seconds)))))
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
@@ -103,11 +103,11 @@
 ;; units.
 
 (deftest duration-test
-  (is (= (t/make-duration 1e6 :nanos) (t/make-duration 1 :millis)))
-  (is (= (t/make-duration 1e9 :nanos) (t/make-duration 1 :seconds)))
-  (is (= (t/make-duration 1000 :millis) (t/make-duration 1 :seconds)))
+  (is (= (t/new-duration 1e6 :nanos) (t/new-duration 1 :millis)))
+  (is (= (t/new-duration 1e9 :nanos) (t/new-duration 1 :seconds)))
+  (is (= (t/new-duration 1000 :millis) (t/new-duration 1 :seconds)))
 
-  (is (= (t/make-duration 24 :hours) (t/duration (t/tomorrow)))))
+  (is (= (t/new-duration 24 :hours) (t/duration (t/tomorrow)))))
 
 ;; TODO: Interval testing
 
@@ -124,7 +124,7 @@
   (is (= 2 (count (t/divide-by t/year-month (t/bounds "2017-09-10" "2017-10-10")))))
   (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019")))))
   (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019-02")))))
-  (is (= 24 (count (t/divide-by (t/make-duration 1 :hours) (t/date "2017-09-10"))))))
+  (is (= 24 (count (t/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10"))))))
 
 ;; TODO: Divide by duration
 
@@ -321,7 +321,7 @@
 (defn moment [t]
   (t/new-interval
     t
-    (t/+ t (t/make-duration 3 :seconds))))
+    (t/+ t (t/new-duration 3 :seconds))))
 
 ;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
 

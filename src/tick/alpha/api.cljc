@@ -311,13 +311,13 @@
 (defn relation [i1 i2]
   (interval/relation i1 i2))
 
-(defn make-duration
+(defn new-duration
   [n u]
-  (core/make-duration n u))
+  (core/new-duration n u))
 
-(defn make-period
+(defn new-period
   [n u]
-  (core/make-period n u))
+  (core/new-period n u))
 
 (defn between [v1 v2] (core/between v1 v2))
 

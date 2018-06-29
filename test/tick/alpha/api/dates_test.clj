@@ -40,7 +40,7 @@
       (testing "(clock) return type"
         (is (instance? Clock (clock))))
       (testing "Time shifting the clock back by 2 hours"
-        (is (= "2018-02-14T13:00:00Z" (str (instant (<< (clock) (make-duration 2 :hours)))))))))
+        (is (= "2018-02-14T13:00:00Z" (str (instant (<< (clock) (new-duration 2 :hours)))))))))
 
   (testing "Creating a clock with a zone, and returning that zone"
     (is (= "America/New_York" (str (zone (clock (zone "America/New_York")))))))
