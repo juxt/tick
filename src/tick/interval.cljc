@@ -33,13 +33,53 @@
   #?(:clj (instance? TemporalAmount o)
      :cljs (.isPrototypeOf TemporalAmount (type o))))
 
+(defprotocol ITimeSpanable
+  (temporal-value [_] "Return a value of a type that satisfies t/ITimeSpan"))
+
+(extend-protocol ITimeSpanable
+  #?(:clj clojure.lang.Fn :cljs function)
+  (temporal-value [f] (temporal-value (f)))
+
+  Instant
+  (temporal-value [i] i)
+
+  #?(:clj String :cljs string)
+  (temporal-value [s] (temporal-value (t/parse s)))
+
+  LocalDate
+  (temporal-value [d] d)
+
+  LocalTime
+  (temporal-value [t] t)
+
+  LocalDateTime
+  (temporal-value [ldt] ldt)
+
+  Date
+  (temporal-value [d] (t/instant d))
+
+  YearMonth
+  (temporal-value [ym] ym)
+
+  Year
+  (temporal-value [y] y)
+
+  OffsetDateTime
+  (temporal-value [odt] odt)
+
+  ZonedDateTime
+  (temporal-value [zdt] zdt))
+
 (defn new-interval [v1 v2]
-  (let [t1 (t/beginning (t/temporal-value v1))
-        t2 (t/end (t/temporal-value v2))]
+  (let [t1 (t/beginning (temporal-value v1))
+        t2 (t/end (temporal-value v2))]
     (if (t/< t1 t2)
       {:tick/beginning t1
        :tick/end t2}
-      (throw (ex-info "Interval must span between two times, the first must be before the second" {:tick/beginning v1 :tick/end v2})))))
+      (throw
+        (ex-info
+          "Interval must span between two times, the first must be before the second"
+          {:tick/beginning v1 :tick/end v2})))))
 
 ;; Adjustments
 

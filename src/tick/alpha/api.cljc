@@ -51,6 +51,8 @@
 (defn tomorrow [] (core/tomorrow))
 (defn yesterday [] (core/yesterday))
 
+;; Conversions, with 0-arity defaults
+
 (defn time
   ([] (core/time (now)))
   ([v] (core/time v)))
@@ -58,23 +60,6 @@
 (defn date
   ([] (today))
   ([v] (core/date v)))
-
-;; Conversion
-
-(defn nanosecond [t] (core/nanosecond t))
-(defn microsecond [t] (core/microsecond t))
-(defn millisecond [t] (core/millisecond t))
-(defn second [t] (core/second t))
-(defn minute [t] (core/minute t))
-(defn hour [t] (core/hour t))
-
-(defn day
-  ([] (core/day (today)))
-  ([v] (core/day v)))
-
-(defn day-of-month
-  ([] (core/day-of-month (today)))
-  ([v] (core/day-of-month v)))
 
 (defn inst
   ([] (core/inst (now)))
@@ -84,9 +69,34 @@
   ([] (core/instant (now)))
   ([v] (core/instant v)))
 
+(defn date-time
+  ([] (core/date-time (now)))
+  ([v] (core/date-time v)))
+
 (defn offset-date-time
   ([] (core/offset-date-time (now)))
   ([v] (core/offset-date-time v)))
+
+(defn zoned-date-time
+  ([] (core/zoned-date-time (now)))
+  ([v] (core/zoned-date-time v)))
+
+;; Extraction
+
+(defn nanosecond [t] (core/nanosecond t))
+(defn microsecond [t] (core/microsecond t))
+(defn millisecond [t] (core/millisecond t))
+(defn second [t] (core/second t))
+(defn minute [t] (core/minute t))
+(defn hour [t] (core/hour t))
+
+(defn day-of-week
+  ([] (core/day-of-week (today)))
+  ([v] (core/day-of-week v)))
+
+(defn day-of-month
+  ([] (core/day-of-month (today)))
+  ([v] (core/day-of-month v)))
 
 (defn month
   ([] (core/month (today)))
@@ -109,15 +119,12 @@
   ([hours minutes] (. ZoneOffset ofHoursMinutes hours minutes))
   ([hours minutes seconds] (. ZoneOffset ofHoursMinutesSeconds hours minutes seconds)))
 
-(defn zoned-date-time
-  ([] (core/zoned-date-time (now)))
-  ([v] (core/zoned-date-time v)))
+;; Reification
 
-(defn date-time
-  ([] (core/date-time (now)))
-  ([v] (core/date-time v)))
-
-
+(defn on [t d] (core/on t (date d)))
+(defn at [d t] (core/at d (time t)))
+(defn in [ldt z] (core/in ldt (zone z)))
+(defn offset-by [ldt offset] (core/offset-by ldt (zone-offset offset)))
 
 ;; Constants
 
@@ -142,23 +149,11 @@
 (def november (t.i/static-prop Month NOVEMBER))
 (def december (t.i/static-prop Month DECEMBER))
 
-
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
 (defn duration [v] (core/duration v))
 
-#_(defn timespan-map [v]
-  {:tick/beginning (core/beginning v)
-   :tick/end (core/end v)})
-
 (def coincident? core/coincident?)
-
-;; Time
-
-(defn on [t d] (core/on t (date d)))
-(defn at [d t] (core/at d (time t)))
-(defn in [ldt z] (core/in ldt (zone z)))
-(defn offset-by [ldt offset] (core/offset-by ldt (zone-offset offset)))
 
 (def noon core/noon)
 (def midnight core/midnight)

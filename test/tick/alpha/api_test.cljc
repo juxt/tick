@@ -149,8 +149,8 @@
            (t/date "2017-04-16")
            (cal/easter-sunday 2017)))
 
-     (is (= t/tuesday (t/day (t/date "2017-04-11"))))
-     (is (= t/wednesday (t/day (t/date "2017-04-19"))))
+     (is (= t/tuesday (t/day-of-week (t/date "2017-04-11"))))
+     (is (= t/wednesday (t/day-of-week (t/date "2017-04-19"))))
 
      ;; Let's take a vacation
      (let [vacation (t/bounds (t/date "2017-04-11") (t/date "2017-04-19"))]
@@ -172,7 +172,7 @@
          ;; OK, now we want to display the vacation on a monthly calendar,
          ;; and want to determine what to display for Thursday 13th April. Does our vacation include this Thursday?
          (let [day (t/date "2017-04-13")]
-           (is (= t/thursday (t/day day)))
+           (is (= t/thursday (t/day-of-week day)))
            ;; Intersections are powerful. If we only booked off a
            ;; half-day on this thursday, the intersection would return
            ;; this half-day.

@@ -121,20 +121,29 @@
   (property-value [this prop-name]
     (first (property-values this prop-name)))
 
-  t/ICoercions
-  (date [this] (t/date (property-value this :dtstart)))
-  (time [this] (t/time (property-value this :dtstart)))
-  (day [this] (t/day (property-value this :dtstart)))
-  (day-of-month [this] (t/day-of-month (property-value this :dtstart)))
+  t/IConversion
   (inst [this] (t/inst (property-value this :dtstart)))
   (instant [this] (t/inst (property-value this :dtstart)))
+  (offset-date-time [this] (t/offset-date-time (property-value this :dtstart)))
+  (zoned-date-time [this] (t/zoned-date-time (property-value this :dtstart)))
+
+  t/IExtraction
+  (time [this] (t/time (property-value this :dtstart)))
+  (date [this] (t/date (property-value this :dtstart)))
+  (date-time [this] (t/date-time (property-value this :dtstart)))
+  (nanosecond [this] (t/nanosecond (property-value this :dtstart)))
+  (microsecond [this] (t/microsecond (property-value this :dtstart)))
+  (millisecond [this] (t/millisecond (property-value this :dtstart)))
+  (second [this] (t/second (property-value this :dtstart)))
+  (minute [this] (t/minute (property-value this :dtstart)))
+  (hour [this] (t/hour (property-value this :dtstart)))
+  (day-of-week [this] (t/day-of-week (property-value this :dtstart)))
+  (day-of-month [this] (t/day-of-month (property-value this :dtstart)))
   (month [this] (t/month (property-value this :dtstart)))
   (year [this] (t/year (property-value this :dtstart)))
   (year-month [this] (t/year-month (property-value this :dtstart)))
   (zone [this] (t/zone (property-value this :dtstart)))
-  (zoned-date-time [this] (t/zoned-date-time (property-value this :dtstart)))
-  (offset-date-time [this] (t/offset-date-time (property-value this :dtstart)))
-  (date-time [this] (t/date-time (property-value this :dtstart))))
+  (zone-offset [this] (t/zone-offset (property-value this :dtstart))))
 
 (defrecord VCalendar [objects]
   ;; TODO: Add t/ITimeSpan

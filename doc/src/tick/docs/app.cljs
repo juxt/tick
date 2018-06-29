@@ -24,10 +24,10 @@
           (fn [x] (cb x)))))))
 
 (defn day-midnight-today []
-  (t/day (t/end (t/bounds (t/today)))))
+  (t/day-of-week (t/end (t/bounds (t/today)))))
 
 (defn day-midnight-tomorrow []
-  (t/day (t/end (t/bounds (t/tomorrow)))))
+  (t/day-of-week (t/end (t/bounds (t/tomorrow)))))
 
 (defn two-days-from-today []
   (str "on " (capitalize (str (day-midnight-tomorrow))) " morning"))
@@ -68,13 +68,13 @@
         max (- x-cells block-width-in-cells)
 
         now (t/now)
-        ->time #(t/+ now (t/make-duration (inc %) :seconds))
+        ->time #(t/+ now (t/new-duration (inc %) :seconds))
 
-        ival1 (t/make-interval
+        ival1 (t/new-interval
                 (->time value)
                 (->time (+ value block-width-in-cells)))
 
-        ival2 (t/make-interval
+        ival2 (t/new-interval
                 (->time (- (/ x-cells 2) (/ fixed-block-width-in-cells 2)))
                 (->time (+ (/ x-cells 2) (/ fixed-block-width-in-cells 2))))]
 

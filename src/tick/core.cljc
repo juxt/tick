@@ -111,31 +111,31 @@
       :>> (fn [s] (. Year parse s))
       (throw (ex-info "Unparseable time string" {:input s})))))
 
-(defprotocol ICoercions
-  (date [_] "Make a java.time.LocalDate instance.")
+(defprotocol IConversion
+  (inst [_] "Make a java.util.Date instance.")
+  (instant [_] "Make a java.time.Instant instance.")
+  (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
+  (zoned-date-time [_] "Make a java.time.ZonedDateTime instance."))
+
+(defprotocol IExtraction
   (time [_] "Make a java.time.LocalTime instance.")
+  (date [_] "Make a java.time.LocalDate instance.")
+  (date-time [_] "Make a java.time.LocalDateTime instance.")
   (nanosecond [_] "Return the millisecond field of the given time")
   (microsecond [_] "Return the millisecond field of the given time")
   (millisecond [_] "Return the millisecond field of the given time")
   (second [_] "Return the second field of the given time")
   (minute [_] "Return the minute field of the given time")
   (hour [_] "Return the hour field of the given time")
-  ;; Should this be day-of-week or at least an alias?
-  (day [_] "Make a java.time.DayOfWeek instance.")
+  (day-of-week [_] "Make a java.time.DayOfWeek instance.")
   (day-of-month [_] "Return value of the day in the month as an integer.")
-  (inst [_] "Make a java.util.Date instance.")
-  (instant [_] "Make a java.time.Instant instance.")
   (int [_] "Return value as integer")
   (long [_] "Return value as long")
   (month [_] "Make a java.time.Month instance.")
   (year [_] "Make a java.time.Year instance.")
   (year-month [_] "Make a java.time.YearMonth instance.")
   (zone [_] "Make a java.time.ZoneId instance.")
-  (zone-offset [_] "Make a java.time.ZoneOffset instance.")
-  (zoned-date-time [_] "Make a java.time.ZonedDateTime instance.")
-  (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
-  (date-time [_] "Make a java.time.LocalDateTime instance.")
-  (temporal-value [_] "Coerce to a preferred value"))
+  (zone-offset [_] "Make a java.time.ZoneOffset instance."))
 
 (defn new-time
   ([] (time (now)))
@@ -159,58 +159,103 @@
     (.getZone clk)
     (. ZoneId systemDefault)))
 
-(extend-protocol ICoercions
+(extend-protocol IConversion
+  #?(:clj clojure.lang.Fn :cljs function)
+  (inst [f] (inst (f)))
+  (instant [f] (instant (f)))
+  (offset-date-time [f] (offset-date-time (f)))
+  (zoned-date-time [f] (zoned-date-time (f)))
+
+  Instant
+  (inst [i] #?(:clj (Date/from i) :cljs (new Date. (.toEpochMilli i))))
+  (instant [i] i)
+  (offset-date-time [i] (. OffsetDateTime ofInstant i (current-zone)))
+  (zoned-date-time [i] (. ZonedDateTime ofInstant i (current-zone)))
+
+  #?(:clj String :cljs string)
+  (inst [s] (inst (instant s)))
+  (instant [s] (instant (parse s)))
+  (offset-date-time [s] (. OffsetDateTime parse s))
+  (zoned-date-time [s] (. ZonedDateTime parse s))
+
+  #?(:clj Number :cljs number)
+  (instant [n] (. Instant ofEpochMilli n))
+
+  LocalDateTime
+  (inst [ldt] (inst (zoned-date-time ldt)))
+  (instant [ldt] (instant (zoned-date-time ldt)))
+  (offset-date-time [ldt] (.atOffset ldt (. ZoneOffset systemDefault)))
+  (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
+
+  Date
+  (inst [d] d)
+  (instant [d] #?(:clj (.toInstant d) :cljs (.ofEpochMilli Instant (.getTime d))))
+  (zoned-date-time [d] (zoned-date-time (instant d)))
+  (offset-date-time [d] (offset-date-time (instant d)))
+
+  OffsetDateTime
+  (inst [zdt] (inst (instant zdt)))
+  (instant [zdt] (.toInstant zdt))
+  (offset-date-time [odt] odt)
+  (zoned-date-time [odt] (.toZonedDateTime odt))
+
+  ZonedDateTime
+  (inst [zdt] (inst (instant zdt)))
+  (instant [zdt] (.toInstant zdt))
+  (offset-date-time [zdt] (.toOffsetDateTime zdt))
+  (zoned-date-time [zdt] zdt))
+
+(extend-protocol IExtraction
   #?(:clj Object :cljs object)
   (int [v] (#?(:clj clojure.core/int :cljs parse-int)  v))
   (long [v] (#?(:clj clojure.core/long :cljs parse-int) v))
 
   #?(:clj clojure.lang.Fn :cljs function)
-  (date [f] (date (f)))
   (time [f] (time (f)))
-  (day [f] (day (f)))
-  (inst [f] (inst (f)))
-  (instant [f] (instant (f)))
+  (date [f] (date (f)))
+  (date-time [f] (date-time (f)))
+  (nanosecond [f] (nanosecond (f)))
+  (microsecond [f] (microsecond (f)))
+  (millisecond [f] (millisecond (f)))
+  (second [f] (second (f)))
+  (minute [f] (minute (f)))
+  (hour [f] (hour (f)))
+  (day-of-week [f] (day-of-week (f)))
+  (day-of-month [f] (day-of-month (f)))
   (int [f] (int (f)))
   (long [f] (long (f)))
   (month [f] (month (f)))
-  (offset-date-time [f] (offset-date-time (f)))
   (year [f] (year (f)))
   (year-month [f] (year-month (f)))
   (zone [f] (zone (f)))
-  (zoned-date-time [f] (zoned-date-time (f)))
-  (date-time [f] (date-time (f)))
-  (temporal-value [f] (temporal-value (f)))
+  (zone-offset [f] (zone-offset (f)))
 
   Instant
-  (date [i] (date (zoned-date-time i)))
   (time [i] (time (zoned-date-time i)))
+  (date [i] (date (zoned-date-time i)))
+  (date-time [i] (date-time (zoned-date-time i)))
   (nanosecond [t] (nanosecond (zoned-date-time t)))
   (microsecond [t] (microsecond (zoned-date-time t)))
   (millisecond [t] (millisecond (zoned-date-time t)))
   (second [t] (second (zoned-date-time t)))
   (minute [t] (minute (zoned-date-time t)))
   (hour [t] (hour (zoned-date-time t)))
-  (day [i] (day (date i)))
+  (day-of-week [i] (day-of-week (date i)))
   (day-of-month [i] (day-of-month (date i)))
-  (inst [i] #?(:clj (Date/from i) :cljs (new Date. (.toEpochMilli i))))
-  (instant [i] i)
   (int [i] (t.i/getter nano i))
   (long [i] (t.i/getter epochSecond i))
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
-  (date-time [i] (date-time (zoned-date-time i)))
-  (zoned-date-time [i] (. ZonedDateTime ofInstant i (current-zone)))
-  (offset-date-time [i] (. OffsetDateTime ofInstant i (current-zone)))
-  (temporal-value [i] i)
+  (zone [i] (. ZoneId of "UTC"))
+  (zone-offset [i] (t.i/static-prop ZoneOffset UTC))
 
   #?(:clj String :cljs string)
-  (inst [s] (inst (instant s)))
-  (instant [s] (instant (parse s)))
-  (day [s] (or (parse-day s) (day (date s))))
-  (day-of-month [s] (day-of-month (date s)))
-  (date [s] (date (parse s)))
   (time [s] (time (parse s)))
+  (date [s] (date (parse s)))
+  (date-time [s] (. LocalDateTime parse s))
+  (day-of-week [s] (or (parse-day s) (day-of-week (date s))))
+  (day-of-month [s] (day-of-month (date s)))
   (month [s] (or (parse-month s) (month (date s))))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
@@ -218,26 +263,20 @@
   (zone-offset [s] (. ZoneOffset of s))
   (int [s] ((t.i/getter nano (instant s))))
   (long [s] ((t.i/getter epochSecond (instant s))))
-  (date-time [s] (. LocalDateTime parse s))
-  (zoned-date-time [s] (. ZonedDateTime parse s))
-  (offset-date-time [s] (. OffsetDateTime parse s))
-  (temporal-value [s] (temporal-value (parse s)))
 
   #?(:clj Number :cljs number)
-  (day [n] (. DayOfWeek of n))
+  (day-of-week [n] (. DayOfWeek of n))
   (month [n] (. Month of n))
-  (instant [n] (. Instant ofEpochMilli n))
   (year [n] (. Year of n))
   (zone-offset [s] (. ZoneOffset ofHours s))
 
   LocalDate
   (date [d] d)
-  (day [d] (t.i/getter dayOfWeek d))
+  (day-of-week [d] (t.i/getter dayOfWeek d))
   (day-of-month [d] (t.i/getter dayOfMonth d))
   (month [d] (. Month from d))
   (year-month [d] (. YearMonth of (t.i/getter year d) (t.i/getter monthValue d)))
   (year [d] (. Year of (t.i/getter year d)))
-  (temporal-value [d] d)
 
   LocalTime
   (time [t] t)
@@ -247,46 +286,35 @@
   (second [t] (t.i/getter second t))
   (minute [t] (t.i/getter minute t))
   (hour [t] (t.i/getter hour t))
-  (temporal-value [t] t)
 
   Month
-  (int [m] (t.i/getter value m)) ;todo
+  (int [m] (t.i/getter value m))        ;todo
 
   LocalDateTime
-  (date [dt] (.toLocalDate dt))
   (time [dt] (.toLocalTime dt))
+  (date [dt] (.toLocalDate dt))
+  (date-time [ldt] ldt)
   (second [t] (t.i/getter second t))
   (minute [t] (t.i/getter minute t))
   (hour [t] (t.i/getter hour t))
-  (day [dt] (day (date dt)))
+  (day-of-week [dt] (day-of-week (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
-  (date-time [ldt] ldt)
-  (offset-date-time [ldt] (.atOffset ldt (. ZoneOffset systemDefault)))
-  (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
-  (temporal-value [ldt] ldt)
 
   Date
-  (inst [d] d)
-  (instant [d] #?(:clj (.toInstant d) :cljs (.ofEpochMilli Instant (.getTime d))))
   (date [d] (date (zoned-date-time (instant d)))) ; implicit conversion to UTC
+  (date-time [d] (date-time (instant d)))
   (year-month [d] (year-month (date d)))
   (year [d] (year (date d)))
-  (date-time [d] (date-time (instant d)))
-  (zoned-date-time [d] (zoned-date-time (instant d)))
-  (offset-date-time [d] (offset-date-time (instant d)))
-  (temporal-value [d] (instant d))
 
   YearMonth
   (year-month [ym] ym)
   (year [ym] (year (t.i/getter year ym)))
-  (temporal-value [ym] ym)
 
   Year
   (year [y] y)
   (int [y] (t.i/getter value y))
-  (temporal-value [y] y)
 
   ZoneId
   (zone [z] z)
@@ -296,32 +324,23 @@
 
   OffsetDateTime
   (time [odt] (.toLocalTime odt))
+  (date [odt] (.toLocalDate odt))
   (date-time [odt] (.toLocalDateTime odt))
-  (inst [zdt] (inst (instant zdt)))
-  (instant [zdt] (.toInstant zdt))
-  (offset-date-time [odt] odt)
-  (zoned-date-time [odt] (.toZonedDateTime odt))
-  (temporal-value [odt] odt)
 
   ZonedDateTime
-  (date [zdt] (.toLocalDate zdt))
   (time [zdt] (.toLocalTime zdt))
+  (date [zdt] (.toLocalDate zdt))
+  (date-time [zdt] (.toLocalDateTime zdt))
   (nanosecond [t] (.get t (t.i/static-prop ChronoField NANO_OF_SECOND)))
   (microsecond [t] (.get t (t.i/static-prop ChronoField MICRO_OF_SECOND)))
   (millisecond [t] (.get t (t.i/static-prop ChronoField MILLI_OF_SECOND)))
   (second [t] (t.i/getter second t))
   (minute [t] (t.i/getter minute t))
   (hour [t] (t.i/getter hour t))
-  (day [t] (t.i/getter dayOfWeek t))
+  (day-of-week [t] (t.i/getter dayOfWeek t))
   (day-of-month [t] (t.i/getter dayOfMonth t))
-  (inst [zdt] (inst (instant zdt)))
-  (instant [zdt] (.toInstant zdt))
   (month [zdt] (t.i/getter month zdt))
-  (date-time [zdt] (.toLocalDateTime zdt))
-  (offset-date-time [zdt] (.toOffsetDateTime zdt))
-  (zoned-date-time [zdt] zdt)
-  (zone [zdt] (t.i/getter zone zdt))
-  (temporal-value [zdt] zdt))
+  (zone [zdt] (t.i/getter zone zdt)))
 
 ;; Fields
 
@@ -396,8 +415,8 @@
 ;; Built-in adjusters
 
 (defn day-of-week-in-month
-  ([ordinal day-of-week] (. TemporalAdjusters dayOfWeekInMonth ordinal (day day-of-week)))
-  ([t ordinal day-of-week] (with t (day-of-week-in-month ordinal day-of-week))))
+  ([ordinal dow] (. TemporalAdjusters dayOfWeekInMonth ordinal (day-of-week dow)))
+  ([t ordinal dow] (with t (day-of-week-in-month ordinal dow))))
 
 (defn first-day-of-month
   ([] (. TemporalAdjusters firstDayOfMonth))
@@ -416,8 +435,8 @@
   ([t] (with t (first-day-of-year))))
 
 (defn first-in-month
-  ([day-of-week] (. TemporalAdjusters firstInMonth (day day-of-week)))
-  ([t day-of-week] (with t (first-in-month day-of-week))))
+  ([dow] (. TemporalAdjusters firstInMonth (day-of-week dow)))
+  ([t dow] (with t (first-in-month dow))))
 
 (defn last-day-of-month
   ([] (. TemporalAdjusters lastDayOfMonth))
@@ -428,24 +447,24 @@
   ([t] (with t (last-day-of-year))))
 
 (defn last-in-month
-  ([day-of-week] (. TemporalAdjusters lastInMonth (day day-of-week)))
-  ([t day-of-week] (with t (last-in-month day-of-week))))
+  ([dow] (. TemporalAdjusters lastInMonth (day-of-week dow)))
+  ([t dow] (with t (last-in-month dow))))
 
 (defn next
-  ([day-of-week] (. TemporalAdjusters next (day day-of-week)))
-  ([t day-of-week] (with t (next day-of-week))))
+  ([dow] (. TemporalAdjusters next (day-of-week dow)))
+  ([t dow] (with t (next dow))))
 
 (defn next-or-same
-  ([day-of-week] (. TemporalAdjusters nextOrSame (day day-of-week)))
-  ([t day-of-week] (with t (next-or-same day-of-week))))
+  ([dow] (. TemporalAdjusters nextOrSame (day-of-week dow)))
+  ([t dow] (with t (next-or-same dow))))
 
 (defn previous
-  ([day-of-week] (. TemporalAdjusters previous (day day-of-week)))
-  ([t day-of-week] (with t (previous day-of-week))))
+  ([dow] (. TemporalAdjusters previous (day-of-week dow)))
+  ([t dow] (with t (previous dow))))
 
 (defn previous-or-same
-  ([day-of-week] (. TemporalAdjusters previousOrSame (day day-of-week)))
-  ([t day-of-week] (with t (previous-or-same day-of-week))))
+  ([dow] (. TemporalAdjusters previousOrSame (day-of-week dow)))
+  ([t dow] (with t (previous-or-same dow))))
 
 ;; Comparison
 
@@ -627,7 +646,7 @@
 
 ;; Coercions
 
-(extend-protocol ICoercions
+(extend-protocol IExtraction
   Duration
   (zone-offset [d] (. ZoneOffset ofTotalSeconds (new-duration 1 :seconds))))
 
@@ -666,9 +685,12 @@
   ([clk dur]
     (. Clock tick clk dur)))
 
-(extend-protocol ICoercions
+(extend-protocol IConversion
   Clock
-  (instant [clk] (.instant clk))
+  (instant [clk] (.instant clk)))
+
+(extend-protocol IExtraction
+  Clock
   (zone [clk] (t.i/getter zone clk)))
 
 (extend-protocol ITimeReify
