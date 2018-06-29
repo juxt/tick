@@ -39,7 +39,7 @@
     (if (t/< t1 t2)
       {:tick/beginning t1
        :tick/end t2}
-      (throw (ex-info "Interval must span between two times, the first must be before the second" {})))))
+      (throw (ex-info "Interval must span between two times, the first must be before the second" {:tick/beginning v1 :tick/end v2})))))
 
 ;; Adjustments
 
