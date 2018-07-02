@@ -194,8 +194,8 @@
   (offset-date-time [d] (offset-date-time (instant d)))
 
   OffsetDateTime
-  (inst [zdt] (inst (instant zdt)))
-  (instant [zdt] (.toInstant zdt))
+  (inst [odt] (inst (instant odt)))
+  (instant [odt] (.toInstant odt))
   (offset-date-time [odt] odt)
   (zoned-date-time [odt] (.toZonedDateTime odt))
 
