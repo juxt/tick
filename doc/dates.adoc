@@ -326,7 +326,56 @@ Alternatively, we can use `t/offset-by` in place of `t/in`, to produce an *offse
 
 == Conversion
 
-TBD
+With ``instant``s, ``inst``s (`java.util.Date`, JavaScript's `Date`),
+``zoned-date-time``s and ``offset-date-time``s, it's easy to get stuck
+with the wrong type. Therefore, _tick_ provides functions to convert
+between them.
+
+To convert between any of these types, simply call the eponymous
+function corresponding to the destination type with the source type as
+an argument.
+
+.Converting between types
+====
+To convert between an `instant` and a `zoned-date-time`:
+
+[source.code,clojure]
+----
+(t/zoned-date-time (t/now))
+----
+
+To convert between a `zoned-date-time` and an `instant`:
+
+[source.code,clojure]
+----
+(t/instant (t/zoned-date-time))
+----
+
+To convert between an `instant` and an `inst`:
+
+[source.code,clojure]
+----
+(t/inst (t/now))
+----
+====
+
+It's also possible to convert from strings to their destination types,
+which will involve parsing the string in to its most appropriate type
+prior to conversion.
+
+In Java, types are converted according to the rules in <<table-conversion>>.
+
+.Converting between Java 8 types
+[#table-conversion%header,cols="h,d,d,d,d"]
+|===
+|Convert between|to instant|to offset-date-time|to zoned-date-time|to inst
+|from instant|identity|`OffsetDateTime/ofInstant`|`ZonedDateTime/ofInstant`|`Date/from`
+|from offset-date-time|`.toInstant`|identity|`.toZonedDateTime`|`.toInstant`, `Date/from`
+|from zoned-date-time|`.toInstant`|`.toOffsetDateTime`|identity|`.toInstant`, `Date/from`
+|from inst|`.toInstant`|`.toInstant`, `OffsetDateTime/ofInstant`|`.toInstant`, `ZonedDateTime/ofInstant`|identity
+|from String|parse|`OffsetDateTime/parse`|`ZonedDateTime/parse`|parse, then `Date/from`
+|===
+
 
 == Extraction
 
