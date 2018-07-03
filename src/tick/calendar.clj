@@ -37,7 +37,7 @@
 (defn weekend?
   "Is the ZonedDateTime during the weekend?"
   [dt]
-  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (t/day dt)))
+  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (t/day-of-week dt)))
 
 ;;(t/year (first (bank-holidays-in-england-and-wales)))
 
