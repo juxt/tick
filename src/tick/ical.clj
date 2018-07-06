@@ -64,7 +64,9 @@
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-1-PATTERN)})
   ZonedDateTime
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-3-PATTERN)
-                        :params {:tzid (t/zone s)}}))
+                        :params {:tzid (t/zone s)}})
+  clojure.lang.APersistentMap
+  (serialize-value [s] s))
 
 (defprotocol ICalendarObject
   (property-values [obj prop-name]
