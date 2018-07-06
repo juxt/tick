@@ -9,7 +9,7 @@
    [tick.core :as t]
    [tick.interval :as ival])
   (:import
-   [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId]
+   [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId ZoneRegion]
    [java.time.format DateTimeFormatter]))
 
 ;; Have considered wrapping ical4j. However, since ical4j does not
@@ -65,6 +65,8 @@
   ZonedDateTime
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-3-PATTERN)
                         :params {:tzid (t/zone s)}})
+  ZoneRegion
+  (serialize-value [zr] {:value (str zr)})
   clojure.lang.APersistentMap
   (serialize-value [s] s))
 
