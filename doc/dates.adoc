@@ -376,10 +376,81 @@ In Java, types are converted according to the rules in <<table-conversion>>.
 |from String|parse|`OffsetDateTime/parse`|`ZonedDateTime/parse`|parse, then `Date/from`
 |===
 
-
 == Extraction
 
-TBD
+Culturally, we understand time via calendars and it is often desirable
+to extract certain fields from time values.
+
+The `day-of-week` function extracts the day (of the week) from a time value, such as date, as shown in <<example-extract-day>>.
+
+[[example-extract-day]]
+.Extracting fields from a date
+====
+
+[source.code,clojure]
+----
+(t/day-of-week (t/date "2018-07-09"))
+----
+
+[source.code,clojure]
+----
+(t/month (t/date "2018-07-09"))
+----
+
+[source.code,clojure]
+----
+(t/year (t/date "2018-07-09"))
+----
+====
+
+Days of the week, and months of the year, are available as constants listed in <<constants>>.
+
+[[constants]]
+[%header]
+.Tick constants and their corresponding host types
+|===
+|Tick|Java|JavaScript
+|tick.alpha.api/MONDAY|java.time.DayOfWeek.MONDAY|DayOfWeek.MONDAY
+|tick.alpha.api/TUESDAY|java.time.DayOfWeek.TUESDAY|DayOfWeek.TUESDAY
+|tick.alpha.api/WEDNESDAY|java.time.DayOfWeek.WEDNESDAY|DayOfWeek.WEDNESDAY
+|tick.alpha.api/THURSDAY|java.time.DayOfWeek.THURSDAY|DayOfWeek.THURSDAY
+|tick.alpha.api/FRIDAY|java.time.DayOfWeek.FRIDAY|DayOfWeek.FRIDAY
+|tick.alpha.api/SATURDAY|java.time.DayOfWeek.SATURDAY|DayOfWeek.SATURDAY
+|tick.alpha.api/SUNDAY|java.time.DayOfWeek.SUNDAY|DayOfWeek.SUNDAY
+|tick.alpha.api/JANUARY|java.time.Month.JANUARY|Month.JANUARY
+|tick.alpha.api/FEBRUARY|java.time.Month.FEBRUARY|Month.FEBRUARY
+|tick.alpha.api/MARCH|java.time.Month.MARCH|Month.MARCH
+|tick.alpha.api/APRIL|java.time.Month.APRIL|Month.APRIL
+|tick.alpha.api/MAY|java.time.Month.MAY|Month.MAY
+|tick.alpha.api/JUNE|java.time.Month.JUNE|Month.JUNE
+|tick.alpha.api/JULY|java.time.Month.JULY|Month.JULY
+|tick.alpha.api/AUGUST|java.time.Month.AUGUST|Month.AUGUST
+|tick.alpha.api/SEPTEMBER|java.time.Month.SEPTEMBER|Month.SEPTEMBER
+|tick.alpha.api/OCTOBER|java.time.Month.OCTOBER|Month.OCTOBER
+|tick.alpha.api/NOVEMBER|java.time.Month.NOVEMBER|Month.NOVEMBER
+|tick.alpha.api/DECEMBER|java.time.Month.DECEMBER|Month.DECEMBER
+|===
+
+
+We can use these constants to compare with `=` as shown in <<example-extract-day-with-compare>>.
+
+[[example-extract-day-with-compare]]
+.Comparing the day of the week from a date
+====
+Is the date 2018-07-09 is a Monday?
+
+[source.code,clojure]
+----
+(= (t/day-of-week (t/date "2018-07-09")) t/MONDAY)
+----
+
+But is the month May?
+
+[source.code,clojure]
+----
+(= (t/month (t/date "2018-07-09")) t/MAY)
+----
+====
 
 == Comparison
 
