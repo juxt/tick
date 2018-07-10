@@ -156,7 +156,7 @@
   "Return the current zone, which can be overridden by the *clock* dynamic var"
   []
   (if-let [clk *clock*]
-    (.getZone clk)
+    (t.i/getter zone clk)
     (. ZoneId systemDefault)))
 
 (extend-protocol IConversion
@@ -636,9 +636,9 @@
   (days [d] (.toDays d))
 
   Period
-  (days [p] (.getDays p))
-  (months [p] (.getMonths p))
-  (years [p] (.getYears p)))
+  (days [p] (t.i/getter days p))
+  (months [p] (t.i/getter months p))
+  (years [p] (t.i/getter years p)))
 
 (defn new-duration [n u]
   (let [unit (unit-map u)]
