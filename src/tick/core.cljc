@@ -775,6 +775,8 @@
   LocalDate
   (forward-number [t n] (.plusDays t n))
   (backward-number [t n] (.minusDays t n))
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   LocalTime
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.plus t d))
@@ -793,6 +795,8 @@
   YearMonth
   (forward-number [t n] (.plusMonths t n))
   (backward-number [t n] (.plusMonths t n))
+  (forward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   Clock
   (forward-duration [clk d] (. Clock offset clk d))
   (backward-duration [clk d] (. Clock offset clk (negated d))))
