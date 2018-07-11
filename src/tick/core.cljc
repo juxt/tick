@@ -529,12 +529,12 @@
      (-compare [x y] (.compareTo x y))
      LocalDateTime
      (-compare [x y] (.compareTo x y))
-     Date
-     (-compare [x y] (.compareTo x y))
      LocalDate
      (-compare [x y] (.compareTo x y))
      LocalTime
      (-compare [x y] (.compareTo x y))
+     OffsetTime
+     (-compare [x y] (.compareTo x y))     
      LocalDateTime
      (-compare [x y] (.compareTo x y))
      OffsetDateTime
@@ -552,11 +552,11 @@
      (-equiv [x y] (.equals x y))
      LocalDateTime
      (-equiv [x y] (.equals x y))
-     Date
-     (-equiv [x y] (= (.getTime x) (.getTime y)))
      LocalDate
      (-equiv [x y] (.equals x y))
      LocalTime
+     (-equiv [x y] (.equals x y))
+     OffsetTime
      (-equiv [x y] (.equals x y))
      LocalDateTime
      (-equiv [x y] (.equals x y))
