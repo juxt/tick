@@ -17,7 +17,9 @@
                         :optimizations :none
                         :target :nodejs}}]}
   :profiles {:dev
-             {:dependencies [[org.clojure/clojure "1.9.0"]]
+             {:dependencies [[org.clojure/clojure "1.9.0"]
+                             [cljsjs/js-joda-timezone "1.3.0-0"]
+                             [henryw374/js-joda-locale-en-us "1.0.0-1"]]
               :plugins [[lein-doo "0.1.10"]]
               :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
              :repl

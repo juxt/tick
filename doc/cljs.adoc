@@ -46,6 +46,10 @@ locales. en-US is one which is currently packaged for cljs and can be used as su
  `henryw374.js-joda-locale_en-us` package is not yet available on cljsjs because the underlying package
  is not yet on npm see https://github.com/cljsjs/packages/pull/1650[for more info].
 
+== Clock
+
+Clock in js-joda is currently missing the offset function https://github.com/js-joda/js-joda/issues/245[js-joda issue 245]
+
 == OffsetTime and OffsetDateTime
 
 OffsetTime is currently missing from JS-Joda (see 

@@ -3,10 +3,8 @@
 (ns tick.alpha.api-test
   (:require
     [clojure.spec.alpha :as s]
-    #?(:clj
-    [clojure.test :refer :all]
-       :cljs
-       [cljs.test :refer-macros [deftest is testing run-tests]])
+    #?(:clj [clojure.test :refer :all]
+       :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
     [tick.interop :as t.i]
     #?(:clj
