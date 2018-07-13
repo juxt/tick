@@ -203,7 +203,13 @@
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
   (offset-date-time [zdt] (.toOffsetDateTime zdt))
-  (zoned-date-time [zdt] zdt))
+  (zoned-date-time [zdt] zdt)
+
+  ;; Durations between the epoch and a time. These are useful
+  ;; conversion functions in the case where numerics are used.
+  Duration
+  (instant [d] (java.time.Instant/ofEpochMilli (millis d)))
+  (inst [d] (inst (instant d))))
 
 (extend-protocol IExtraction
   #?(:clj Object :cljs object)

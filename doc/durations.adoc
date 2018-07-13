@@ -38,3 +38,25 @@ NOTE: TBD
 == Misc
 
 NOTE: TODO Don't forget you can create zone-offsets from durations!
+
+====
+NOTE: TODO Don't forget you can create instants from durations - this is often needed when you get Unix times (e.g. JWT OAuth2 tokens)
+
+The problem with numeric times is that there are cases where the units
+are in seconds and cases where milliseconds are used. If _tick_ were
+to convert numbers to times, it would be a source of confusion and
+bugs if the units were not clear. For this reason, you cannot convert
+numbers to times. However, you can first create the duration from the
+number, specifying the units explicitly, and then convert the duration
+to an `instant` (or `inst`).
+
+[source,clojure]
+----
+(instant (new-duration 1531467976048 :millis))
+----
+
+[source,clojure]
+----
+(inst (new-duration 1531468976 :seconds))
+----
+====
