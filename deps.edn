@@ -28,8 +28,8 @@
   :dev/nrepl {:jvm-opts ["-Dnrepl.load=true"]
               :extra-paths ["aliases/nrepl"]
               :extra-deps
-              {cider/cider-nrepl {:mvn/version "0.16.0"}
-               refactor-nrepl {:mvn/version "2.3.1"}
+              {cider/cider-nrepl {:mvn/version "0.17.0"}
+               ;;refactor-nrepl {:mvn/version "2.3.1"}
                com.cemerick/piggieback {:mvn/version "0.2.2"}
                org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
 
