@@ -617,12 +617,13 @@
   (months [_] "Return the given quantity in months.")
   (years [_] "Return the given quantity in years."))
 
-(extend-protocol IConversion
-  ;; Durations between the epoch and a time. These are useful
-  ;; conversion functions in the case where numerics are used.
-  Duration
-  (instant [d] (java.time.Instant/ofEpochMilli (millis d)))
-  (inst [d] (inst (instant d))))
+#?(:clj
+   (extend-protocol IConversion
+     ;; Durations between the epoch and a time. These are useful
+     ;; conversion functions in the case where numerics are used.
+     Duration
+     (instant [d] (java.time.Instant/ofEpochMilli (millis d)))
+     (inst [d] (inst (instant d)))))
 
 (extend-protocol ITimeLength
   Duration
