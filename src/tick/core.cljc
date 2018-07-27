@@ -6,8 +6,11 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [tick.interop :as t.i]
-    #?(:cljs
-       [tick.js-joda :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]))
+    #?@(:cljs
+       [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
+         [cljs.java-time.extend-eq-and-compare]]))
+  
+  
   #?(:clj
      (:import
        [java.util Date]
@@ -522,54 +525,6 @@
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y))))
-
-#?(:cljs
-   (extend-protocol IComparable
-     Instant
-     (-compare [x y] (.compareTo x y))
-     LocalDateTime
-     (-compare [x y] (.compareTo x y))
-     LocalDate
-     (-compare [x y] (.compareTo x y))
-     LocalTime
-     (-compare [x y] (.compareTo x y))
-     OffsetTime
-     (-compare [x y] (.compareTo x y))     
-     LocalDateTime
-     (-compare [x y] (.compareTo x y))
-     OffsetDateTime
-     (-compare [x y] (.compareTo x y))
-     ZonedDateTime
-     (-compare [x y] (.compareTo x y))
-     Year
-     (-compare [x y] (.compareTo x y))
-     YearMonth
-     (-compare [x y] (.compareTo x y))))
-
-#?(:cljs
-   (extend-protocol IEquiv
-     Instant
-     (-equiv [x y] (.equals x y))
-     LocalDateTime
-     (-equiv [x y] (.equals x y))
-     LocalDate
-     (-equiv [x y] (.equals x y))
-     LocalTime
-     (-equiv [x y] (.equals x y))
-     OffsetTime
-     (-equiv [x y] (.equals x y))
-     LocalDateTime
-     (-equiv [x y] (.equals x y))
-     OffsetDateTime
-     (-equiv [x y] (.equals x y))
-     ZonedDateTime
-     (-equiv [x y] (.equals x y))
-     Year
-     (-equiv [x y] (.equals x y))
-     YearMonth
-     (-equiv [x y] (.equals x y))
-     Duration
-     (-equiv [x y] (.equals x y))))
 
 ;; Units
 

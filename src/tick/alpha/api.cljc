@@ -19,7 +19,7 @@
     [tick.interval :as interval]
     [clojure.set :as set]
     #?(:cljs
-       [tick.js-joda :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]))
+       [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]))
   #?(:cljs
      (:require-macros
        [net.cgrand.macrovich :as macros]

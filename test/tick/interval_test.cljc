@@ -9,7 +9,7 @@
       :cljs
       [cljs.test :refer-macros [deftest is testing run-tests]])
    #?(:cljs
-      [tick.js-joda :refer [ChronoUnit]])
+      [java.time :refer [ChronoUnit]])
    [tick.interval :as ti])
   #?(:clj
      (:import

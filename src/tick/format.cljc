@@ -4,7 +4,7 @@
   (:require
     [tick.interop :as t.i]
     #?@(:cljs
-        [[tick.js-joda :refer [DateTimeFormatter]]]))
+        [[java.time :refer [DateTimeFormatter]]]))
   #?(:clj
      (:import [java.time.temporal TemporalAccessor]
               [java.time.format DateTimeFormatter DateTimeFormatterBuilder ResolverStyle])))

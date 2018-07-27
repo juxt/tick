@@ -9,7 +9,7 @@
       :cljs
       [cljs.test :refer-macros [deftest is testing run-tests]])
     #?(:cljs
-       [tick.js-joda :refer [LocalDate Instant]]))
+       [java.time :refer [LocalDate Instant]]))
   #?(:clj (:import [java.time Instant LocalDate])))
 
 (s/check-asserts true)
