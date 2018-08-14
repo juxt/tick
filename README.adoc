@@ -1,17 +1,30 @@
 = tick
 
-A Clojure library for dealing with time.
+A Clojure(Script) library for dealing with time. Intended as a
+replacement for clj-time.
+
+Based on Java 8 time (on the JVM) and js-joda (on JavaScript
+runtimes).
+
+[source,clojure]
+----
+(require [tick.alpha.api :as t])
+
+;; Get the current time
+(t/now)
+----
 
 == Status
 
-The latest master branch of tick is still a work-in-progress and is moving towards a stable alpha soon.
+Alpha: Ready to use with the caveat that the API might still undergo
+minor changes.
 
 == Install
 
-Add to your lein or boot dependencies:
+Add to your `project.clj`, `build.boot` or `deps.edn`:
 
 ```
-[tick "0.3.5"]
+[tick "1.0-alpha-1"]
 ```
 
 == Development
@@ -45,15 +58,6 @@ lein doo node test
 == Documentation
 
 - https://juxt.github.io/tick[Generated API docs]
-
-== Discussion
-
-The 'flow of time' complicates our systems and we can simplify them if
-we separate the concept of a timeline from the 'flow' of time we
-perceive.
-
-For more information, see the author's talk at ClojuTRE-2016 on https://www.youtube.com/watch?v=odPAkEO2uPQ[The
-Universe As A Value] where he argues that time is a perception.
 
 == Acknowledgements
 
