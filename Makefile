@@ -1,7 +1,7 @@
 STYLESDIR = ../asciidoctor-stylesheet-factory/stylesheets
 STYLESHEET = juxt.css
 
-.PHONY: 		watch default
+.PHONY: 		watch default deploy
 
 default:		docs/index.html
 
@@ -17,3 +17,9 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 # See shadow-cljs.edn for configuration
 watch:
 			shadow-cljs watch doc bootstrap-support
+
+pom.xml:
+			clj -Spom
+
+deploy:			pom.xml
+			mvn deploy
