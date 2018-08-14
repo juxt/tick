@@ -21,3 +21,4 @@ gh-pages
 /bin/test-cljs
 node_modules/
 /docs/index.html
+/docs/js
