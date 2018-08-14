@@ -1,6 +1,6 @@
 ;; shadow-cljs configuration
 {:source-paths
- ["src" "doc/src"]
+ ["src" "docs/src"]
 
  :dependencies
  [[cljsjs/js-joda "1.6.2-0"]
@@ -11,7 +11,7 @@
 
  :builds
  {:doc {:target :browser
-        :output-dir "doc/js"
+        :output-dir "docs/js"
         :asset-path "js"
         :modules {:main {:entries [tick.docs.app]}}
         :devtools {:http-root "doc"
@@ -19,7 +19,7 @@
 
   :bootstrap-support
   {:target :bootstrap
-   :output-dir "doc/js/bootstrap"
+   :output-dir "docs/js/bootstrap"
    :exclude #{cljs.js}
    :entries [cljs.js tick.alpha.api]
    :macros []}}}
