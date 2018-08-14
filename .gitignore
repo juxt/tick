@@ -20,3 +20,4 @@ gh-pages
 /project.clj.bak
 /bin/test-cljs
 node_modules/
+/docs/index.html
