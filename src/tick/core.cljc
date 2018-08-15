@@ -725,8 +725,8 @@
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.minus t d))
   Date
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.plus t d))
+  (forward-duration [t d] (.plus (instant t) d))
+  (backward-duration [t d] (.plus (instant t) d))
   LocalDate
   (forward-number [t n] (.plusDays t n))
   (backward-number [t n] (.minusDays t n))
