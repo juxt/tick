@@ -170,7 +170,7 @@
   (zoned-date-time [f] (zoned-date-time (f)))
 
   Instant
-  (inst [i] #?(:clj (Date/from i) :cljs (new Date. (.toEpochMilli i))))
+  (inst [i] #?(:clj (Date/from i) :cljs (Date. (.toEpochMilli i))))
   (instant [i] i)
   (offset-date-time [i] (. OffsetDateTime ofInstant i (current-zone)))
   (zoned-date-time [i] (. ZonedDateTime ofInstant i (current-zone)))
