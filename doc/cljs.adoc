@@ -4,7 +4,7 @@ There are some considerations when using tick with Clojurescript
 
 == Timezone and Locale data
 
-TL;DR if you're working with timezones and/or need to create custome formatters like "dd MMM yyyy"
+TL;DR if you're working with timezones and/or need to create custom formatters from patterns, such as "dd MMM yyyy"
 
 add the following to your dependencies:
 
@@ -13,14 +13,14 @@ add the following to your dependencies:
 [henryw374/js-joda-locale-en-us "1.0.0-1"]
 ---
 
-and add this to your cljs code 
+and add this to your cljs code somewhere before timezones and locales are used
 
 ---
 (ns xyz
 
 (:require [tick.alpha.api]
           [cljsjs.js-joda-timezone]
-          [henryw374.js-joda-locale_en-us]))
+          [henryw374.js-joda-locale-en-us]))
 
 
 (set! js/JSJoda (.use js/JSJoda js/JSJodaLocale))
@@ -39,11 +39,11 @@ names, their offsets from UTC, and daylight savings(DST) data.
  (. ZoneId of "Europe/London") 
 ---
 
-Locale data is needed for date formatters which need particular symbols, such as M for month. 
+Locale data is needed for custom date formatters which need particular symbols, such as M for month. 
 Due to the size and complexity of using the js-joda-locale, the authors of js-joda-locale have created
 https://github.com/js-joda/js-joda-locale#use-prebuilt-locale-packages[prebuilt locale packages], for specific 
 locales. en-US is one which is currently packaged for cljs and can be used as suggested above. The 
- `henryw374.js-joda-locale_en-us` package is not yet available on cljsjs because the underlying package
+ `henryw374.js-joda-locale-en-us` package is not yet available on cljsjs because the underlying package
  is not yet on npm see https://github.com/cljsjs/packages/pull/1650[for more info].
 
 == Clock
