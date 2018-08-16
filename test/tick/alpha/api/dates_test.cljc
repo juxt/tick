@@ -43,9 +43,8 @@
     (with-clock (-> (t/date "2018-02-14") (t/at "10:00") (t/in "America/New_York"))
       (testing "(clock) return type"
         (is (instance? Clock (t/clock))))
-      #?(:clj ; Clock.offset not yet implemented in js-joda - https://github.com/js-joda/js-joda/issues/245
-         (testing "Time shifting the clock back by 2 hours"
-           (is (= "2018-02-14T13:00:00Z" (str (t/instant (t/<< (t/clock) (t/new-duration 2 :hours))))))))))
+      (testing "Time shifting the clock back by 2 hours"
+        (is (= "2018-02-14T13:00:00Z" (str (t/instant (t/<< (t/clock) (t/new-duration 2 :hours)))))))))
 
   (testing "Creating a clock with a zone, and returning that zone"
     (is (= "America/New_York" (str (t/zone (t/clock (t/zone "America/New_York")))))))

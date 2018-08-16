@@ -5,7 +5,7 @@
   :url "https://github.com/juxt/tick"
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
-  :dependencies [[cljs.java-time "0.1.1"]
+  :dependencies [[cljs.java-time "0.1.2"]
                  [org.clojure/clojurescript "1.10.238"]
                  [net.cgrand/macrovich "0.2.0" :exclusions [org.clojure/clojurescript]]]
   :cljsbuild
