@@ -1,0 +1,38 @@
+=== Time
+
+To get the current time:
+====
+[source.code,clojure]
+----
+(t/time)
+----
+
+[source.code,clojure]
+----
+(t/new-time)
+----
+
+====
+
+A specific time can be produced in multiple ways with varying degrees of precision:
+====
+[source.code,clojure]
+----
+(t/time "12:34")
+----
+
+[source.code,clojure]
+----
+(t/time "12:34:56.789")
+----
+
+[source.code,clojure]
+----
+(t/new-time 12 34)
+----
+
+[source.code,clojure]
+----
+(t/new-time 12 34 56 789000000)
+----
+====

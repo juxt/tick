@@ -1,0 +1,80 @@
+=== & more
+
+
+====
+Maths with time
+
+[source.code,clojure]
+----
+(t/+ (t/now)
+     (t/new-duration 15 :minutes))
+----
+
+[source.code,clojure]
+----
+(t/- (t/now)
+     (t/new-duration 10 :days))
+----
+
+[source.code,clojure]
+----
+(t/millis (t/duration {:tick/beginning (t/now)
+                       :tick/end (t/+ (t/now)
+                                      (t/new-duration 10 :minutes))}))
+----
+[source.code,clojure]
+----
+(let [duration (t/new-duration 1 :hours)]
+  {:millis (t/millis duration)
+   :seconds (t/seconds duration)
+   :minutes (t/minutes duration)
+   :hours (t/hours duration)
+   :days (t/days duration)})
+----
+
+Count-down
+[source.code,clojure]
+----
+(let [end (t/instant "2100-01-01T00:00:00.001")
+      duration (t/duration
+                {:tick/beginning (t/instant)
+                 :tick/end end})
+      hours (t/hours duration)
+      minutes (t/minutes (t/- duration
+                              (t/new-duration hours :hours)))
+      seconds (t/seconds (t/- duration
+                              (t/new-duration minutes :minutes)
+                              (t/new-duration hours :hours)))
+      millis (t/millis (t/- duration
+                            (t/new-duration seconds :seconds)
+                            (t/new-duration minutes :minutes)
+                            (t/new-duration hours :hours)))]
+  {:hours-left hours
+   :minutes-left minutes
+   :seconds-left seconds
+   :millis-left millis})
+----
+[source.code,clojure]
+----
+(map #(apply t/new-interval %)
+     (t/divide-by 10
+                  {:tick/beginning (t/instant "2000-01-01T00:00")
+                   :tick/end (t/instant "2001-01-01T00:00")}))
+----
+[source.code,clojure]
+----
+(map #(apply t/new-interval %)
+     (t/divide-by (t/new-period 1 :weeks)
+                  {:tick/beginning (t/instant "2000-01-01T00:00")
+                   :tick/end (t/instant "2001-01-01T00:00")}))
+----
+[source.code,clojure]
+----
+
+----
+[source.code,clojure]
+----
+
+----
+
+====

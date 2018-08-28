@@ -29,4 +29,6 @@ include::calendars.adoc[]
 
 include::schedules.adoc[]
 
+include::cookbook/index.adoc[]
+
 include::bibliography.adoc[]

@@ -1,0 +1,39 @@
+=== Instants and Inst
+
+To get the current instant:
+====
+[source.code,clojure]
+----
+(t/instant)
+----
+
+[source.code,clojure]
+----
+(t/now)
+----
+====
+
+Create a specific instant:
+====
+[source.code,clojure]
+----
+(t/instant "2000-01-01T00:00:00.001")
+----
+====
+
+Convert inst to and from instant:
+====
+[source.code,clojure]
+----
+(t/instant (t/inst))
+----
+
+[source.code,clojure]
+----
+(t/inst (t/instant))
+----
+====
+
+NOTE: tick's default is `java.time.Instant` but caters for projects that use
+`java.util.Date` by the conversions above. It is recomended when using tick to
+keep as an instant for as long as possible.

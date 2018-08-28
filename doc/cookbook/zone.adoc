@@ -1,0 +1,27 @@
+=== Time Zones & Offset
+
+Extract a zone from a `java.time.ZonedDateTime`:
+====
+[source.code,clojure]
+----
+(t/zone (t/zoned-date-time "2000-01-01T00:00:00Z[Europe/Paris]"))
+----
+
+[source.code,clojure]
+----
+(t/zone)
+----
+
+====
+
+Create a `java.time.ZonedDateTime` in a particular time zone:
+
+====
+[source.code,clojure]
+----
+(t/in (t/instant "2000-01-01T00:00") "Australia/Darwin")
+----
+====
+
+
+==== TBD : offsets

@@ -11,6 +11,12 @@ include::inst.adoc[]
 
 include::zone.adoc[]
 
+include::time.adoc[]
+
+include::inst.adoc[]
+
+include::zone.adoc[]
+
 include::rough.adoc[]
 
 include::function-index.adoc[]
