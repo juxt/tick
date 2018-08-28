@@ -1,4 +1,4 @@
-== Time Zones & Offset
+=== Time Zones & Offset
 
 Extract a zone from a `java.time.ZonedDateTime`:
 ====
@@ -23,19 +23,5 @@ Create a `java.time.ZonedDateTime` in a particular time zone:
 ----
 ====
 
-Give the `OffsetDateTime` instead of `ZonedDateTime`:
 
-====
-[source.code,clojure]
-----
-(t/offset-date-time (t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]"))
-----
-====
-
-Specify the offset for a `LocalDateTime`:
-====
-[source.code,clojure]
-----
-(t/offset-by (t/date-time "2018-01-01T00:00") 9)
-----
-====
+==== TBD : offsets

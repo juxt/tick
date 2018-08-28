@@ -1,4 +1,4 @@
-== Instants and Inst
+=== Instants and Inst
 
 To get the current instant:
 ====
