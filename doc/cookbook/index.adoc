@@ -1,0 +1,16 @@
+= Cookbook
+
+== Inroduction
+
+This cookbook aims to give some examples of tick being used in different cercumstances
+ranging from the very basic usage to more complex examples.
+
+include::time.adoc[]
+
+include::inst.adoc[]
+
+include::zone.adoc[]
+
+include::rough.adoc[]
+
+include::function-index.adoc[]
