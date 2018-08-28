@@ -5,141 +5,190 @@ This section shows basic examples of each function in the tick api library.
 
 ====
 `+` - Add a duration to an instant:
-
 [source.code,clojure]
 ----
 (t/+ (t/now)
      (t/new-duration 10 :minutes))
 ----
+====
 
+====
 `-` - Subtract a duration to an instant:
-
 [source.code,clojure]
 ----
 (t/- (t/now)
-     (t/new-duraion 10 :hours))
+     (t/new-duration 10 :hours))
 ----
+====
 
+====
 `<<` - Go back in time a duration:
-
 [source.code,clojure]
 ----
 (t/<< (t/now) (t/new-period 10 :weeks))
 ----
+====
 
+====
 `>>` - Go forward in time a duration:
-
 [source.code,clojure]
 ----
 (t/>> (t/now) (t/new-duration 10 :hours))
 ----
+====
 
+====
 `<` - Before?
-
 [source.code,clojure]
 ----
 (t/< (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `>` - After?
-
 [source.code,clojure]
 ----
 (t/> (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
 ----
+====
 
-`<=` - Before or same time?
-
+====
+`\<=` - Before or same time?
 [source.code,clojure]
 ----
 (t/<= (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `>=` - After or same time?
-
 [source.code,clojure]
 ----
 (t/>= (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `ago` - Give the time a duration ago:
-
 [source.code,clojure]
 ----
 (t/ago (t/new-duration 1 :hours))
 ----
+====
 
-TBD
-am
-
+====
+`am` - Create an interval spanning the morning of a given date:
 [source.code,clojure]
 ----
-
+(t/am (t/date "2018-01-01"))
 ----
+====
 
+====
 `at` - Make date-time from a date (given date `at` "time"):
-
 [source.code,clojure]
 ----
 (-> (t/date "2000-01-01") (t/at "00:00"))
 ----
+====
 
-TBD atom?
-
-
+====
+`atom` - TBD
 [source.code,clojure]
 ----
 
 ----
+====
 
+====
 `beginning` - Give the beginning of an interval:
-
 [source.code,clojure]
 ----
 (t/beginning (t/today))
 ----
+====
 
+====
 `between` - Give a value for the duration between two instances:
-
 [source.code,clojure]
 ----
 (t/between (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `bounds` - Give the beginning and end of an interval:
-
 [source.code,clojure]
 ----
 (t/bounds (t/yesterday))
 ----
+====
 
+====
 `clock` - Create a system clock or fixed clock:
-
 [source.code,clojure]
 ----
 (t/clock)
 ----
-
 [source.code,clojure]
 ----
 (t/clock (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
+`coincident?` - Are two intervals the same?
+[source.code,clojure]
+----
+(t/coincident? (t/today) (t/today))
+----
+====
 
-TDB coincident?
-compare-and-set!
-compliemnt
-concur
-concurrencies
-conj
-
+====
+`compare-and-set!` - TBD (Atomic clocks)
 [source.code,clojure]
 ----
 
 ----
+====
 
+====
+`complement` - Give the inverse intervals. - TBD : better description.
+[source.code,clojure]
+----
+(t/complement [(t/instant "2010-01-01T00:00")
+	       (t/instant "2010-02-01T00:00")
+	       (t/instant "2010-03-01T00:00")])
+----
+====
+
+====
+`concur` - Get the common interval (if any) of two intervals.
+[source.code,clojure]
+----
+(t/concur (t/today) (t/new-interval (t/yesterday) (t/tomorrow)))
+----
+====
+
+====
+`concurrencies` - A sequence of times when intervals overlap: - TBD Better definition.
+[source.code,clojure]
+----
+(t/concurrencies (t/today) (t/new-interval (t/today) (t/tomorrow)))
+----
+====
+
+====
+`conj` - TBD
+[source.code,clojure]
+----
+
+----
+====
+
+====
 `date` - Get the date:
-
 [source.code,clojure]
 ----
 (t/date)
@@ -156,7 +205,9 @@ conj
 ----
 (t/date "2018-01-01")
 ----
+====
 
+====
 `date-time` - Get the date-time:
 [source.code,clojure]
 ----
@@ -174,9 +225,10 @@ conj
 ----
 (t/date "2018-01-01T00:00")
 ----
+====
 
+====
 `day-of-month` - Get the numerical day of the month:
-
 [source.code,clojure]
 ----
 (t/day-of-month)
@@ -193,9 +245,10 @@ conj
 ----
 (t/day-of-month (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `day-of-week` - Get the day of the week
-
 [source.code,clojure]
 ----
 (t/day-of-week)
@@ -212,132 +265,156 @@ conj
 ----
 (t/day-of-week "2018-01-01")
 ----
+====
 
+====
 `days` - Convert a duration into days
-
 [source.code,clojure]
 ----
 (t/days (t/new-duration 24 :hours))
 ----
+====
 
+====
 `dec` - Give the prevous year:
-
-
 _This does not work_
-
 [source.code,clojure]
 ----
 (t/dec (t/year))
 ----
+====
 
-TBD
-
-difference
-
-divide
-
-
+====
+`difference` - TBD
 [source.code,clojure]
 ----
 
 ----
+====
 
+====
+`divide` - Divide a duration by another duration:
+[source.code,clojure]
+----
+(t/divide (t/new-duration 1 :days) (t/new-duration 1 :hours))
+----
+====
+
+====
 `divide-by` - Split an interval into even sections of time:
-
 [source.code,clojure]
 ----
 (t/divide-by 10 {:tick/beginning (t/instant "2018-01-01T00:00")
 	         :tick/end (t/instant "2018-01-10T00:00")})
 ----
+====
 
+====
 `duration` - Give the duration of an interval:
-
 [source.code,clojure]
 ----
 (t/duration {:tick/beginning (t/instant "2018-01-01T00:00")
 	     :tick/end (t/instant "2018-01-10T00:00")})
 ----
+====
 
+====
 `end` - Give the end instance of an interval:
-
 [source.code,clojure]
 ----
 (t/end {:tick/beginning (t/instant "2018-01-01T00:00")
 	:tick/end (t/instant "2018-01-10T00:00")})
 ----
+====
 
+====
 `epoc` - Give the https://en.wikipedia.org/wiki/Unix_time[epoc]:
-
 [source.code,clojure]
 ----
 (t/epoch)
 ----
+====
 
+====
 `extend` - Extend an interval by a duration:
-
 [source.code,clojure]
 ----
 (t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
            :tick/end (t/instant "2018-01-10T00:00")}
   (t/new-period 10 :weeks))
 ----
+====
 
-TBD
-
-fields
-
-group-by
-
-hence
-
-
+====
+`fields` -TBD
 [source.code,clojure]
 ----
 
 ----
+====
 
+====
+`group-by` - TBD
+[source.code,clojure]
+----
+
+----
+====
+
+====
+`hence` - TBD
+[source.code,clojure]
+----
+
+----
+====
+
+====
 `hour` - Give the hour of the day:
-
 [source.code,clojure]
 ----
 (t/hour (t/now))
 ----
+====
 
+====
 `hours` - Give a duration in hours:
-
 [source.code,clojure]
 ----
 (t/hours (t/new-duration 2 :days))
 ----
+====
 
+====
 `in` - Give an instance in a time zone:
-
 [source.code,clojure]
 ----
-(t/in (t/instant) "Australia/Darwin")
+(t/in (t/instant "2018-01-01T10:00") "Australia/Darwin")
 ----
+====
 
+====
 `inc` - Give the next year:
-
 [source.code,clojure]
 ----
 (t/inc (t/year))
 ----
+====
 
+====
 `inst` - Convert to `java.util.Date`:
-
 [source.code,clojure]
 ----
 (t/inst)
 ----
-
 [source.code,clojure]
 ----
 (t/inst (t/instant "2018-01-01T00:00"))
 ----
+====
 
+====
 `instant` - Convert to `java.time.Instant`:
-
 [source.code,clojure]
 ----
 (t/instant (t/inst))
@@ -346,91 +423,122 @@ hence
 ----
 (t/instant "2018-01-01T00:00:00.000+09:30[Australia/Darwin]")
 ----
+====
 
+====
 `int` - Give the year as an integer:
-
 [source.code,clojure]
 ----
 (t/int (t/year))
 ----
+====
 
-TBD
-intersection
-intersects?
-long
-max
-
+====
+`intersection` - TBD
 [source.code,clojure]
 ----
 
 ----
+====
 
+====
+`intersects?` - TBD
+[source.code,clojure]
+----
+
+----
+====
+
+====
+`long` - return an instant as a long:
+[source.code,clojure]
+----
+(t/long (t/instant))
+----
+====
+
+====
+`max` - Give the last chronological date from multiple unordered dates:
+[source.code,clojure]
+----
+(t/max (t/today) (t/tomorrow) (t/yesterday) (t/new-date 2018 11 11))
+----
+====
+
+====
 `micros` - Give a duration in microseconds:
-
 [source.code,clojure]
 ----
 (t/micros (t/new-duration 5 :minutes))
 ----
+====
 
+====
 `microsecond` - Give the microsecond of an instant:
-
 [source.code,clojure]
 ----
 (t/microsecond (t/now))
 ----
+====
 
+====
 `midnight` - Time at midnight:
-
 [source.code,clojure]
 ----
 (t/midnight)
 ----
+====
 
-TBD
-midnight?
-
+====
+`midnight?` - Is it midnight?
 [source.code,clojure]
 ----
-
+(t/midnight? (t/date-time))
 ----
+====
 
+====
 `millis` - Give a duration in milliseconds:
-
 [source.code,clojure]
 ----
 (t/millis (t/new-duration 5 :minutes))
 ----
+====
 
+====
 `millisecond` - Give the millisecond of an instant.
-
 [source.code,clojure]
 ----
 (t/millisecond (t/now))
 ----
+====
 
-TBD min
-
+====
+`min` - Give the first chronological date from an unordered list of dates:
 [source.code,clojure]
 ----
-
+(t/min (t/today) (t/tomorrow) (t/yesterday) (t/new-date 2018 11 11))
 ----
+====
 
+====
 `minutes` - Give a duration in minutes:
-
 [source.code,clojure]
 ----
 (t/minutes (t/new-duration 5 :hours))
 ----
+====
 
+====
 `minute` - Give the minute of an instant:
-
 [source.code,clojure]
 ----
 (t/minute (t/now))
 ----
+====
 
+====
 `month` - Get the month:
-
 [source.code,clojure]
 ----
 (t/month)
@@ -439,28 +547,33 @@ TBD min
 ----
 (t/month "2018-11-11")
 ----
+====
 
+====
 `months` - Get the number of months in a duration:
-
 [source.code,clojure]
 ----
 (t/months (t/new-period 10 :months))
 ----
+====
 
+====
 `nanos` - Get the number of nanoseconds in a duration:
-
 [source.code,clojure]
 ----
 (t/nanos (t/new-duration 5 :minutes))
 ----
+====
 
+====
 `nanosecond` - Get the nanosecond of the time:
-
 [source.code,clojure]
 ----
 (t/nanosecond (t/now))
 ----
+====
 
+====
 `new-date` - Created a new `java.time.LocalDate`
 
 [source.code,clojure]
@@ -471,66 +584,145 @@ TBD min
 ----
 (t/new-date)
 ----
+====
 
+====
 [[new-duration]]
 `t/new-duration` - Create a new duration.
-
 [source.code,clojure]
 ----
 (t/new-duration 10 :minutes)
 ----
-NOTE: `new-duration` units are from _nanos_ to _days_. For larger units of time, see <<new-period>>.
+NOTE: `new-duration` units are from _nanos_ to _days_. For larger units of time, see <<new-period,`new-period`>>.
+====
 
-
+====
+`new-interval` - Create a new interval: a map with a `:tick/beginning` and a `:tick/end`
 [source.code,clojure]
 ----
-(t/new-interval {:tick/beginning (t/instant "2018-01-01T00:00")
-	         :tick/end (t/instant "2019-01-01T00:00")})
+(t/new-interval (t/instant "2018-01-01T00:00") (t/instant "2019-01-01T00:00"))
 ----
+====
+
+====
 [[new-period]]
 `new-period` - Create a new duration:
 [source.code,clojure]
 ----
 (t/new-period 10 :weeks)
 ----
+NOTE: `new period` is in units greater than days. For smaller units, see <<new-duration,`new-duration`>>.
+====
 
-NOTE: `new period` is in units greater than days. For smaller units, see <<new-duration>>.
-
+====
+`new-time` - Create a new `java.time.LocalTime`
+[source.code,clojure]
+----
+(t/new-time)
+----
 [source.code,clojure]
 ----
 (t/new-time 12 00)
 ----
+====
+
+====
+`noon` - Give the time at noon.
 [source.code,clojure]
 ----
 (t/noon)
 ----
+====
+
+====
+`normalize` - TBD
+_"Within a time-ordered sequence of disjoint intervals, return a
+  sequence of interval groups, splicing together meeting intervals."_
 [source.code,clojure]
 ----
-TBD
-normalize
+(t/normalize [(t/new-interval (t/instant "2000-01-01T00:00")
+	     		      (t/instant "2000-01-02T00:00"))
+              (t/new-interval (t/instant "2000-01-02T00:00")
+	      		      (t/instant "2000-02-02T00:00"))])
 ----
+====
+
+====
+`now` - Give _now_ as an instant:
 [source.code,clojure]
 ----
 (t/now)
 ----
+====
+
+====
+`offset-by` - Give a `java.time.OffsetDateTime` of a specified instant with a specified offset:
 [source.code,clojure]
 ----
 (t/offset-by (t/now) 1)
+----
+====
+
+====
+`offset-date-time` - Convert a `java.time.Instant` to a `java.time.OffsetDateTime`
+
+[source.code,clojure]
+----
+(t/offset-date-time (t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]"))
 ----
 [source.code,clojure]
 ----
 (t/offset-date-time)
 ----
+====
+
+====
+`on` - Give a LocalDateTime for a given time `on` a given date:
 [source.code,clojure]
 ----
 (t/on (t/new-time 11 00) (t/new-date 2000 01 01))
 ----
-TBD
-ordered-disjoint-intervals?
-parse
-pm
-range
+====
 
+====
+`ordered-disjoint-intervals?` - Are the given intervals timeordered and disjointed?
+[source.code,clojure]
+----
+(t/ordered-disjoint-intervals? [(t/new-interval (t/instant "2000-01-01T00:00")
+			       			(t/instant "2000-01-02T00:00"))
+				(t/new-interval (t/instant "2000-01-02T00:00")
+						(t/instant "2000-02-02T00:00"))])
+----
+====
+
+====
+`parse` - Give the most applicable instance for the input string:
+[source.code,clojure]
+----
+(t/parse "1pm")
+----
+====
+
+====
+`pm` - Give an interval covering the afternoon of a given date:
+[source.code,clojure]
+----
+(t/pm (t/today))
+----
+====
+
+====
+`range` - Give a lazy sequence of times from start to finish.
+[source.code,clojure]
+----
+(t/range (t/date-time "2000-01-01T12:00")
+	 (t/date-time "2000-01-01T12:05")
+	 (t/new-duration 1 :minutes))
+----
+====
+
+====
+`relation` - Show the relation of two intervals:
 [source.code,clojure]
 ----
 (t/relation {:tick/beginning (t/instant "2018-01-01T00:00")
@@ -538,80 +730,214 @@ range
             {:tick/beginning (t/instant "2018-06-01T00:00")
 	     :tick/end (t/instant "2019-06-01T00:00")})
 ----
-TBD
-reset!
-reset-vals!
+[source.code,clojure]
+----
+(t/relation (t/today) (t/yesterday))
+----
+NOTE: see <<relation-yesterday-tomorrow,above>> for more.
+====
 
-Increase interval by a duration:
+====
+`reset!` - TBD (clocks)
+[source.code,clojure]
+----
+
+----
+====
+
+====
+`reset-vals!` - TBD (clocks)
+====
+
+====
+`scale` - Increase an interval by a given duration:
 [source.code,clojure]
 ----
 (t/scale {:tick/beginning (t/instant "2018-01-01T00:00")
 	  :tick/end (t/instant "2019-01-01T00:00")}
          (t/new-duration 10 :minutes))
 ----
+====
+
+====
+`seconds` - Give a duration in seconds:
 [source.code,clojure]
 ----
 (t/seconds (t/new-duration 5 :minutes))
 ----
+====
+
+====
+`second` - Give the second of time:
 [source.code,clojure]
 ----
 (t/second (t/now))
 ----
-TBD:
-swap!
-swap-vals!
+====
+
+====
+`swap!` - TBD (clocks)
+[source.code,clojure]
+----
+
+----
+====
+
+====
+`swap-vals!` - TBD (clocks)
+====
+
+====
+`time` - Give the time of an instant:
 [source.code,clojure]
 ----
 (t/time (t/now))
 ----
+====
+
+====
+`today` - Give todays date:
 [source.code,clojure]
 ----
 (t/today)
 ----
+====
+
+====
+`tomorrow` - Give tomorrows date:
 [source.code,clojure]
 ----
 (t/tomorrow)
 ----
+====
+
+====
+`truncate` - Lessen precision of an instant:
 [source.code,clojure]
 ----
 (t/truncate (t/instant) :days)
 ----
-TBD
-union
+====
 
+====
+`union` - TBD --> to get working
+"Merge multiple time-ordered sequences of disjoint intervals into a
+  single sequence of time-ordered disjoint intervals."
+[source.code,clojure]
+----
+(t/union (t/new-interval (t/instant "2000-01-01T00:00") (t/instant "2000-01-02T00:00"))
+	 (t/new-interval (t/instant "2000-01-02T00:00") (t/instant "2000-02-02T00:00")))
+----
+====
+
+====
+`unit-map` - A map of units of time that tick works with:
+[source.code,clojure]
+----
+(keys t/unit-map)
+----
 [source.code,clojure]
 ----
 (:minutes t/unit-map)
 ----
-TBD
-unite
-units
-with
-with-clock
+====
+
+====
+`unite` - Unite concurrent intervals ordered by beginning:
+[source.code,clojure]
+----
+(t/unite [(t/new-interval (t/instant "2000-01-01T00:00")
+	 		  (t/instant "2000-01-02T00:00"))
+	  (t/new-interval (t/instant "2000-01-01T00:00")
+	  		  (t/instant "2000-02-02T00:00"))])
+----
+====
+
+====
+`units` - TBD --> Describe
+[source.code,clojure]
+----
+(t/units (t/new-duration 5 :hours))
+----
+====
+
+====
+`with` - TBD --> get working
+[source.code,clojure]
+----
+
+----
+====
+
+====
+`with-clock` - TBD
+====
+
+====
+`year` - Give the year:
 [source.code,clojure]
 ----
 (t/year)
 ----
 [source.code,clojure]
 ----
+(t/year "2000-01-01")
+----
+====
+
+====
+`year-month` - Give the year and month:
+[source.code,clojure]
+----
 (t/year-month)
 ----
-TBD
-years
+[source.code,clojure]
+----
+(t/year-month "2000-01-01")
+----
+====
+
+====
+`years` - Give a duration in years.
+====
+(t/years (t/new-period 10 :years))
+====
+`yesterday` - Give yesterdays date:
 [source.code,clojure]
 ----
 (t/yesterday)
 ----
+====
+
+====
+`zone` - Give the time zone:
 [source.code,clojure]
 ----
 (t/zone)
 ----
 [source.code,clojure]
 ----
-(t/zone-offset)
+(t/zone (t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]"))
 ----
+====
+
+====
+`zone-offset` - Give the `java.time.ZoneOffset` with a specified offset:
+[source.code,clojure]
+----
+(t/zone-offset 1 30 59)
+----
+====
+
+====
+`zoned-date-time` - Create a `java.time.ZonedDateTime`:
 [source.code,clojure]
 ----
 (t/zoned-date-time)
 ----
+[source.code,clojure]
+----
+(t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]")
+----
+
 ====
