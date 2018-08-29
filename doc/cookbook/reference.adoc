@@ -1,7 +1,8 @@
-== Index of functions
+== Tick Reference
 
-This section shows basic examples of each function in the tick api library.
+This section gives, in alphabetical order, examples of how to use each function in the tick api library.
 
+NOTE: This is a work in progress.
 
 ====
 `+` - Add a duration to an instant:
