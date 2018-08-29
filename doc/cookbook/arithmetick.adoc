@@ -1,0 +1,99 @@
+== Arithmetic
+
+The tick library lends itself to doing arithmetic.
+
+=== Simple maths
+
+Operating on an instant it will return another instant in time.
+
+====
+Addition:
+[source.code,clojure]
+----
+(t/+ (t/now)
+     (t/new-duration 15 :minutes))
+----
+Subtraction:
+[source.code,clojure]
+----
+(t/- (t/now)
+     (t/new-duration 10 :days))
+----
+====
+
+An interval has a beginning and an end, operating on it
+will return a modified inteval.
+
+====
+Addition:
+[source.code,clojure]
+----
+(t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
+           :tick/end (t/instant "2018-01-10T00:00")}
+	  (t/new-period 10 :weeks))
+----
+Subtraction:
+[source.code,clojure]
+----
+(t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
+           :tick/end (t/instant "2018-01-10T00:00")}
+	  (t/new-duration -1 :days))
+----
+This can be done with `scale` too:
+
+[source.code,clojure]
+----
+(= (t/extend (t/today)
+     (t/new-period 10 :weeks))
+   (t/scale (t/today)
+	    (t/new-period 10 :weeks)))
+----
+
+====
+
+An interval can be divided into smaller intervals:
+
+====
+Divide the day by 24, to get hour long intervals:
+
+----
+(map #(apply t/new-interval %)
+     (t/divide-by 24 {:tick/beginning (t/instant "2000-01-01T00:00")
+                      :tick/end (t/instant "2000-01-02T00:00")}))
+----
+
+Or just devide the day by a duration of 1 hour to get the same result:
+[source.code,clojure]
+----
+(= (t/divide-by (t/new-duration 1 :hours)
+                {:tick/beginning (t/instant "2000-01-01T00:00")
+                 :tick/end (t/instant "2000-01-02T00:00")})
+   (t/divide-by 24
+                {:tick/beginning (t/instant "2000-01-01T00:00")
+                 :tick/end (t/instant "2000-01-02T00:00")}))
+----
+====
+
+Durations can be treated like independent chuncks of time.
+They can be extended, shrunk and divided.
+
+====
+Addition:
+[source.code,clojure]
+----
+(t/+ (t/new-duration 1 :hours)
+     (t/new-duration 10 :minutes))
+----
+Subtraction:
+[source.code,clojure]
+----
+(t/- (t/new-duration 1 :hours)
+     (t/new-duration 10 :minutes))
+----
+Division:
+[source.code,clojure]
+----
+(t/divide (t/new-duration 1 :hours)
+     (t/new-duration 1 :minutes))
+----
+====
