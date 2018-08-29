@@ -1,4 +1,4 @@
-== Countdown timer
+== Countdown timers
 
 [.lead]
 Creating a countdown timer greatly depends on the length of time being counted and the accuracy required.
@@ -23,3 +23,102 @@ For a simple timer, usually only hours minutes and seconds are required:
               hours minutes seconds)
       "Time's up!")))
 ----
+
+
+For longer durations, counting to high precision is unneccesary. If we are counting down the weeks, knowing how many seconds
+remain is for the most part meaningless.
+
+----
+(defn countdown-weeks
+  [end-time]
+  (let [duration (tick/duration
+                  {:tick/beginning (tick/instant)
+                   :tick/end end-time})
+        weeks (long (tick/divide duration (tick/new-duration 7 :days)))
+        days (t/days (t/- duration
+                          (t/new-duration (* weeks 7) :days)))
+        hours (tick/hours (tick/- duration
+                                  (t/new-duration (+ days (* weeks 7)) :days)))]
+    (if (tick/< (tick/instant) end-time)
+      (format "%d weeks, %d days, %d hours"
+              weeks days hours)
+      "Time's up!")))
+
+----
+
+If you  do not know the units of time that are going to be counted down, you may require a more general countdown function.
+
+----
+(defn countdown-generic
+  "Gives a map of the countdown with units of time as keys."
+  [end-time]
+  (let [duration (tick/duration
+                  {:tick/beginning (tick/instant)
+                   :tick/end end-time})
+        weeks (long (tick/divide duration (tick/new-duration 7 :days)))
+        days  (t/days (t/- duration
+                           (t/new-duration (* weeks 7) :days)))
+        hours (tick/hours (tick/- duration
+                                  (t/new-duration (+ days (* weeks 7)) :days)))
+        minutes (tick/minutes (tick/- duration
+                                      (t/new-duration (+ days (* weeks 7)) :days)
+                                      (t/new-duration hours :hours)))
+        seconds (tick/seconds (tick/- duration
+                                      (t/new-duration (+ days (* weeks 7)) :days)
+                                      (t/new-duration hours :hours)
+                                      (t/new-duration minutes :minutes)))
+        millis (tick/millis (tick/- duration
+                                    (t/new-duration (+ days (* weeks 7)) :days)
+                                    (t/new-duration hours :hours)
+                                    (t/new-duration minutes :minutes)
+                                    (t/new-duration seconds :seconds)))]
+    (if (tick/< (tick/instant) end-time)
+      {:counting true
+       :weeks weeks
+       :days days
+       :hours hours
+       :minutes minutes
+       :seconds seconds
+       :milliseconds millis}
+      {:counting false})))
+----
+
+It may be required that the time _since_ an event is calculated. In this can be done in a very similar way to counting down:
+
+----
+(defn count-up
+  "Gives the time since an event in the most appropriate units of time"
+  [event]
+  (let [duration (tick/duration
+                  {:tick/beginning event
+                   :tick/end (tick/instant)})
+        years (long (tick/divide duration (tick/new-duration 365 :days)))
+        months (long (tick/divide duration (tick/new-duration (/ 365 12) :days)))
+        weeks (long (tick/divide duration (tick/new-duration 7 :days)))]
+    (cond
+      (> (t/days duration) 365)
+      (format "%d years" years)
+
+      (and (<= (t/days duration) 365) (> (t/days duration) (/ 365 12)))
+      (format "%d months" months)
+
+      (and (<= (t/days duration) (/ 365 12)) (> (t/days duration) 7))
+      (format "%d weeks" weeks)
+
+      (and (<= (t/days duration) 7) (> (t/days duration) 1))
+      (format "%d days" (t/days duration))
+
+      (and (<= (t/days duration) 1) (> (t/hours duration) 1))
+      (format "%d hours %d" (t/hours duration))
+
+      (and (<= (t/hours duration) 1) (> (t/minutes duration) 1))
+      (format "%d minutes %d" (t/minutes duration))
+
+      (and (<= (t/minutes duration) 1) (> (t/seconds duration) 1))
+      (format "%d seconds" (t/seconds duration))
+
+      (tick/< (tick/instant) event)
+      "Event hasn't happened yet")))
+----
+
+CAUTION: These timers have lower accuracy at higher precissions - they do not account for leap seconds or years.
