@@ -15,4 +15,6 @@ include::arithmetick.adoc[]
 
 include::countdown.adoc[]
 
+include::misc.adoc[]
+
 include::reference.adoc[]
