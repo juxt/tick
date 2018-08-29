@@ -14,7 +14,6 @@ Extend an instant to a interval
 
 ====
 Give the am pm time:
-[source.code,clojure]
 ----
 (defn twelve-hour-time
   "Takes a time and gives the 12 hour display"
@@ -34,11 +33,32 @@ Give the am pm time:
       (< hour 12)
       (format "%02d:%02d AM" hour minute))))
 
-(twelve-hour-time (t/time "12:01"))
 ----
-NOTE: "12 noon is by definition neither ante meridiem (before noon) nor post
-meridiem (after noon), then 12 a.m. refers to midnight at the start of the
+NOTE: "12 noon is by definition neither *ante meridiem* (before noon) nor *post
+meridiem* (after noon), then 12 a.m. refers to midnight at the start of the
 specified day (00:00) and 12 p.m. to midnight at the end of that day (24:00)"
 - http://www.npl.co.uk/reference/faqs/is-midnight-12-am-or-12-pm-faq-time[NPL]
 ====
-(= (t/noon) (t/time "12:00"))
+====
+Check if an expiration has passed:
+[source.code,clojure]
+----
+(let [expiry (t/instant "2018-01-01T00:00")]
+  (t/> (t/now)
+       expiry))
+----
+====
+
+====
+Get the days in a year
+----
+(t/divide-by (t/new-duration 1 :days) (t/bounds (t/year)))
+(filter #(or (= (t/SATURDAY) (t/day-of-week (first %)))
+             (= (t/SUNDAY) (t/day-of-week (first %))))
+        (t/divide-by (t/new-duration 1 :days) (t/bounds (t/year))))
+
+----
+(= (t/MONDAY) (t/day-of-week (first (first (t/divide-by (t/new-duration 1 :days) (t/bounds (t/year)))))))
+
+(t/dec (t/year))
+====
