@@ -1,4 +1,4 @@
-=== Time Zones & Offset
+== Time Zones & Offset
 
 Extract a zone from a `java.time.ZonedDateTime`:
 ====
@@ -24,4 +24,4 @@ Create a `java.time.ZonedDateTime` in a particular time zone:
 ====
 
 
-==== TBD : offsets
+=== TBD : offsets
