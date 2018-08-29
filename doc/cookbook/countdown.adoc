@@ -1,0 +1,25 @@
+== Countdown timer
+
+[.lead]
+Creating a countdown timer greatly depends on the length of time being counted and the accuracy required.
+
+
+For a simple timer, usually only hours minutes and seconds are required:
+
+----
+(defn countdown-HH-mm-ss
+  [end-time]
+  (let [duration (tick/duration
+                  {:tick/beginning (tick/instant)
+                   :tick/end end-time})
+        hours (tick/hours duration)
+        minutes (tick/minutes (tick/- duration
+                                      (tick/new-duration hours :hours)))
+        seconds (tick/seconds (tick/- duration
+                                      (tick/new-duration minutes :minutes)
+                                      (tick/new-duration hours :hours)))]
+    (if (tick/< (tick/instant) end-time)
+      (format "%02d:%02d:%02d"
+              hours minutes seconds)
+      "Time's up!")))
+----
