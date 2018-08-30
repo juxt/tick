@@ -24,7 +24,7 @@ minor changes.
 Add to your `project.clj`, `build.boot` or `deps.edn`:
 
 ```
-[tick "1.0-alpha-1"]
+[tick "0.4.1-alpha"]
 ```
 
 == Development
