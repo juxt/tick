@@ -9,8 +9,8 @@
     #?@(:cljs
        [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
-  
-  
+
+
   #?(:clj
      (:import
        [java.util Date]
@@ -726,7 +726,7 @@
   (backward-duration [t d] (.minus t d))
   Date
   (forward-duration [t d] (.plus (instant t) d))
-  (backward-duration [t d] (.plus (instant t) d))
+  (backward-duration [t d] (.minus (instant t) d))
   LocalDate
   (forward-number [t n] (.plusDays t n))
   (backward-number [t n] (.minusDays t n))
@@ -734,22 +734,22 @@
   (backward-duration [t d] (.minus t d))
   LocalTime
   (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   LocalDateTime
   (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   OffsetDateTime
   (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   ZonedDateTime
   (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.plus t d))
+  (backward-duration [t d] (.minus t d))
   Year
   (forward-number [t n] (.plusYears t n))
-  (backward-number [t n] (.plusYears t n))
+  (backward-number [t n] (.minusYears t n))
   YearMonth
   (forward-number [t n] (.plusMonths t n))
-  (backward-number [t n] (.plusMonths t n))
+  (backward-number [t n] (.minusMonths t n))
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.minus t d))
   Clock
