@@ -48,17 +48,3 @@ Check if an expiration has passed:
        expiry))
 ----
 ====
-
-====
-Get the days in a year
-----
-(t/divide-by (t/new-duration 1 :days) (t/bounds (t/year)))
-(filter #(or (= (t/SATURDAY) (t/day-of-week (first %)))
-             (= (t/SUNDAY) (t/day-of-week (first %))))
-        (t/divide-by (t/new-duration 1 :days) (t/bounds (t/year))))
-
-----
-(= (t/MONDAY) (t/day-of-week (first (first (t/divide-by (t/new-duration 1 :days) (t/bounds (t/year)))))))
-
-(t/dec (t/year))
-====
