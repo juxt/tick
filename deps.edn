@@ -2,8 +2,9 @@
  :deps
  {
   cljsjs/js-joda {:mvn/version "1.6.2-0"}
-  net.cgrand/macrovich
-  {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}}
+  cljsjs/js-joda-timezone {:mvn/version "1.3.0-0"}
+  henryw374/js-joda-locale-en-us {:mvn/version "1.0.0-1"}
+  net.cgrand/macrovich {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}}
 
  :aliases
  {:dev
