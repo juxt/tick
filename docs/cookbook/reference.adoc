@@ -96,10 +96,11 @@ NOTE: This is a work in progress.
 ====
 
 ====
-`atom` - TBD
+`atom` - Create an holder for the current time:
 [source.code,clojure]
 ----
-
+(def clk (t/atom))
+(t/time @clk)
 ----
 ====
 
@@ -148,7 +149,7 @@ NOTE: This is a work in progress.
 ====
 
 ====
-`compare-and-set!` - TBD (Atomic clocks)
+`compare-and-set!` - TBD
 [source.code,clojure]
 ----
 
@@ -156,7 +157,7 @@ NOTE: This is a work in progress.
 ====
 
 ====
-`complement` - Give the inverse intervals. - TBD : better description.
+`complement` - Give the inverse of a list of intervals.
 [source.code,clojure]
 ----
 (t/complement [(t/instant "2010-01-01T00:00")
@@ -174,18 +175,18 @@ NOTE: This is a work in progress.
 ====
 
 ====
-`concurrencies` - A sequence of times when intervals overlap: - TBD Better definition.
+`concurrencies` - A sequence of times when intervals overlap:
 [source.code,clojure]
 ----
-(t/concurrencies (t/today) (t/new-interval (t/today) (t/tomorrow)))
+(t/concurrencies (t/pm (t/today)) (t/new-interval (t/today) (t/tomorrow)))
 ----
 ====
 
 ====
-`conj` - TBD
+`conj` - Return new collection with the original collection including a new date:
 [source.code,clojure]
 ----
-
+(t/conj [(t/yesterday) (t/today)] (t/tomorrow))
 ----
 ====
 
@@ -278,7 +279,7 @@ NOTE: This is a work in progress.
 ====
 
 ====
-`dec` - Give the prevous year:
+`dec` - Give the previous year:
 _This does not work_
 [source.code,clojure]
 ----
@@ -287,10 +288,10 @@ _This does not work_
 ====
 
 ====
-`difference` - TBD
+`difference` - Return the first collection without the second collection elements.
 [source.code,clojure]
 ----
-
+(t/difference [(t/yesterday) (t/today) (t/tomorrow)] [(t/today)])
 ----
 ====
 
@@ -330,7 +331,7 @@ _This does not work_
 ====
 
 ====
-`epoc` - Give the https://en.wikipedia.org/wiki/Unix_time[epoc]:
+`epoch` - Give the https://en.wikipedia.org/wiki/Unix_time[epoch]:
 [source.code,clojure]
 ----
 (t/epoch)
@@ -351,23 +352,27 @@ _This does not work_
 `fields` -TBD
 [source.code,clojure]
 ----
-
+(t/fields (t/time))
 ----
 ====
 
 ====
-`group-by` - TBD
+`group-by` - Group a collection of intervals by a given function.
 [source.code,clojure]
 ----
-
+(t/group-by t/year
+            (map #(apply t/new-interval %)
+                 (t/divide-by (t/new-duration 1 :days)
+                              (t/new-interval (t/new-date 2000 12 29)
+                                              (t/new-date 2001 1 2)))))
 ----
 ====
 
 ====
-`hence` - TBD
+`hence` - Return an instant 15 minutes from now:
 [source.code,clojure]
 ----
-
+(t/hence (t/new-duration 15 :minutes))
 ----
 ====
 
@@ -436,18 +441,22 @@ _This does not work_
 ====
 
 ====
-`intersection` - TBD
+`intersection` - Give the intersection of two sequences:
 [source.code,clojure]
 ----
-
+(t/intersection [(t/year)]
+                [(t/date "2017-01-01")
+                 (t/date "2018-01-01")
+                 (t/date "2019-01-01")])
 ----
 ====
 
 ====
-`intersects?` - TBD
+`intersects?` - Does an interval intersect with another?
 [source.code,clojure]
 ----
-
+(t/intersects? [(t/year)]
+               (t/inc (t/year)))
 ----
 ====
 
@@ -613,7 +622,8 @@ NOTE: `new-duration` units are from _nanos_ to _days_. For larger units of time,
 ----
 (t/new-period 10 :weeks)
 ----
-NOTE: `new period` is in units greater than days. For smaller units, see <<new-duration,`new-duration`>>.
+NOTE: `new period` is in units greater than days. For smaller units,
+see <<new-duration,`new-duration`>>.
 ====
 
 ====
@@ -637,15 +647,16 @@ NOTE: `new period` is in units greater than days. For smaller units, see <<new-d
 ====
 
 ====
-`normalize` - TBD
-_"Within a time-ordered sequence of disjoint intervals, return a
-  sequence of interval groups, splicing together meeting intervals."_
+`normalize` - From a time ordered sequence of disjointed intervals, return a
+sequence of interval groups:
 [source.code,clojure]
 ----
-(t/normalize [(t/new-interval (t/instant "2000-01-01T00:00")
-	     		      (t/instant "2000-01-02T00:00"))
-              (t/new-interval (t/instant "2000-01-02T00:00")
-	      		      (t/instant "2000-02-02T00:00"))])
+(count (t/normalize [(t/new-interval (t/instant "2000-01-01T00:00")
+	     		             (t/instant "2000-01-02T00:00"))
+                     (t/new-interval (t/instant "2000-01-02T00:00")
+	      		             (t/instant "2000-02-02T00:00"))
+                     (t/new-interval (t/instant "2000-06-01T00:00")
+	      		             (t/instant "2000-06-09T00:00"))]))
 ----
 ====
 
@@ -658,7 +669,8 @@ _"Within a time-ordered sequence of disjoint intervals, return a
 ====
 
 ====
-`offset-by` - Give a `java.time.OffsetDateTime` of a specified instant with a specified offset:
+`offset-by` - Give a `java.time.OffsetDateTime` of a specified instant with a
+specified offset:
 [source.code,clojure]
 ----
 (t/offset-by (t/now) 1)
@@ -687,7 +699,7 @@ _"Within a time-ordered sequence of disjoint intervals, return a
 ====
 
 ====
-`ordered-disjoint-intervals?` - Are the given intervals timeordered and disjointed?
+`ordered-disjoint-intervals?` - Are the given intervals time-ordered and disjointed?
 [source.code,clojure]
 ----
 (t/ordered-disjoint-intervals? [(t/new-interval (t/instant "2000-01-01T00:00")
@@ -740,15 +752,25 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
 
 ====
-`reset!` - TBD (clocks)
+`reset!` - Reset an atom clock with one 5 mins slow.
 [source.code,clojure]
 ----
-
+(def clk (t/atom))
+(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
+(t/reset! clk clk2)
 ----
 ====
 
 ====
-`reset-vals!` - TBD (clocks)
+`reset-vals!` - Reset an atom clock with one 5 mins slow, and give the
+value of before and after.
+[source.code,clojure]
+----
+(def clk (t/atom))
+(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
+(t/reset-vals! clk clk2)
+----
+
 ====
 
 ====
@@ -778,7 +800,7 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
 
 ====
-`swap!` - TBD (clocks)
+`swap!` - TBD
 [source.code,clojure]
 ----
 
@@ -786,7 +808,7 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
 
 ====
-`swap-vals!` - TBD (clocks)
+`swap-vals!` - TBD
 ====
 
 ====
@@ -822,13 +844,10 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
 
 ====
-`union` - TBD --> to get working
-"Merge multiple time-ordered sequences of disjoint intervals into a
-  single sequence of time-ordered disjoint intervals."
+`union` - Join two time-ordered sequences together into one ordered sequence
 [source.code,clojure]
 ----
-(t/union (t/new-interval (t/instant "2000-01-01T00:00") (t/instant "2000-01-02T00:00"))
-	 (t/new-interval (t/instant "2000-01-02T00:00") (t/instant "2000-02-02T00:00")))
+(t/union [(t/today)] [(t/yesterday) (t/tomorrow)])
 ----
 ====
 
@@ -856,25 +875,29 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
 
 ====
-`units` - TBD --> Describe
+`units` - Give the appropriate units for a duration:
 [source.code,clojure]
 ----
-(t/units (t/new-duration 5 :hours))
+(t/units (t/new-duration 1000000001 :nanos))
 ----
 ====
 
 ====
-`with` - TBD --> get working
+`with` - NOTE: Does not work in the api
+----
+(t/with (t/date (t/now)) (t/first-day-of-month))
+----
+====
+
+====
+`with-clock` - Get the time from a clock:
 [source.code,clojure]
 ----
-
+(def clk (t/>> (t/clock) (t/new-duration 5 :minutes)))
+(t/with-clock clk (t/time))
 ----
-====
 
 ====
-`with-clock` - TBD
-====
-
 ====
 `year` - Give the year:
 [source.code,clojure]
