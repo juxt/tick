@@ -11,6 +11,8 @@ include::inst.adoc[]
 
 include::zone.adoc[]
 
+include::intervals.adoc[]
+
 include::arithmetick.adoc[]
 
 include::countdown.adoc[]
