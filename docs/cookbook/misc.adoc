@@ -4,47 +4,26 @@
 These examples don't have a home yet.
 
 ====
-Extend an instant to a interval
-[source.code,clojure]
-----
-(t/extend (t/instant "2000-01-01T00:00")
-  (t/new-period 3 :weeks))
-----
-====
-
-====
-Give the am pm time:
-----
-(defn twelve-hour-time
-  "Takes a time and gives the 12 hour display"
-  [t]
-  (let [minute (t/minute t)
-        hour (t/hour t)]
-    (cond
-      (= (t/noon) t)
-      "12:00 NOON"
-
-      (>= hour 13)
-      (format "%02d:%02d PM" (- hour 12) minute)
-
-      (>= hour 12)
-      (format "%02d:%02d PM" hour minute)
-
-      (< hour 12)
-      (format "%02d:%02d AM" hour minute))))
-
-----
-NOTE: "12 noon is by definition neither *ante meridiem* (before noon) nor *post
-meridiem* (after noon), then 12 a.m. refers to midnight at the start of the
-specified day (00:00) and 12 p.m. to midnight at the end of that day (24:00)"
-- http://www.npl.co.uk/reference/faqs/is-midnight-12-am-or-12-pm-faq-time[NPL]
-====
-====
 Check if an expiration has passed:
 [source.code,clojure]
 ----
 (let [expiry (t/instant "2018-01-01T00:00")]
   (t/> (t/now)
        expiry))
+----
+====
+
+====
+Return a sequence of dates between two given dates a with
+a specified jump between each.
+
+For instance, to get a sequence of the first day of each month in a given year:
+
+[source.code,clojure]
+----
+(def intvl (t/bounds (t/year)))
+(t/range (t/beginning intvl)
+	 (t/end intvl)
+	 (t/new-period 1 :months))
 ----
 ====

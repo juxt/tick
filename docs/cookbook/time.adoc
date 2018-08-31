@@ -233,6 +233,105 @@ Make up a `Zoned-Date-Time`
     (t/at (t/midnight))
     (t/in (t/zone)))
 ----
+====
 
 
+=== Time and Date manipulation
+====
+Give a date a set time in the future:
+
+[source.code,clojure]
+----
+(t/+ (t/date "2000-01-01") (t/new-period 1 :months))
+----
+
+[source.code,clojure]
+----
+(t/+ (t/date "2000-01-01") (t/new-period 4 :weeks))
+----
+
+[source.code,clojure]
+----
+(t/+ (t/date "2000-01-01") (t/new-period 30 :days))
+----
+
+[source.code,clojure]
+----
+(t/+ (t/date "2000-01-01") (t/+ (t/new-period 5 :days)
+                                (t/new-period 1 :weeks)
+                                (t/new-period 10 :months)))
+----
+
+Or past:
+
+[source.code,clojure]
+----
+(t/- (t/date "2000-01-01") (t/new-period 1 :years))
+----
+====
+
+====
+Move around in time:
+[source.code,clojure]
+----
+(t/+ (t/time "12:00") (t/new-duration 5 :minutes))
+----
+
+[source.code,clojure]
+----
+(t/- (t/time "12:00") (t/new-duration 5 :hours))
+----
+
+[source.code,clojure]
+----
+(t/>> (t/time "12:00") (t/+ (t/new-duration 5 :seconds)
+                           (t/new-duration 5 :millis)
+                           (t/new-duration 5 :micros)
+                           (t/new-duration 5 :nanos)))
+----
+
+Increasing a time by a duration of day magnitude will leave the time
+alone - `12:00` in 5 days is still `12:00` (ignoring daylight savings)
+
+[source.code,clojure]
+----
+(t/+ (t/time "12:00") (t/new-duration 5 :days))
+----
+====
+
+====
+Truncate time to a desired precision:
+
+[source.code,clojure]
+----
+(t/truncate (t/time "10:30:59.99") :minutes)
+----
+====
+
+====
+Give the am pm time:
+----
+(defn twelve-hour-time
+  "Takes a time and gives the 12 hour display"
+  [t]
+  (let [minute (t/minute t)
+        hour (t/hour t)]
+    (cond
+      (= (t/noon) t)
+      "12:00 NOON"
+
+      (>= hour 13)
+      (format "%02d:%02d PM" (- hour 12) minute)
+
+      (>= hour 12)
+      (format "%02d:%02d PM" hour minute)
+
+      (< hour 12)
+      (format "%02d:%02d AM" hour minute))))
+
+----
+NOTE: "12 noon is by definition neither *ante meridiem* (before noon) nor *post
+meridiem* (after noon), then 12 a.m. refers to midnight at the start of the
+specified day (00:00) and 12 p.m. to midnight at the end of that day (24:00)"
+- http://www.npl.co.uk/reference/faqs/is-midnight-12-am-or-12-pm-faq-time[NPL]
 ====

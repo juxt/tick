@@ -1,8 +1,10 @@
-=== Instants and Inst
+== Instants and Inst
 
-tick's default is `java.time.Instant` but caters for projects that use
+tick's default convention is `java.time.Instant` but caters for projects that use
 `java.util.Date` by the conversions above. It is recommended when using tick to
 keep as an instant for as long as possible.
+
+=== Creation
 
 ====
 To get the current instant:
@@ -26,6 +28,8 @@ Create a specific instant:
 (t/instant "2000-01-01T00:00:00.001")
 ----
 ====
+
+=== Conversions between Inst and Instant
 
 ====
 Convert inst to and from instant:
