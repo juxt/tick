@@ -25,7 +25,7 @@ For a simple timer, usually only hours minutes and seconds are required:
 ----
 
 
-For longer durations, counting to high precision is unneccesary. If we are counting down the weeks, knowing how many seconds
+For longer durations, counting to high precision is unnecessary. If we are counting down the weeks, knowing how many seconds
 remain is for the most part meaningless.
 
 ----
@@ -121,4 +121,4 @@ It may be required that the time _since_ an event is calculated. In this can be 
       "Event hasn't happened yet")))
 ----
 
-CAUTION: These timers have lower accuracy at higher precissions - they do not account for leap seconds or years.
+CAUTION: These timers have lower accuracy at higher precisions - they do not account for leap seconds or years.

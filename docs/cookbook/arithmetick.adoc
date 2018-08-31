@@ -1,6 +1,9 @@
 == Arithmetic
 
-The tick library lends itself to doing arithmetic.
+The tick library lends itself to doing additions, subtractions
+and divisions of time chunks and durations. Below are some
+examples of how time can be treated as a quantity which can be operated
+on.
 
 === Simple maths
 
@@ -22,7 +25,7 @@ Subtraction:
 ====
 
 An interval has a beginning and an end, operating on it
-will return a modified inteval.
+will return a modified interval.
 
 ====
 Addition:
@@ -62,7 +65,7 @@ Divide the day by 24, to get hour long intervals:
                       :tick/end (t/instant "2000-01-02T00:00")}))
 ----
 
-Or just devide the day by a duration of 1 hour to get the same result:
+Or just divide the day by a duration of 1 hour to get the same result:
 [source.code,clojure]
 ----
 (= (t/divide-by (t/new-duration 1 :hours)
@@ -74,7 +77,7 @@ Or just devide the day by a duration of 1 hour to get the same result:
 ----
 ====
 
-Durations can be treated like independent chuncks of time.
+Durations can be treated like independent chunks of time.
 They can be extended, shrunk and divided.
 
 ====

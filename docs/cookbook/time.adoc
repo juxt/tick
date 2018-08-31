@@ -1,21 +1,14 @@
-=== Time
+== Times & dates
 
-To get the current time:
-====
-[source.code,clojure]
-----
-(t/time)
-----
+Tick is flexible with the way in which times and dates are created; ergo,
+increasing efficiency.
+Times and dates can be easily stripped down to smaller modules of time,
+likewise they can be built up into complete instants.
 
-[source.code,clojure]
-----
-(t/new-time)
-----
+=== Create time
 
 ====
-
 A specific time can be produced in multiple ways with varying degrees of precision:
-====
 [source.code,clojure]
 ----
 (t/time "12:34")
@@ -35,4 +28,211 @@ A specific time can be produced in multiple ways with varying degrees of precisi
 ----
 (t/new-time 12 34 56 789000000)
 ----
+====
+
+=== Get the time
+
+====
+To get the current time:
+
+[source.code,clojure]
+----
+(t/time)
+----
+
+[source.code,clojure]
+----
+(t/new-time)
+----
+====
+
+====
+Or the time from an instant:
+
+[source.code,clojure]
+----
+(t/time (t/instant "1999-12-31T23:59:59"))
+----
+====
+
+====
+Get the current time in another time-zone:
+
+[source.code,clojure]
+----
+(t/time (t/in (t/now) "Australia/Darwin"))
+----
+====
+
+====
+Get a specific unit of time:
+[source.code,clojure]
+----
+(t/hour (t/instant "1999-12-31T23:59:59"))
+----
+[source.code,clojure]
+----
+(t/minute (t/instant "1999-12-31T23:59:59"))
+----
+[source.code,clojure]
+----
+(t/second (t/instant "1999-12-31T23:59:59"))
+----
+====
+
+=== Create a date
+====
+Creating dates is done in much the same way as creating time.
+[source.code,clojure]
+----
+(t/date "2000-01-01")
+----
+[source.code,clojure]
+----
+(t/new-date 2000 01 01)
+----
+====
+
+=== Get the date
+====
+To get the current date:
+
+[source.code,clojure]
+----
+(t/date)
+----
+[source.code,clojure]
+----
+(t/new-date)
+----
+====
+
+====
+Or the date from an instant:
+[source.code,clojure]
+----
+(t/date (t/instant "1999-12-31T23:59:59"))
+----
+====
+
+====
+Get the date in another time-zone:
+[source.code,clojure]
+----
+(t/date (t/in (t/instant "1999-12-31T23:59:59") "Australia/Darwin"))
+----
+====
+
+====
+Get a specific part of the date:
+[source.code,clojure]
+----
+(t/year (t/instant "1999-12-31T23:59:59"))
+----
+[source.code,clojure]
+----
+(t/month (t/instant "1999-12-31T23:59:59"))
+----
+[source.code,clojure]
+----
+(t/day-of-month (t/instant "1999-12-31T23:59:59"))
+----
+====
+
+
+=== Build up times and dates
+A unique feature of tick is that you can treat individual units of time
+as modular, making it easy to build up and break down time into components.
+
+====
+Break up an instant:
+
+----
+(defn instant-breakdown
+  "Takes an instant of time and breaks it down into units."
+  [t]
+  {:day  (t/day-of-week t)
+   :month  (t/month t)
+   :dd (t/day-of-month t)
+   :MM (t/int (t/month t))
+   :yyyy (t/int (t/year t))
+   :mm (t/minute t)
+   :HH (t/hour t)
+   :ss (t/second t)})
+----
+
+====
+
+We can treat the individual units of time as building blocks:
+
+.Tick Time Blocks
+[options="header",valign="center"]
+|====
+5+|Time 3+|Date |Zone
+
+5+|(t/time) 3+|(t/date)	|(t/zone)
+
+|(t/hour)|(t/minute) 3+|(t/second)|(t/year)|(t/month)|(t/day-of-month)|-
+
+|- |-|(t/millisecond)|(t/microsecond)|(t/nanosecond)|- |- |- |-
+|====
+
+====
+Make up a `time`
+
+If we want it to be half-past the current hour:
+[source.code,clojure]
+----
+(t/new-time (t/hour (t/instant)) 30)
+----
+Or about lunch time:
+[source.code,clojure]
+----
+(t/new-time 13 (t/minute (t/instant)))
+----
+====
+
+====
+Make up a `date-time`
+[source.code,clojure]
+----
+(t/at (t/date "2018-01-01") (t/time "13:00"))
+----
+[source.code,clojure]
+----
+(t/on (t/time "13:00") (t/date "2018-01-01"))
+----
+[source.code,clojure]
+----
+(-> (t/parse "1pm")
+    (t/on "2018-10-20"))
+----
+[source.code,clojure]
+----
+(-> (t/tomorrow)
+    (t/at (t/midnight)))
+----
+[source.code,clojure]
+----
+(-> (t/noon)
+    (t/on (t/yesterday)))
+----
+====
+
+====
+Make up a `Zoned-Date-Time`
+[source.code,clojure]
+----
+(-> (t/tomorrow)
+    (t/at (t/midnight))
+    (t/in "Europe/Paris"))
+----
+[source.code,clojure]
+----
+(-> (t/tomorrow)
+    (t/at (t/midnight))
+    (t/in (t/zone)))
+----
+
+
 ====
