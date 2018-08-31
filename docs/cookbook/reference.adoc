@@ -349,7 +349,7 @@ _This does not work_
 ====
 
 ====
-`fields` -TBD
+`fields` - Get the field for a given time value:
 [source.code,clojure]
 ----
 (t/fields (t/time))
@@ -883,9 +883,9 @@ value of before and after.
 ====
 
 ====
-`with` - NOTE: Does not work in the api
+`with` - Return a date with an altered field:
 ----
-(t/with (t/date (t/now)) (t/first-day-of-month))
+(t/with (t/today) :day-of-month 1)
 ----
 ====
 
