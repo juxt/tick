@@ -27,3 +27,58 @@ For instance, to get a sequence of the first day of each month in a given year:
 	 (t/new-period 1 :months))
 ----
 ====
+
+
+====
+Get the time difference between two instances:
+[source.code,clojure]
+----
+(t/between (t/now) (t/epoch))
+----
+====
+
+
+====
+Not sure on input format? `parse` will do the work for you.
+
+[source.code,clojure]
+----
+(t/parse "2 pm")
+----
+[source.code,clojure]
+----
+(t/parse "14")
+----
+[source.code,clojure]
+----
+(t/parse "14:00")
+----
+[source.code,clojure]
+----
+(t/parse "2018-01-01")
+----
+[source.code,clojure]
+----
+(t/parse "2018-01-01T00:00")
+----
+[source.code,clojure]
+----
+(t/parse "2018-01-01T00:00:00")
+----
+[source.code,clojure]
+----
+(t/parse "2018-01-01T00:00:00+01:00")
+----
+[source.code,clojure]
+----
+(t/parse "2018-01-01T00:00:00+01:00[Europe/London]")
+----
+[source.code,clojure]
+----
+(t/parse "2019")
+----
+[source.code,clojure]
+----
+(t/parse "2000-01")
+----
+====
