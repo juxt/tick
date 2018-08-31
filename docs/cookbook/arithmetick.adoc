@@ -33,14 +33,14 @@ Addition:
 ----
 (t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
            :tick/end (t/instant "2018-01-10T00:00")}
-	  (t/new-period 10 :weeks))
+  (t/new-period 10 :weeks))
 ----
 Subtraction:
 [source.code,clojure]
 ----
 (t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
            :tick/end (t/instant "2018-01-10T00:00")}
-	  (t/new-duration -1 :days))
+  (t/new-duration -1 :days))
 ----
 This can be done with `scale` too:
 
@@ -97,6 +97,6 @@ Division:
 [source.code,clojure]
 ----
 (t/divide (t/new-duration 1 :hours)
-     (t/new-duration 1 :minutes))
+          (t/new-duration 1 :minutes))
 ----
 ====
