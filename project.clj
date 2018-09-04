@@ -6,7 +6,6 @@
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[cljs.java-time "0.1.2"]
-                 [org.clojure/clojurescript "1.10.238"]
                  [net.cgrand/macrovich "0.2.0" :exclusions [org.clojure/clojurescript]]]
   :cljsbuild
   {:builds [{:id "test"
@@ -18,6 +17,7 @@
                         :target :nodejs}}]}
   :profiles {:dev
              {:dependencies [[org.clojure/clojure "1.9.0"]
+                             [org.clojure/clojurescript "1.10.238"]
                              [cljsjs/js-joda-timezone "1.3.0-0"]
                              [henryw374/js-joda-locale-en-us "1.0.0-1"]]
               :plugins [[lein-doo "0.1.10"]]
