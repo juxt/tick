@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>tick</groupId>
   <artifactId>tick</artifactId>
-  <version>0.4.2-alpha</version>
+  <version>0.4.3-alpha</version>
   <name>tick</name>
   <dependencies>
     <dependency>
@@ -29,7 +29,20 @@
     </dependency>
   </dependencies>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <resources>
+        <resource>
+            <directory>src</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </resource>
+        <resource>
+            <directory>resources</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </resource>
+    </resources>
   </build>
   <distributionManagement>
     <repository>
