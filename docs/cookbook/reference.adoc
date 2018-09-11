@@ -3,8 +3,6 @@
 
 This section gives, in alphabetical order, examples of how to use each function in the tick api library.
 
-NOTE: This is a work in progress.
-
 ====
 `+` - Add a duration to an instant:
 [source.code,clojure]
@@ -145,14 +143,6 @@ NOTE: This is a work in progress.
 [source.code,clojure]
 ----
 (t/coincident? (t/today) (t/today))
-----
-====
-
-====
-`compare-and-set!` - TBD
-[source.code,clojure]
-----
-
 ----
 ====
 
@@ -797,18 +787,6 @@ value of before and after.
 ----
 (t/second (t/now))
 ----
-====
-
-====
-`swap!` - TBD
-[source.code,clojure]
-----
-
-----
-====
-
-====
-`swap-vals!` - TBD
 ====
 
 ====
