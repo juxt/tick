@@ -1,0 +1,16 @@
+= Formatting 
+
+If it is de/serialization of java.time objects that is needed, then the https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
+library is the right tool for that.
+
+Tick includes a small formatting api over that provided by jsr-310
+
+[source.code,clojure]
+----
+ (require '[tick.format])    
+ 
+ (tick.format/format :iso-zoned-date-time (tick/zoned-date-time))
+ 
+ (tick.format/format (tick.format/formatter "yyyy-MMM-dd") (tick/date))
+----
+

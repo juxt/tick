@@ -5,3 +5,11 @@ Add to your lein or boot dependencies:
 ```
 [tick "0.4.0-alpha"]
 ```
+
+== Serialization 
+
+There are many use cases for de/serialization of dates, including simply being able to 
+copy and paste within the REPL. For this, there is the https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
+Clojure(Script) library.
+
+include::cljs.adoc[]

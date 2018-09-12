@@ -74,9 +74,9 @@ and implementations in both Java and Javascript and so it is possible
 to create _tick_, which combines the excellent JSR-310 with an
 expressive, cross-platform Clojure(Script) API.
 
-Sometimes we can get away with just switching the clj(s)-time import
-for the compilation target, the fact that cljs-time doesn't have
-complete fidelity with clj-time often leaks out.
+For some use cases it is possible to write cross-platform code with clj/s-time, conditionally requiring clj-time 
+or cljs-time in a cljc file. In our experience though, the fact that cljs-time doesn't have complete fidelity
+with clj-time often comes to be a problem.
 
 === Quartz
 
