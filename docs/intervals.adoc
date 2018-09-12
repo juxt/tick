@@ -16,16 +16,9 @@ Here we use a literal map syntax to construct an interval representing the last 
 [source,clojure]
 ----
 {:tick/beginning "2018-12-31T23:55:00Z"
- :tick/end "2019-01-01T00:00:00Z")
+ :tick/end "2019-01-01T00:00:00Z"}
 ----
 
-If we have aliased `tick.alpha.api` to `t`, we can use this alternative shorthand syntax:
-
-[source,clojure]
-----
-{::t/beginning "2018-12-31T23:55:00Z"
- ::t/end "2019-01-01T00:00:00Z")
-----
 ====
 
 Alternatively, we can use the `t/make-interval` function which takes the two boundaries of the interval as its arguments.
