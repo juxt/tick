@@ -41,21 +41,21 @@ We can get the name of the day today like this:
 
 [source.code,clojure]
 ----
-(t/day (t/today))
+(t/day-of-week (t/today))
 ----
 
 Or, even just:
 
 [source.code,clojure]
 ----
-(t/day)
+(t/day-of-week)
 ----
 
 Or, the day tomorrow:
 
 [source.code,clojure]
 ----
-(t/day (t/tomorrow))
+(t/day-of-week (t/tomorrow))
 ----
 ====
 
