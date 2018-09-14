@@ -76,6 +76,7 @@ the interval constructor function, and Henry Widd for porting to cljc.
 
 == References
 
+* https://github.com/dm3/clojure.java-time
 * https://clojuresync.com/emily-ashley/
 * https://github.com/aphyr/tea-time
 * https://github.com/sunng87/rigui
