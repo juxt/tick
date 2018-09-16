@@ -25,7 +25,7 @@ test:
 # For developing the cljs used by the documentation, uses shadow-cljs
 # See shadow-cljs.edn for configuration
 dev-docs-cljs:
-			shadow-cljs watch doc bootstrap-support
+			npm i; shadow-cljs watch doc bootstrap-support
 
 pom.xml:
 			clj -Spom

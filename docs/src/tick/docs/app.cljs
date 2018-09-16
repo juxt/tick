@@ -17,7 +17,8 @@
       (fn []
         (eval-str
           env
-          (str "(ns tick.repl (:require [tick.alpha.api :as t]))" s)
+          (str "(ns tick.repl (:require [tick.alpha.api :as t]
+                                        ))" s)
           (str "[" label "]")
           {:eval js-eval
            :loader (partial boot/load env)}
