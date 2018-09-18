@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>tick</groupId>
   <artifactId>tick</artifactId>
-  <version>0.4.3-alpha</version>
+  <version>0.4.4-alpha</version>
   <name>tick</name>
   <dependencies>
     <dependency>
@@ -26,6 +26,21 @@
           <artifactId>clojurescript</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>cljsjs</groupId>
+      <artifactId>js-joda-timezone</artifactId>
+      <version>1.3.0-0</version>
+    </dependency>
+    <dependency>
+      <groupId>henryw374</groupId>
+      <artifactId>js-joda-locale-en-us</artifactId>
+      <version>1.0.0-1</version>
+    </dependency>
+    <dependency>
+      <groupId>jsr310-tagged-literals</groupId>
+      <artifactId>jsr310-tagged-literals</artifactId>
+      <version>0.1.3</version>
     </dependency>
   </dependencies>
   <build>

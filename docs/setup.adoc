@@ -9,7 +9,16 @@ Add to your lein or boot dependencies:
 == Serialization 
 
 There are many use cases for de/serialization of dates, including simply being able to 
-copy and paste within the REPL. For this, there is the https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
-Clojure(Script) library.
+copy and paste within the REPL. Tick bundles https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
+Clojure(Script) library, so having require'd tick, in your code or at the repl you can type
+
+----
+#jsr310/period "P1D"
+----
+
+which is read as a java.time.Period (or js-joda Period in ClojureScript).
+
+To read and write edn data containing these literals in Clojure(Script) and for more information generally, see
+the https://github.com/henryw374/jsr310-tagged-literals[tagged literals Readme]
 
 include::cljs.adoc[]

@@ -6,6 +6,8 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [tick.interop :as t.i]
+    [jsr310-tagged-literals.read-write]
+    [jsr310-tagged-literals.data-readers]
     #?@(:cljs
        [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))

@@ -2,14 +2,15 @@
  :deps
  {
   cljs.java-time {:mvn/version "0.1.2"}
-  net.cgrand/macrovich {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}}
+  net.cgrand/macrovich {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}
+  cljsjs/js-joda-timezone {:mvn/version "1.3.0-0"} 
+  henryw374/js-joda-locale-en-us {:mvn/version "1.0.0-1"}
+  jsr310-tagged-literals {:mvn/version "0.1.3"}}
 
  :aliases
  {:dev
   {:extra-deps
-   {org.clojure/clojurescript {:mvn/version "1.10.238"}     
-    cljsjs/js-joda-timezone {:mvn/version "1.3.0-0"}
-    henryw374/js-joda-locale-en-us {:mvn/version "1.0.0-1"}
+   {org.clojure/clojurescript {:mvn/version "1.10.238"}
     org.clojure/data.xml {:mvn/version "0.2.0-alpha5"}
     org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
     io.aviso/pretty {:mvn/version "0.1.34"}
