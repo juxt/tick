@@ -21,11 +21,8 @@ minor changes.
 
 == Install
 
-Add to your `project.clj`, `build.boot` or `deps.edn`:
-
-```
-[tick "0.4.1-alpha"]
-```
+Get the latest from https://clojars.org/tick[Clojars] and 
+add to your `project.clj`, `build.boot` or `deps.edn`:
 
 == Development
 

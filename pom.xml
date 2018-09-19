@@ -5,7 +5,9 @@
   <artifactId>tick</artifactId>
   <version>0.4.4-alpha</version>
   <name>tick</name>
-  <dependencies>
+    <description>A Clojure(Script) library for dealing with time. Intended as a replacement for clj-time</description>
+    <url>https://github.com/juxt/tick</url>
+    <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
