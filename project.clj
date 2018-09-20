@@ -6,7 +6,10 @@
   :license {:name "The MIT License"
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[cljs.java-time "0.1.2"]
-                 [net.cgrand/macrovich "0.2.0" :exclusions [org.clojure/clojurescript]]]
+                 [net.cgrand/macrovich "0.2.0" :exclusions [org.clojure/clojurescript]]
+                 [cljsjs/js-joda-timezone "1.3.0-0"]
+                 [henryw374/js-joda-locale-en-us "1.0.0-1"]
+                 [jsr310-tagged-literals "0.1.3"]]
   :cljsbuild
   {:builds [{:id "test"
              :source-paths ["src" "test"]
@@ -17,10 +20,8 @@
                         :target :nodejs}}]}
   :profiles {:dev
              {:dependencies [[org.clojure/clojure "1.9.0"]
-                             [org.clojure/clojurescript "1.10.238"]
-                             [cljsjs/js-joda-timezone "1.3.0-0"]
-                             [henryw374/js-joda-locale-en-us "1.0.0-1"]]
-              :plugins [[lein-doo "0.1.10"]]
+                             [org.clojure/clojurescript "1.10.238"]]
+              :plugins      [[lein-doo "0.1.10"]]
               :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
              :repl
              {:dependencies
