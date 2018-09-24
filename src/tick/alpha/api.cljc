@@ -331,8 +331,8 @@
   (core/divide t divisor))
 
 ;; Alternative useful for -> threading
-(defn divide [divisor t]
-  (core/divide divisor t))
+(defn divide [t divisor]
+  (core/divide t divisor))
 
 ;; Temporal adjusters
 
