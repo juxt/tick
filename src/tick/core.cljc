@@ -103,7 +103,8 @@
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
       :>> (fn [s] (. Instant parse s))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}"
-      :>> (fn [s] (. OffsetDateTime parse s))
+      :>> (fn [s] #?(:clj (. OffsetDateTime parse s)
+                     :cljs (. ZonedDateTime parse s)))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}\[\w+/\w+\]"
       :>> (fn [s] (. ZonedDateTime parse s))
       #"\d{4}-\d{2}-\d{2}T\S*"
@@ -174,13 +175,15 @@
   Instant
   (inst [i] #?(:clj (Date/from i) :cljs (Date. (.toEpochMilli i))))
   (instant [i] i)
-  (offset-date-time [i] (. OffsetDateTime ofInstant i (current-zone)))
+  (offset-date-time [i] #?(:clj (. OffsetDateTime ofInstant i (current-zone))
+                           :cljs (zoned-date-time i)))
   (zoned-date-time [i] (. ZonedDateTime ofInstant i (current-zone)))
 
   #?(:clj String :cljs string)
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
-  (offset-date-time [s] (. OffsetDateTime parse s))
+  (offset-date-time [s] #?(:clj (. OffsetDateTime parse s)
+                          :cljs (zoned-date-time s)))
   (zoned-date-time [s] (. ZonedDateTime parse s))
 
   #?(:clj Number :cljs number)
@@ -189,7 +192,8 @@
   LocalDateTime
   (inst [ldt] (inst (zoned-date-time ldt)))
   (instant [ldt] (instant (zoned-date-time ldt)))
-  (offset-date-time [ldt] (.atOffset ldt (. ZoneOffset systemDefault)))
+  (offset-date-time [ldt] #?(:clj (.atOffset ldt (. ZoneOffset systemDefault))
+                             :cljs (zoned-date-time ldt)))
   (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
 
   Date
@@ -207,7 +211,8 @@
   ZonedDateTime
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
-  (offset-date-time [zdt] (.toOffsetDateTime zdt))
+  (offset-date-time [zdt] #?(:clj (.toOffsetDateTime zdt)
+                             :cljs zdt))
   (zoned-date-time [zdt] zdt))
 
 (extend-protocol IExtraction
@@ -989,10 +994,14 @@
   (at [date t] (.atTime date (time t)))
   LocalDateTime
   (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset] (.atOffset ldt (zone-offset offset)))
+  (offset-by [ldt offset]  #?(:clj (.atOffset ldt (zone-offset offset)) 
+                              :cljs (.atZone ldt (zone-offset offset))))
   Instant
-  (in [t z] (.atZone t z))
-  (offset-by [t offset] (.atOffset t (zone-offset offset)))
+  ; todo - should use Instant/atZone - await js-joda release with https://github.com/js-joda/js-joda/pull/263
+  (in [t z] (. ZonedDateTime ofInstant t z)) 
+  (offset-by [t offset] #?(:clj (.atOffset t (zone-offset offset))
+                           ; todo - no OffsetDateTime in js-joda yet
+                           :cljs (. ZonedDateTime ofInstant t (zone-offset offset))))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
   Date

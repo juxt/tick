@@ -39,6 +39,21 @@
     (is (= (t/date-time "2017-08-08T12:00:00") (t/noon (t/today))))
     (is (= (t/date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
+(deftest offset-date-time-test
+  (let [t "2018-09-24T18:57:08.996+01:00"
+        instance-type #?(:clj OffsetDateTime
+                         :cljs ZonedDateTime)]
+    (testing "is zdt in cljs, odt in clj - because odt doesnt yet exist in js-joda"
+      (is (instance? instance-type (t/parse t)))
+      (is (instance? instance-type (t/offset-date-time (t/now))))
+      (is (instance? instance-type (t/offset-date-time t)))
+      (is (instance? instance-type (t/offset-date-time (t/date-time))))
+      (is (instance? instance-type (t/offset-date-time (t/zoned-date-time))))
+      
+      
+      
+      )))
+
 (deftest epoch-test
   (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))
 
