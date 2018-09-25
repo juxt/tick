@@ -5,12 +5,15 @@ library is the right tool for that.
 
 Tick includes a small formatting api over that provided by jsr-310
 
-[source.code,clojure]
+In ClojureScript, require ns _[tick.locale-en-us]_ to create custom formatters
+
 ----
- (require '[tick.format])    
+ (require '[tick.alpha.api :as t])    
  
- (tick.format/format :iso-zoned-date-time (tick/zoned-date-time))
+ (t/format :iso-zoned-date-time (tick/zoned-date-time))
  
- (tick.format/format (tick.format/formatter "yyyy-MMM-dd") (tick/date))
+ (require '[tick.locale-en-us]) ; only need this require for custom format patterns
+ ; and it's only needed for cljs, although the ns is cljc
+ (t/format (tick.format/formatter "yyyy-MMM-dd") (tick/date))
 ----
 

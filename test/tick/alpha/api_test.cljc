@@ -48,11 +48,12 @@
       (is (instance? instance-type (t/offset-date-time (t/now))))
       (is (instance? instance-type (t/offset-date-time t)))
       (is (instance? instance-type (t/offset-date-time (t/date-time))))
-      (is (instance? instance-type (t/offset-date-time (t/zoned-date-time))))
-      
-      
-      
-      )))
+      (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
+
+(deftest formatting-test 
+  (let [d "3030-02-03"]
+    (is (= d (t/format :iso-local-date (t/parse d))))
+    (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))))
 
 (deftest epoch-test
   (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))

@@ -9,24 +9,26 @@
              atom swap! swap-vals! compare-and-set!
              reset! reset-vals!
              second
-             group-by divide] )
+             group-by divide format] )
   (:require
     [clojure.spec.alpha :as s]
     [tick.core :as core]
     [tick.interop :as t.i]
+    [tick.format :as t.f]
     #?(:clj tick.file) ; To ensure protocol extension
     #?(:clj [net.cgrand.macrovich :as macros])
     [tick.interval :as interval]
     [clojure.set :as set]
     #?(:cljs
-       [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]))
+       [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset DateTimeFormatter]]))
   #?(:cljs
      (:require-macros
        [net.cgrand.macrovich :as macros]
        [tick.alpha.api :refer [with-clock]]))
   #?(:clj
      (:import
-       [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset])))
+       [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]
+       [java.time.format DateTimeFormatter])))
 
 ;; This API is optimises convenience, API stability and (type) safety
 ;; over performance. Where performance is critical, use tick.core and
@@ -386,3 +388,18 @@
 (def difference interval/difference)
 (def complement interval/complement)
 (def group-by interval/group-by)
+
+;; Formatting
+(defn format
+  ([o] (t.f/format o))
+  ([fmt o]
+    (t.f/format fmt o)))
+
+(defn ^DateTimeFormatter formatter
+  "Constructs a DateTimeFormatter out of either a
+
+  * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
+  or
+  * formatter name - :iso-instant :iso-date etc"
+  [fmt]
+  (t.f/formatter fmt))

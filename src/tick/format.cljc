@@ -27,10 +27,11 @@
    :iso-instant (t.i/static-prop  DateTimeFormatter ISO_INSTANT)})
 
 (defn ^DateTimeFormatter formatter
-  "Constructs a DateTimeFormatter out of a
+  "Constructs a DateTimeFormatter out of either a
 
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
-  * formatter name - :date :iso-instant"
+  or
+  * formatter name - :iso-instant :iso-date etc"
    [fmt]
   (let [^DateTimeFormatter fmt
         (cond (instance? DateTimeFormatter fmt) fmt
