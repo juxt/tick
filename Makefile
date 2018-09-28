@@ -29,6 +29,13 @@ dev-docs-cljs:
 
 pom.xml:
 			clj -Spom
+# Dev pom is used to created development project with intellij
+dev-pom:
+			clj -R:dev:dev/rebel:dev/nrepl -C:dev:dev/rebel:dev/nrepl -Spom
+			
 
 deploy:			pom.xml
 			mvn deploy
+figwheel:
+			clj -R:dev:dev/nrepl:dev/rebel -C:dev:dev/nrepl:dev/rebel:test -m figwheel.main --build tick --repl
+

@@ -44,9 +44,16 @@ clj -Atest -e deprecated
 
 === with ClojureScript
 
+Various options:
+
+----
+clj -R:dev:dev/rebel -m figwheel.main --build tick --repl
+----
+
+
 From the Clojure REPL type `(node)`.
 
-For testing, we are still using Leiningen:
+For testing, either use Leiningen:
 
 ----
 lein doo node test

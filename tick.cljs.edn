@@ -1,0 +1,4 @@
+^{:auto-testing true
+  :open-url false
+  :watch-dirs ["src" "test"]}
+{:main tick.alpha.api}
