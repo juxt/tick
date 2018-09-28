@@ -192,7 +192,7 @@
   LocalDateTime
   (inst [ldt] (inst (zoned-date-time ldt)))
   (instant [ldt] (instant (zoned-date-time ldt)))
-  (offset-date-time [ldt] #?(:clj (.atOffset ldt (. ZoneOffset systemDefault))
+  (offset-date-time [ldt] #?(:clj (.atOffset ldt (.. ZoneOffset systemDefault getRules (getOffset ldt)))
                              :cljs (zoned-date-time ldt)))
   (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
 
