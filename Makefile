@@ -20,7 +20,7 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 
 test:
 			clj -Atest -e deprecated
-			lein doo node test
+			clj -Rtest -Ctest -m cljs-test-runner.main
 
 # For developing the cljs used by the documentation, uses shadow-cljs
 # See shadow-cljs.edn for configuration
