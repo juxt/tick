@@ -21,12 +21,12 @@ Here we use a literal map syntax to construct an interval representing the last 
 
 ====
 
-Alternatively, we can use the `t/make-interval` function which takes the two boundaries of the interval as its arguments.
+Alternatively, we can use the `t/new-interval` function which takes the two boundaries of the interval as its arguments.
 
 ====
 [source,clojure]
 ----
-(t/make-interval
+(t/new-interval
   (t/instant "2018-12-31T23:55:00Z")
   (t/instant "2019-01-01T00:00:00Z"))
 ----
@@ -45,7 +45,7 @@ To return today as an interval:
 ----
 ====
 
-The arguments to `t/make-interval` do not have to be instants, they can be any time supported by _tick_.
+The arguments to `t/new-interval` do not have to be instants, they can be any time supported by _tick_.
 
 ====
 To return a 2-day interval spanning midnight this morning to midnight [#eval-two-days-from-today]#two days from today#:
@@ -53,7 +53,7 @@ To return a 2-day interval spanning midnight this morning to midnight [#eval-two
 
 [source.code,clojure]
 ----
-(t/make-interval (t/today) (t/tomorrow))
+(t/new-interval (t/today) (t/tomorrow))
 ----
 ====
 
