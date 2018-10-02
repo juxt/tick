@@ -39,7 +39,7 @@ Port is written to `.nrepl-port`.
 Run tests with:
 
 ----
-clj -Atest -e deprecated
+make test
 ----
 
 === with ClojureScript
@@ -47,17 +47,14 @@ clj -Atest -e deprecated
 Various options:
 
 ----
-clj -R:dev:dev/rebel -m figwheel.main --build tick --repl
+make figwheel
 ----
 
+Then navigate to http://localhost:9500/figwheel-extra-main/auto-testing
 
-From the Clojure REPL type `(node)`.
 
-For testing, either use Leiningen:
+Or, From the Clojure REPL type `(node)` to get a node repl.
 
-----
-lein doo node test
-----
 
 == Documentation
 
