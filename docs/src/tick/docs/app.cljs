@@ -17,10 +17,10 @@
       (fn []
         (eval-str
           env
-          (str "(ns tick.repl (:require [tick.alpha.api :as t])
-                              (:refer-clojure))" s)
+          (str "(require '[tick.alpha.api :as t])\n\n" s)
           (str "[" label "]")
-          {:eval js-eval
+          {:ns 'tick.repl
+           :eval js-eval
            :loader (partial boot/load env)}
           (fn [x] (cb x)))))))
 
