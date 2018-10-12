@@ -1,5 +1,5 @@
 = tick
-Malcolm Sparks, Henry Widd
+Malcolm Sparks <mal@juxt.pro>; Henry Widd; Johanna Antonelli <joa@juxt.pro>
 0.4-1, 2018-02-09
 :toc: left
 :toclevels: 4
