@@ -11,18 +11,19 @@
 (defn eval-code [s cb label]
   (let [env (env/default-compiler-env)]
     (boot/init
-      env
-      {:path "js/bootstrap"
-       :load-on-init #{'tick.alpha.api}}
-      (fn []
-        (eval-str
-          env
-          (str "(require '[tick.alpha.api :as t])\n\n" s)
-          (str "[" label "]")
-          {:ns 'tick.repl
-           :eval js-eval
-           :loader (partial boot/load env)}
-          (fn [x] (cb x)))))))
+     env
+     {:path "js/bootstrap"
+      :load-on-init #{'tick.alpha.api}}
+     (fn []
+       (eval-str
+        env
+        #_s
+        (str "(ns tick.repl (:require [tick.alpha.api :as t]))\n\n" s)
+        (str "[" label "]")
+        {:ns 'tick.repl
+         :eval js-eval
+         :loader (partial boot/load env)}
+        (fn [x] (cb x)))))))
 
 (defn day-midnight-today []
   (t/day-of-week (t/end (t/bounds (t/today)))))
@@ -118,12 +119,7 @@
          [:em (f (t/relation ival2 ival1))]
          " the higher interval."]
         [:p "Relation between higher and lower interval: " [:tt (pr-str (t/relation ival1 ival2))]]
-        [:p "Relation between lower and higher interval: " [:tt (pr-str (t/relation ival2 ival1))]]])
-
-
-
-
-     ]))
+        [:p "Relation between lower and higher interval: " [:tt (pr-str (t/relation ival2 ival1))]]])]))
 
 (defonce code-blocks
   (for [el (array-seq (.querySelectorAll js/document ".code"))]
@@ -140,6 +136,10 @@
      :value (r/atom 0)}))
 
 (defn init []
+
+  ;; Read this and weep: https://github.com/arichiardi/replumb/commit/339fe2aa39bb794ca34710317b109bf07916de27
+  (js* "goog.isProvided_ = function(x) { return false; };")
+
   (.log js/console "Starting up…")
 
   (r/render [two-days-from-today]

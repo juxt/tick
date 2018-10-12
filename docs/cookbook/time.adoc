@@ -8,11 +8,6 @@ likewise they can be built up into complete instants.
 === Create time
 
 ====
-[source.code,clojure]
-----
-(+ 2 2)
-----
-
 A specific time can be produced in multiple ways with varying degrees of precision:
 [source.code,clojure]
 ----
