@@ -38,21 +38,21 @@ If you want to work with timezones, something like this, for example:
 
 add the following require:
 
-[source.code,clojure]
 ----
 [tick.timezone]
 ----
 
+=== Formatting
+
 If you want to create custom formatters from patterns, such as "dd MMM yyyy", add this require:
 
-[source.code,clojure]
 ----
 [tick.locale-en-us]
 ----
 
-==== Why are the extra libraries needed or not included automatically?
+==== Why are the extra requires needed?
 
-It is done to allow a smaller payload, when the extra libraries are not required. Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k.
+It is done to allow a smaller payload, when the extra libraries are not being used. Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k.
   
 Timezone is an extra 26k, and Locale (just en-US) is an extra 45k
 
