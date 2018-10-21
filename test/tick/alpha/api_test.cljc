@@ -30,7 +30,7 @@
 ;; Point-in-time tests
 (deftest today-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/instant "2017-08-08T12:00:00Z") (t/now)))
+    (is (= #jsr310/instant "2017-08-08T12:00:00Z" (t/now)))
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
     (is (= (t/date "2017-08-09") (t/tomorrow)))
@@ -51,9 +51,12 @@
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
 (deftest formatting-test 
-  (let [d "3030-02-03"]
+  (let [d "3030-05-03"]
     (is (= d (t/format :iso-local-date (t/parse d))))
-    (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))))
+    (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))
+    (is (= d (t/format (t/formatter "YYYY-MM-dd") (t/parse d))))
+    #?(:clj
+       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) (t/parse d)))))))
 
 (deftest epoch-test
   (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))

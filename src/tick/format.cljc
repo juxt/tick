@@ -7,7 +7,8 @@
         [[java.time :refer [DateTimeFormatter]]]))
   #?(:clj
      (:import [java.time.temporal TemporalAccessor]
-              [java.time.format DateTimeFormatter DateTimeFormatterBuilder ResolverStyle])))
+              [java.time.format DateTimeFormatter DateTimeFormatterBuilder ResolverStyle]
+              [java.util Locale])))
 
 (def predefined-formatters
   {:iso-zoned-date-time (t.i/static-prop  DateTimeFormatter ISO_ZONED_DATE_TIME)
@@ -31,13 +32,28 @@
 
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
   or
-  * formatter name - :iso-instant :iso-date etc"
-   [fmt]
-  (let [^DateTimeFormatter fmt
-        (cond (instance? DateTimeFormatter fmt) fmt
-              (string? fmt) (. DateTimeFormatter ofPattern fmt)
-              :else (get predefined-formatters fmt))]
-    fmt))
+  * formatter name - :iso-instant :iso-date etc
+  
+  and a Locale, which is optional."
+  ([fmt]
+    (formatter 
+      fmt 
+      #?(:clj (Locale/getDefault)
+         :cljs (some-> 
+                 (goog.object/get js/JSJoda "Locale")
+                 (goog.object/get "US")))))
+  ([fmt locale]
+   (let [^DateTimeFormatter fmt
+         (cond (instance? DateTimeFormatter fmt) fmt
+               (string? fmt) (if (nil? locale)
+                               (throw 
+                                 #?(:clj (Exception. "Locale is nil")
+                                    :cljs (js/Error. (str "Locale is nil, try adding a require '[tick.locale-en-us]"))))
+                               (.. DateTimeFormatter
+                                   (ofPattern fmt)
+                                   (withLocale locale)))
+               :else (get predefined-formatters fmt))]
+     fmt)))
 
 (defn format
   "Formats the given time entity as a string.

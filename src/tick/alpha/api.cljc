@@ -401,5 +401,7 @@
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
   or
   * formatter name - :iso-instant :iso-date etc"
-  [fmt]
-  (t.f/formatter fmt))
+  ([fmt]
+   (t.f/formatter fmt))
+  ([fmt locale]
+    (t.f/formatter fmt locale)))
