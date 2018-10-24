@@ -1,0 +1,2 @@
+{:optimizations :advanced
+ :cache-analysis true}

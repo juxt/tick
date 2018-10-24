@@ -20,7 +20,7 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 
 test:
 			clj -Atest -e deprecated
-			clj -Rtest -Ctest -m cljs-test-runner.main
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clj -Atest-cljs 
 
 # For developing the cljs used by the documentation, uses shadow-cljs
 # See shadow-cljs.edn for configuration
@@ -37,7 +37,7 @@ dev-pom:
 deploy:			pom.xml
 			mvn deploy
 figwheel:
-			clj -R:dev:dev/nrepl:dev/rebel -C:dev:dev/nrepl:dev/rebel:test -m figwheel.main --build tick --repl
+			clj -R:dev:dev/nrepl:dev/rebel -C:dev:dev/nrepl:dev/rebel:test -m figwheel.main -O whitespace --build-once tick
 			
 # hooray for stackoverflow			
 .PHONY: list
