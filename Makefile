@@ -20,7 +20,7 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 
 test:
 			clj -Atest -e deprecated
-			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clj -Atest-cljs 
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clj -Sverbose -Atest-cljs 
 
 # For developing the cljs used by the documentation, uses shadow-cljs
 # See shadow-cljs.edn for configuration
@@ -31,7 +31,7 @@ pom.xml:
 			clj -Spom
 # Dev pom is used to created development project with intellij
 dev-pom:
-			clj -R:dev:dev/rebel:dev/nrepl -C:dev:dev/rebel:dev/nrepl -Spom
+			clj -R:dev:dev/rebel:dev/nrepl:test-cljs -C:dev:dev/rebel:dev/nrepl:test-cljs -Spom
 			
 
 deploy:			pom.xml

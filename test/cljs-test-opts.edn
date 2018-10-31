@@ -1,2 +1,5 @@
 {:optimizations :advanced
- :cache-analysis true}
+ :cache-analysis true
+ :pseudo-names true
+ :infer-externs true
+ :pretty-print true}
