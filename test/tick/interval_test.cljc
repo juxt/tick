@@ -3,7 +3,7 @@
 (ns tick.interval-test
   (:require
    [clojure.spec.alpha :as s]
-   [tick.core :as t]
+   [tick.alpha.api :as t]
    #?(:clj
       [clojure.test :refer :all]
       :cljs
@@ -552,18 +552,19 @@
 
 (deftest group-by-intervals-test
   (testing "p and s"
-    (is
-      (=
-        {(t/year 2017) [(ti/new-interval
-                          (t/date-time "2017-12-20T00:00")
-                          (t/date-time "2018-01-01T00:00"))]
-         (t/year 2018) [(ti/new-interval
-                          (t/date-time "2018-01-01T00:00")
-                          (t/date-time "2018-01-10T00:00"))]}
-        (ti/group-by
-          (t/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
-          [(ti/new-interval (t/date-time #inst "2017-12-20")
-                            (t/date-time #inst "2018-01-10"))]))))
+    (t/with-clock t/UTC
+      (is
+        (=
+          {(t/year 2017) [(ti/new-interval
+                            (t/date-time "2017-12-20T00:00")
+                            (t/date-time "2018-01-01T00:00"))]
+           (t/year 2018) [(ti/new-interval
+                            (t/date-time "2018-01-01T00:00")
+                            (t/date-time "2018-01-10T00:00"))]}
+          (ti/group-by
+            (t/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
+            [(ti/new-interval (t/date-time #inst "2017-12-20")
+               (t/date-time #inst "2018-01-10"))])))))
 
   (testing "O"
     (is
