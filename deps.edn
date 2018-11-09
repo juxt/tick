@@ -3,8 +3,8 @@
  {
   cljs.java-time {:mvn/version "0.1.6"}
   net.cgrand/macrovich {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}
-  cljsjs/js-joda-timezone {:mvn/version "1.3.0-0"} 
-  henryw374/js-joda-locale-en-us {:mvn/version "1.0.0-1"}
+  cljsjs/js-joda-timezone {:mvn/version "2.0.1-0"} 
+  cljsjs/js-joda-locale-en-us {:mvn/version "2.0.0-0"}
   jsr310-tagged-literals {:mvn/version "0.1.4" :exclusions [cljs.java-time]}}
 
  :aliases
@@ -23,7 +23,6 @@
    :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
   :test-cljs {:extra-paths ["test" "cljs-test-runner-out/gen"]
               :extra-deps {org.clojure/clojurescript {:mvn/version "1.10.238"}
-                           com.bhauman/figwheel-main {:mvn/version "0.1.9"}
                            henryw374/cljs-test-runner {:mvn/version "3.1.1"}}
               :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
   :test {:extra-paths ["test"]

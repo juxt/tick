@@ -66,9 +66,7 @@ names, their offsets from UTC, and daylight savings(DST) data.
 Locale data is needed for custom date formatters which need particular symbols, such as M for month. 
 Due to the size and complexity of using the js-joda-locale, the authors of js-joda-locale have created
 https://github.com/js-joda/js-joda-locale#use-prebuilt-locale-packages[prebuilt locale packages], for specific 
-locales. en-US is one which is currently packaged for cljs and can be used as suggested above. The 
- `henryw374.js-joda-locale-en-us` package is not yet available on cljsjs because the underlying package
- is not yet on npm see https://github.com/cljsjs/packages/pull/1650[for more info].
+locales. en-US is one which is currently packaged for cljs and can be used as suggested above.
  
 === OffsetTime and OffsetDateTime
 

@@ -39,9 +39,11 @@
     (formatter 
       fmt 
       #?(:clj (Locale/getDefault)
-         :cljs (some-> 
-                 (goog.object/get js/JSJoda "Locale")
-                 (goog.object/get "US")))))
+         :cljs (try
+                 (some->
+                   (goog.object/get js/JSJodaLocale "Locale")
+                   (goog.object/get "US"))
+                 (catch js/Error e)))))
   ([fmt locale]
    (let [^DateTimeFormatter fmt
          (cond (instance? DateTimeFormatter fmt) fmt
