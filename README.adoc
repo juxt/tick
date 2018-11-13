@@ -22,7 +22,9 @@ minor changes.
 == Install
 
 Get the latest from https://clojars.org/tick[Clojars] and 
-add to your `project.clj`, `build.boot` or `deps.edn`:
+add to your `project.clj`, `build.boot` or `deps.edn`. 
+
+To use this with Shadow-CLJS, there are some https://github.com/henryw374/tick-on-shadow-cljs-demo[extra steps]
 
 == Development
 
