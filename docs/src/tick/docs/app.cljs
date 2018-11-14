@@ -13,12 +13,13 @@
     (boot/init
      env
      {:path "js/bootstrap"
-      :load-on-init #{'tick.alpha.api}}
+      :load-on-init #{'tick.alpha.api 'tick.timezone}}
      (fn []
        (eval-str
         env
         #_s
-        (str "(ns tick.repl (:require [tick.alpha.api :as t]))\n\n" s)
+        (str "(ns tick.repl (:require [tick.alpha.api :as t]
+                                      [tick.timezone]))\n\n" s)
         (str "[" label "]")
         {:ns 'tick.repl
          :eval js-eval

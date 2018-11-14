@@ -1,10 +1,9 @@
 = Setup
 
-Add to your lein or boot dependencies:
+Get the latest from https://clojars.org/tick[Clojars] and 
+add to your `project.clj`, `build.boot` or `deps.edn`. 
 
-```
-[tick "0.4.0-alpha"]
-```
+To use tick with Shadow-CLJS, there are some https://github.com/henryw374/tick-on-shadow-cljs-demo[extra steps]
 
 == Serialization 
 

@@ -14,7 +14,7 @@ In future, tick could instead require consumers to rely on `:npm-deps` directive
 
 === Dropping to java.time
 
-Tick doesn't contain equivalents of every method in java.time (which in total has about ~2.5k), but that's ok because you
+Tick doesn't contain equivalents of every method in java.time (of there are about ~2.5k in total), but that's ok because you
 can use interop syntax. However, Clojurescript does not support Clojure's static method
 call syntax. For example
 

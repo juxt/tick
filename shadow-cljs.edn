@@ -4,13 +4,13 @@
 
   :dependencies
   [[org.clojure/clojurescript "1.10.238"]
-   [cljs.java-time "0.1.3"]
+   [tick "0.4.7-alpha"]
+   [thheller/shadow-cljsjs "0.0.16"]
+   [cljs.java-time "0.1.6"]
    [jsr310-tagged-literals "0.1.4"]
-   [cljsjs/js-joda-timezone "1.3.0-0"]
-   [henryw374/js-joda-locale-en-us "1.0.0-1"]
-   [reagent "0.8.1"]
    [net.cgrand/macrovich "0.2.0"
     :exclusions [org.clojure/clojurescript]]
+   [reagent "0.8.1"]
    [cider/cider-nrepl "0.17.0"]]
 
   :builds
@@ -25,5 +25,5 @@
    {:target :bootstrap
     :output-dir "docs/js/bootstrap"
     :exclude #{cljs.js}
-    :entries [cljs.js tick.alpha.api]
+    :entries [cljs.js tick.alpha.api tick.timezone]
     :macros []}}}
