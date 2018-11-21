@@ -25,7 +25,7 @@
               :extra-deps {org.clojure/clojurescript {:mvn/version "1.10.238"}
                            henryw374/cljs-test-runner {:mvn/version "3.1.1"}}
               :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
-  :docs-index {
+  :docs-index {:jvm-opts ["-Xmx500M"]
                :extra-paths ["docs/src"] 
                :extra-deps {reagent {:mvn/version "0.8.1"}
                             com.bhauman/figwheel-main {:mvn/version "0.1.9"}
