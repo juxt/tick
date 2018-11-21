@@ -1,0 +1,9 @@
+^{:auto-testing false
+  :open-url false
+  :watch-dirs ["docs/src" ]}
+{:main          tick.docs.app
+ :output-to     "docs/js/main.js"
+ :verbose       true
+ :optimizations :simple
+ ;:cache-analysis true
+ }

@@ -1,30 +1,30 @@
 (ns tick.docs.app
+  (:require-macros [tick.docs.app :refer [analyzer-state]])
   (:require
-   [reagent.core :as r]
-   [tick.alpha.api :as t]
-   [clojure.string :refer [lower-case capitalize]]
-   [cljs.js :refer [empty-state eval js-eval eval-str]]
-   [cljs.tools.reader :refer [read-string]]
-   [cljs.env :as env]
-   [shadow.cljs.bootstrap.browser :as boot]))
+    [reagent.core :as r]
+    [tick.alpha.api :as t]
+    [tick.timezone]
+    [clojure.string :refer [lower-case capitalize]]
+    [cljs.js :refer [empty-state eval js-eval eval-str]]
+    [cljs.tools.reader :refer [read-string]]
+    [cljs.env :as env]))
 
-(defn eval-code [s cb label]
-  (let [env (env/default-compiler-env)]
-    (boot/init
-     env
-     {:path "js/bootstrap"
-      :load-on-init #{'tick.alpha.api 'tick.timezone}}
-     (fn []
-       (eval-str
-        env
-        #_s
-        (str "(ns tick.repl (:require [tick.alpha.api :as t]
-                                      [tick.timezone]))\n\n" s)
-        (str "[" label "]")
-        {:ns 'tick.repl
-         :eval js-eval
-         :loader (partial boot/load env)}
-        (fn [x] (cb x)))))))
+(def state (cljs.js/empty-state))
+
+(defn eval-code [source cb label]
+  (cljs.js/eval-str 
+    state
+    ; don't know how to do namespacing
+    (clojure.string/replace source "t/" "tick.alpha.api/")
+    (str "[" label "]") 
+    {:eval cljs.js/js-eval :context :expr} 
+    cb))
+
+(defn load-library-analysis-cache! []
+  (cljs.js/load-analysis-cache! state 'tick.alpha.api (analyzer-state 'tick.alpha.api))
+  ;(cljs.js/load-analysis-cache! state 't (analyzer-state 'tick.alpha.api))
+  (cljs.js/load-analysis-cache! state 'tick.timezone (analyzer-state 'tick.timezone))
+  nil)
 
 (defn day-midnight-today []
   (t/day-of-week (t/end (t/bounds (t/today)))))
@@ -142,6 +142,8 @@
   (js* "goog.isProvided_ = function(x) { return false; };")
 
   (.log js/console "Starting up…")
+
+  (load-library-analysis-cache!)
 
   (r/render [two-days-from-today]
             (.getElementById js/document "eval-two-days-from-today"))

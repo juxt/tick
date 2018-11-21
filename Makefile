@@ -26,10 +26,9 @@ test-cljs:
 test:
 			make test-clj && make test-cljs 
 
-# For developing the cljs used by the documentation, uses shadow-cljs
-# See shadow-cljs.edn for configuration
+# For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
-			npm i; shadow-cljs watch doc bootstrap-support
+			npm i; clj -Adocs-index
 
 pom:
 			rm pom.xml; clj -Spom; echo "Now use git diff to add back in the non-generated bits of pom"
