@@ -20,3 +20,4 @@ gh-pages
 node_modules/
 /docs/index.html
 /docs/js
+/cljs-test-runner-out
