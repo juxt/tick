@@ -394,21 +394,6 @@
   (new-interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
-  LocalDate
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
-  YearMonth
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
-  Year
-  (< [x y] (t/< (interval x) (interval y)))
-  (<= [x y] (t/<= (interval x) (interval y)))
-  (> [x y] (t/> (interval x) (interval y)))
-  (>= [x y] (t/>= (interval x) (interval y)))
   #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
