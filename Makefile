@@ -24,7 +24,7 @@ test-cljs:
 			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clj -Sverbose -Atest-cljs
 
 test:
-			make test-clj && make test-cljs 
+			make test-clj && make test-cljs
 
 # For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
@@ -35,15 +35,13 @@ pom:
 # Dev pom is used to created development project with intellij
 dev-pom:
 			rm pom.xml && clj -R:dev:dev/rebel:dev/nrepl:test-cljs -C:dev:dev/rebel:dev/nrepl:test-cljs -Spom
-			
 
 deploy:			pom
 			mvn deploy
 figwheel:
 			clj -R:dev:dev/nrepl:dev/rebel -C:dev:dev/nrepl:dev/rebel:test -m figwheel.main --build tick --repl
-			
-# hooray for stackoverflow			
+
+# hooray for stackoverflow
 .PHONY: list
 list:
-		@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs		
-
+		@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs
