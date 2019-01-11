@@ -11,14 +11,12 @@
     #?@(:cljs
        [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
-
-
   #?(:clj
      (:import
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
        [java.time.format DateTimeFormatter]
-       [java.time.temporal ChronoUnit ChronoField TemporalAdjusters]
+       [java.time.temporal ChronoUnit ChronoField Temporal TemporalAdjusters]
        [clojure.lang ILookup Seqable])))
 
 (def ^{:dynamic true} *clock* nil)
@@ -916,14 +914,17 @@
   (between [v1 v2] "Return the duration (or period) between two times"))
 
 (extend-protocol IBetween
-  LocalDate
-  (between [v1 v2] (. Period between v1 (date v2)))
-  Instant
-  (between [v1 v2] (. Duration between v1 (instant v2)))
-  LocalTime
-  (between [v1 v2] (. Duration between v1 (time v2)))
+  #?@(:cljs
+      [LocalDate
+       (between [v1 v2] (. Period between v1 (date v2)))
+       LocalDateTime
+       (between [v1 v2] (. Duration between v1 (date-time v2)))
+       Instant
+       (between [v1 v2] (. Duration between v1 (instant v2)))])
+  #?@(:clj [Temporal
+            (between [v1 v2] (Duration/between v1 v2))])
   #?(:clj String :cljs string)
-  (between [v1 v2] (between (parse v1) v2)))
+  (between [v1 v2] (between (parse v1) (parse v2))))
 
 ;; TODO: Test concurrent? in tick.core-test
 

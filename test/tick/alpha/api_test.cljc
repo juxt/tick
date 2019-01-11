@@ -50,7 +50,7 @@
       (is (instance? instance-type (t/offset-date-time (t/date-time))))
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
-(deftest formatting-test 
+(deftest formatting-test
   (let [d "3030-05-03"]
     (is (= d (t/format :iso-local-date (t/parse d))))
     (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))
@@ -69,6 +69,23 @@
 
 (deftest subtraction-test
   (is (= (t/new-duration 3 :seconds) (t/- (t/new-duration 5 :seconds) (t/new-duration 2 :seconds)))))
+
+;; Between test
+(deftest between-test
+  (is
+   (=
+    (let [now (t/now)]
+      (t/between
+       (t/- now (t/new-duration 10 :seconds))
+       (t/+ now (t/new-duration 10 :seconds))))
+    (t/new-duration 20 :seconds)))
+  (is
+   (= (t/new-duration 48 :hours)
+      (t/between (t/beginning (t/today)) (t/end (t/tomorrow)))))
+  (is
+   (=
+    (t/new-duration 2 :minutes)
+    (t/between "2020-01-01T12:00" "2020-01-01T12:02"))))
 
 ;; Range test
 
