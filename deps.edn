@@ -3,7 +3,7 @@
  {
   cljs.java-time {:mvn/version "0.1.6"}
   net.cgrand/macrovich {:mvn/version "0.2.0" :exclusions [org.clojure/clojurescript]}
-  cljsjs/js-joda-timezone {:mvn/version "2.0.1-0"} 
+  cljsjs/js-joda-timezone {:mvn/version "2.0.1-0"}
   cljsjs/js-joda-locale-en-us {:mvn/version "2.0.0-0"}
   jsr310-tagged-literals {:mvn/version "0.1.4" :exclusions [cljs.java-time]}}
 
@@ -11,7 +11,7 @@
  {:dev
   {:extra-deps
    {com.bhauman/figwheel-main {:mvn/version "0.1.9"}
-    com.bhauman/cljs-test-display {:mvn/version "0.1.1"} 
+    com.bhauman/cljs-test-display {:mvn/version "0.1.1"}
     org.clojure/clojurescript {:mvn/version "1.10.238"}
     org.clojure/data.xml {:mvn/version "0.2.0-alpha5"}
     org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
@@ -26,7 +26,7 @@
                            henryw374/cljs-test-runner {:mvn/version "3.1.1"}}
               :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
   :docs-index {:jvm-opts ["-Xmx500M"]
-               :extra-paths ["docs/src"] 
+               :extra-paths ["docs/src"]
                :extra-deps {reagent {:mvn/version "0.8.1"}
                             com.bhauman/figwheel-main {:mvn/version "0.1.9"}
                             org.clojure/clojurescript {:mvn/version "1.10.238"}}

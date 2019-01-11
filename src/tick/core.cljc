@@ -994,11 +994,11 @@
   (at [date t] (.atTime date (time t)))
   LocalDateTime
   (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset]  #?(:clj (.atOffset ldt (zone-offset offset)) 
+  (offset-by [ldt offset]  #?(:clj (.atOffset ldt (zone-offset offset))
                               :cljs (.atZone ldt (zone-offset offset))))
   Instant
   ; todo - should use Instant/atZone - await js-joda release with https://github.com/js-joda/js-joda/pull/263
-  (in [t z] (. ZonedDateTime ofInstant t z)) 
+  (in [t z] (. ZonedDateTime ofInstant t z))
   (offset-by [t offset] #?(:clj (.atOffset t (zone-offset offset))
                            ; todo - no OffsetDateTime in js-joda yet
                            :cljs (. ZonedDateTime ofInstant t (zone-offset offset))))
