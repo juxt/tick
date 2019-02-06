@@ -13,7 +13,6 @@
   (:require
     [clojure.spec.alpha :as s]
     [tick.core :as core]
-    [tick.interop :as t.i]
     [tick.format :as t.f]
     #?(:clj tick.file) ; To ensure protocol extension
     #?(:clj [net.cgrand.macrovich :as macros])
@@ -130,26 +129,26 @@
 
 ;; Constants
 
-(def MONDAY (t.i/static-prop DayOfWeek MONDAY))
-(def TUESDAY (t.i/static-prop DayOfWeek TUESDAY))
-(def WEDNESDAY (t.i/static-prop DayOfWeek WEDNESDAY))
-(def THURSDAY (t.i/static-prop DayOfWeek THURSDAY))
-(def FRIDAY (t.i/static-prop DayOfWeek FRIDAY))
-(def SATURDAY (t.i/static-prop DayOfWeek SATURDAY))
-(def SUNDAY (t.i/static-prop DayOfWeek SUNDAY))
+(def MONDAY (. DayOfWeek -MONDAY))
+(def TUESDAY (. DayOfWeek -TUESDAY))
+(def WEDNESDAY (. DayOfWeek -WEDNESDAY))
+(def THURSDAY (. DayOfWeek -THURSDAY))
+(def FRIDAY (. DayOfWeek -FRIDAY))
+(def SATURDAY (. DayOfWeek -SATURDAY))
+(def SUNDAY (. DayOfWeek -SUNDAY))
 
-(def JANUARY (t.i/static-prop Month JANUARY))
-(def FEBRUARY (t.i/static-prop Month FEBRUARY))
-(def MARCH (t.i/static-prop Month MARCH))
-(def APRIL (t.i/static-prop Month APRIL))
-(def MAY (t.i/static-prop Month MAY))
-(def JUNE (t.i/static-prop Month JUNE))
-(def JULY (t.i/static-prop Month JULY))
-(def AUGUST (t.i/static-prop Month AUGUST))
-(def SEPTEMBER (t.i/static-prop Month SEPTEMBER))
-(def OCTOBER (t.i/static-prop Month OCTOBER))
-(def NOVEMBER (t.i/static-prop Month NOVEMBER))
-(def DECEMBER (t.i/static-prop Month DECEMBER))
+(def JANUARY (. Month -JANUARY))
+(def FEBRUARY (. Month -FEBRUARY))
+(def MARCH (. Month -MARCH))
+(def APRIL (. Month -APRIL))
+(def MAY (. Month -MAY))
+(def JUNE (. Month -JUNE))
+(def JULY (. Month -JULY))
+(def AUGUST (. Month -AUGUST))
+(def SEPTEMBER (. Month -SEPTEMBER))
+(def OCTOBER (. Month -OCTOBER))
+(def NOVEMBER (. Month -NOVEMBER))
+(def DECEMBER (. Month -DECEMBER))
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))
@@ -179,13 +178,13 @@
 ;; Arithmetic
 
 (defn +
-  ([] (t.i/static-prop Duration ZERO))
+  ([] (. Duration -ZERO))
   ([arg] arg)
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
 (defn -
-  ([] (t.i/static-prop Duration ZERO))
+  ([] (. Duration -ZERO))
   ([arg] (core/negated arg))
   ([arg & args]
    (reduce #(core/- %1 %2) arg args)))

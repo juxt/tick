@@ -32,7 +32,7 @@
     (. LocalDate now)))
 
 (defn epoch []
-  (t.i/static-prop Instant EPOCH))
+  (. Instant -EPOCH))
 
 (defprotocol ITimeReify
   (on [time date] "Set time be ON a date")
@@ -41,42 +41,42 @@
   (offset-by [dt amount] "Set a date-time to be offset by an amount"))
 
 (defn midnight
-  ([] (t.i/static-prop LocalTime MIDNIGHT))
+  ([] (. LocalTime -MIDNIGHT))
   ([^LocalDate date]
-   (at date (t.i/static-prop LocalTime MIDNIGHT))))
+   (at date (. LocalTime -MIDNIGHT))))
 
 (defn noon
-  ([] (t.i/static-prop LocalTime NOON))
+  ([] (. LocalTime -NOON))
   ([^LocalDate date]
-   (at date (t.i/static-prop LocalTime NOON))))
+   (at date (. LocalTime -NOON))))
 
 (s/def ::instant #(instance? Instant %))
 
 (defn parse-day [input]
   (condp re-matches (str/lower-case input)
-    #"(mon)(day)?" (t.i/static-prop DayOfWeek MONDAY)
-    #"(tue)(s|sday)?" (t.i/static-prop DayOfWeek TUESDAY)
-    #"(wed)(s|nesday)?" (t.i/static-prop DayOfWeek WEDNESDAY)
-    #"(thur)(s|sday)?" (t.i/static-prop DayOfWeek THURSDAY)
-    #"(fri)(day)?" (t.i/static-prop DayOfWeek FRIDAY)
-    #"(sat)(urday)?" (t.i/static-prop DayOfWeek SATURDAY)
-    #"(sun)(day)?" (t.i/static-prop DayOfWeek SUNDAY)
+    #"(mon)(day)?" (. DayOfWeek -MONDAY)
+    #"(tue)(s|sday)?" (. DayOfWeek -TUESDAY)
+    #"(wed)(s|nesday)?" (. DayOfWeek -WEDNESDAY)
+    #"(thur)(s|sday)?" (. DayOfWeek -THURSDAY)
+    #"(fri)(day)?" (. DayOfWeek -FRIDAY)
+    #"(sat)(urday)?" (. DayOfWeek -SATURDAY)
+    #"(sun)(day)?" (. DayOfWeek -SUNDAY)
     nil))
 
 (defn parse-month [input]
   (condp re-matches (str/lower-case input)
-    #"(jan)(uary)?" (t.i/static-prop Month JANUARY)
-    #"(feb)(ruary)?" (t.i/static-prop Month FEBRUARY)
-    #"(mar)(ch)?" (t.i/static-prop Month MARCH)
-    #"(apr)(il)?" (t.i/static-prop Month APRIL)
-    #"may" (t.i/static-prop Month MAY)
-    #"(jun)(e)?" (t.i/static-prop Month JUNE)
-    #"(jul)(y)?" (t.i/static-prop Month JULY)
-    #"(aug)(ust)?" (t.i/static-prop Month AUGUST)
-    #"(sep)(tember)?" (t.i/static-prop Month SEPTEMBER)
-    #"(oct)(tober)?" (t.i/static-prop Month OCTOBER)
-    #"(nov)(ember)?" (t.i/static-prop Month NOVEMBER)
-    #"(dec)(ember)?" (t.i/static-prop Month DECEMBER)
+    #"(jan)(uary)?" (. Month -JANUARY)
+    #"(feb)(ruary)?" (. Month -FEBRUARY)
+    #"(mar)(ch)?" (. Month -MARCH)
+    #"(apr)(il)?" (. Month -APRIL)
+    #"may" (. Month -MAY)
+    #"(jun)(e)?" (. Month -JUNE)
+    #"(jul)(y)?" (. Month -JULY)
+    #"(aug)(ust)?" (. Month -AUGUST)
+    #"(sep)(tember)?" (. Month -SEPTEMBER)
+    #"(oct)(tober)?" (. Month -OCTOBER)
+    #"(nov)(ember)?" (. Month -NOVEMBER)
+    #"(dec)(ember)?" (. Month -DECEMBER)
     nil))
 
 (defprotocol IParseable
@@ -256,7 +256,7 @@
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
   (zone [i] (. ZoneId of "UTC"))
-  (zone-offset [i] (t.i/static-prop ZoneOffset UTC))
+  (zone-offset [i] (. ZoneOffset -UTC))
 
   #?(:clj String :cljs string)
   (time [s] (time (parse s)))
@@ -288,9 +288,9 @@
 
   LocalTime
   (time [t] t)
-  (nanosecond [t] (.get t (t.i/static-prop ChronoField NANO_OF_SECOND)))
-  (microsecond [t] (.get t (t.i/static-prop ChronoField MICRO_OF_SECOND)))
-  (millisecond [t] (.get t (t.i/static-prop ChronoField MILLI_OF_SECOND)))
+  (nanosecond [t] (.get t (. ChronoField -NANO_OF_SECOND)))
+  (microsecond [t] (.get t (. ChronoField -MICRO_OF_SECOND)))
+  (millisecond [t] (.get t (. ChronoField -MILLI_OF_SECOND)))
   (second [t] (t.i/getter second t))
   (minute [t] (t.i/getter minute t))
   (hour [t] (t.i/getter hour t))
@@ -339,9 +339,9 @@
   (time [zdt] (.toLocalTime zdt))
   (date [zdt] (.toLocalDate zdt))
   (date-time [zdt] (.toLocalDateTime zdt))
-  (nanosecond [t] (.get t (t.i/static-prop ChronoField NANO_OF_SECOND)))
-  (microsecond [t] (.get t (t.i/static-prop ChronoField MICRO_OF_SECOND)))
-  (millisecond [t] (.get t (t.i/static-prop ChronoField MILLI_OF_SECOND)))
+  (nanosecond [t] (.get t (. ChronoField -NANO_OF_SECOND)))
+  (microsecond [t] (.get t (. ChronoField -MICRO_OF_SECOND)))
+  (millisecond [t] (.get t (. ChronoField -MILLI_OF_SECOND)))
   (second [t] (t.i/getter second t))
   (minute [t] (t.i/getter minute t))
   (hour [t] (t.i/getter hour t))
@@ -353,36 +353,36 @@
 ;; Fields
 
 (def field-map
-  {:aligned-day-of-week-in-month (t.i/static-prop ChronoField ALIGNED_DAY_OF_WEEK_IN_MONTH)
-   :aligned-day-of-week-in-year (t.i/static-prop ChronoField ALIGNED_DAY_OF_WEEK_IN_YEAR)
-   :aligned-week-of-month (t.i/static-prop ChronoField ALIGNED_WEEK_OF_MONTH)
-   :aligned-week-of-year (t.i/static-prop ChronoField ALIGNED_WEEK_OF_YEAR)
-   :ampm-of-day (t.i/static-prop ChronoField AMPM_OF_DAY)
-   :clock-hour-of-ampm (t.i/static-prop ChronoField CLOCK_HOUR_OF_AMPM)
-   :clock-hour-of-day (t.i/static-prop ChronoField CLOCK_HOUR_OF_DAY)
-   :day-of-month (t.i/static-prop ChronoField DAY_OF_MONTH)
-   :day-of-week (t.i/static-prop ChronoField DAY_OF_WEEK)
-   :day-of-year (t.i/static-prop ChronoField DAY_OF_YEAR)
-   :epoch-day (t.i/static-prop ChronoField EPOCH_DAY)
-   :era (t.i/static-prop ChronoField ERA)
-   :hour-of-ampm (t.i/static-prop ChronoField HOUR_OF_AMPM)
-   :hour-of-day (t.i/static-prop ChronoField HOUR_OF_DAY)
-   :instant-seconds (t.i/static-prop ChronoField INSTANT_SECONDS)
-   :micro-of-day (t.i/static-prop ChronoField MICRO_OF_DAY)
-   :micro-of-second (t.i/static-prop ChronoField MICRO_OF_SECOND)
-   :milli-of-day (t.i/static-prop ChronoField MILLI_OF_DAY)
-   :milli-of-second (t.i/static-prop ChronoField MILLI_OF_SECOND)
-   :minute-of-day (t.i/static-prop ChronoField MINUTE_OF_DAY)
-   :minute-of-hour (t.i/static-prop ChronoField MINUTE_OF_HOUR)
-   :month-of-year (t.i/static-prop ChronoField MONTH_OF_YEAR)
-   :nano-of-day (t.i/static-prop ChronoField NANO_OF_DAY)
-   :nano-of-second (t.i/static-prop ChronoField NANO_OF_SECOND)
-   :offset-seconds (t.i/static-prop ChronoField OFFSET_SECONDS)
-   :proleptic-month (t.i/static-prop ChronoField PROLEPTIC_MONTH)
-   :second-of-day (t.i/static-prop ChronoField SECOND_OF_DAY)
-   :second-of-minute (t.i/static-prop ChronoField SECOND_OF_MINUTE)
-   :year (t.i/static-prop ChronoField YEAR)
-   :year-of-era (t.i/static-prop ChronoField YEAR_OF_ERA)})
+  {:aligned-day-of-week-in-month (. ChronoField -ALIGNED_DAY_OF_WEEK_IN_MONTH)
+   :aligned-day-of-week-in-year (. ChronoField -ALIGNED_DAY_OF_WEEK_IN_YEAR)
+   :aligned-week-of-month (. ChronoField -ALIGNED_WEEK_OF_MONTH)
+   :aligned-week-of-year (. ChronoField -ALIGNED_WEEK_OF_YEAR)
+   :ampm-of-day (. ChronoField -AMPM_OF_DAY)
+   :clock-hour-of-ampm (. ChronoField -CLOCK_HOUR_OF_AMPM)
+   :clock-hour-of-day (. ChronoField -CLOCK_HOUR_OF_DAY)
+   :day-of-month (. ChronoField -DAY_OF_MONTH)
+   :day-of-week (. ChronoField -DAY_OF_WEEK)
+   :day-of-year (. ChronoField -DAY_OF_YEAR)
+   :epoch-day (. ChronoField -EPOCH_DAY)
+   :era (. ChronoField -ERA)
+   :hour-of-ampm (. ChronoField -HOUR_OF_AMPM)
+   :hour-of-day (. ChronoField -HOUR_OF_DAY)
+   :instant-seconds (. ChronoField -INSTANT_SECONDS)
+   :micro-of-day (. ChronoField -MICRO_OF_DAY)
+   :micro-of-second (. ChronoField -MICRO_OF_SECOND)
+   :milli-of-day (. ChronoField -MILLI_OF_DAY)
+   :milli-of-second (. ChronoField -MILLI_OF_SECOND)
+   :minute-of-day (. ChronoField -MINUTE_OF_DAY)
+   :minute-of-hour (. ChronoField -MINUTE_OF_HOUR)
+   :month-of-year (. ChronoField -MONTH_OF_YEAR)
+   :nano-of-day (. ChronoField -NANO_OF_DAY)
+   :nano-of-second (. ChronoField -NANO_OF_SECOND)
+   :offset-seconds (. ChronoField -OFFSET_SECONDS)
+   :proleptic-month (. ChronoField -PROLEPTIC_MONTH)
+   :second-of-day (. ChronoField -SECOND_OF_DAY)
+   :second-of-minute (. ChronoField -SECOND_OF_MINUTE)
+   :year (. ChronoField -YEAR)
+   :year-of-era (. ChronoField -YEAR_OF_ERA)})
 
 (deftype FieldsLookup [t]
   #?(:clj Seqable :cljs ISeqable)
@@ -534,22 +534,22 @@
 ;; Units
 
 (def unit-map
-  {:nanos (t.i/static-prop ChronoUnit NANOS)
-   :micros (t.i/static-prop ChronoUnit MICROS)
-   :millis (t.i/static-prop ChronoUnit MILLIS)
-   :seconds (t.i/static-prop ChronoUnit SECONDS)
-   :minutes (t.i/static-prop ChronoUnit MINUTES)
-   :hours (t.i/static-prop ChronoUnit HOURS)
-   :half-days (t.i/static-prop ChronoUnit HALF_DAYS)
-   :days (t.i/static-prop ChronoUnit DAYS)
-   :weeks (t.i/static-prop ChronoUnit WEEKS)
-   :months (t.i/static-prop ChronoUnit MONTHS)
-   :years (t.i/static-prop ChronoUnit YEARS)
-   :decades (t.i/static-prop ChronoUnit DECADES)
-   :centuries (t.i/static-prop ChronoUnit CENTURIES)
-   :millennia (t.i/static-prop ChronoUnit MILLENNIA)
-   :eras (t.i/static-prop ChronoUnit ERAS)
-   :forever (t.i/static-prop ChronoUnit FOREVER)})
+  {:nanos (. ChronoUnit -NANOS)
+   :micros (. ChronoUnit -MICROS)
+   :millis (. ChronoUnit -MILLIS)
+   :seconds (. ChronoUnit -SECONDS)
+   :minutes (. ChronoUnit -MINUTES)
+   :hours (. ChronoUnit -HOURS)
+   :half-days (. ChronoUnit -HALF_DAYS)
+   :days (. ChronoUnit -DAYS)
+   :weeks (. ChronoUnit -WEEKS)
+   :months (. ChronoUnit -MONTHS)
+   :years (. ChronoUnit -YEARS)
+   :decades (. ChronoUnit -DECADES)
+   :centuries (. ChronoUnit -CENTURIES)
+   :millennia (. ChronoUnit -MILLENNIA)
+   :eras (. ChronoUnit -ERAS)
+   :forever (. ChronoUnit -FOREVER)})
 
 (def reverse-unit-map (into {} (map vec (map reverse unit-map))))
 
@@ -1033,20 +1033,20 @@
 
 (extend-protocol MinMax
   LocalTime
-  (min-of-type [_] (t.i/static-prop LocalTime MIN))
-  (max-of-type [_]  (t.i/static-prop LocalTime MAX))
+  (min-of-type [_] (. LocalTime -MIN))
+  (max-of-type [_]  (. LocalTime -MAX))
   LocalDateTime
-  (min-of-type [_]  (t.i/static-prop LocalDateTime MIN))
-  (max-of-type [_]  (t.i/static-prop LocalDateTime MAX))
+  (min-of-type [_]  (. LocalDateTime -MIN))
+  (max-of-type [_]  (. LocalDateTime -MAX))
   Instant
-  (min-of-type [_]  (t.i/static-prop Instant MIN))
-  (max-of-type [_]  (t.i/static-prop Instant MAX))
+  (min-of-type [_]  (. Instant -MIN))
+  (max-of-type [_]  (. Instant -MAX))
   ;; TODO: This may cause surprises - see clojure/java-time. We should
   ;; change the semantics of nil to not imply epoch, forever, or
   ;; whatever.
   nil
-  (min-of-type [_]  (t.i/static-prop Instant MIN))
-  (max-of-type [_]  (t.i/static-prop Instant MAX)))
+  (min-of-type [_]  (. Instant -MIN))
+  (max-of-type [_]  (. Instant -MAX)))
 
 
 ;; first/last using java.time.temporal/TemporalAdjuster

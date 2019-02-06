@@ -4,16 +4,9 @@
      :cljs
      (:require-macros 
        [net.cgrand.macrovich :as macros]
-       [tick.interop :refer [static-prop getter]])))
+       [tick.interop :refer [getter]])))
 
 (macros/deftime
-
-  (defmacro static-prop [target prop]
-    (macros/case
-        :clj
-        `(. ~target ~prop)
-        :cljs
-        `(goog.object/get ~target ~(str prop))))
   
 (defmacro getter [p t & args]
   (macros/case

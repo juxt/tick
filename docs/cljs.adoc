@@ -23,20 +23,20 @@ call syntax. For example
 ----
 
 Is valid Clojure, but not valid Clojurescript. However, using the 'dot' syntax, 
-it is possible to write this so that it works in both Clojure and Clojurescript:
+it is possible to write this so that it works in both Clojure and Clojurescript by using the 
+https://clojure.org/reference/java_interop#_the_dot_special_form[dot special form]:
 
 ----
 (. java.time.Period parse "P1D")
 ----
 
-Property access is another problem, because Clojurescript properties are prefixed
-with a '-'. For example to access property bar on foo:
+Similarly for static property access, the normal Clojure `Foo/bar` doesn't work in cljs. Again the solution
+is to use the dot special form:
 
 ----
-(.-bar foo)
+(. Foo -bar)
 ----
 
-To get around this problem, there is a macro `tick.interop/static-prop`
 
 === Timezones 
 
