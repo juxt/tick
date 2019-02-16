@@ -6,7 +6,7 @@
 STYLESDIR = ../asciidoctor-stylesheet-factory/stylesheets
 STYLESHEET = juxt.css
 
-.PHONY: 		watch default deploy test dev-doc-cljs
+.PHONY: 		watch default deploy test dev-docs-cljs
 
 default:		docs/index.html
 
