@@ -5,7 +5,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
-    [tick.interop :as t.i]
+    [cljs.java-time.interop :as t.i]
     [jsr310-tagged-literals.read-write]
     [jsr310-tagged-literals.data-readers]
     #?@(:cljs

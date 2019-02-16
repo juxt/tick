@@ -6,7 +6,7 @@
     #?(:clj [clojure.test :refer :all]
        :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
-    [tick.interop :as t.i]
+    [cljs.java-time.interop :as t.i]
     #?(:clj
     [tick.deprecated.cal :as cal])
     #?(:cljs
