@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>tick</groupId>
   <artifactId>tick</artifactId>
-  <version>0.4.8-alpha</version>
+  <version>0.4.10-alpha</version>
   <name>tick</name>
     <description>A Clojure(Script) library for dealing with time. Intended as a replacement for clj-time</description>
     <url>https://github.com/juxt/tick</url>
@@ -19,18 +19,7 @@
     <dependency>
       <groupId>cljs.java-time</groupId>
       <artifactId>cljs.java-time</artifactId>
-      <version>0.1.6</version>
-    </dependency>
-    <dependency>
-      <groupId>net.cgrand</groupId>
-      <artifactId>macrovich</artifactId>
-      <version>0.2.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.clojure</groupId>
-          <artifactId>clojurescript</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>0.1.7</version>
     </dependency>
     <dependency>
       <groupId>cljsjs</groupId>
@@ -43,9 +32,9 @@
       <version>2.0.0-0</version>
     </dependency>
     <dependency>
-      <groupId>jsr310-tagged-literals</groupId>
-      <artifactId>jsr310-tagged-literals</artifactId>
-      <version>0.1.4</version>
+      <groupId>time-literals</groupId>
+      <artifactId>time-literals</artifactId>
+      <version>0.1.1</version>
       <exclusions>
         <exclusion>
           <groupId>cljs.java-time</groupId>

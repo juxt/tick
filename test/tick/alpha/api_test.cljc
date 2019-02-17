@@ -30,7 +30,7 @@
 ;; Point-in-time tests
 (deftest today-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= #jsr310/instant "2017-08-08T12:00:00Z" (t/now)))
+    (is (= (t/instant "2017-08-08T12:00:00Z") (t/now)))
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
     (is (= (t/date "2017-08-09") (t/tomorrow)))

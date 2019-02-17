@@ -4,7 +4,7 @@
   cljs.java-time {:mvn/version "0.1.7"}
   cljsjs/js-joda-timezone {:mvn/version "2.0.1-0"}
   cljsjs/js-joda-locale-en-us {:mvn/version "2.0.0-0"}
-  jsr310-tagged-literals {:mvn/version "0.1.4" :exclusions [cljs.java-time]}}
+  time-literals {:mvn/version "0.1.1" :exclusions [cljs.java-time]}}
 
  :aliases
  {:dev

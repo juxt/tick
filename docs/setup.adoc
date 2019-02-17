@@ -8,16 +8,23 @@ To use tick with Shadow-CLJS, there are some https://github.com/henryw374/tick-o
 == Serialization 
 
 There are many use cases for de/serialization of dates, including simply being able to 
-copy and paste within the REPL. Tick bundles https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
+copy and paste within the REPL. Tick bundles https://clojars.org/time-literals[time-literals]
 Clojure(Script) library, so having require'd tick, in your code or at the repl you can type
 
 ----
-#jsr310/period "P1D"
+#time/period "P1D"
 ----
 
 which is read as a java.time.Period (or js-joda Period in ClojureScript).
 
+To avoid tick modifying the printer for java.time objects (if you already employ a custom set of literals for example),
+set the following jvm property
+
+```
+ :jvm-opts ["-Dtick.time-literals.printing=false"]
+```
+
 To read and write edn data containing these literals in Clojure(Script) and for more information generally, see
-the https://github.com/henryw374/jsr310-tagged-literals[tagged literals Readme]
+the https://github.com/henryw374/time-literals[tagged literals Readme]
 
 include::cljs.adoc[]

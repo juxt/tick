@@ -6,18 +6,23 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [cljs.java-time.interop :as t.i]
-    [jsr310-tagged-literals.read-write]
-    [jsr310-tagged-literals.data-readers]
-    #?@(:cljs
+    [time-literals.read-write]
+    #?@(:clj 
+        [[tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
+        :cljs
        [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
-  #?(:clj
+  #?(:cljs
+     (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
+     :clj
      (:import
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
        [java.time.format DateTimeFormatter]
        [java.time.temporal ChronoUnit ChronoField Temporal TemporalAdjusters]
        [clojure.lang ILookup Seqable])))
+
+(modify-printing-of-time-literals-if-enabled!)
 
 (def ^{:dynamic true} *clock* nil)
 
