@@ -9,27 +9,30 @@
 
 (def predefined-formatters
   {:iso-zoned-date-time  (. DateTimeFormatter -ISO_ZONED_DATE_TIME)
-   :iso-offset-date      (. DateTimeFormatter -ISO_OFFSET_DATE)
-   :rfc-1123-date-time   (. DateTimeFormatter -RFC_1123_DATE_TIME)
-   :iso-week-date        (. DateTimeFormatter -ISO_WEEK_DATE)
    :iso-offset-date-time (. DateTimeFormatter -ISO_OFFSET_DATE_TIME)
    :iso-local-time       (. DateTimeFormatter -ISO_LOCAL_TIME)
-   :iso-time             (. DateTimeFormatter -ISO_TIME)
-   :iso-date             (. DateTimeFormatter -ISO_DATE)
-   :basic-iso-date       (. DateTimeFormatter -BASIC_ISO_DATE)
-   :iso-date-time        (. DateTimeFormatter -ISO_DATE_TIME)
-   :iso-offset-time      (. DateTimeFormatter -ISO_OFFSET_TIME)
    :iso-local-date-time  (. DateTimeFormatter -ISO_LOCAL_DATE_TIME)
    :iso-local-date       (. DateTimeFormatter -ISO_LOCAL_DATE)
-   :iso-ordinal-date     (. DateTimeFormatter -ISO_ORDINAL_DATE)
-   :iso-instant          (. DateTimeFormatter -ISO_INSTANT)})
+   :iso-instant          (. DateTimeFormatter -ISO_INSTANT)
+
+   ; these exist in java but not in js-joda 
+   ;:iso-offset-date      (. DateTimeFormatter -ISO_OFFSET_DATE)
+   ;:rfc-1123-date-time   (. DateTimeFormatter -RFC_1123_DATE_TIME)
+   ;:iso-week-date        (. DateTimeFormatter -ISO_WEEK_DATE)
+   ;:iso-ordinal-date     (. DateTimeFormatter -ISO_ORDINAL_DATE)
+   ;:iso-time             (. DateTimeFormatter -ISO_TIME)
+   ;:iso-date             (. DateTimeFormatter -ISO_DATE)
+   ;:basic-iso-date       (. DateTimeFormatter -BASIC_ISO_DATE)
+   ;:iso-date-time        (. DateTimeFormatter -ISO_DATE_TIME)
+   ;:iso-offset-time      (. DateTimeFormatter -ISO_OFFSET_TIME)
+   })
 
 (defn ^DateTimeFormatter formatter
   "Constructs a DateTimeFormatter out of either a
 
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
   or
-  * formatter name - :iso-instant :iso-date etc
+  * formatter name - :iso-instant :iso-local-date etc
   
   and a Locale, which is optional."
   ([fmt]

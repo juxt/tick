@@ -6,6 +6,7 @@
     #?(:clj [clojure.test :refer :all]
        :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
+    [tick.format :as t.f]
     [cljs.java-time.interop :as t.i]
     #?(:clj
     [tick.deprecated.cal :as cal])
@@ -51,6 +52,9 @@
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
 (deftest formatting-test
+  (testing "all predefined formatters exist"
+    (doseq [pre-defined (vals t.f/predefined-formatters)]
+      (is pre-defined)))
   (let [d "3030-05-03"]
     (is (= d (t/format :iso-local-date (t/parse d))))
     (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))
