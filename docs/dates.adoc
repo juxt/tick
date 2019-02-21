@@ -254,7 +254,7 @@ Values are created using _constructor functions_ in _tick_. There are also _conv
 
 In _tick_, the names of constructor functions are prefixed with `new-` to prevent naming clashes with conversion functions.
 
-These conventions have been taken from a link:https://stuartsierra.com/2016/01/09/how-to-name-clojure-functions[blog article from Stuart Sierra] on how to name Clojure functions—as good a guide as any.
+These conventions have been taken from a link:https://stuartsierra.com/2016/01/09/how-to-name-clojure-functions[blog article from Stuart Sierra] on how to name Clojure functions.
 
 
 ****
