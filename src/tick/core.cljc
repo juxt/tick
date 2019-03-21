@@ -7,7 +7,7 @@
     [clojure.string :as str]
     [cljs.java-time.interop :as t.i]
     [time-literals.read-write]
-    #?@(:clj 
+    #?@(:clj
         [[tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
         :cljs
        [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
@@ -534,7 +534,13 @@
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y))))
+  (>= [x y] (not (.isBefore x y)))
+  Duration
+  (< [x y] (neg? (.compareTo x y)))
+  (<= [x y] (or (= x y) (.compareTo x y)))
+  (> [x y] (pos? (.compareTo x y)))
+  (>= [x y] (or (= x y) (pos? (.compareTo x y)))))
+
 
 ;; Units
 

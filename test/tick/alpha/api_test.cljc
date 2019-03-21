@@ -126,16 +126,23 @@
           (t/+ (t/now) (t/new-duration 20 :seconds))
           (t/+ (t/now) (t/new-duration 10 :seconds)))))
   (is (t/<= (t/now) (t/now) (t/+ (t/now) (t/new-duration 1 :seconds))))
-  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/new-duration 10 :seconds)))))
+  (is (t/>= (t/now) (t/now) (t/- (t/now) (t/new-duration 10 :seconds))))
+
+  (testing "durations"
+    (is (t/> (t/new-duration 20 :seconds) (t/new-duration 10 :seconds)))
+    (is (t/>= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))
+    (is (t/< (t/new-duration 10 :seconds) (t/new-duration 20 :seconds)))
+    (is (t/<= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))))
+
 
 (deftest am-test
   (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")
-             (t/date-time "2017-08-08T12:00:00"))
-          (t/am (t/today))))
+                           (t/date-time "2017-08-08T12:00:00"))
+           (t/am (t/today))))
     (is (= (t/new-interval (t/date-time "2017-08-08T12:00:00")
-             (t/date-time "2017-08-09T00:00:00"))
-          (t/pm (t/today))))))
+                           (t/date-time "2017-08-09T00:00:00"))
+           (t/pm (t/today))))))
 
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
