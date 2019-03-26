@@ -270,7 +270,6 @@ This section gives, in alphabetical order, examples of how to use each function 
 
 ====
 `dec` - Give the previous year:
-_This does not work_
 [source.code,clojure]
 ----
 (t/dec (t/year))
