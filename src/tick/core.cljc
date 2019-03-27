@@ -10,7 +10,9 @@
     #?@(:clj
         [[tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
         :cljs
-       [[java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters]]
+       [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime 
+                           LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
+        [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
@@ -18,7 +20,6 @@
      (:import
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
-       [java.time.format DateTimeFormatter]
        [java.time.temporal ChronoUnit ChronoField Temporal TemporalAdjusters]
        [clojure.lang ILookup Seqable])))
 
@@ -176,7 +177,7 @@
   (zoned-date-time [f] (zoned-date-time (f)))
 
   Instant
-  (inst [i] #?(:clj (Date/from i) :cljs (Date. (.toEpochMilli i))))
+  (inst [i] #?(:clj (Date/from i) :cljs (js/Date. (.toEpochMilli i))))
   (instant [i] i)
   (offset-date-time [i] #?(:clj (. OffsetDateTime ofInstant i (current-zone))
                            :cljs (zoned-date-time i)))
@@ -199,7 +200,7 @@
                              :cljs (zoned-date-time ldt)))
   (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
 
-  Date
+  #?(:clj Date :cljs js/Date)
   (inst [d] d)
   (instant [d] #?(:clj (.toInstant d) :cljs (.ofEpochMilli Instant (.getTime d))))
   (zoned-date-time [d] (zoned-date-time (instant d)))
@@ -315,7 +316,7 @@
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
 
-  Date
+ #?(:clj Date :cljs js/Date)
   (date [d] (date (zoned-date-time (instant d)))) ; implicit conversion to UTC
   (date-time [d] (date-time (instant d)))
   (year-month [d] (year-month (date d)))
@@ -740,7 +741,7 @@
   Instant
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.minus t d))
-  Date
+ #?(:clj Date :cljs js/Date)
   (forward-duration [t d] (.plus (instant t) d))
   (backward-duration [t d] (.minus (instant t) d))
   LocalDate
@@ -981,7 +982,7 @@
   (beginning [i] i)
   (end [i] i)
 
-  Date
+ #?(:clj Date :cljs js/Date)
   (beginning [i] (instant i))
   (end [i] (instant i))
 
@@ -1016,14 +1017,14 @@
                            :cljs (. ZonedDateTime ofInstant t (zone-offset offset))))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
-  Date
+ #?(:clj Date :cljs js/Date)
   (in [t z] (in (instant t) (zone z))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
 
 (extend-protocol ILocalTime
-  Date
+ #?(:clj Date :cljs js/Date)
   (local? [d] false)
 
   Instant

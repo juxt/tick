@@ -10,8 +10,9 @@
     [cljs.java-time.interop :as t.i]
     #?(:clj
     [tick.deprecated.cal :as cal])
-    #?(:cljs
-       [java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]))
+    #?@(:cljs
+        [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]]
+         [java.time.temporal :refer [ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]]))
   #?(:clj
      (:import
        [java.util Date]

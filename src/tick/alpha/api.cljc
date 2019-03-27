@@ -18,8 +18,10 @@
     #?(:clj [net.cgrand.macrovich :as macros])
     [tick.interval :as interval]
     [clojure.set :as set]
-    #?(:cljs
-       [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset DateTimeFormatter]]))
+    #?@(:cljs
+       [
+        [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]
+        [java.time.format :refer [DateTimeFormatter]]]))
   #?(:cljs
      (:require-macros
        [net.cgrand.macrovich :as macros]

@@ -7,8 +7,11 @@
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [tick.core :as t]
-    #?(:cljs
-       [java.time :refer [Date Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]))
+    #?@(:cljs
+         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
+                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
+          [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters TemporalAdjusters TemporalAmount]]
+          [cljs.java-time.extend-eq-and-compare]]))
   #?(:clj
      (:import
        [java.util Date]
@@ -55,7 +58,7 @@
   LocalDateTime
   (temporal-value [ldt] ldt)
 
-  Date
+ #?(:clj Date :cljs js/Date)
   (temporal-value [d] (t/instant d))
 
   YearMonth

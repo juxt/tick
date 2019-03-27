@@ -1,10 +1,9 @@
 (ns tick.format
   "originally copied from https://github.com/dm3/clojure.java-time"
   (:refer-clojure :exclude (format))
-  #?(:cljs (:require [java.time :refer [DateTimeFormatter]]))
+  #?(:cljs (:require [java.time.format :refer [DateTimeFormatter]]))
   #?(:clj
-     (:import [java.time.temporal TemporalAccessor]
-              [java.time.format DateTimeFormatter DateTimeFormatterBuilder ResolverStyle]
+     (:import [java.time.format DateTimeFormatter]
               [java.util Locale])))
 
 (def predefined-formatters

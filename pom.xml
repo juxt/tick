@@ -19,7 +19,7 @@
     <dependency>
       <groupId>cljs.java-time</groupId>
       <artifactId>cljs.java-time</artifactId>
-      <version>0.1.7</version>
+      <version>0.1.8</version>
     </dependency>
     <dependency>
       <groupId>cljsjs</groupId>
