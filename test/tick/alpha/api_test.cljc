@@ -52,6 +52,23 @@
       (is (instance? instance-type (t/offset-date-time (t/date-time))))
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
+(deftest fields-test 
+  (let [xs [(t/now) 
+            (t/zoned-date-time)
+            (t/offset-date-time)
+            (t/date-time)
+            (t/date)
+            (t/time)
+            (t/year)
+            (t/year-month)]]
+    (doseq [x xs]
+      (let [fields (t/fields x)
+            fields-map (into {} fields)]
+        (is (not-empty fields-map))
+        (doseq [[f v] fields-map]
+          (is (= v (get fields f)))
+          (is (= :foo (get fields :bar :foo))))))))
+
 (deftest formatting-test
   (testing "all predefined formatters exist"
     (doseq [pre-defined (vals t.f/predefined-formatters)]

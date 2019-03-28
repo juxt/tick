@@ -397,17 +397,17 @@
          (keep (fn [[k v]]
                  (let [cf (get field-map k)]
                    (when (.isSupported t cf)
-                     [k (t.i/getter long t cf)]))))
+                     [k (.getLong t cf)]))))
          (into {})
          seq))
   ILookup
   (#?(:clj valAt :cljs -lookup) [_ fld]
     (when-let [f (get field-map fld)]
-      (t.i/getter long t f)))
+      (.getLong t f)))
   (#?(:clj valAt :cljs -lookup) [_ fld notfound]
     (if-let [f (get field-map fld)]
       (try
-        (t.i/getter long t f)
+        (.getLong t f)
         (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) e
           notfound))
       notfound)))
