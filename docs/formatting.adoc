@@ -1,6 +1,6 @@
 = Formatting 
 
-If it is de/serialization of java.time objects that is needed, then the https://clojars.org/jsr310-tagged-literals[jsr310-tagged-literals]
+If it is de/serialization of java.time objects that is needed, then the https://clojars.org/time-literals[time-literals]
 library is the right tool for that.
 
 Tick includes a small formatting api over that provided by jsr-310
