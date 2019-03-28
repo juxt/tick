@@ -32,6 +32,20 @@ To use tick with Shadow-CLJS, there are some https://github.com/henryw374/tick-o
 
 == Development
 
+=== Develop The Documentation Site
+
+Build the Cljs
+---
+make dev-docs-cljs
+---
+
+Build the html
+---
+make docs/index.html
+---
+
+Serve the docs directory and navigate to it in a browser
+
 === with Clojure
 
 REPL with nREPL server
