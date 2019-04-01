@@ -58,8 +58,8 @@ CAUTION: Because _tick_ is built on `java.time`, Clojure programs must run on Ja
 === clj-time and cljs-time
 
 Most Clojure applications use `clj-time` which is based on Joda
-Time. However, `cljs-time` is a wrapper over goog.date which in turn
-is a wrapper over mutable JavaScript Date objects.
+Time. However, `cljs-time` objects are mutable goog.date objects which in turn wrap
+ JavaScript Date objects.
 
 This works OK as a proxy for Instant, but is not a great foundation
 for local dates etc.
