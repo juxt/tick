@@ -1,7 +1,7 @@
 {:paths ["src" "resources"]
  :deps
  {
-  cljs.java-time {:mvn/version "0.1.8"}
+  cljs.java-time {:mvn/version "0.1.9"}
   cljsjs/js-joda-timezone {:mvn/version "2.0.1-0"}
   cljsjs/js-joda-locale-en-us {:mvn/version "2.0.0-0"}
   time-literals {:mvn/version "0.1.1" :exclusions [cljs.java-time]}}
@@ -22,7 +22,7 @@
    :jvm-opts ["-Dclojure.spec.compile-asserts=true"]}
   :test-cljs {:extra-paths ["test" "cljs-test-runner-out/gen"]
               :extra-deps {org.clojure/clojurescript {:mvn/version "1.10.238"}
-                           henryw374/cljs-test-runner {:mvn/version "3.1.1"}}
+                           olical/cljs-test-runner {:mvn/version "3.5.0"}}
               :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
   :docs-index {:jvm-opts ["-Xmx500M"]
                :extra-paths ["docs/src"]
