@@ -1,18 +1,40 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [+ - / inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
+  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
   (:require
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
-    [cljs.java-time.interop :as t.i]
     [time-literals.read-write]
+    
+    [cljc.java-time.local-date]
+    [cljc.java-time.local-date-time]
+    [cljc.java-time.local-time]
+    [cljc.java-time.clock]
+    [cljc.java-time.instant]
+    [cljc.java-time.zone-id]
+    [cljc.java-time.zone-offset]
+    [cljc.java-time.zoned-date-time]
+    [cljc.java-time.offset-date-time]
+    [cljc.java-time.duration]
+    [cljc.java-time.year-month]
+    [cljc.java-time.month]
+    [cljc.java-time.year]
+    [cljc.java-time.day-of-week]
+    [cljc.java-time.period]
+    [cljc.java-time.duration]
+    [cljc.java-time.temporal.temporal-amount]
+    [cljc.java-time.temporal.temporal-adjusters]
+    [cljc.java-time.temporal.chrono-field]
+    [cljc.java-time.temporal.chrono-unit]
+    
     #?@(:clj
-        [[tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
+        [
+    [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
         :cljs
-       [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime 
-                           LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
-        [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
+        [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
+                            LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
+         [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
@@ -29,16 +51,16 @@
 
 (defn now []
   (if *clock*
-    (. Instant now *clock*)
-    (. Instant now)))
+    (cljc.java-time.instant/now *clock*)
+    (cljc.java-time.instant/now)))
 
 (defn today []
   (if *clock*
-    (. LocalDate now *clock*)
-    (. LocalDate now)))
+    (cljc.java-time.local-date/now *clock*)
+    (cljc.java-time.local-date/now)))
 
 (defn epoch []
-  (. Instant -EPOCH))
+  cljc.java-time.instant/epoch)
 
 (defprotocol ITimeReify
   (on [time date] "Set time be ON a date")
@@ -47,42 +69,42 @@
   (offset-by [dt amount] "Set a date-time to be offset by an amount"))
 
 (defn midnight
-  ([] (. LocalTime -MIDNIGHT))
+  ([] cljc.java-time.local-time/midnight)
   ([^LocalDate date]
-   (at date (. LocalTime -MIDNIGHT))))
+   (at date cljc.java-time.local-time/midnight)))
 
 (defn noon
-  ([] (. LocalTime -NOON))
+  ([] cljc.java-time.local-time/noon)
   ([^LocalDate date]
-   (at date (. LocalTime -NOON))))
+   (at date cljc.java-time.local-time/noon)))
 
 (s/def ::instant #(instance? Instant %))
 
 (defn parse-day [input]
   (condp re-matches (str/lower-case input)
-    #"(mon)(day)?" (. DayOfWeek -MONDAY)
-    #"(tue)(s|sday)?" (. DayOfWeek -TUESDAY)
-    #"(wed)(s|nesday)?" (. DayOfWeek -WEDNESDAY)
-    #"(thur)(s|sday)?" (. DayOfWeek -THURSDAY)
-    #"(fri)(day)?" (. DayOfWeek -FRIDAY)
-    #"(sat)(urday)?" (. DayOfWeek -SATURDAY)
-    #"(sun)(day)?" (. DayOfWeek -SUNDAY)
+    #"(mon)(day)?" cljc.java-time.day-of-week/monday
+    #"(tue)(s|sday)?" cljc.java-time.day-of-week/tuesday
+    #"(wed)(s|nesday)?" cljc.java-time.day-of-week/wednesday
+    #"(thur)(s|sday)?" cljc.java-time.day-of-week/thursday
+    #"(fri)(day)?" cljc.java-time.day-of-week/friday
+    #"(sat)(urday)?" cljc.java-time.day-of-week/saturday
+    #"(sun)(day)?" cljc.java-time.day-of-week/sunday
     nil))
 
 (defn parse-month [input]
   (condp re-matches (str/lower-case input)
-    #"(jan)(uary)?" (. Month -JANUARY)
-    #"(feb)(ruary)?" (. Month -FEBRUARY)
-    #"(mar)(ch)?" (. Month -MARCH)
-    #"(apr)(il)?" (. Month -APRIL)
-    #"may" (. Month -MAY)
-    #"(jun)(e)?" (. Month -JUNE)
-    #"(jul)(y)?" (. Month -JULY)
-    #"(aug)(ust)?" (. Month -AUGUST)
-    #"(sep)(tember)?" (. Month -SEPTEMBER)
-    #"(oct)(tober)?" (. Month -OCTOBER)
-    #"(nov)(ember)?" (. Month -NOVEMBER)
-    #"(dec)(ember)?" (. Month -DECEMBER)
+    #"(jan)(uary)?" cljc.java-time.month/january
+    #"(feb)(ruary)?" cljc.java-time.month/february
+    #"(mar)(ch)?" cljc.java-time.month/march
+    #"(apr)(il)?" cljc.java-time.month/april
+    #"may" cljc.java-time.month/may
+    #"(jun)(e)?" cljc.java-time.month/june
+    #"(jul)(y)?" cljc.java-time.month/july
+    #"(aug)(ust)?" cljc.java-time.month/august
+    #"(sep)(tember)?" cljc.java-time.month/september
+    #"(oct)(tober)?" cljc.java-time.month/october
+    #"(nov)(ember)?" cljc.java-time.month/november
+    #"(dec)(ember)?" cljc.java-time.month/december
     nil))
 
 (defprotocol IParseable
@@ -97,28 +119,28 @@
   (parse [s]
     (condp re-matches s
       #"(\d{1,2})\s*(am|pm)"
-      :>> (fn [[_ h ap]] (. LocalTime of (cond-> (parse-int h) (= "pm" ap) (clojure.core/+ 12)) 0))
+      :>> (fn [[_ h ap]] (cljc.java-time.local-time/of (cond-> (parse-int h) (= "pm" ap) (clojure.core/+ 12)) 0))
       #"(\d{1,2})"
-      :>> (fn [[_ h]] (. LocalTime of (parse-int h) 0))
+      :>> (fn [[_ h]] (cljc.java-time.local-time/of (parse-int h) 0))
       #"\d{2}:\d{2}\S*"
-      :>> (fn [s] (. LocalTime parse s))
+      :>> (fn [s] (cljc.java-time.local-time/parse s))
       #"(\d{1,2}):(\d{2})"
-      :>> (fn [[_ h m]] (. LocalTime of (parse-int h) (parse-int m)))
+      :>> (fn [[_ h m]] (cljc.java-time.local-time/of (parse-int h) (parse-int m)))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
-      :>> (fn [s] (. Instant parse s))
+      :>> (fn [s] (cljc.java-time.instant/parse s))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}"
-      :>> (fn [s] #?(:clj (. OffsetDateTime parse s)
-                     :cljs (. ZonedDateTime parse s)))
+      :>> (fn [s] #?(:clj (cljc.java-time.offset-date-time/parse s)
+                     :cljs (cljc.java-time.zoned-date-time/parse s)))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}\[\w+/\w+\]"
-      :>> (fn [s] (. ZonedDateTime parse s))
+      :>> (fn [s] (cljc.java-time.zoned-date-time/parse s))
       #"\d{4}-\d{2}-\d{2}T\S*"
-      :>> (fn [s] (. LocalDateTime parse s))
+      :>> (fn [s] (cljc.java-time.local-date-time/parse s))
       #"\d{4}-\d{2}-\d{2}"
-      :>> (fn [s] (. LocalDate parse s))
+      :>> (fn [s] (cljc.java-time.local-date/parse s))
       #"\d{4}-\d{2}"
-      :>> (fn [s] (. YearMonth parse s))
+      :>> (fn [s] (cljc.java-time.year-month/parse s))
       #"\d{4}"
-      :>> (fn [s] (. Year parse s))
+      :>> (fn [s] (cljc.java-time.year/parse s))
       (throw (ex-info "Unparseable time string" {:input s})))))
 
 (defprotocol IConversion
@@ -149,25 +171,25 @@
 
 (defn new-time
   ([] (time (now)))
-  ([hour minute] (. LocalTime of hour minute))
-  ([hour minute second] (. LocalTime of hour minute second))
-  ([hour minute second nano] (. LocalTime of hour minute second nano)))
+  ([hour minute] (cljc.java-time.local-time/of hour minute))
+  ([hour minute second] (cljc.java-time.local-time/of hour minute second))
+  ([hour minute second nano] (cljc.java-time.local-time/of hour minute second nano)))
 
 (defn new-date
   ([] (today))
   ([year month day-of-month]
-   (. LocalDate of year month day-of-month))
+   (cljc.java-time.local-date/of year month day-of-month))
   ([year day-of-year]
-   (. LocalDate ofYearDay year day-of-year))
+   (cljc.java-time.local-date/of-year-day year day-of-year))
   ([epoch-day]
-   (. LocalDate ofEpochDay epoch-day)))
+   (cljc.java-time.local-date/of-epoch-day epoch-day)))
 
 (defn current-zone
   "Return the current zone, which can be overridden by the *clock* dynamic var"
   []
   (if-let [clk *clock*]
-    (t.i/getter zone clk)
-    (. ZoneId systemDefault)))
+    (cljc.java-time.clock/get-zone clk)
+    (cljc.java-time.zone-id/system-default)))
 
 (extend-protocol IConversion
   #?(:clj clojure.lang.Fn :cljs function)
@@ -177,51 +199,55 @@
   (zoned-date-time [f] (zoned-date-time (f)))
 
   Instant
-  (inst [i] #?(:clj (Date/from i) :cljs (js/Date. (.toEpochMilli i))))
+  (inst [i] #?(:clj (Date/from i) :cljs (js/Date. (cljc.java-time.instant/to-epoch-milli i))))
   (instant [i] i)
-  (offset-date-time [i] #?(:clj (. OffsetDateTime ofInstant i (current-zone))
+  (offset-date-time [i] #?(:clj (cljc.java-time.offset-date-time/of-instant i (current-zone))
                            :cljs (zoned-date-time i)))
-  (zoned-date-time [i] (. ZonedDateTime ofInstant i (current-zone)))
+  (zoned-date-time [i] (cljc.java-time.zoned-date-time/of-instant i (current-zone)))
 
   #?(:clj String :cljs string)
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
-  (offset-date-time [s] #?(:clj (. OffsetDateTime parse s)
-                          :cljs (zoned-date-time s)))
-  (zoned-date-time [s] (. ZonedDateTime parse s))
+  (offset-date-time [s] #?(:clj (cljc.java-time.offset-date-time/parse s)
+                           :cljs (zoned-date-time s)))
+  (zoned-date-time [s] (cljc.java-time.zoned-date-time/parse s))
 
   #?(:clj Number :cljs number)
-  (instant [n] (. Instant ofEpochMilli n))
+  (instant [n] (cljc.java-time.instant/of-epoch-milli n))
 
   LocalDateTime
   (inst [ldt] (inst (zoned-date-time ldt)))
   (instant [ldt] (instant (zoned-date-time ldt)))
-  (offset-date-time [ldt] #?(:clj (.atOffset ldt (.. ZoneOffset systemDefault getRules (getOffset ldt)))
+  (offset-date-time [ldt] #?(:clj (cljc.java-time.local-date-time/at-offset
+                                    ldt
+                                    (-> (cljc.java-time.zone-id/system-default)
+                                        (cljc.java-time.zone-id/get-rules)
+                                        (.getOffset ldt)))
                              :cljs (zoned-date-time ldt)))
-  (zoned-date-time [ldt] (.atZone ldt (. ZoneId systemDefault)))
+  (zoned-date-time [ldt] (cljc.java-time.local-date-time/at-zone ldt (cljc.java-time.zone-id/system-default)))
 
   #?(:clj Date :cljs js/Date)
   (inst [d] d)
-  (instant [d] #?(:clj (.toInstant d) :cljs (.ofEpochMilli Instant (.getTime d))))
+  (instant [d] #?(:clj (.toInstant d) :cljs (cljc.java-time.instant/of-epoch-milli (.getTime d))))
   (zoned-date-time [d] (zoned-date-time (instant d)))
   (offset-date-time [d] (offset-date-time (instant d)))
 
   OffsetDateTime
   (inst [odt] (inst (instant odt)))
-  (instant [odt] (.toInstant odt))
+  (instant [odt] (cljc.java-time.offset-date-time/to-instant odt))
   (offset-date-time [odt] odt)
-  (zoned-date-time [odt] (.toZonedDateTime odt))
+  (zoned-date-time [odt] (cljc.java-time.offset-date-time/to-zoned-date-time odt))
 
   ZonedDateTime
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
-  (offset-date-time [zdt] #?(:clj (.toOffsetDateTime zdt)
+  (offset-date-time [zdt] #?(:clj (cljc.java-time.zoned-date-time/to-offset-date-time zdt)
                              :cljs zdt))
   (zoned-date-time [zdt] zdt))
 
 (extend-protocol IExtraction
   #?(:clj Object :cljs object)
-  (int [v] (#?(:clj clojure.core/int :cljs parse-int)  v))
+  (int [v] (#?(:clj clojure.core/int :cljs parse-int) v))
   (long [v] (#?(:clj clojure.core/long :cljs parse-int) v))
 
   #?(:clj clojure.lang.Fn :cljs function)
@@ -256,67 +282,69 @@
   (hour [t] (hour (zoned-date-time t)))
   (day-of-week [i] (day-of-week (date i)))
   (day-of-month [i] (day-of-month (date i)))
-  (int [i] (t.i/getter nano i))
-  (long [i] (t.i/getter epochSecond i))
+  (int [i] (cljc.java-time.instant/get-nano i))
+  (long [i] (cljc.java-time.instant/get-epoch-second i))
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
   (zone [i] (. ZoneId of "UTC"))
-  (zone-offset [i] (. ZoneOffset -UTC))
+  (zone-offset [i] cljc.java-time.zone-offset/utc)
 
   #?(:clj String :cljs string)
   (time [s] (time (parse s)))
   (date [s] (date (parse s)))
-  (date-time [s] (. LocalDateTime parse s))
+  (date-time [s] (cljc.java-time.local-date-time/parse s))
   (day-of-week [s] (or (parse-day s) (day-of-week (date s))))
   (day-of-month [s] (day-of-month (date s)))
   (month [s] (or (parse-month s) (month (date s))))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
   (zone [s] (. ZoneId of s))
-  (zone-offset [s] (. ZoneOffset of s))
-  (int [s] ((t.i/getter nano (instant s))))
-  (long [s] ((t.i/getter epochSecond (instant s))))
+  (zone-offset [s] (cljc.java-time.zone-offset/of s))
+  (int [s] (cljc.java-time.instant/get-nano (instant s)))
+  (long [s] (cljc.java-time.instant/get-epoch-second (instant s)))
 
   #?(:clj Number :cljs number)
-  (day-of-week [n] (. DayOfWeek of n))
-  (month [n] (. Month of n))
-  (year [n] (. Year of n))
-  (zone-offset [s] (. ZoneOffset ofHours s))
+  (day-of-week [n] (cljc.java-time.day-of-week/of n))
+  (month [n] (cljc.java-time.month/of n))
+  (year [n] (cljc.java-time.year/of n))
+  (zone-offset [s] (cljc.java-time.zone-offset/of-hours s))
 
   LocalDate
   (date [d] d)
-  (day-of-week [d] (t.i/getter dayOfWeek d))
-  (day-of-month [d] (t.i/getter dayOfMonth d))
-  (month [d] (. Month from d))
-  (year-month [d] (. YearMonth of (t.i/getter year d) (t.i/getter monthValue d)))
-  (year [d] (. Year of (t.i/getter year d)))
+  (day-of-week [d] (cljc.java-time.local-date/get-day-of-week d))
+  (day-of-month [d] (cljc.java-time.local-date/get-day-of-month d))
+  (month [d] (cljc.java-time.month/from d))
+  (year-month [d] (cljc.java-time.year-month/of 
+                    (cljc.java-time.local-date/get-year d)
+                    (cljc.java-time.local-date/get-month-value d)))
+  (year [d] (cljc.java-time.year/of (cljc.java-time.local-date/get-year d)))
 
   LocalTime
   (time [t] t)
-  (nanosecond [t] (.get t (. ChronoField -NANO_OF_SECOND)))
-  (microsecond [t] (.get t (. ChronoField -MICRO_OF_SECOND)))
-  (millisecond [t] (.get t (. ChronoField -MILLI_OF_SECOND)))
-  (second [t] (t.i/getter second t))
-  (minute [t] (t.i/getter minute t))
-  (hour [t] (t.i/getter hour t))
+  (nanosecond [t] (cljc.java-time.local-time/get t cljc.java-time.temporal.chrono-field/nano-of-second))
+  (microsecond [t] (cljc.java-time.local-time/get t cljc.java-time.temporal.chrono-field/micro-of-second))
+  (millisecond [t] (cljc.java-time.local-time/get t cljc.java-time.temporal.chrono-field/milli-of-second))
+  (second [t] (cljc.java-time.local-time/get-second t))
+  (minute [t] (cljc.java-time.local-time/get-minute t))
+  (hour [t] (cljc.java-time.local-time/get-hour t))
 
   Month
-  (int [m] (t.i/getter value m))        ;todo
+  (int [m] (cljc.java-time.month/get-value m)) ;todo
 
   LocalDateTime
-  (time [dt] (.toLocalTime dt))
-  (date [dt] (.toLocalDate dt))
+  (time [dt] (cljc.java-time.local-date-time/to-local-time dt))
+  (date [dt] (cljc.java-time.local-date-time/to-local-date dt))
   (date-time [ldt] ldt)
-  (second [t] (t.i/getter second t))
-  (minute [t] (t.i/getter minute t))
-  (hour [t] (t.i/getter hour t))
+  (second [t] (cljc.java-time.local-date-time/get-second t))
+  (minute [t] (cljc.java-time.local-date-time/get-minute t))
+  (hour [t] (cljc.java-time.local-date-time/get-hour t))
   (day-of-week [dt] (day-of-week (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
   (year [dt] (year (date dt)))
 
- #?(:clj Date :cljs js/Date)
+  #?(:clj Date :cljs js/Date)
   (date [d] (date (zoned-date-time (instant d)))) ; implicit conversion to UTC
   (date-time [d] (date-time (instant d)))
   (year-month [d] (year-month (date d)))
@@ -324,11 +352,11 @@
 
   YearMonth
   (year-month [ym] ym)
-  (year [ym] (year (t.i/getter year ym)))
+  (year [ym] (year (cljc.java-time.year-month/get-year ym)))
 
   Year
   (year [y] y)
-  (int [y] (t.i/getter value y))
+  (int [y] (cljc.java-time.year/get-value y))
 
   ZoneId
   (zone [z] z)
@@ -337,58 +365,58 @@
   (zone-offset [z] z)
 
   OffsetDateTime
-  (time [odt] (.toLocalTime odt))
-  (date [odt] (.toLocalDate odt))
-  (date-time [odt] (.toLocalDateTime odt))
+  (time [odt] (cljc.java-time.offset-date-time/to-local-time odt))
+  (date [odt] (cljc.java-time.offset-date-time/to-local-date odt))
+  (date-time [odt] (cljc.java-time.offset-date-time/to-local-date-time odt))
 
   ZonedDateTime
-  (time [zdt] (.toLocalTime zdt))
-  (date [zdt] (.toLocalDate zdt))
-  (date-time [zdt] (.toLocalDateTime zdt))
-  (nanosecond [t] (.get t (. ChronoField -NANO_OF_SECOND)))
-  (microsecond [t] (.get t (. ChronoField -MICRO_OF_SECOND)))
-  (millisecond [t] (.get t (. ChronoField -MILLI_OF_SECOND)))
-  (second [t] (t.i/getter second t))
-  (minute [t] (t.i/getter minute t))
-  (hour [t] (t.i/getter hour t))
-  (day-of-week [t] (t.i/getter dayOfWeek t))
-  (day-of-month [t] (t.i/getter dayOfMonth t))
-  (month [zdt] (t.i/getter month zdt))
-  (zone [zdt] (t.i/getter zone zdt)))
+  (time [zdt] (cljc.java-time.zoned-date-time/to-local-time zdt))
+  (date [zdt] (cljc.java-time.zoned-date-time/to-local-date zdt))
+  (date-time [zdt] (cljc.java-time.zoned-date-time/to-local-date-time zdt))
+  (nanosecond [t] (cljc.java-time.zoned-date-time/get t cljc.java-time.temporal.chrono-field/nano-of-second))
+  (microsecond [t] (cljc.java-time.local-time/get t cljc.java-time.temporal.chrono-field/micro-of-second))
+  (millisecond [t] (cljc.java-time.local-time/get t cljc.java-time.temporal.chrono-field/milli-of-second))
+  (second [t] (cljc.java-time.zoned-date-time/get-second t))
+  (minute [t] (cljc.java-time.zoned-date-time/get-minute t))
+  (hour [t] (cljc.java-time.zoned-date-time/get-hour t))
+  (day-of-week [t] (cljc.java-time.zoned-date-time/get-day-of-week t))
+  (day-of-month [t] (cljc.java-time.zoned-date-time/get-day-of-month t))
+  (month [zdt] (cljc.java-time.zoned-date-time/get-month zdt))
+  (zone [zdt] (cljc.java-time.zoned-date-time/get-zone zdt)))
 
 ;; Fields
 
 (def field-map
-  {:aligned-day-of-week-in-month (. ChronoField -ALIGNED_DAY_OF_WEEK_IN_MONTH)
-   :aligned-day-of-week-in-year (. ChronoField -ALIGNED_DAY_OF_WEEK_IN_YEAR)
-   :aligned-week-of-month (. ChronoField -ALIGNED_WEEK_OF_MONTH)
-   :aligned-week-of-year (. ChronoField -ALIGNED_WEEK_OF_YEAR)
-   :ampm-of-day (. ChronoField -AMPM_OF_DAY)
-   :clock-hour-of-ampm (. ChronoField -CLOCK_HOUR_OF_AMPM)
-   :clock-hour-of-day (. ChronoField -CLOCK_HOUR_OF_DAY)
-   :day-of-month (. ChronoField -DAY_OF_MONTH)
-   :day-of-week (. ChronoField -DAY_OF_WEEK)
-   :day-of-year (. ChronoField -DAY_OF_YEAR)
-   :epoch-day (. ChronoField -EPOCH_DAY)
-   :era (. ChronoField -ERA)
-   :hour-of-ampm (. ChronoField -HOUR_OF_AMPM)
-   :hour-of-day (. ChronoField -HOUR_OF_DAY)
-   :instant-seconds (. ChronoField -INSTANT_SECONDS)
-   :micro-of-day (. ChronoField -MICRO_OF_DAY)
-   :micro-of-second (. ChronoField -MICRO_OF_SECOND)
-   :milli-of-day (. ChronoField -MILLI_OF_DAY)
-   :milli-of-second (. ChronoField -MILLI_OF_SECOND)
-   :minute-of-day (. ChronoField -MINUTE_OF_DAY)
-   :minute-of-hour (. ChronoField -MINUTE_OF_HOUR)
-   :month-of-year (. ChronoField -MONTH_OF_YEAR)
-   :nano-of-day (. ChronoField -NANO_OF_DAY)
-   :nano-of-second (. ChronoField -NANO_OF_SECOND)
-   :offset-seconds (. ChronoField -OFFSET_SECONDS)
-   :proleptic-month (. ChronoField -PROLEPTIC_MONTH)
-   :second-of-day (. ChronoField -SECOND_OF_DAY)
-   :second-of-minute (. ChronoField -SECOND_OF_MINUTE)
-   :year (. ChronoField -YEAR)
-   :year-of-era (. ChronoField -YEAR_OF_ERA)})
+  {:aligned-day-of-week-in-month cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-month 
+   :aligned-day-of-week-in-year  cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-year 
+   :aligned-week-of-month        cljc.java-time.temporal.chrono-field/aligned-week-of-month       
+   :aligned-week-of-year         cljc.java-time.temporal.chrono-field/aligned-week-of-year        
+   :ampm-of-day                  cljc.java-time.temporal.chrono-field/ampm-of-day                 
+   :clock-hour-of-ampm           cljc.java-time.temporal.chrono-field/clock-hour-of-ampm          
+   :clock-hour-of-day            cljc.java-time.temporal.chrono-field/clock-hour-of-day           
+   :day-of-month                 cljc.java-time.temporal.chrono-field/day-of-month                
+   :day-of-week                  cljc.java-time.temporal.chrono-field/day-of-week                 
+   :day-of-year                  cljc.java-time.temporal.chrono-field/day-of-year                 
+   :epoch-day                    cljc.java-time.temporal.chrono-field/epoch-day                   
+   :era                          cljc.java-time.temporal.chrono-field/era                         
+   :hour-of-ampm                 cljc.java-time.temporal.chrono-field/hour-of-ampm                
+   :hour-of-day                  cljc.java-time.temporal.chrono-field/hour-of-day                 
+   :instant-seconds              cljc.java-time.temporal.chrono-field/instant-seconds             
+   :micro-of-day                 cljc.java-time.temporal.chrono-field/micro-of-day                
+   :micro-of-second              cljc.java-time.temporal.chrono-field/micro-of-second             
+   :milli-of-day                 cljc.java-time.temporal.chrono-field/milli-of-day                
+   :milli-of-second              cljc.java-time.temporal.chrono-field/milli-of-second             
+   :minute-of-day                cljc.java-time.temporal.chrono-field/minute-of-day               
+   :minute-of-hour               cljc.java-time.temporal.chrono-field/minute-of-hour              
+   :month-of-year                cljc.java-time.temporal.chrono-field/month-of-year               
+   :nano-of-day                  cljc.java-time.temporal.chrono-field/nano-of-day                 
+   :nano-of-second               cljc.java-time.temporal.chrono-field/nano-of-second              
+   :offset-seconds               cljc.java-time.temporal.chrono-field/offset-seconds              
+   :proleptic-month              cljc.java-time.temporal.chrono-field/proleptic-month             
+   :second-of-day                cljc.java-time.temporal.chrono-field/second-of-day               
+   :second-of-minute             cljc.java-time.temporal.chrono-field/second-of-minute            
+   :year                         cljc.java-time.temporal.chrono-field/year                        
+   :year-of-era                  cljc.java-time.temporal.chrono-field/year-of-era                 })
 
 (deftype FieldsLookup [t]
   #?(:clj Seqable :cljs ISeqable)
@@ -421,7 +449,7 @@
   "Adjust a temporal with an adjuster or field"
   ([t adj]
    (.with t adj)
-   )
+    )
   ([t fld new-value]
    (when-let [f (get field-map fld)]
      (.with t f new-value))))
@@ -429,55 +457,55 @@
 ;; Built-in adjusters
 
 (defn day-of-week-in-month
-  ([ordinal dow] (. TemporalAdjusters dayOfWeekInMonth ordinal (day-of-week dow)))
+  ([ordinal dow] (cljc.java-time.temporal.temporal-adjusters/day-of-week-in-month ordinal (day-of-week dow)))
   ([t ordinal dow] (with t (day-of-week-in-month ordinal dow))))
 
 (defn first-day-of-month
-  ([] (. TemporalAdjusters firstDayOfMonth))
+  ([] (cljc.java-time.temporal.temporal-adjusters/first-day-of-month))
   ([t] (with t (first-day-of-month))))
 
 (defn first-day-of-next-month
-  ([] (. TemporalAdjusters firstDayOfNextMonth))
+  ([] (cljc.java-time.temporal.temporal-adjusters/first-day-of-next-month))
   ([t] (with t (first-day-of-next-month))))
 
 (defn first-day-of-next-year
-  ([] (. TemporalAdjusters firstDayOfNextYear))
+  ([] (cljc.java-time.temporal.temporal-adjusters/first-day-of-next-year))
   ([t] (with t (first-day-of-next-year))))
 
 (defn first-day-of-year
-  ([] (. TemporalAdjusters firstDayOfYear))
+  ([] (cljc.java-time.temporal.temporal-adjusters/first-day-of-year))
   ([t] (with t (first-day-of-year))))
 
 (defn first-in-month
-  ([dow] (. TemporalAdjusters firstInMonth (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/first-in-month (day-of-week dow)))
   ([t dow] (with t (first-in-month dow))))
 
 (defn last-day-of-month
-  ([] (. TemporalAdjusters lastDayOfMonth))
+  ([] (cljc.java-time.temporal.temporal-adjusters/last-day-of-month))
   ([t] (with t (last-day-of-month))))
 
 (defn last-day-of-year
-  ([] (. TemporalAdjusters lastDayOfYear))
+  ([] (cljc.java-time.temporal.temporal-adjusters/last-day-of-year))
   ([t] (with t (last-day-of-year))))
 
 (defn last-in-month
-  ([dow] (. TemporalAdjusters lastInMonth (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/last-in-month (day-of-week dow)))
   ([t dow] (with t (last-in-month dow))))
 
 (defn next
-  ([dow] (. TemporalAdjusters next (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/next (day-of-week dow)))
   ([t dow] (with t (next dow))))
 
 (defn next-or-same
-  ([dow] (. TemporalAdjusters nextOrSame (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/next-or-same (day-of-week dow)))
   ([t dow] (with t (next-or-same dow))))
 
 (defn previous
-  ([dow] (. TemporalAdjusters previous (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/previous (day-of-week dow)))
   ([t dow] (with t (previous dow))))
 
 (defn previous-or-same
-  ([dow] (. TemporalAdjusters previousOrSame (day-of-week dow)))
+  ([dow] (cljc.java-time.temporal.temporal-adjusters/previous-or-same (day-of-week dow)))
   ([t dow] (with t (previous-or-same dow))))
 
 ;; Comparison
@@ -546,35 +574,35 @@
 ;; Units
 
 (def unit-map
-  {:nanos (. ChronoUnit -NANOS)
-   :micros (. ChronoUnit -MICROS)
-   :millis (. ChronoUnit -MILLIS)
-   :seconds (. ChronoUnit -SECONDS)
-   :minutes (. ChronoUnit -MINUTES)
-   :hours (. ChronoUnit -HOURS)
-   :half-days (. ChronoUnit -HALF_DAYS)
-   :days (. ChronoUnit -DAYS)
-   :weeks (. ChronoUnit -WEEKS)
-   :months (. ChronoUnit -MONTHS)
-   :years (. ChronoUnit -YEARS)
-   :decades (. ChronoUnit -DECADES)
-   :centuries (. ChronoUnit -CENTURIES)
-   :millennia (. ChronoUnit -MILLENNIA)
-   :eras (. ChronoUnit -ERAS)
-   :forever (. ChronoUnit -FOREVER)})
+  {:nanos     cljc.java-time.temporal.chrono-unit/nanos    
+   :micros    cljc.java-time.temporal.chrono-unit/micros   
+   :millis    cljc.java-time.temporal.chrono-unit/millis   
+   :seconds   cljc.java-time.temporal.chrono-unit/seconds  
+   :minutes   cljc.java-time.temporal.chrono-unit/minutes  
+   :hours     cljc.java-time.temporal.chrono-unit/hours    
+   :half-days cljc.java-time.temporal.chrono-unit/half-days
+   :days      cljc.java-time.temporal.chrono-unit/days     
+   :weeks     cljc.java-time.temporal.chrono-unit/weeks    
+   :months    cljc.java-time.temporal.chrono-unit/months   
+   :years     cljc.java-time.temporal.chrono-unit/years    
+   :decades   cljc.java-time.temporal.chrono-unit/decades  
+   :centuries cljc.java-time.temporal.chrono-unit/centuries
+   :millennia cljc.java-time.temporal.chrono-unit/millennia
+   :eras      cljc.java-time.temporal.chrono-unit/eras     
+   :forever   cljc.java-time.temporal.chrono-unit/forever  })
 
 (def reverse-unit-map (into {} (map vec (map reverse unit-map))))
 
 (defn units [x]
   (into {}
-        (for [tu (t.i/getter units x)
-              :let [k (reverse-unit-map tu)]
-              :when k]
-          [k (.get x tu)])))
+    (for [tu (cljc.java-time.temporal.temporal-amount/get-units x)
+          :let [k (reverse-unit-map tu)]
+          :when k]
+      [k (.get x tu)])))
 
 (defn truncate [x u]
   (when-let [u (get unit-map u)]
-    (.truncatedTo x  u)))
+    (.truncatedTo x u)))
 
 ;; Durations & Periods
 
@@ -602,50 +630,50 @@
   (nanos [d] (.toNanos d))
   (micros [d] (#?(:clj Long/divideUnsigned :cljs cljs.core//) (nanos d) 1000))
   (millis [d] (.toMillis d))
-  (seconds [d] (t.i/getter seconds d))
+  (seconds [d] (cljc.java-time.duration/get-seconds d))
   (minutes [d] (.toMinutes d))
   (hours [d] (.toHours d))
   (days [d] (.toDays d))
 
   Period
-  (days [p] (t.i/getter days p))
-  (months [p] (t.i/getter months p))
-  (years [p] (t.i/getter years p)))
+  (days [p] (cljc.java-time.period/get-days p))
+  (months [p] (cljc.java-time.period/get-months p))
+  (years [p] (cljc.java-time.period/get-years p)))
 
 (defn new-duration [n u]
   (let [unit (unit-map u)]
     (assert unit (str "Not a unit: " u))
-    (. Duration of n unit)))
+    (cljc.java-time.duration/of n unit)))
 
 (defn new-period [n u]
   (case u
-    :days (. Period ofDays n)
-    :weeks (. Period ofWeeks n)
-    :months (. Period ofMonths n)
-    :years (. Period ofYears n)))
+    :days (cljc.java-time.period/of-days n)
+    :weeks (cljc.java-time.period/of-weeks n)
+    :months (cljc.java-time.period/of-months n)
+    :years (cljc.java-time.period/of-years n)))
 
 ;; Coercions
 
 (extend-protocol IExtraction
   Duration
-  (zone-offset [d] (. ZoneOffset ofTotalSeconds (new-duration 1 :seconds))))
+  (zone-offset [d] (cljc.java-time.zone-offset/of-total-seconds (new-duration 1 :seconds))))
 
 ;; Clocks
 
 (defn current-clock []
   (or
     *clock*
-    (. Clock systemDefaultZone)))
+    (cljc.java-time.clock/system-default-zone)))
 
 (defprotocol IClock
   (clock [_] "Make a clock"))
 
 (extend-protocol IClock
   Instant
-  (clock [i] (. Clock fixed i (. ZoneId systemDefault)))
+  (clock [i] (cljc.java-time.clock/fixed i (cljc.java-time.zone-id/system-default)))
 
   ZonedDateTime
-  (clock [zdt] (. Clock fixed (.toInstant zdt) (t.i/getter zone zdt)))
+  (clock [zdt] (cljc.java-time.clock/fixed (.toInstant zdt) (cljc.java-time.zoned-date-time/get-zone zdt)))
 
   #?(:clj Object :cljs object)
   (clock [o] (clock (zoned-date-time o)))
@@ -654,7 +682,7 @@
   (clock [clk] clk)
 
   ZoneId
-  (clock [z] (. Clock system z))
+  (clock [z] (cljc.java-time.clock/system z))
 
   #?(:clj String :cljs string)
   (clock [s] (clock (parse s))))
@@ -663,7 +691,7 @@
   ([clk]
    (advance clk (new-duration 1 :seconds)))
   ([clk dur]
-    (. Clock tick clk dur)))
+   (cljc.java-time.clock/tick clk dur)))
 
 (extend-protocol IConversion
   Clock
@@ -671,7 +699,7 @@
 
 (extend-protocol IExtraction
   Clock
-  (zone [clk] (t.i/getter zone clk)))
+  (zone [clk] (cljc.java-time.clock/get-zone clk)))
 
 (extend-protocol ITimeReify
   Clock
@@ -741,7 +769,7 @@
   Instant
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.minus t d))
- #?(:clj Date :cljs js/Date)
+  #?(:clj Date :cljs js/Date)
   (forward-duration [t d] (.plus (instant t) d))
   (backward-duration [t d] (.minus (instant t) d))
   LocalDate
@@ -770,8 +798,8 @@
   (forward-duration [t d] (.plus t d))
   (backward-duration [t d] (.minus t d))
   Clock
-  (forward-duration [clk d] (. Clock offset clk d))
-  (backward-duration [clk d] (. Clock offset clk (negated d))))
+  (forward-duration [clk d] (cljc.java-time.clock/offset clk d))
+  (backward-duration [clk d] (cljc.java-time.clock/offset clk (negated d))))
 
 (defn >> [t n-or-d]
   (if (number? n-or-d)
@@ -821,7 +849,7 @@
   (range
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
-                 to (take-while #(< % to) )))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plusDays % step) from)
                       to (take-while #(< % to))))))
 
@@ -839,7 +867,7 @@
   (range
     ([from] (iterate #(.plusSeconds % 1) from))
     ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
-                 to (take-while #(< % to) )))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
@@ -848,7 +876,7 @@
   (range
     ([from] (iterate #(.plusMonths % 1) from))
     ([from to] (cond->> (iterate #(.plusMonths % 1) from)
-                 to (take-while #(< % to) )))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
@@ -857,7 +885,7 @@
   (range
     ([from] (iterate #(.plusYears % 1) from))
     ([from to] (cond->> (iterate #(.plusYears % 1) from)
-                 to (take-while #(< % to) )))
+                 to (take-while #(< % to))))
     ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
@@ -868,16 +896,17 @@
   #?(:clj String :cljs string)
   (divide [s d] (divide (parse s) d)))
 
-     (defprotocol IDivisibleDuration
-       (divide-duration [divisor duration] "Divide a duration"))
+(defprotocol IDivisibleDuration
+  (divide-duration [divisor duration] "Divide a duration"))
 
-     (extend-protocol IDivisibleDuration
-       #?(:clj Long :cljs number)
-       (divide-duration [n duration] (.dividedBy duration n))
-       Duration
-       (divide-duration [divisor duration]
-          #?(:clj (clojure.core// (t.i/getter seconds duration) (t.i/getter seconds divisor))
-             :cljs (cljs.core// (.seconds duration) (.seconds divisor))) ))
+(extend-protocol IDivisibleDuration
+  #?(:clj Long :cljs number)
+  (divide-duration [n duration] (.dividedBy duration n))
+  Duration
+  (divide-duration [divisor duration]
+    (/
+      (cljc.java-time.duration/get-seconds duration)
+      (cljc.java-time.duration/get-seconds divisor))))
 
 (extend-type Duration
   IDivisible
@@ -888,7 +917,7 @@
   (end [_] "Return the end of a span of time"))
 
 (defn duration [x]
-  (. Duration between (beginning x) (end x)))
+  (cljc.java-time.duration/between (beginning x) (end x)))
 
 (defn- beginning-composite [m]
   (let [{:tick/keys [beginning intervals]} m]
@@ -928,11 +957,11 @@
 (extend-protocol IBetween
   #?@(:cljs
       [LocalDate
-       (between [v1 v2] (. Period between v1 (date v2)))
+       (between [v1 v2] (cljc.java-time.period/between v1 (date v2)))
        LocalDateTime
-       (between [v1 v2] (. Duration between v1 (date-time v2)))
+       (between [v1 v2] (cljc.java-time.duration/between v1 (date-time v2)))
        Instant
-       (between [v1 v2] (. Duration between v1 (instant v2)))])
+       (between [v1 v2] (cljc.java-time.duration/between v1 (instant v2)))])
   #?@(:clj [Temporal
             (between [v1 v2] (Duration/between v1 v2))])
   #?(:clj String :cljs string)
@@ -982,7 +1011,7 @@
   (beginning [i] i)
   (end [i] i)
 
- #?(:clj Date :cljs js/Date)
+  #?(:clj Date :cljs js/Date)
   (beginning [i] (instant i))
   (end [i] (instant i))
 
@@ -1007,24 +1036,24 @@
   (at [date t] (.atTime date (time t)))
   LocalDateTime
   (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset]  #?(:clj (.atOffset ldt (zone-offset offset))
-                              :cljs (.atZone ldt (zone-offset offset))))
+  (offset-by [ldt offset] #?(:clj (.atOffset ldt (zone-offset offset))
+                             :cljs (.atZone ldt (zone-offset offset))))
   Instant
   ; todo - should use Instant/atZone - await js-joda release with https://github.com/js-joda/js-joda/pull/263
-  (in [t z] (. ZonedDateTime ofInstant t z))
+  (in [t z] (cljc.java-time.zoned-date-time/of-instant t z))
   (offset-by [t offset] #?(:clj (.atOffset t (zone-offset offset))
                            ; todo - no OffsetDateTime in js-joda yet
-                           :cljs (. ZonedDateTime ofInstant t (zone-offset offset))))
+                           :cljs (cljc.java-time.zoned-date-time/of-instant t (zone-offset offset))))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
- #?(:clj Date :cljs js/Date)
+  #?(:clj Date :cljs js/Date)
   (in [t z] (in (instant t) (zone z))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
 
 (extend-protocol ILocalTime
- #?(:clj Date :cljs js/Date)
+  #?(:clj Date :cljs js/Date)
   (local? [d] false)
 
   Instant
@@ -1045,20 +1074,20 @@
 
 (extend-protocol MinMax
   LocalTime
-  (min-of-type [_] (. LocalTime -MIN))
-  (max-of-type [_]  (. LocalTime -MAX))
+  (min-of-type [_] cljc.java-time.local-time/min)
+  (max-of-type [_] cljc.java-time.local-time/max)
   LocalDateTime
-  (min-of-type [_]  (. LocalDateTime -MIN))
-  (max-of-type [_]  (. LocalDateTime -MAX))
+  (min-of-type [_] cljc.java-time.local-date-time/min)
+  (max-of-type [_] cljc.java-time.local-date-time/max)
   Instant
-  (min-of-type [_]  (. Instant -MIN))
-  (max-of-type [_]  (. Instant -MAX))
+  (min-of-type [_] cljc.java-time.instant/min)
+  (max-of-type [_] cljc.java-time.instant/max)
   ;; TODO: This may cause surprises - see clojure/java-time. We should
   ;; change the semantics of nil to not imply epoch, forever, or
   ;; whatever.
   nil
-  (min-of-type [_]  (. Instant -MIN))
-  (max-of-type [_]  (. Instant -MAX)))
+  (min-of-type [_] cljc.java-time.instant/min)
+  (max-of-type [_] cljc.java-time.instant/max))
 
 
 ;; first/last using java.time.temporal/TemporalAdjuster
@@ -1067,7 +1096,7 @@
 ;; java.time.temporal/TemporalAmount
 
 #_(defn adjust [t adjuster]
-  (.with t adjuster))
+    (.with t adjuster))
 
 ;; adjust
 
@@ -1082,4 +1111,4 @@
   (forward-duration (now) dur))
 
 (defn midnight? [^LocalDateTime t]
-  (.isZero (. Duration between t (beginning (date t)))))
+  (.isZero (cljc.java-time.duration/between t (beginning (date t)))))

@@ -7,6 +7,7 @@
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [tick.core :as t]
+    [cljc.java-time.duration]
     #?@(:cljs
          [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                              LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
@@ -97,7 +98,7 @@
 (defn scale [ival factor]
   (make-interval
     (t/beginning ival)
-    (t/forward-duration (t/beginning ival) (.multipliedBy (t/duration ival) factor))))
+    (t/forward-duration (t/beginning ival) (cljc.java-time.duration/multiplied-by (t/duration ival) factor))))
 
 (extend-protocol t/ITimeShift
   #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
@@ -739,7 +740,7 @@
        (map (juxt identity #(t/min (t/forward-duration % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
-  (divide-by-duration ival (.dividedBy (t/duration ival) divisor)))
+  (divide-by-duration ival (cljc.java-time.duration/divided-by (t/duration ival) divisor)))
 
 (defprotocol IDivisibleInterval
   (divide-interval [divisor ival] "Divide an interval by a given divisor"))

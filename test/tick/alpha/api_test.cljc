@@ -7,6 +7,8 @@
        :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
     [tick.format :as t.f]
+    [cljc.java-time.clock]
+    [cljc.java-time.instant]
     [cljs.java-time.interop :as t.i]
     #?(:clj
     [tick.deprecated.cal :as cal])
@@ -31,7 +33,7 @@
 
 ;; Point-in-time tests
 (deftest today-test
-  (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+  (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= (t/instant "2017-08-08T12:00:00Z") (t/now)))
     (is (= (t/date "2017-08-08") (t/today)))
     (is (= (t/date "2017-08-07") (t/yesterday)))
@@ -81,7 +83,7 @@
        (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) (t/parse d)))))))
 
 (deftest epoch-test
-  (is (= (. Instant parse "1970-01-01T00:00:00Z") (t/epoch))))
+  (is (= (cljc.java-time.instant/parse "1970-01-01T00:00:00Z") (t/epoch))))
 
 ;; Period arithmetic
 
@@ -154,7 +156,7 @@
 
 
 (deftest am-test
-  (t/with-clock (. Clock fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+  (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")
                            (t/date-time "2017-08-08T12:00:00"))
            (t/am (t/today))))
