@@ -14,6 +14,8 @@ runtimes).
 (t/now)
 ----
 
+See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/North 2019] for some background
+
 == Docs
 
 http://juxt.pro/tick/docs/index.html[Tick Documentation]
