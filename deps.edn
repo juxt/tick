@@ -13,6 +13,7 @@
     com.bhauman/cljs-test-display {:mvn/version "0.1.1"}
     org.clojure/clojurescript {:mvn/version "1.10.238"}
     org.clojure/data.xml {:mvn/version "0.2.0-alpha5"}
+    org.clojure/tools.namespace {:mvn/version "0.2.11"}
     org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
     io.aviso/pretty {:mvn/version "0.1.34"}
     spyscope {:mvn/version "0.1.6"}
