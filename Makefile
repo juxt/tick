@@ -34,12 +34,12 @@ pom:
 			rm pom.xml; clojure -Spom; echo "Now use git diff to add back in the non-generated bits of pom"
 # Dev pom is used to created development project with intellij
 dev-pom:
-			rm pom.xml && clj -R:dev:dev/rebel:dev/nrepl:test-cljs -C:dev:dev/rebel:dev/nrepl:test-cljs -Spom
+			rm pom.xml && clj -R:dev:dev-rebel:dev-nrepl:test-cljs -C:dev:dev-rebel:dev-nrepl:test-cljs -Spom
 
 deploy:			pom
 			mvn deploy
 figwheel:
-			clj -R:dev:dev/nrepl:dev/rebel -C:dev:dev/nrepl:dev/rebel:test -m figwheel.main --build tick --repl
+			clj -R:dev:dev-nrepl:dev-rebel -C:dev:dev-nrepl:dev-rebel:test -m figwheel.main --build tick --repl
 
 # hooray for stackoverflow
 .PHONY: list

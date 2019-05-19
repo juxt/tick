@@ -37,7 +37,7 @@
                                                   :sha "028a6d41ac9ac5d5c405dfc38e4da6b4cc1255d5"}}
          :main-opts ["-m" "cognitect.test-runner"]}
 
-  :dev/nrepl {:jvm-opts ["-Dnrepl.load=true"]
+  :dev-nrepl {:jvm-opts ["-Dnrepl.load=true"]
               :extra-paths ["aliases/nrepl"]
               :extra-deps
               {cider/cider-nrepl {:mvn/version "0.17.0"}
@@ -45,7 +45,7 @@
                com.cemerick/piggieback {:mvn/version "0.2.2"}
                org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
 
-  :dev/rebel {:extra-paths ["aliases/rebel"]
+  :dev-rebel {:extra-paths ["aliases/rebel"]
               :extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.1"}
                            com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
                            io.aviso/pretty {:mvn/version "0.1.34"}}
