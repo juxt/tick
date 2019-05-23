@@ -3,7 +3,6 @@
 (ns tick.interval
   (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide flatten])
   (:require
-    [clojure.pprint :refer [pprint]]
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [tick.core :as t]
