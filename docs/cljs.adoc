@@ -14,29 +14,8 @@ In future, tick could instead require consumers to rely on `:npm-deps` directive
 
 === Dropping to java.time
 
-Tick doesn't contain equivalents of every method in java.time (there are ~2.5k in total), but that's ok because you
-can use interop syntax. However, Clojurescript does not support Clojure's static method
-call syntax. For example
-
-----
-(java.time.Period/parse "P1D")
-----
-
-Is valid Clojure, but not valid Clojurescript. However, using the 'dot' syntax, 
-it is possible to write this so that it works in both Clojure and Clojurescript by using the 
-https://clojure.org/reference/java_interop#_the_dot_special_form[dot special form]:
-
-----
-(. java.time.Period parse "P1D")
-----
-
-Similarly for static property access, the normal Clojure `Foo/bar` doesn't work in cljs. Again the solution
-is to use the dot special form:
-
-----
-(. Foo -bar)
-----
-
+Tick depends on https://github.com/henryw374/cljc.java-time[cljc.java-time] which is the easiest way to access the full
+java.time api underneath tick. 
 
 === Timezones 
 
@@ -60,9 +39,13 @@ If you want to create custom formatters from patterns, such as "dd MMM yyyy", ad
 [tick.locale-en-us]
 ----
 
-==== Why are the extra requires needed?
+==== Reducing Tick Build Size
 
-It is done to allow a smaller payload, when the extra libraries are not being used. Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k.
+The extra requires for timezones and locales are have been done that way to allow a smaller payload, when the extra 
+libraries are not being used. 
+
+Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k. It could be possible to take advantage
+of tree-shaking with JSJoda, see https://github.com/juxt/tick/issues/33[this ticket] for discussion.
   
 Timezone is an extra 26k, and Locale (just en-US) is an extra 45k
 
