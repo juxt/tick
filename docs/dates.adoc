@@ -452,6 +452,18 @@ But is the month May?
 ----
 ====
 
+The `ITimeLength` protocol provides functions to extract data from Durations & Periods.
+
+Some examples
+
+[%header,cols="l,a,l"]
+|===
+|Code|Description
+|(t/seconds (t/new-duration 10 :seconds))|Seconds of a Duration
+|(t/nanos (t/new-duration 10 :seconds))|Nanos of a Duration
+|(t/days (t/new-period 100 :days))|Days of a Period
+|===
+
 == Comparison
 
 TBD
