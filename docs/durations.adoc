@@ -5,12 +5,10 @@
 [%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
-|(seconds 1)|Duration of a second|java.time.Duration
-|(seconds 10)|Duration of 10 seconds|java.time.Duration
-|(nanos 1200)|Duration of 1200 nanoseconds|java.time.Duration
-|(days 100)|Duration of 100 days|java.time.Duration
-|(period 100 :days)|Period of 100 days|java.time.Period
-|(months 2)|Period of 2 months|java.time.Period
+|(t/new-duration 1 :seconds)|Duration of a second|java.time.Duration
+|(t/new-duration 100 :days)|Duration of 100 days|java.time.Duration
+|(t/new-period 100 :days)|Period of 100 days|java.time.Period
+|(t/new-period 2 :months)|Period of 2 months|java.time.Period
 |===
 
 === Days, Months, Years…
