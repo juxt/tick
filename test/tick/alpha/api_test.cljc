@@ -109,7 +109,12 @@
   (is
    (=
     (t/new-duration 2 :minutes)
-    (t/between "2020-01-01T12:00" "2020-01-01T12:02"))))
+    (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
+
+  (testing "LocalDate"
+    (is (= (t/new-period 1 :days)
+           (t/between (t/date "2020-01-01")
+                      (t/date "2020-01-02"))))))
 
 ;; Range test
 
