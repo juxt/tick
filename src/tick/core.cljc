@@ -962,7 +962,9 @@
        (between [v1 v2] (cljc.java-time.duration/between v1 (date-time v2)))
        Instant
        (between [v1 v2] (cljc.java-time.duration/between v1 (instant v2)))])
-  #?@(:clj [Temporal
+  #?@(:clj [LocalDate
+            (between [v1 v2] (Period/between v1 (date v2)))
+            Temporal
             (between [v1 v2] (Duration/between v1 v2))])
   #?(:clj String :cljs string)
   (between [v1 v2] (between (parse v1) (parse v2))))
