@@ -2,15 +2,20 @@
 
 There are extra considerations when using tick with Clojurescript
 
-=== Shadow-CLJS
+=== Shadow-CLJS & Other NPM-related issues
 
 TL;DR to use tick on shadow, follow https://github.com/henryw374/tick-on-shadow-cljs-demo[this demo]
 
-Tick uses an npm lib, `js-joda` which is packaged in http://cljsjs.github.io/[cljsjs]. Shadow ignores the 
+Tick uses an npm lib, `js-joda` which is packaged in http://cljsjs.github.io/[cljsjs]. 
+
+This is done as a convenience so that users need not have npm installed and won't need to add build steps
+in order to try tick out. However, if you are using Shadow, Node, Webpack etc you may wish to depend on the 
+NPM libraries directly. https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides
+advice on how to replace cljsjs dependencies.
+
+Shadow ignores the 
 `:foreign-libs` directive in the `deps.cljs` dependency file of that lib, so requires a shim to create
 the namespace that would normally come from the foreign-lib directive.
-
-In future, tick could instead require consumers to rely on `:npm-deps` directive in deps.cljs.
 
 === Dropping to java.time
 
