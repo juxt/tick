@@ -287,7 +287,7 @@
   (month [i] (month (date i)))
   (year [i] (year (date i)))
   (year-month [i] (year-month (date i)))
-  (zone [i] (. ZoneId of "UTC"))
+  (zone [i] (cljc.java-time.zone-id/of "UTC"))
   (zone-offset [i] cljc.java-time.zone-offset/utc)
 
   #?(:clj String :cljs string)
@@ -299,7 +299,7 @@
   (month [s] (or (parse-month s) (month (date s))))
   (year [s] (year (parse s)))
   (year-month [s] (year-month (parse s)))
-  (zone [s] (. ZoneId of s))
+  (zone [s] (cljc.java-time.zone-id/of s))
   (zone-offset [s] (cljc.java-time.zone-offset/of s))
   (int [s] (cljc.java-time.instant/get-nano (instant s)))
   (long [s] (cljc.java-time.instant/get-epoch-second (instant s)))
