@@ -32,7 +32,7 @@ jobs:
 
       - run: sudo apt-get update
       - run: curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-      - run: sudo apt-get install -y nodejs
+      - run: sudo apt-get install -y make nodejs
       - run: sudo npm install karma
       - run: make test
 
