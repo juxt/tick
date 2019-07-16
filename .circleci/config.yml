@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/clojure:tools-deps-1.9.0.397
+      - image: circleci/clojure:tools-deps-1.9.0.394-node
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -30,10 +30,12 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: sudo apt-get update
-      - run: curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-      - run: sudo apt-get install -y make nodejs
-      - run: sudo npm install karma
+      # need a few bits for cljs test - there must be a better way of including?
+      - run: sudo npm install karma-cli -g
+      - run: npm install karma --save-dev                            
+      - run: npm install karma-cljs-test
+          
+      - run: sudo apt-get install -y make        
       - run: make test
 
       - save_cache:

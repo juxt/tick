@@ -34,6 +34,8 @@ To use tick with Shadow-CLJS, there are some https://github.com/henryw374/tick-o
 
 == Development
 
+image:https://circleci.com/gh/juxt/tick.svg?style=svg["CircleCI", link="https://circleci.com/gh/juxt/tick"]
+
 === Develop The Documentation Site
 
 Build the Cljs

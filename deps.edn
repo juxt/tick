@@ -24,7 +24,10 @@
   :test-cljs {:extra-paths ["test" "cljs-test-runner-out/gen"]
               :extra-deps {org.clojure/clojurescript {:mvn/version "1.10.238"}
                            olical/cljs-test-runner {:mvn/version "3.5.0"}}
-              :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
+              :main-opts   ["-m" "cljs-test-runner.main"
+                            ; "-c" "test/cljs-test-opts.edn -x chrome-headless"
+                            "-x node"]}
+  
   :docs-index {:jvm-opts ["-Xmx500M"]
                :extra-paths ["docs/src"]
                :extra-deps {reagent {:mvn/version "0.8.1"}
