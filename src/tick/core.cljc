@@ -245,6 +245,8 @@
                              :cljs zdt))
   (zoned-date-time [zdt] zdt))
 
+not clojure
+
 (extend-protocol IExtraction
   #?(:clj Object :cljs object)
   (int [v] (#?(:clj clojure.core/int :cljs parse-int) v))
