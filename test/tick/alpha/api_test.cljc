@@ -29,7 +29,9 @@
   (is (= Year (type (t/year 2017))))
   (is (= 2017 (t.i/getter value (t/year 2017))))
   (is (= Month (type (t/month 12))))
-  (is (= t/DECEMBER (t/month 12))))
+  (is (= t/DECEMBER (t/month 12)))
+  (is (= (t/new-date 3030 3 3)
+        (t/date "3030-03-03"))))
 
 ;; Point-in-time tests
 (deftest today-test
