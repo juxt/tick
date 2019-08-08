@@ -178,7 +178,7 @@
 (defn new-date
   ([] (today))
   ([year month day-of-month]
-   (cljc.java-time.local-date/of (clojure.core/int year) (clojure.core/int month) (clojure.core/int day-of-month)))
+   (cljc.java-time.local-date/of year month day-of-month))
   ([year day-of-year]
    (cljc.java-time.local-date/of-year-day year day-of-year))
   ([epoch-day]
