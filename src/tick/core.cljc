@@ -220,11 +220,11 @@
   (instant [ldt] (instant (zoned-date-time ldt)))
   (offset-date-time [ldt] #?(:clj (cljc.java-time.local-date-time/at-offset
                                     ldt
-                                    (-> (cljc.java-time.zone-id/system-default)
+                                    (-> (current-zone)
                                         (cljc.java-time.zone-id/get-rules)
                                         (.getOffset ldt)))
                              :cljs (zoned-date-time ldt)))
-  (zoned-date-time [ldt] (cljc.java-time.local-date-time/at-zone ldt (cljc.java-time.zone-id/system-default)))
+  (zoned-date-time [ldt] (cljc.java-time.local-date-time/at-zone ldt (current-zone)))
 
   #?(:clj Date :cljs js/Date)
   (inst [d] d)
@@ -670,7 +670,7 @@
 
 (extend-protocol IClock
   Instant
-  (clock [i] (cljc.java-time.clock/fixed i (cljc.java-time.zone-id/system-default)))
+  (clock [i] (cljc.java-time.clock/fixed i (current-zone)))
 
   ZonedDateTime
   (clock [zdt] (cljc.java-time.clock/fixed (.toInstant zdt) (cljc.java-time.zoned-date-time/get-zone zdt)))

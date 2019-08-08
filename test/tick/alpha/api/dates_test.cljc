@@ -44,7 +44,23 @@
       (testing "(clock) return type"
         (is (instance? Clock (t/clock))))
       (testing "Time shifting the clock back by 2 hours"
-        (is (= "2018-02-14T13:00:00Z" (str (t/instant (t/<< (t/clock) (t/new-duration 2 :hours)))))))))
+        (is (= "2018-02-14T13:00:00Z" (str (t/instant (t/<< (t/clock) (t/new-duration 2 :hours)))))))
+      (testing "with instant"
+        (is (= (t/zone (t/clock (t/instant)))
+               (t/zone "America/New_York"))))))
+
+  (testing "Converting using with-clock"
+    (t/with-clock (t/clock (t/zone "America/New_York"))
+     (testing "inst to zoned-date-time"
+       (is (= (t/zoned-date-time #inst"2019-08-07T16:00")
+              (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
+     (testing "date-time to zoned-date-time"
+       (is (= (t/zoned-date-time (t/date-time "2019-08-07T12:00"))
+              (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
+     (testing "date-time to offset-date-time"
+       (is (= (t/offset-date-time (t/date-time "2019-08-07T12:00"))
+              #?(:clj (t/offset-date-time "2019-08-07T12:00-04:00")
+                 :cljs (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]")))))))
 
   (testing "Creating a clock with a zone, and returning that zone"
     (is (= "America/New_York" (str (t/zone (t/clock (t/zone "America/New_York")))))))
