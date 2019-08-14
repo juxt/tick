@@ -332,6 +332,9 @@
   Month
   (int [m] (cljc.java-time.month/get-value m)) ;todo
 
+  DayOfWeek
+  (int [d] (cljc.java-time.day-of-week/get-value d))
+
   LocalDateTime
   (time [dt] (cljc.java-time.local-date-time/to-local-time dt))
   (date [dt] (cljc.java-time.local-date-time/to-local-date dt))
@@ -342,6 +345,7 @@
   (day-of-week [dt] (day-of-week (date dt)))
   (day-of-month [dt] (day-of-month (date dt)))
   (year-month [dt] (year-month (date dt)))
+  (month [dt] (cljc.java-time.local-date-time/get-month dt))
   (year [dt] (year (date dt)))
 
   #?(:clj Date :cljs js/Date)
@@ -352,6 +356,7 @@
 
   YearMonth
   (year-month [ym] ym)
+  (month [ym] (cljc.java-time.year-month/get-month ym))
   (year [ym] (year (cljc.java-time.year-month/get-year ym)))
 
   Year
