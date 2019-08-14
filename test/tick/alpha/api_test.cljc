@@ -33,6 +33,10 @@
   (is (= (t/new-date 3030 3 3)
         (t/date "3030-03-03"))))
 
+(deftest extraction-test
+  (is (= 2 (t/int t/FEBRUARY)))
+  (is (= 2 (t/int t/TUESDAY))))
+
 ;; Point-in-time tests
 (deftest today-test
   (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)

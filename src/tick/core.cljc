@@ -332,6 +332,9 @@
   Month
   (int [m] (cljc.java-time.month/get-value m)) ;todo
 
+  DayOfWeek
+  (int [d] (cljc.java-time.day-of-week/get-value d))
+
   LocalDateTime
   (time [dt] (cljc.java-time.local-date-time/to-local-time dt))
   (date [dt] (cljc.java-time.local-date-time/to-local-date dt))
