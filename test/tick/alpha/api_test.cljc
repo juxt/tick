@@ -35,7 +35,9 @@
 
 (deftest extraction-test
   (is (= 2 (t/int t/FEBRUARY)))
-  (is (= 2 (t/int t/TUESDAY))))
+  (is (= 2 (t/int t/TUESDAY)))
+  (is (= t/AUGUST (t/month (t/date-time "2017-08-08T12:00:00"))))
+  (is (= t/AUGUST (t/month (t/year-month "2017-08")))))
 
 ;; Point-in-time tests
 (deftest today-test
