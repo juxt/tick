@@ -8,7 +8,7 @@ runtimes).
 
 [source,clojure]
 ----
-(require [tick.alpha.api :as t])
+(require '[tick.alpha.api :as t])
 
 ;; Get the current time
 (t/now)
