@@ -11,7 +11,7 @@
     [cljc.java-time.instant]
     [cljs.java-time.interop :as t.i]
     #?(:clj
-    [tick.deprecated.cal :as cal])
+       [tick.deprecated.cal :as cal])
     #?@(:cljs
         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]]
          [java.time.temporal :refer [ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]]))
@@ -31,7 +31,12 @@
   (is (= Month (type (t/month 12))))
   (is (= t/DECEMBER (t/month 12)))
   (is (= (t/new-date 3030 3 3)
-        (t/date "3030-03-03"))))
+        (t/date "3030-03-03")))
+  (is (-> (t/new-duration 1000 :millis)
+          (t/inst)
+          (t/instant)
+          (cljc.java-time.instant/to-epoch-milli)
+          (= 1000))))
 
 (deftest extraction-test
   (is (= 2 (t/int t/FEBRUARY)))
@@ -62,8 +67,8 @@
       (is (instance? instance-type (t/offset-date-time (t/date-time))))
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
-(deftest fields-test 
-  (let [xs [(t/now) 
+(deftest fields-test
+  (let [xs [(t/now)
             (t/zoned-date-time)
             (t/offset-date-time)
             (t/date-time)
@@ -105,24 +110,24 @@
 ;; Between test
 (deftest between-test
   (is
-   (=
-    (let [now (t/now)]
-      (t/between
-       (t/- now (t/new-duration 10 :seconds))
-       (t/+ now (t/new-duration 10 :seconds))))
-    (t/new-duration 20 :seconds)))
+    (=
+      (let [now (t/now)]
+        (t/between
+          (t/- now (t/new-duration 10 :seconds))
+          (t/+ now (t/new-duration 10 :seconds))))
+      (t/new-duration 20 :seconds)))
   (is
-   (= (t/new-duration 48 :hours)
+    (= (t/new-duration 48 :hours)
       (t/between (t/beginning (t/today)) (t/end (t/tomorrow)))))
   (is
-   (=
-    (t/new-duration 2 :minutes)
-    (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
+    (=
+      (t/new-duration 2 :minutes)
+      (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
 
   (testing "LocalDate"
     (is (= (t/new-period 1 :days)
-           (t/between (t/date "2020-01-01")
-                      (t/date "2020-01-02"))))))
+          (t/between (t/date "2020-01-01")
+            (t/date "2020-01-02"))))))
 
 ;; Range test
 
@@ -171,11 +176,11 @@
 (deftest am-test
   (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")
-                           (t/date-time "2017-08-08T12:00:00"))
-           (t/am (t/today))))
+             (t/date-time "2017-08-08T12:00:00"))
+          (t/am (t/today))))
     (is (= (t/new-interval (t/date-time "2017-08-08T12:00:00")
-                           (t/date-time "2017-08-09T00:00:00"))
-           (t/pm (t/today))))))
+             (t/date-time "2017-08-09T00:00:00"))
+          (t/pm (t/today))))))
 
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
@@ -211,16 +216,16 @@
 (deftest concur-test
   (is
     (= 2
-       (t/hours
-         (t/duration
-           (t/concur (t/new-interval (t/at (t/today) "16:00")
-                                     (t/end (t/today)))
-                     (t/today)
-                     (t/new-interval (t/at (t/today) "20:00")
-                                     (t/at (t/today) "22:00"))))))))
+      (t/hours
+        (t/duration
+          (t/concur (t/new-interval (t/at (t/today) "16:00")
+                      (t/end (t/today)))
+            (t/today)
+            (t/new-interval (t/at (t/today) "20:00")
+              (t/at (t/today) "22:00"))))))))
 
 ;; Let's count some days over Easter 2017.
-#?(:clj                                 ;cal not in cljs
+#?(:clj ;cal not in cljs
    (deftest holiday-counting-test
      (is (=
            ;; Easter is mid-April
@@ -276,7 +281,7 @@
 
 #_(t/partition-by-date)
 
-#_((t/at-zone (t/new-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London" ))
+#_((t/at-zone (t/new-interval [#inst "2017-04-24T23:00" #inst "2017-04-20T23:00"]) "Europe/London"))
 
 #_(t/new-interval [#inst "2017-07-30T23:00" #inst "2017-08-11T23:00"])
 
@@ -378,18 +383,18 @@
    (deftest working-days-in-a-year-test
      (let [year (t/year 2017)
            holidays (map (comp t/bounds :date) (cal/holidays-in-england-and-wales year))
-        weekends (map t/bounds (filter cal/weekend? (t/divide-by t/date year)))]
+           weekends (map t/bounds (filter cal/weekend? (t/divide-by t/date year)))]
        (is (t/ordered-disjoint-intervals? holidays))
        (is (t/ordered-disjoint-intervals? weekends))
        (let [non-working-days (t/union holidays weekends)]
          (is (t/ordered-disjoint-intervals? non-working-days))
          (is (= 113 (count non-working-days)))
-      (is (= 365 (count (t/divide-by t/date (t/year 2017)))))
+         (is (= 365 (count (t/divide-by t/date (t/year 2017)))))
 
          ;; 252 is the number of working days in 2017 in England & Wales.
          ;; We can calculate this by subtracting the number of holidays, by count, and by using intersection.
-      (is (= 252 (- 365 113)))
-      (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/bounds year)] non-working-days))))))))))
+         (is (= 252 (- 365 113)))
+         (is (= 252 (t/days (reduce t/+ (map t/duration (t/difference [(t/bounds year)] non-working-days))))))))))
 
 
 ;; Do not disturb tests
@@ -406,24 +411,24 @@
 ;; Can we disturb?
 (deftest cannot-disturb-test
   (let
-      [disturb-interval [(t/new-interval (t/time "07:00") (t/time "22:00"))]
-       no-disturb-interval (t/complement disturb-interval)
-       can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
-       ]
-      (is (not (can-disturb? (t/time "3:00"))))
-      (is (not (can-disturb? (t/time "7:00"))))
-      (is (can-disturb? (t/time "7:01")))
-      (is (can-disturb? (t/time "12:00")))
-      (is (can-disturb? (t/time "21:59")))
-      (is (not (can-disturb? (t/time "22:00"))))
-      (is (not (can-disturb? (t/time "00:00"))))))
+    [disturb-interval [(t/new-interval (t/time "07:00") (t/time "22:00"))]
+     no-disturb-interval (t/complement disturb-interval)
+     can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
+     ]
+    (is (not (can-disturb? (t/time "3:00"))))
+    (is (not (can-disturb? (t/time "7:00"))))
+    (is (can-disturb? (t/time "7:01")))
+    (is (can-disturb? (t/time "12:00")))
+    (is (can-disturb? (t/time "21:59")))
+    (is (not (can-disturb? (t/time "22:00"))))
+    (is (not (can-disturb? (t/time "00:00"))))))
 
 
 
 ;; TODO: An 'on' test with an interval
 #_(t/on
-  (t/new-interval (t/time "07:00") (t/time "22:00"))
-  (t/today))
+    (t/new-interval (t/time "07:00") (t/time "22:00"))
+    (t/today))
 
 
 ;; Weekend
@@ -431,7 +436,7 @@
     [disturb-interval [(t/new-interval (t/time "07:00") (t/time "21:00"))]
      no-disturb-interval (t/complement disturb-interval)
      t (t/time "6:00")]
-  (not (some #(t/coincident? % t) no-disturb-interval)))
+    (not (some #(t/coincident? % t) no-disturb-interval)))
 
 
 #_(t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
@@ -441,7 +446,7 @@
 
 
 #_(not (some (partial t/concur (moment (t/time "21:59:57")))
-           (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])))
+         (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])))
 
 #_(t/at-zone (t/midnight (t/today)) "Europe/Berlin")
 
@@ -457,8 +462,8 @@
 
 
 #_(tick.interval/concur?
-  (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
-  (moment (t/time (t/as-local (t/now) "Europe/Berlin"))))
+    (t/complement [(t/new-interval (t/time "07:00") (t/time "22:00"))])
+    (moment (t/time (t/as-local (t/now) "Europe/Berlin"))))
 
 
 
