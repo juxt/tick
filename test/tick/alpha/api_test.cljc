@@ -42,7 +42,9 @@
   (is (= 2 (t/int t/FEBRUARY)))
   (is (= 2 (t/int t/TUESDAY)))
   (is (= t/AUGUST (t/month (t/date-time "2017-08-08T12:00:00"))))
-  (is (= t/AUGUST (t/month (t/year-month "2017-08")))))
+  (is (= t/AUGUST (t/month (t/year-month "2017-08"))))
+  (is (= (t/year 2019) (t/year (t/zoned-date-time "2019-09-05T00:00:00+02:00[Europe/Oslo]"))))
+  (is (= (t/year 2019) (t/year (t/offset-date-time "2019-09-05T00:00:00-03:00")))))
 
 ;; Point-in-time tests
 (deftest today-test
