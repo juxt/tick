@@ -102,7 +102,7 @@
     #"(jul)(y)?" cljc.java-time.month/july
     #"(aug)(ust)?" cljc.java-time.month/august
     #"(sep)(tember)?" cljc.java-time.month/september
-    #"(oct)(tober)?" cljc.java-time.month/october
+    #"(oct)(ober)?" cljc.java-time.month/october
     #"(nov)(ember)?" cljc.java-time.month/november
     #"(dec)(ember)?" cljc.java-time.month/december
     nil))
