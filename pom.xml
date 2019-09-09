@@ -19,7 +19,7 @@
     <dependency>
       <groupId>cljc.java-time</groupId>
       <artifactId>cljc.java-time</artifactId>
-      <version>0.1.5</version>
+      <version>0.1.6</version>
     </dependency>
     <dependency>
       <groupId>cljsjs</groupId>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>time-literals</groupId>
       <artifactId>time-literals</artifactId>
-      <version>0.1.2</version>
+      <version>0.1.3</version>
       <exclusions>
         <exclusion>
           <groupId>cljs.java-time</groupId>
