@@ -374,6 +374,7 @@
   (date [odt] (cljc.java-time.offset-date-time/to-local-date odt))
   (date-time [odt] (cljc.java-time.offset-date-time/to-local-date-time odt))
   (year [odt] (year (cljc.java-time.offset-date-time/get-year odt)))
+  (zone-offset [odt] (cljc.java-time.offset-date-time/get-offset odt))
 
   ZonedDateTime
   (time [zdt] (cljc.java-time.zoned-date-time/to-local-time zdt))
@@ -389,7 +390,8 @@
   (day-of-month [t] (cljc.java-time.zoned-date-time/get-day-of-month t))
   (month [zdt] (cljc.java-time.zoned-date-time/get-month zdt))
   (year [zdt] (year (cljc.java-time.zoned-date-time/get-year zdt)))
-  (zone [zdt] (cljc.java-time.zoned-date-time/get-zone zdt)))
+  (zone [zdt] (cljc.java-time.zoned-date-time/get-zone zdt))
+  (zone-offset [zdt] (cljc.java-time.zoned-date-time/get-offset zdt)))
 
 ;; Fields
 
