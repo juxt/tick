@@ -206,6 +206,9 @@
 (def max core/max)
 (def min core/min)
 
+(def min-of-type core/min-of-type)
+(def max-of-type core/max-of-type)
+
 (def range core/range)
 
 (defn int [arg] (core/int arg))
