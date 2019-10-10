@@ -663,8 +663,11 @@
 (defn complement [coll]
   (if (empty? coll)
     [(new-interval (t/min-of-type (t/now)) (t/max-of-type (t/now)))]
-    (let [r (map (fn [[x y]] (new-interval (t/end x) (t/beginning y)))
-                 (partition 2 1 coll))]
+    (let [r (->> coll
+                 (partition 2 1)
+                 (keep (fn [[x y]]
+                         (when-not (meets? x y)
+                           (new-interval (t/end x) (t/beginning y))))))]
       (cond-> r
         (not= (t/beginning (first coll)) (t/min-of-type (t/beginning (first coll))))
         (#(concat [(new-interval (t/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))

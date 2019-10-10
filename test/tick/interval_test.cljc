@@ -524,25 +524,23 @@
                             (t/date-time "2018-01-01T00:00"))]
           (disj [(bounds "2017")] (bounds (t/date "2017-07-04"))))))
 
-#_(deftest complement-test
-    ;; Not sure why this is failing on the equals check
-    #_(is (=
-            [[(tick.core/min-of-type (t/time "2017-01-01T00:00:00Z"))
-              (t/time "2017-01-01T00:00:00Z")]
-
-             [(t/time "2017-01-04T00:00:00Z")
-              (t/time "2017-01-05T00:00:00Z")]
-
-             [(t/time "2018-01-01T00:00:00Z")
-              (tick.core/max-of-type (t/time "2017-01-01T00:00:00Z"))
-              ]]
-
-            (complement [[(t/time "2017-01-01T00:00:00Z")
-                          (t/time "2017-07-04T00:00:00Z")]
-                         [(t/time "2017-07-05T00:00:00Z")
-                          (t/time "2018-01-01T00:00:00Z")]])))
-
-    (is (= [] (complement (complement [])))))
+(deftest complement-test
+  (testing "complement through max of type"
+    (is (= [(ti/new-interval (t/time "01:00") (t/max-of-type (t/time "00:00")))]
+           (ti/complement [(ti/new-interval (t/time "00:00") (t/time "01:00"))]))))
+  (testing "complement ordered disjoint intervals"
+    (is (= [(ti/new-interval (t/time "00:00") (t/time "01:00"))
+            (ti/new-interval (t/time "02:00") (t/time "03:00"))
+            (ti/new-interval (t/time "04:00") (t/max-of-type (t/time "00:00")))]
+           (ti/complement [(ti/new-interval (t/time "01:00") (t/time "02:00"))
+                        (ti/new-interval (t/time "03:00") (t/time "04:00"))]))))
+  (testing "complement meeting intervals"
+    (is (= [(ti/new-interval (t/time "00:00") (t/time "01:00"))
+            (ti/new-interval (t/time "03:00") (t/max-of-type (t/time "00:00")))]
+           (ti/complement [(ti/new-interval (t/time "01:00") (t/time "02:00"))
+                        (ti/new-interval (t/time "02:00") (t/time "03:00"))]))))
+  (testing "complement empty interval round trip"
+    (is (= [] (ti/complement (ti/complement []))))))
 
 
 ;; Division test
