@@ -50,35 +50,27 @@ make docs/index.html
 
 Serve the docs directory and navigate to it in a browser
 
-=== with Clojure
+=== Develop Tick
 
 REPL with nREPL server
 
 ----
-clj -Adev
+make nrepl
 ----
 
-Port is written to `.nrepl-port`.
+connect to the printed port
+
+Once in, start cljs build with:
+
+---
+(figwheel-start!)
+---
 
 Run tests with:
 
 ----
 make test
 ----
-
-=== with ClojureScript
-
-Various options:
-
-----
-make figwheel
-----
-
-Then navigate to http://localhost:9500/figwheel-extra-main/auto-testing
-
-
-Or, From the Clojure REPL type `(node)` to get a node repl.
-
 
 == Documentation
 

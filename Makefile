@@ -34,8 +34,8 @@ pom:
 			rm pom.xml; clojure -Spom; echo "Now use git diff to add back in the non-generated bits of pom"
 deploy:			
 			mvn deploy
-figwheel:
-			clj -R:dev:dev-nrepl:dev-rebel -C:dev:dev-nrepl:dev-rebel:test -m figwheel.main --build tick --repl
+nrepl:
+			clj -Adev:dev-nrepl -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --port 5610
 
 # hooray for stackoverflow
 .PHONY: list
