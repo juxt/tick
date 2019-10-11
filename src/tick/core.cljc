@@ -82,29 +82,29 @@
 
 (defn parse-day [input]
   (condp re-matches (str/lower-case input)
-    #"(mon)(day)?" cljc.java-time.day-of-week/monday
-    #"(tue)(s|sday)?" cljc.java-time.day-of-week/tuesday
-    #"(wed)(s|nesday)?" cljc.java-time.day-of-week/wednesday
-    #"(thur)(s|sday)?" cljc.java-time.day-of-week/thursday
-    #"(fri)(day)?" cljc.java-time.day-of-week/friday
-    #"(sat)(urday)?" cljc.java-time.day-of-week/saturday
-    #"(sun)(day)?" cljc.java-time.day-of-week/sunday
+    #"^(mon)(day)?$" cljc.java-time.day-of-week/monday
+    #"^(tue)(s|sday)?$" cljc.java-time.day-of-week/tuesday
+    #"^(wed)(s|nesday)?$" cljc.java-time.day-of-week/wednesday
+    #"^(thur)(s|sday)?$" cljc.java-time.day-of-week/thursday
+    #"^(fri)(day)?$" cljc.java-time.day-of-week/friday
+    #"^(sat)(urday)?$" cljc.java-time.day-of-week/saturday
+    #"^(sun)(day)?$" cljc.java-time.day-of-week/sunday
     nil))
 
 (defn parse-month [input]
   (condp re-matches (str/lower-case input)
-    #"(jan)(uary)?" cljc.java-time.month/january
-    #"(feb)(ruary)?" cljc.java-time.month/february
-    #"(mar)(ch)?" cljc.java-time.month/march
-    #"(apr)(il)?" cljc.java-time.month/april
-    #"may" cljc.java-time.month/may
-    #"(jun)(e)?" cljc.java-time.month/june
-    #"(jul)(y)?" cljc.java-time.month/july
-    #"(aug)(ust)?" cljc.java-time.month/august
-    #"(sep)(tember)?" cljc.java-time.month/september
-    #"(oct)(ober)?" cljc.java-time.month/october
-    #"(nov)(ember)?" cljc.java-time.month/november
-    #"(dec)(ember)?" cljc.java-time.month/december
+    #"^(jan)(uary)?$" cljc.java-time.month/january
+    #"^(feb)(ruary)?$" cljc.java-time.month/february
+    #"^(mar)(ch)?$" cljc.java-time.month/march
+    #"^(apr)(il)?$" cljc.java-time.month/april
+    #"^may$" cljc.java-time.month/may
+    #"^(jun)(e)?$" cljc.java-time.month/june
+    #"^(jul)(y)?$" cljc.java-time.month/july
+    #"^(aug)(ust)?$" cljc.java-time.month/august
+    #"^(sep)(tember)?$" cljc.java-time.month/september
+    #"^(oct)(ober)?$" cljc.java-time.month/october
+    #"^(nov)(ember)?$" cljc.java-time.month/november
+    #"^(dec)(ember)?$" cljc.java-time.month/december
     nil))
 
 (defprotocol IParseable

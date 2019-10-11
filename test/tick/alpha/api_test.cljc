@@ -9,6 +9,8 @@
     [tick.format :as t.f]
     [cljc.java-time.clock]
     [cljc.java-time.instant]
+    [cljc.java-time.day-of-week]
+    [cljc.java-time.month]
     [cljs.java-time.interop :as t.i]
     #?(:clj
        [tick.deprecated.cal :as cal])
@@ -188,6 +190,31 @@
     (is (= (t/new-interval (t/date-time "2017-08-08T12:00:00")
              (t/date-time "2017-08-09T00:00:00"))
           (t/pm (t/today))))))
+
+(deftest day-of-week
+  (let [days (fn [strings] (map t/day-of-week strings))]
+    (is (every? #{cljc.java-time.day-of-week/sunday} (days ["sun" "sunday"])))
+    (is (every? #{cljc.java-time.day-of-week/monday} (days ["mon" "monday"])))
+    (is (every? #{cljc.java-time.day-of-week/tuesday} (days ["tue" "tues" "tuesday"])))
+    (is (every? #{cljc.java-time.day-of-week/wednesday} (days ["wed" "weds" "wednesday"])))
+    (is (every? #{cljc.java-time.day-of-week/thursday} (days ["thur" "thurs" "thursday"])))
+    (is (every? #{cljc.java-time.day-of-week/friday} (days ["fri" "friday"])))
+    (is (every? #{cljc.java-time.day-of-week/saturday} (days ["sat" "saturday"])))))
+
+(deftest month
+  (let [months (fn [strings] (map t/month strings))]
+    (is (every? #{cljc.java-time.month/january} (months ["jan" "january"])))
+    (is (every? #{cljc.java-time.month/february} (months ["feb" "february"])))
+    (is (every? #{cljc.java-time.month/march} (months ["mar" "march"])))
+    (is (every? #{cljc.java-time.month/april} (months ["apr" "april"])))
+    (is (every? #{cljc.java-time.month/may} (months ["may"])))
+    (is (every? #{cljc.java-time.month/june} (months ["jun" "june"])))
+    (is (every? #{cljc.java-time.month/july} (months ["jul" "july"])))
+    (is (every? #{cljc.java-time.month/august} (months ["aug" "august"])))
+    (is (every? #{cljc.java-time.month/september} (months ["sep" "september"])))
+    (is (every? #{cljc.java-time.month/october} (months ["oct" "october"])))
+    (is (every? #{cljc.java-time.month/november} (months ["nov" "november"])))
+    (is (every? #{cljc.java-time.month/december} (months ["dec" "december"])))))
 
 ;; Durations. Simple constructors to create durations of specific
 ;; units.
