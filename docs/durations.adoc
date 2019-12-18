@@ -1,5 +1,9 @@
 = Durations & periods
 
+*Durations* are used when the units range from nanoseconds to days. 
+
+*Periods* are used for units from days to years.
+
 == Construction
 
 [%header,cols="l,a,l"]
