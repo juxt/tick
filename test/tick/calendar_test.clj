@@ -6,4 +6,4 @@
    [tick.calendar :as cal]))
 
 (deftest bank-holidays-in-england-and-wales-test
-  (is (= 65 (count (cal/bank-holidays-in-england-and-wales)))))
+  (is (= 56 (count (cal/bank-holidays-in-england-and-wales)))))
