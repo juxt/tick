@@ -182,6 +182,26 @@
     (is (t/<= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))))
 
 
+(deftest comparison-test-date
+  (let [t1 #inst "2019-12-24"
+        t2 #inst "2019-12-31"]
+
+    (is (t/< t1 t2))
+    (is (not (t/< t1 t1)))
+    (is (not (t/< t2 t1)))
+
+    (is (t/<= t1 t2))
+    (is (t/<= t1 t1))
+    (is (not (t/<= t2 t1)))
+
+    (is (not (t/> t1 t2)))
+    (is (not (t/> t1 t1)))
+    (is (t/> t2 t1))
+
+    (is (not (t/>= t1 t2)))
+    (is (t/>= t1 t1))
+    (is (t/>= t2 t1))))
+
 (deftest am-test
   (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
     (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")

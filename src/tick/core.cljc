@@ -536,8 +536,11 @@
   (<= [x y] (not (.isAfter x y)))
   (> [x y] (.isAfter x y))
   (>= [x y] (not (.isBefore x y)))
-  ;Date
-  ;(-compare [x y] (.compareTo x y))
+  #?(:clj Date :cljs js/Date)
+  (<  [x y] (neg? (compare x y)))
+  (<= [x y] (not (pos? (compare x y))))
+  (>  [x y] (pos? (compare x y)))
+  (>= [x y] (not (neg? (compare x y))))
   LocalDate
   (< [x y] (.isBefore x y))
   (<= [x y] (not (.isAfter x y)))
