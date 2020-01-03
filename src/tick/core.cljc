@@ -978,7 +978,9 @@
             Temporal
             (between [v1 v2] (Duration/between v1 v2))])
   #?(:clj String :cljs string)
-  (between [v1 v2] (between (parse v1) (parse v2))))
+  (between [v1 v2] (between (parse v1) (parse v2)))
+  #?(:clj Date :cljs js/Date)
+  (between [x y] (between (instant x) (instant y))))
 
 ;; TODO: Test concurrent? in tick.core-test
 
