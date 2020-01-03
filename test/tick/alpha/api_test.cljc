@@ -132,6 +132,11 @@
       (t/new-duration 2 :minutes)
       (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
 
+  (is
+   (=
+    (t/new-duration 2 :minutes)
+    (t/between #inst "2020-01-01T12:00" #inst "2020-01-01T12:02")))
+
   (testing "LocalDate"
     (is (= (t/new-period 1 :days)
           (t/between (t/date "2020-01-01")
@@ -181,6 +186,26 @@
     (is (t/< (t/new-duration 10 :seconds) (t/new-duration 20 :seconds)))
     (is (t/<= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))))
 
+
+(deftest comparison-test-date
+  (let [t1 #inst "2019-12-24"
+        t2 #inst "2019-12-31"]
+
+    (is (t/< t1 t2))
+    (is (not (t/< t1 t1)))
+    (is (not (t/< t2 t1)))
+
+    (is (t/<= t1 t2))
+    (is (t/<= t1 t1))
+    (is (not (t/<= t2 t1)))
+
+    (is (not (t/> t1 t2)))
+    (is (not (t/> t1 t1)))
+    (is (t/> t2 t1))
+
+    (is (not (t/>= t1 t2)))
+    (is (t/>= t1 t1))
+    (is (t/>= t2 t1))))
 
 (deftest am-test
   (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
