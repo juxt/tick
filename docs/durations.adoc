@@ -1,8 +1,16 @@
 = Durations & periods
 
-*Durations* are used when the units range from nanoseconds to days. 
+A *Duration* instance stores time as an amount of *seconds*, for example 5.999999999 seconds.   
 
-*Periods* are used for units from days to years.
+A *Period* instance stores amounts of *years*, *months* and *days*, for example -1 years, 20 months and 100 days
+
+The javadocs refer to these entities as *time-based*  and *date-based*, respectively. 
+
+The reason for having both representations is that the Period units are variable length (leap years, DST etc) but the time-based ones are not. 
+
+So for example a Duration of 48 hours will not the same span as a Period of 2 days in all contexts.
+
+Note that https://www.threeten.org/threeten-extra/[threeten-extra] has an additional PeriodDuration entity
 
 == Construction
 
