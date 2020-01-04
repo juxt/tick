@@ -2,6 +2,10 @@
 
 There are extra considerations when using tick with Clojurescript
 
+Tick uses the https://js-joda.github.io/js-joda/[js-joda] library, which aims to replicate the http://www.threeten.org/threetenbp/[three-ten-backport]
+project. JS-Joda is broken down into a core project (what tick depends on) and additional timezone
+and locale projects. 
+
 === Shadow-CLJS & Other NPM-related issues
 
 TL;DR to use tick on shadow, follow https://github.com/henryw374/tick-on-shadow-cljs-demo[this demo]
@@ -16,11 +20,6 @@ advice on how to replace cljsjs dependencies.
 Shadow ignores the 
 `:foreign-libs` directive in the `deps.cljs` dependency file of that lib, so requires a shim to create
 the namespace that would normally come from the foreign-lib directive.
-
-=== Dropping to java.time
-
-Tick depends on https://github.com/henryw374/cljc.java-time[cljc.java-time] which is the easiest way to access the full
-java.time api underneath tick. 
 
 === Timezones 
 
@@ -53,10 +52,6 @@ Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is a
 of tree-shaking with JSJoda, see https://github.com/juxt/tick/issues/33[this ticket] for discussion.
   
 Timezone is an extra 26k, and Locale (just en-US) is an extra 45k
-
-Tick uses the https://js-joda.github.io/js-joda/[js-joda] library, which aims to replicate the http://www.threeten.org/threetenbp/[three-ten-backport]
-project. JS-Joda is broken down into a core project (what tick depends on) and additional timezone
-and locale projects. 
 
 The js-joda timezone dependency contains the timezone database, containing mappings between zone
 names, their offsets from UTC, and daylight savings(DST) data.
