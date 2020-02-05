@@ -616,7 +616,7 @@
                        (:finishes :during :equals)
                        (difference
                          (assert-proper-head (next xs))
-                         (assert-proper-head (next ys)))
+                         (assert-proper-head ys))
 
                        :starts
                        (difference
