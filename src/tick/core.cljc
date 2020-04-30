@@ -126,13 +126,13 @@
       :>> (fn [s] (cljc.java-time.local-time/parse s))
       #"(\d{1,2}):(\d{2})"
       :>> (fn [[_ h m]] (cljc.java-time.local-time/of (parse-int h) (parse-int m)))
-      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
-      :>> (fn [s] (cljc.java-time.instant/parse s))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}"
       :>> (fn [s] #?(:clj (cljc.java-time.offset-date-time/parse s)
                      :cljs (cljc.java-time.zoned-date-time/parse s)))
-      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}\[\w+/\w+\]"
+      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(([+-]\d{2}:\d{2})|Z)\[\w+/\w+\]"
       :>> (fn [s] (cljc.java-time.zoned-date-time/parse s))
+      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
+      :>> (fn [s] (cljc.java-time.instant/parse s))
       #"\d{4}-\d{2}-\d{2}T\S*"
       :>> (fn [s] (cljc.java-time.local-date-time/parse s))
       #"\d{4}-\d{2}-\d{2}"
