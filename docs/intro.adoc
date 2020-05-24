@@ -19,6 +19,11 @@ strings. It's often desirable to have date-heavy business logic
 portable across platforms. _Tick_ supports both Clojure and
 ClojureScript, with an identical API.
 
+Tick is implemented using the api of `java.time` and an understanding of the https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[concepts behind java.time] will be very useful when working with tick, 
+because tick entities are java.time entities (Instant, LocalTime etc). Where tick doesn't provide the api you need,
+you can look at the java.time api to see if there alternatives. If you cannot find the help you need in the tick documentation, it 
+is quite likely that someone will have had the same query and had it resolved on https://stackoverflow.com/questions/tagged/java-time[Stack Overflow].
+
 == Status
 
 _Tick_ is currently in _alpha_ status. By _alpha_, we mean that the
