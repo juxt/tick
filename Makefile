@@ -25,7 +25,7 @@ test-chrome:
 test-node:
 			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-node
 test:
-			make test-clj && make test-chrome && test-node
+			make test-clj && make test-chrome && make test-node
 
 # For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
