@@ -20,15 +20,16 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 
 test-clj:
 			clojure -Atest -e deprecated
-test-cljs:
-			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-cljs
-
+test-chrome:
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-chrome
+test-node:
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-node
 test:
-			make test-clj && make test-cljs
+			make test-clj && make test-chrome && test-node
 
 # For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
-			npm i; clojure -Adocs-index
+			clojure -Adocs-index
 
 pom:
 			rm pom.xml; clojure -Spom; echo "Now use git diff to add back in the non-generated bits of pom"

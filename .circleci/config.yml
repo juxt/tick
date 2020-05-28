@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/clojure:tools-deps-1.9.0.394-node
+      - image: circleci/clojure:tools-deps-1.9.0.394-node-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -32,7 +32,8 @@ jobs:
 
       # need a few bits for cljs test - there must be a better way of including?
       - run: sudo npm install karma-cli -g
-      - run: npm install karma --save-dev                            
+      - run: npm install karma --save-dev 
+      - run: npm install karma-chrome-launcher  
       - run: npm install karma-cljs-test
           
       - run: sudo apt-get install -y make        

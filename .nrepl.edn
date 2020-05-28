@@ -1,0 +1,3 @@
+{ ;:bind         "::"
+ ;:transport    nrepl.transport/tty
+ :middleware   [cider.piggieback/wrap-cljs-repl]}

@@ -1,25 +1,29 @@
 == Clojurescript
 
+Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
+
 There are extra considerations when using tick with Clojurescript
 
 Tick uses the https://js-joda.github.io/js-joda/[js-joda] library, which aims to replicate the http://www.threeten.org/threetenbp/[three-ten-backport]
 project. JS-Joda is broken down into a core project (what tick depends on) and additional timezone
 and locale projects. 
 
-=== Shadow-CLJS & Other NPM-related issues
+=== NPM Setup
 
-TL;DR to use tick on shadow, follow https://github.com/henryw374/tick-on-shadow-cljs-demo[this demo]
+If you are using npm in your build, first add the transitive npm dependencies to your package.json. Assuming you have 
+tick in your deps.edn, from your project directory, run 
 
-Tick uses an npm lib, `js-joda` which is packaged in http://cljsjs.github.io/[cljsjs]. 
+```
+clj -m cljs.main --install-deps
+```
 
-This is done as a convenience so that users need not have npm installed and won't need to add build steps
-in order to try tick out. However, if you are using Shadow, Node, Webpack etc you may wish to depend on the 
-NPM libraries directly. https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides
-advice on how to replace cljsjs dependencies.
+Now your package.json has the required npm libs added. Shadow actually does this for you, if you are using that. 
 
-Shadow ignores the 
-`:foreign-libs` directive in the `deps.cljs` dependency file of that lib, so requires a shim to create
-the namespace that would normally come from the foreign-lib directive.
+The only other thing to be aware of is if your build tool supports
+`:foreign-libs` (Shadow doesn't) then you should exclude the transitive cljsjs dependencies. 
+https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides more info. 
+
+Note: For tick versions 0.4.23-alpha and earlier, to use tick on shadow follow https://github.com/henryw374/tick-on-shadow-cljs-demo[this demo]
 
 === Timezones 
 
@@ -34,6 +38,9 @@ add the following require:
 ----
 [tick.timezone]
 ----
+
+Note that this is pulling in all of the history of timezones as well. If you don't need historic data and you 
+want to reduce build size, js-joda provides pre-build packages for just the more recent data.
 
 === Formatting
 

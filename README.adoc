@@ -30,7 +30,15 @@ minor changes.
 Get the latest from https://clojars.org/tick[Clojars] and 
 add to your `project.clj`, `build.boot` or `deps.edn`. 
 
-To use tick with Shadow-CLJS, there are some https://github.com/henryw374/tick-on-shadow-cljs-demo[extra steps]
+Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
+
+There are some docs/cljs.adoc[extra considerations when using tick from Clojurescript]. 
+
+Here is a one-liner to drop into a node repl with tick:
+
+---
+clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.741" } tick {:mvn/version "0.4.24-alpha"} }}' -m cljs.main  -re node  --repl
+---
 
 == Development
 
