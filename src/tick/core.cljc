@@ -6,7 +6,7 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [time-literals.read-write]
-    
+
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
     [cljc.java-time.local-time]
@@ -23,11 +23,12 @@
     [cljc.java-time.day-of-week]
     [cljc.java-time.period]
     [cljc.java-time.duration]
+    [cljc.java-time.extn.predicates]
     [cljc.java-time.temporal.temporal-amount]
     [cljc.java-time.temporal.temporal-adjusters]
     [cljc.java-time.temporal.chrono-field]
     [cljc.java-time.temporal.chrono-unit]
-    
+
     #?@(:clj
         [
     [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
@@ -315,7 +316,7 @@
   (day-of-week [d] (cljc.java-time.local-date/get-day-of-week d))
   (day-of-month [d] (cljc.java-time.local-date/get-day-of-month d))
   (month [d] (cljc.java-time.month/from d))
-  (year-month [d] (cljc.java-time.year-month/of 
+  (year-month [d] (cljc.java-time.year-month/of
                     (cljc.java-time.local-date/get-year d)
                     (cljc.java-time.local-date/get-month-value d)))
   (year [d] (cljc.java-time.year/of (cljc.java-time.local-date/get-year d)))
@@ -396,35 +397,35 @@
 ;; Fields
 
 (def field-map
-  {:aligned-day-of-week-in-month cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-month 
-   :aligned-day-of-week-in-year  cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-year 
-   :aligned-week-of-month        cljc.java-time.temporal.chrono-field/aligned-week-of-month       
-   :aligned-week-of-year         cljc.java-time.temporal.chrono-field/aligned-week-of-year        
-   :ampm-of-day                  cljc.java-time.temporal.chrono-field/ampm-of-day                 
-   :clock-hour-of-ampm           cljc.java-time.temporal.chrono-field/clock-hour-of-ampm          
-   :clock-hour-of-day            cljc.java-time.temporal.chrono-field/clock-hour-of-day           
-   :day-of-month                 cljc.java-time.temporal.chrono-field/day-of-month                
-   :day-of-week                  cljc.java-time.temporal.chrono-field/day-of-week                 
-   :day-of-year                  cljc.java-time.temporal.chrono-field/day-of-year                 
-   :epoch-day                    cljc.java-time.temporal.chrono-field/epoch-day                   
-   :era                          cljc.java-time.temporal.chrono-field/era                         
-   :hour-of-ampm                 cljc.java-time.temporal.chrono-field/hour-of-ampm                
-   :hour-of-day                  cljc.java-time.temporal.chrono-field/hour-of-day                 
-   :instant-seconds              cljc.java-time.temporal.chrono-field/instant-seconds             
-   :micro-of-day                 cljc.java-time.temporal.chrono-field/micro-of-day                
-   :micro-of-second              cljc.java-time.temporal.chrono-field/micro-of-second             
-   :milli-of-day                 cljc.java-time.temporal.chrono-field/milli-of-day                
-   :milli-of-second              cljc.java-time.temporal.chrono-field/milli-of-second             
-   :minute-of-day                cljc.java-time.temporal.chrono-field/minute-of-day               
-   :minute-of-hour               cljc.java-time.temporal.chrono-field/minute-of-hour              
-   :month-of-year                cljc.java-time.temporal.chrono-field/month-of-year               
-   :nano-of-day                  cljc.java-time.temporal.chrono-field/nano-of-day                 
-   :nano-of-second               cljc.java-time.temporal.chrono-field/nano-of-second              
-   :offset-seconds               cljc.java-time.temporal.chrono-field/offset-seconds              
-   :proleptic-month              cljc.java-time.temporal.chrono-field/proleptic-month             
-   :second-of-day                cljc.java-time.temporal.chrono-field/second-of-day               
-   :second-of-minute             cljc.java-time.temporal.chrono-field/second-of-minute            
-   :year                         cljc.java-time.temporal.chrono-field/year                        
+  {:aligned-day-of-week-in-month cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-month
+   :aligned-day-of-week-in-year  cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-year
+   :aligned-week-of-month        cljc.java-time.temporal.chrono-field/aligned-week-of-month
+   :aligned-week-of-year         cljc.java-time.temporal.chrono-field/aligned-week-of-year
+   :ampm-of-day                  cljc.java-time.temporal.chrono-field/ampm-of-day
+   :clock-hour-of-ampm           cljc.java-time.temporal.chrono-field/clock-hour-of-ampm
+   :clock-hour-of-day            cljc.java-time.temporal.chrono-field/clock-hour-of-day
+   :day-of-month                 cljc.java-time.temporal.chrono-field/day-of-month
+   :day-of-week                  cljc.java-time.temporal.chrono-field/day-of-week
+   :day-of-year                  cljc.java-time.temporal.chrono-field/day-of-year
+   :epoch-day                    cljc.java-time.temporal.chrono-field/epoch-day
+   :era                          cljc.java-time.temporal.chrono-field/era
+   :hour-of-ampm                 cljc.java-time.temporal.chrono-field/hour-of-ampm
+   :hour-of-day                  cljc.java-time.temporal.chrono-field/hour-of-day
+   :instant-seconds              cljc.java-time.temporal.chrono-field/instant-seconds
+   :micro-of-day                 cljc.java-time.temporal.chrono-field/micro-of-day
+   :micro-of-second              cljc.java-time.temporal.chrono-field/micro-of-second
+   :milli-of-day                 cljc.java-time.temporal.chrono-field/milli-of-day
+   :milli-of-second              cljc.java-time.temporal.chrono-field/milli-of-second
+   :minute-of-day                cljc.java-time.temporal.chrono-field/minute-of-day
+   :minute-of-hour               cljc.java-time.temporal.chrono-field/minute-of-hour
+   :month-of-year                cljc.java-time.temporal.chrono-field/month-of-year
+   :nano-of-day                  cljc.java-time.temporal.chrono-field/nano-of-day
+   :nano-of-second               cljc.java-time.temporal.chrono-field/nano-of-second
+   :offset-seconds               cljc.java-time.temporal.chrono-field/offset-seconds
+   :proleptic-month              cljc.java-time.temporal.chrono-field/proleptic-month
+   :second-of-day                cljc.java-time.temporal.chrono-field/second-of-day
+   :second-of-minute             cljc.java-time.temporal.chrono-field/second-of-minute
+   :year                         cljc.java-time.temporal.chrono-field/year
    :year-of-era                  cljc.java-time.temporal.chrono-field/year-of-era                 })
 
 (deftype FieldsLookup [t]
@@ -586,21 +587,21 @@
 ;; Units
 
 (def unit-map
-  {:nanos     cljc.java-time.temporal.chrono-unit/nanos    
-   :micros    cljc.java-time.temporal.chrono-unit/micros   
-   :millis    cljc.java-time.temporal.chrono-unit/millis   
-   :seconds   cljc.java-time.temporal.chrono-unit/seconds  
-   :minutes   cljc.java-time.temporal.chrono-unit/minutes  
-   :hours     cljc.java-time.temporal.chrono-unit/hours    
+  {:nanos     cljc.java-time.temporal.chrono-unit/nanos
+   :micros    cljc.java-time.temporal.chrono-unit/micros
+   :millis    cljc.java-time.temporal.chrono-unit/millis
+   :seconds   cljc.java-time.temporal.chrono-unit/seconds
+   :minutes   cljc.java-time.temporal.chrono-unit/minutes
+   :hours     cljc.java-time.temporal.chrono-unit/hours
    :half-days cljc.java-time.temporal.chrono-unit/half-days
-   :days      cljc.java-time.temporal.chrono-unit/days     
-   :weeks     cljc.java-time.temporal.chrono-unit/weeks    
-   :months    cljc.java-time.temporal.chrono-unit/months   
-   :years     cljc.java-time.temporal.chrono-unit/years    
-   :decades   cljc.java-time.temporal.chrono-unit/decades  
+   :days      cljc.java-time.temporal.chrono-unit/days
+   :weeks     cljc.java-time.temporal.chrono-unit/weeks
+   :months    cljc.java-time.temporal.chrono-unit/months
+   :years     cljc.java-time.temporal.chrono-unit/years
+   :decades   cljc.java-time.temporal.chrono-unit/decades
    :centuries cljc.java-time.temporal.chrono-unit/centuries
    :millennia cljc.java-time.temporal.chrono-unit/millennia
-   :eras      cljc.java-time.temporal.chrono-unit/eras     
+   :eras      cljc.java-time.temporal.chrono-unit/eras
    :forever   cljc.java-time.temporal.chrono-unit/forever  })
 
 (def reverse-unit-map (into {} (map vec (map reverse unit-map))))
@@ -1127,3 +1128,21 @@
 
 (defn midnight? [^LocalDateTime t]
   (.isZero (cljc.java-time.duration/between t (beginning (date t)))))
+
+;; Predicates
+(defn clock?            [v] (cljc.java-time.extn.predicates/clock? v))
+(defn day-of-week?      [v] (cljc.java-time.extn.predicates/day-of-week? v))
+(defn duration?         [v] (cljc.java-time.extn.predicates/duration? v))
+(defn instant?          [v] (cljc.java-time.extn.predicates/instant? v))
+(defn date?             [v] (cljc.java-time.extn.predicates/local-date? v))
+(defn date-time?        [v] (cljc.java-time.extn.predicates/local-date-time? v))
+(defn time?             [v] (cljc.java-time.extn.predicates/local-time? v))
+(defn month?            [v] (cljc.java-time.extn.predicates/month? v))
+(defn offset-date-time? [v] (cljc.java-time.extn.predicates/offset-date-time? v))
+(defn period?           [v] (cljc.java-time.extn.predicates/period? v))
+(defn year?             [v] (cljc.java-time.extn.predicates/year? v))
+(defn year-month?       [v] (cljc.java-time.extn.predicates/year-month? v))
+(defn zone?             [v] (cljc.java-time.extn.predicates/zone-id? v))
+(defn zone-offset?      [v] (cljc.java-time.extn.predicates/zone-offset? v))
+(defn zoned-date-time?  [v] (cljc.java-time.extn.predicates/zoned-date-time? v))
+(defn interval?         [v] (satisfies? ITimeSpan v))

@@ -482,7 +482,25 @@
     (is (not (can-disturb? (t/time "22:00"))))
     (is (not (can-disturb? (t/time "00:00"))))))
 
-
+(deftest predicates-test
+  (is (true? (t/clock? (t/clock))))
+  (is (true? (t/day-of-week? t/MONDAY)))
+  (is (true? (t/duration? (t/new-duration 1 :minutes))))
+  (is (true? (t/instant? (t/instant))))
+  (is (true? (t/date? (t/today))))
+  (is (true? (t/date-time? (t/at (t/today) (t/new-time 0 0)))))
+  (is (true? (t/time? (t/new-time 0 0))))
+  (is (true? (t/month? t/MAY)))
+  (is (true? (t/offset-date-time? (t/offset-date-time))))
+  (is (true? (t/period? (t/new-period 1 :weeks))))
+  (is (true? (t/year? (t/year))))
+  (is (true? (t/year-month? (t/year-month))))
+  (is (true? (t/zone? (t/zone))))
+  (is (true? (t/zone-offset? (t/zone-offset (t/zoned-date-time)))))
+  (is (true? (t/zoned-date-time? (t/zoned-date-time))))
+  (is (true? (t/interval? (moment (t/now)))))
+  (is (false? (t/date? 16)))
+  (is (false? (t/month? 16))))
 
 ;; TODO: An 'on' test with an interval
 #_(t/on

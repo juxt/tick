@@ -409,3 +409,52 @@
    (t.f/formatter fmt))
   ([fmt locale]
     (t.f/formatter fmt locale)))
+
+(defn clock?
+  "Return whether the provided value `v` is a clock"
+  [v] (core/clock? v))
+(defn day-of-week?
+  "Return whether the provided value `v` is a day of the week"
+  [v] (core/day-of-week? v))
+(defn duration?
+  "Return whether the provided value `v` is a duration"
+  [v] (core/duration? v))
+(defn instant?
+  "Return whether the provided value `v` is an instant"
+  [v] (core/instant? v))
+(defn date?
+  "Return whether the provided value `v` is a date"
+  [v] (core/date? v))
+(defn date-time?
+  "Return whether the provided value `v` is a date time"
+  [v] (core/date-time? v))
+(defn time?
+  "Return whether the provided value `v` is a time"
+  [v] (core/time? v))
+(defn month?
+  "Return whether the provided value `v` is a month"
+  [v] (core/month? v))
+(defn offset-date-time?
+  "Return whether the provided value `v` is an offset date time"
+  [v] (core/offset-date-time? v))
+(defn period?
+  "Return whether the provided value `v` is a period"
+  [v] (core/period? v))
+(defn year?
+  "Return whether the provided value `v` is a year"
+  [v] (core/year? v))
+(defn year-month?
+  "Return whether the provided value `v` is a year month"
+  [v] (core/year-month? v))
+(defn zone?
+  "Return whether the provided value `v` is a zone time zone"
+  [v] (core/zone? v))
+(defn zone-offset?
+  "Return whether the provided value `v` is a zone offset"
+  [v] (core/zone-offset? v))
+(defn zoned-date-time?
+  "Return whether the provided value `v` is a zoned date time"
+  [v] (core/zoned-date-time? v))
+(defn interval?
+  "Return whether the provided value `v` is an interval"
+  [v] (core/interval? v))
