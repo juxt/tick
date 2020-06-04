@@ -16,6 +16,7 @@
 (comment 
   
   (figwheel-start!)
+  (cljs-repl)
   
   
   )
