@@ -861,6 +861,7 @@ value of before and after.
 
 ====
 `with` - Return a date with an altered field:
+[source.code,clojure]
 ----
 (t/with (t/today) :day-of-month 1)
 ----
