@@ -902,8 +902,12 @@ value of before and after.
 
 ====
 `years` - Give a duration in years.
-====
+[source.code,clojure]
+----
 (t/years (t/new-period 10 :years))
+----
+====
+
 ====
 `yesterday` - Give yesterdays date:
 [source.code,clojure]
