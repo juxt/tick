@@ -759,7 +759,6 @@ value of before and after.
 (def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
 (t/reset-vals! clk clk2)
 ----
-
 ====
 
 ====
@@ -861,6 +860,7 @@ value of before and after.
 
 ====
 `with` - Return a date with an altered field:
+[source.code,clojure]
 ----
 (t/with (t/today) :day-of-month 1)
 ----
@@ -873,8 +873,8 @@ value of before and after.
 (def clk (t/>> (t/clock) (t/new-duration 5 :minutes)))
 (t/with-clock clk (t/time))
 ----
-
 ====
+
 ====
 `year` - Give the year:
 [source.code,clojure]
@@ -901,8 +901,12 @@ value of before and after.
 
 ====
 `years` - Give a duration in years.
-====
+[source.code,clojure]
+----
 (t/years (t/new-period 10 :years))
+----
+====
+
 ====
 `yesterday` - Give yesterdays date:
 [source.code,clojure]
@@ -941,5 +945,4 @@ value of before and after.
 ----
 (t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]")
 ----
-
 ====
