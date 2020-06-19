@@ -726,9 +726,9 @@
   (clock [_] @*clock))
 
 #?(:clj
-   (do
-     (prefer-method print-method clojure.lang.IPersistentMap clojure.lang.IDeref)
-     (prefer-method print-method java.util.Map clojure.lang.IDeref))
+   (defmethod print-method AtomicClock
+     [& args]
+     (apply (get-method print-method clojure.lang.IPersistentMap) args))
    ;todo  - for cljs
    )
 
