@@ -728,7 +728,7 @@
 #?(:clj
    (defmethod print-method AtomicClock
      [& args]
-     (apply (get-method print-method clojure.lang.IPersistentMap) args))
+     (apply (get-method print-method clojure.lang.IRecord) args))
    ;todo  - for cljs
    )
 
