@@ -862,7 +862,7 @@
     ([from] (iterate #(.plusDays % 1) from))
     ([from to] (cond->> (iterate #(.plusDays % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plusDays % step) from)
+    ([from to step] (cond->> (iterate #(.plus % step) from)
                       to (take-while #(< % to))))))
 
 (defn inc [t] (forward-number t 1))
