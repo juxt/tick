@@ -1,6 +1,6 @@
 = tick
 Malcolm Sparks <mal@juxt.pro>; Henry Widd; Johanna Antonelli <joa@juxt.pro>
-0.4.10-alpha, 2019-03-27
+0.4.25-alpha, 2020-10-01
 :toc: left
 :toclevels: 4
 :docinfo: shared
