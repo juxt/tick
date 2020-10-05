@@ -8,13 +8,13 @@ to plugin alternative clocks, perhaps for testing purposes.
 You create a clock that tracks the current time.
 
 ----
-(clock)
+(t/clock)
 ----
 
 With an argument, you can fix a clock to always report a fixed time.
 
 ----
-(clock "1999-12-31T23:59:59")
+(t/clock "1999-12-31T23:59:59")
 ----
 
 == Construction
@@ -22,7 +22,7 @@ With an argument, you can fix a clock to always report a fixed time.
 [%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
-|(clock)|Return a clock that will always return the current time|java.time.Clock
+|(t/clock)|Return a clock that will always return the current time|java.time.Clock
 |===
 
 == Derivation
@@ -58,7 +58,7 @@ In Clojure, an atom is a holder of a value at a particular time. Similarly, a _t
 You create this atom with `(atom)`. Naturally, you can get the instant of the atom's clock by dereferencing, e.g. `@(atom)`
 
 ----
-user> (def clk (atom))
+user> (def clk (t/atom))
 user> (println @clk)
 #object[java.time.Instant 0x2e014670 2018-02-28T07:52:52.302Z]
 (some time later)
@@ -69,13 +69,13 @@ user> (println @clk)
 You can also create an atom with a clock.
 
 ----
-(atom (clock))
+(t/atom (t/clock))
 ----
 
 [%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
-|(atom)|Return a clock that tracks the current time|java.time.Clock
+|(t/atom)|Return a clock that tracks the current time|java.time.Clock
 |===
 
 
@@ -86,7 +86,7 @@ A clock can be used to callibrate tick to a particular time and time-zone, if sy
 As I'm currently writing this in London, on my system I get the following when I use '(zone)'.
 
 ----
-(zone)
+(t/zone)
 
 => #object[java.time.ZoneRegion 0x744a6545 "Europe/London"]
 ----
