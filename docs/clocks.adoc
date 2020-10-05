@@ -34,12 +34,6 @@ backward using the `>>` and `<<` functions respectively.
 (t/<< (t/clock) (t/new-duration 2 :hours))
 ----
 
-You can also create a clock from a base clock which reports time with granualarity given by a duration.
-
-----
-(def minute-clk (tick (clock) (minutes 1)))
-----
-
 [%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
