@@ -5,17 +5,21 @@ time-zone. You should prefer using clocks to making direct calls to
 `(System/currentTimeMillis)`, because this then allows you and others
 to plugin alternative clocks, perhaps for testing purposes.
 
+====
 You create a clock that tracks the current time.
 
+[source.code,clojure]
 ----
 (t/clock)
 ----
 
 With an argument, you can fix a clock to always report a fixed time.
 
+[source.code,clojure]
 ----
 (t/clock "1999-12-31T23:59:59")
 ----
+====
 
 == Construction
 
@@ -30,9 +34,14 @@ With an argument, you can fix a clock to always report a fixed time.
 Just like times and dates, you can time-shift clocks forward and
 backward using the `>>` and `<<` functions respectively.
 
+====
+Shift a clock to run 2 hours slow.
+
+[source.code,clojure]
 ----
 (t/<< (t/clock) (t/new-duration 2 :hours))
 ----
+====
 
 [%header,cols="l,a,l"]
 |===
@@ -60,11 +69,15 @@ user> (println @clk)
 #object[java.time.Instant 0x6e5b1dca 2018-02-28T08:01:50.622Z]
 ----
 
+====
 You can also create an atom with a clock.
 
+[source.code,clojure]
 ----
-(t/atom (t/clock))
+(let [clk (t/atom (t/clock))]
+  @clk)
 ----
+====
 
 [%header,cols="l,a,l"]
 |===
