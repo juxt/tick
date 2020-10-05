@@ -751,9 +751,9 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 `reset!` - Reset an atom clock with one 5 mins slow.
 [source.code,clojure]
 ----
-(def clk (t/atom))
-(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
-(t/reset! clk clk2)
+(let [clk  (t/atom)
+      clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes)))]
+     (t/reset! clk clk2))
 ----
 ====
 
@@ -762,9 +762,9 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 value of before and after.
 [source.code,clojure]
 ----
-(def clk (t/atom))
-(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
-(t/reset-vals! clk clk2)
+(let [clk  (t/atom)
+      clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes)))]
+     (t/reset-vals! clk clk2))
 ----
 ====
 
@@ -879,8 +879,8 @@ value of before and after.
 `with-clock` - Get the time from a clock:
 [source.code,clojure]
 ----
-(def clk (t/>> (t/clock) (t/new-duration 5 :minutes)))
-(t/with-clock clk (t/time))
+(let [clk (t/>> (t/clock) (t/new-duration 5 :minutes))]
+  (t/with-clock clk (t/time)))
 ----
 ====
 
