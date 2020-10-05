@@ -434,19 +434,26 @@ This section gives, in alphabetical order, examples of how to use each function 
 [source.code,clojure]
 ----
 (t/intersection [(t/year)]
-                [(t/date "2017-01-01")
-                 (t/date "2018-01-01")
-                 (t/date "2019-01-01")])
+                [(t/date "2019-01-01")
+                 (t/date "2020-01-01")
+                 (t/date "2021-01-01")])
 ----
 ====
 
 ====
-`intersects?` - Does an interval intersect with another?
+`intersects?` - Does an interval intersect with another? Return `nil` if not, or the intersection if so.
 [source.code,clojure]
 ----
 (t/intersects? [(t/year)]
                (t/inc (t/year)))
 ----
+
+[source.code,clojure]
+----
+(t/intersects? [(t/year)]
+                (t/today))
+----
+
 ====
 
 ====
@@ -744,9 +751,9 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 `reset!` - Reset an atom clock with one 5 mins slow.
 [source.code,clojure]
 ----
-(def clk (t/atom))
-(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
-(t/reset! clk clk2)
+(let [clk  (t/atom)
+      clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes)))]
+     (t/reset! clk clk2))
 ----
 ====
 
@@ -755,9 +762,9 @@ NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 value of before and after.
 [source.code,clojure]
 ----
-(def clk (t/atom))
-(def clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes))))
-(t/reset-vals! clk clk2)
+(let [clk  (t/atom)
+      clk2 (t/atom (t/<< (t/clock) (t/new-duration 5 :minutes)))]
+     (t/reset-vals! clk clk2))
 ----
 ====
 
@@ -859,19 +866,21 @@ value of before and after.
 ====
 
 ====
+
 `with` - Return a date with an altered field:
 [source.code,clojure]
 ----
 (t/with (t/today) :day-of-month 1)
 ----
+
 ====
 
 ====
 `with-clock` - Get the time from a clock:
 [source.code,clojure]
 ----
-(def clk (t/>> (t/clock) (t/new-duration 5 :minutes)))
-(t/with-clock clk (t/time))
+(let [clk (t/>> (t/clock) (t/new-duration 5 :minutes))]
+  (t/with-clock clk (t/time)))
 ----
 ====
 

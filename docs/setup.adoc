@@ -7,9 +7,9 @@ There are some docs/cljs.adoc[extra considerations when using tick from Clojures
 
 Here is a one-liner to drop into a node repl with tick:
 
----
+----
 clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.764" } tick {:mvn/version "0.4.24-alpha"} }}' -m cljs.main  -re node  --repl
----
+----
 
 == Serialization 
 
@@ -26,9 +26,9 @@ which is read as a java.time.Period (or js-joda Period in ClojureScript).
 To avoid tick modifying the printer for java.time objects (if you already employ a custom set of literals for example),
 set the following jvm property
 
-```
- :jvm-opts ["-Dtick.time-literals.printing=false"]
-```
+----
+:jvm-opts ["-Dtick.time-literals.printing=false"]
+----
 
 To read and write edn data containing these literals in Clojure(Script) and for more information generally, see
 the https://github.com/henryw374/time-literals[tagged literals Readme]

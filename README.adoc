@@ -36,10 +36,9 @@ There are some extra considerations when using tick from Clojurescript, see file
 
 Here is a one-liner to drop into a node repl with tick:
 
----
+----
 clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.741" } tick {:mvn/version "0.4.24-alpha"} }}' -m cljs.main  -re node  --repl
-
----
+----
 
 == Development
 
@@ -48,14 +47,14 @@ image:https://circleci.com/gh/juxt/tick/tree/master.svg?style=svg["CircleCI", li
 === Develop The Documentation Site
 
 Build the Cljs
----
+----
 make dev-docs-cljs
----
+----
 
 Build the html
----
+----
 make docs/index.html
----
+----
 
 Serve the docs directory and navigate to it in a browser
 
@@ -71,9 +70,9 @@ connect to the printed port
 
 Once in, start cljs build with:
 
----
+----
 (figwheel-start!)
----
+----
 
 Run tests with:
 

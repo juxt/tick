@@ -13,9 +13,9 @@ and locale projects.
 If you are using npm in your build, first add the transitive npm dependencies to your package.json. Assuming you have 
 tick in your deps.edn, from your project directory, run 
 
-```
+----
 clj -m cljs.main --install-deps
-```
+----
 
 Now your package.json has the required npm libs added. Shadow actually does this for you, if you are using that. 
 
@@ -30,7 +30,7 @@ Note: For tick versions 0.4.23-alpha and earlier, to use tick on shadow follow h
 If you want to work with timezones, something like this, for example:
                      
 ----
- (tick/zone "Europe/London") 
+(tick/zone "Europe/London")
 ----
 
 add the following require:
