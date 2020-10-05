@@ -62,11 +62,11 @@ to an `instant` (or `inst`).
 
 [source.code,clojure]
 ----
-(instant (new-duration 1531467976048 :millis))
+(t/instant (t/new-duration 1531467976048 :millis))
 ----
 
 [source.code,clojure]
 ----
-(inst (new-duration 1531468976 :seconds))
+(t/inst (t/new-duration 1531468976 :seconds))
 ----
 ====
