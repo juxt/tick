@@ -32,7 +32,7 @@
   (first (drop-while #(not= (day-of-week %) day) (t/range ld))))
 
 (defn- last-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (t/range ld nil -1))))
+  (first (drop-while #(not= (day-of-week %) day) (t/range ld nil (t/new-period -1 :days)))))
 
 (defn first-monday-of-month [^YearMonth ym]
   (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
