@@ -31,7 +31,7 @@ Just like times and dates, you can time-shift clocks forward and
 backward using the `>>` and `<<` functions respectively.
 
 ----
-(<< (clock) (hours 2))
+(t/<< (t/clock) (t/new-duration 2 :hours))
 ----
 
 You can also create a clock from a base clock which reports time with granualarity given by a duration.
@@ -43,8 +43,8 @@ You can also create a clock from a base clock which reports time with granualari
 [%header,cols="l,a,l"]
 |===
 |Code|Description|Return type
-|(<< (clock) (minutes 2))|Return a clock running 2 minutes slow|java.time.Clock
-|(>> (clock) (minutes 2))|Return a clock running 2 minutes fast|java.time.Clock
+|(t/<< (t/clock) (t/new-duration 2 :minutes))|Return a clock running 2 minutes slow|java.time.Clock
+|(t/>> (t/clock) (t/new-duration 2 :minutes))|Return a clock running 2 minutes fast|java.time.Clock
 |===
 
 == Comparison
