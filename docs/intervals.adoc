@@ -13,7 +13,7 @@ Obviously, the Clojure's literal syntax for maps can be used to create intervals
 ====
 Here we use a literal map syntax to construct an interval representing the last 5 minutes of 2018 (in UTC).
 
-[source,clojure]
+[source.code,clojure]
 ----
 {:tick/beginning "2018-12-31T23:55:00Z"
  :tick/end "2019-01-01T00:00:00Z"}
@@ -24,7 +24,7 @@ Here we use a literal map syntax to construct an interval representing the last 
 Alternatively, we can use the `t/new-interval` function which takes the two boundaries of the interval as its arguments.
 
 ====
-[source,clojure]
+[source.code,clojure]
 ----
 (t/new-interval
   (t/instant "2018-12-31T23:55:00Z")
