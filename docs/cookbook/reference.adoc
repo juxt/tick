@@ -434,19 +434,26 @@ This section gives, in alphabetical order, examples of how to use each function 
 [source.code,clojure]
 ----
 (t/intersection [(t/year)]
-                [(t/date "2017-01-01")
-                 (t/date "2018-01-01")
-                 (t/date "2019-01-01")])
+                [(t/date "2019-01-01")
+                 (t/date "2020-01-01")
+                 (t/date "2021-01-01")])
 ----
 ====
 
 ====
-`intersects?` - Does an interval intersect with another?
+`intersects?` - Does an interval intersect with another? Return `nil` if not, or the intersection if so.
 [source.code,clojure]
 ----
 (t/intersects? [(t/year)]
                (t/inc (t/year)))
 ----
+
+[source.code,clojure]
+----
+(t/intersects? [(t/year)]
+                (t/today))
+----
+
 ====
 
 ====
@@ -859,11 +866,13 @@ value of before and after.
 ====
 
 ====
+
 `with` - Return a date with an altered field:
 [source.code,clojure]
 ----
 (t/with (t/today) :day-of-month 1)
 ----
+
 ====
 
 ====
