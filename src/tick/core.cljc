@@ -859,10 +859,10 @@
 (extend-type LocalDate
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusDays % 1) from))
-    ([from to] (cond->> (iterate #(.plusDays % 1) from)
+    ([from] (iterate #(cljc.java-time.local-date/plus-days % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.local-date/plus-days % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.local-date/plus % step) from)
                       to (take-while #(< % to))))))
 
 (defn inc [t] (forward-number t 1))
