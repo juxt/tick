@@ -180,13 +180,13 @@
 ;; Arithmetic
 
 (defn +
-  ([] (. Duration -ZERO))
+  ([] cljc.java-time.duration/zero)
   ([arg] arg)
   ([arg & args]
    (reduce #(core/+ %1 %2) arg args)))
 
 (defn -
-  ([] (. Duration -ZERO))
+  ([] cljc.java-time.duration/zero)
   ([arg] (core/negated arg))
   ([arg & args]
    (reduce #(core/- %1 %2) arg args)))

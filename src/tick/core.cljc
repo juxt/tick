@@ -754,22 +754,18 @@
 ;; Arithmetic
 
 (defprotocol ITimeArithmetic
-  (+ [t d] "Add to time")
-  (- [t d] "Subtract from time, or negate"))
-
-(defn minus_
-  ([d] (.negated d))
-  ([t d] (.minus t d)))
+  (+ [t d] "Add durations")
+  (- [t d] "Subtract from duration, or negate"))
 
 (extend-protocol ITimeArithmetic
-  #?(:clj Object :cljs object)
-  (+ [t d] (.plus t d))
-  (- [t d] (.minus t d)))
+  Duration
+  (+ [t d] (cljc.java-time.duration/plus t d))
+  (- [t d] (cljc.java-time.duration/minus t d)))
 
 (defn negated
   "Return the duration as a negative duration"
   [d]
-  (.negated d))
+  (cljc.java-time.duration/negated d))
 
 (defprotocol ITimeShift
   (forward-number [_ n] "Increment time")

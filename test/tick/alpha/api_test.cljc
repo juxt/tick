@@ -121,8 +121,8 @@
     (=
       (let [now (t/now)]
         (t/between
-          (t/- now (t/new-duration 10 :seconds))
-          (t/+ now (t/new-duration 10 :seconds))))
+          (t/<< now (t/new-duration 10 :seconds))
+          (t/>> now (t/new-duration 10 :seconds))))
       (t/new-duration 20 :seconds)))
   (is
     (= (t/new-duration 48 :hours)
@@ -164,21 +164,21 @@
   (is
     (t/<
       (t/now)
-      (t/+ (t/now) (t/new-duration 10 :seconds))
-      (t/+ (t/now) (t/new-duration 20 :seconds))))
+      (t/>> (t/now) (t/new-duration 10 :seconds))
+      (t/>> (t/now) (t/new-duration 20 :seconds))))
   (is
     (t/>
-      (t/+ (t/now) (t/new-duration 20 :seconds))
-      (t/+ (t/now) (t/new-duration 10 :seconds))
+      (t/>> (t/now) (t/new-duration 20 :seconds))
+      (t/>> (t/now) (t/new-duration 10 :seconds))
       (t/now)))
   (is (not
         (t/<
           (t/now)
-          (t/+ (t/now) (t/new-duration 20 :seconds))
-          (t/+ (t/now) (t/new-duration 10 :seconds)))))
+          (t/>> (t/now) (t/new-duration 20 :seconds))
+          (t/<< (t/now) (t/new-duration 10 :seconds)))))
   (let [at (t/now)]
-    (is (t/<= at at (t/+ at (t/new-duration 1 :seconds))))
-    (is (t/>= at at (t/- at (t/new-duration 10 :seconds)))))
+    (is (t/<= at at (t/>> at (t/new-duration 1 :seconds))))
+    (is (t/>= at at (t/<< at (t/new-duration 10 :seconds)))))
 
   (testing "durations"
     (is (t/> (t/new-duration 20 :seconds) (t/new-duration 10 :seconds)))
@@ -463,7 +463,7 @@
 (defn moment [t]
   (t/new-interval
     t
-    (t/+ t (t/new-duration 3 :seconds))))
+    (t/>> t (t/new-duration 3 :seconds))))
 
 ;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
 
