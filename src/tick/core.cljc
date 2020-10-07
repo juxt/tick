@@ -841,28 +841,28 @@
 (extend-type Instant
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusSeconds % 1) from))
-    ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
+    ([from] (iterate #(cljc.java-time.instant/plus-seconds % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.instant/plus-seconds % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.instant/plus % step) from)
                       to (take-while #(< % to))))))
 
 (extend-type ZonedDateTime
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusSeconds % 1) from))
-    ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
+    ([from] (iterate #(cljc.java-time.zoned-date-time/plus-seconds % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.zoned-date-time/plus-seconds % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.zoned-date-time/plus % step) from)
                       to (take-while #(< % to))))))
 
 (extend-type LocalDate
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusDays % 1) from))
-    ([from to] (cond->> (iterate #(.plusDays % 1) from)
+    ([from] (iterate #(cljc.java-time.local-date/plus-days % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.local-date/plus-days % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.local-date/plus % step) from)
                       to (take-while #(< % to))))))
 
 (defn inc [t] (forward-number t 1))
@@ -877,28 +877,28 @@
 (extend-type LocalDateTime
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusSeconds % 1) from))
-    ([from to] (cond->> (iterate #(.plusSeconds % 1) from)
+    ([from] (iterate #(cljc.java-time.local-date-time/plus-seconds % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.local-date-time/plus-seconds % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.local-date-time/plus % step) from)
                       to (take-while #(< % to))))))
 
 (extend-type YearMonth
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusMonths % 1) from))
-    ([from to] (cond->> (iterate #(.plusMonths % 1) from)
+    ([from] (iterate #(cljc.java-time.year-month/plus-months % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.year-month/plus-months % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.year-month/plus % step) from)
                       to (take-while #(< % to))))))
 
 (extend-type Year
   ITimeRangeable
   (range
-    ([from] (iterate #(.plusYears % 1) from))
-    ([from to] (cond->> (iterate #(.plusYears % 1) from)
+    ([from] (iterate #(cljc.java-time.year/plus-years % 1) from))
+    ([from to] (cond->> (iterate #(cljc.java-time.year/plus-years % 1) from)
                  to (take-while #(< % to))))
-    ([from to step] (cond->> (iterate #(.plus % step) from)
+    ([from to step] (cond->> (iterate #(cljc.java-time.year/plus % step) from)
                       to (take-while #(< % to))))))
 
 (defprotocol IDivisible
