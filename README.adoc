@@ -80,6 +80,18 @@ Run tests with:
 make test
 ----
 
+=== npm dependencies
+
+For running the ClojureScript tests you will need the following npm dependencies installed:
+
+----
+sudo npm install karma-cli -g
+npm install karma --save-dev
+npm install karma-chrome-launcher
+npm install karma-cljs-test
+----
+
+
 == Documentation
 
 - https://juxt.github.io/tick[Generated API docs]
