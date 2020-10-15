@@ -75,6 +75,10 @@
       (is (instance? instance-type (t/offset-date-time (t/date-time))))
       (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
 
+(deftest zoned-date-time-test
+  (is (instance? java.time.ZonedDateTime (t/parse "2020-12-15T12:00:10Z[Europe/London]")))
+  (is (instance? java.time.ZonedDateTime (t/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
+
 (deftest fields-test
   (let [xs [(t/now)
             (t/zoned-date-time)
