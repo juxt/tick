@@ -42,6 +42,7 @@
 
 (def new-time core/new-time)
 (def new-date core/new-date)
+(def new-year-month core/new-year-month)
 
 ;; Surfacing some useful constants
 

@@ -185,6 +185,12 @@
   ([epoch-day]
    (cljc.java-time.local-date/of-epoch-day epoch-day)))
 
+
+(defn new-year-month
+  ([] (cljc.java-time.year-month/now))
+  ([year month]
+   (cljc.java-time.year-month/of year month)))
+
 (defn current-zone
   "Return the current zone, which can be overridden by the *clock* dynamic var"
   []
@@ -1146,3 +1152,4 @@
 (defn zone-offset?      [v] (cljc.java-time.extn.predicates/zone-offset? v))
 (defn zoned-date-time?  [v] (cljc.java-time.extn.predicates/zoned-date-time? v))
 (defn interval?         [v] (satisfies? ITimeSpan v))
+
