@@ -33,12 +33,14 @@
   (is (= Month (type (t/month 12))))
   (is (= t/DECEMBER (t/month 12)))
   (is (= (t/new-date 3030 3 3)
-        (t/date "3030-03-03")))
+         (t/date "3030-03-03")))
   (is (-> (t/new-duration 1000 :millis)
           (t/inst)
           (t/instant)
           (cljc.java-time.instant/to-epoch-milli)
-          (= 1000))))
+          (= 1000)))
+  (is (= (t/new-year-month 2020 7)
+         (t/year-month  "2020-07"))))
 
 (deftest extraction-test
   (is (= 2 (t/int t/FEBRUARY)))
