@@ -97,8 +97,8 @@ This section gives, in alphabetical order, examples of how to use each function 
 `atom` - Create an holder for the current time:
 [source.code,clojure]
 ----
-(def clk (t/atom))
-(t/time @clk)
+(let [clk (t/atom)]
+  (t/time @clk))
 ----
 ====
 

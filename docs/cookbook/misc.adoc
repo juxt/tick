@@ -21,10 +21,11 @@ For instance, to get a sequence of the first day of each month in a given year:
 
 [source.code,clojure]
 ----
-(def intvl (t/bounds (t/year)))
-(t/range (t/beginning intvl)
-	 (t/end intvl)
-	 (t/new-period 1 :months))
+(let [intvl (t/bounds (t/year))]
+  (t/range
+    (t/beginning intvl)
+    (t/end intvl)
+    (t/new-period 1 :months)))
 ----
 ====
 
