@@ -271,6 +271,16 @@ JUXT was incorporated on March 22nd, 2013. We can create this date with `new-dat
 ----
 ====
 
+Likewise, year-months are constsructed from the year and the month:
+
+.Creating a year-month value
+====
+[source.code,clojure]
+----
+(t/new-year-month 2013 3)
+----
+====
+
 == Reification
 
 While `t/time` and `t/new-time` return a time, you may want to provide a date for that time later on. We can reify with `t/on` and `t/at`.
