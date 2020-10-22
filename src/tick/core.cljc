@@ -48,17 +48,13 @@
 
 (modify-printing-of-time-literals-if-enabled!)
 
-(def ^{:dynamic true} *clock* nil)
+(def ^{:dynamic true} *clock* (cljc.java-time.clock/system-default-zone))
 
 (defn now []
-  (if *clock*
-    (cljc.java-time.instant/now *clock*)
-    (cljc.java-time.instant/now)))
+  (cljc.java-time.instant/now *clock*))
 
 (defn today []
-  (if *clock*
-    (cljc.java-time.local-date/now *clock*)
-    (cljc.java-time.local-date/now)))
+  (cljc.java-time.local-date/now *clock*))
 
 (defn epoch []
   cljc.java-time.instant/epoch)
@@ -679,9 +675,7 @@
 ;; Clocks
 
 (defn current-clock []
-  (or
-    *clock*
-    (cljc.java-time.clock/system-default-zone)))
+  *clock*)
 
 (defprotocol IClock
   (clock [_] "Make a clock"))
