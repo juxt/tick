@@ -749,13 +749,20 @@
   (apply clojure.core/swap-vals! (:*clock at) f args))
 
 (defn compare-and-set! [at oldval newval]
-  (apply clojure.core/compare-and-set! (:*clock at) oldval newval))
+  (clojure.core/compare-and-set!
+   (:*clock at)
+   oldval
+   newval))
 
 (defn reset! [at newval]
-  (apply clojure.core/reset! (:*clock at) newval))
+  (clojure.core/reset!
+   (:*clock at)
+   newval))
 
 (defn reset-vals! [at newval]
-  (apply clojure.core/reset-vals! (:*clock at) newval))
+  (clojure.core/reset-vals!
+   (:*clock at)
+   newval))
 
 ;; Arithmetic
 
@@ -1152,4 +1159,3 @@
 (defn zone-offset?      [v] (cljc.java-time.extn.predicates/zone-offset? v))
 (defn zoned-date-time?  [v] (cljc.java-time.extn.predicates/zoned-date-time? v))
 (defn interval?         [v] (satisfies? ITimeSpan v))
-
