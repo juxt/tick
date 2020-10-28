@@ -617,7 +617,7 @@
 
 (defn truncate [x u]
   (when-let [u (get unit-map u)]
-    (.truncatedTo x u)))
+    (.truncatedTo ^Instant x u)))
 
 ;; Durations & Periods
 
