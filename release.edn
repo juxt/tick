@@ -1,0 +1,3 @@
+{:group-id "tick"
+ :artifact-id "tick"
+ :scm-url "https://github.com/juxt/tick"}

@@ -31,10 +31,10 @@ test:
 dev-docs-cljs:
 			clojure -Adocs-index
 
-pom:
-			rm pom.xml; clojure -Spom; echo "Now use git diff to add back in the non-generated bits of pom"
+install:
+			clj -Arelease install
 deploy:			
-			mvn deploy
+			clj -A:release
 nrepl:
 			clj -Adev:dev-nrepl -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --port 5610
 

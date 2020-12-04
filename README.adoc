@@ -91,6 +91,18 @@ npm install karma-chrome-launcher
 npm install karma-cljs-test
 ----
 
+=== Release 
+
+create a git tag
+
+`make install` (this installs in ~/.m2 - check that things look ok)
+
+`make release`  - you need to have set up clojars creds as per https://github.com/applied-science/deps-library
+
+`git push origin new-tag-name`
+
+
+
 
 == Documentation
 

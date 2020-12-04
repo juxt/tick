@@ -6,54 +6,57 @@
   time-literals/time-literals   {:mvn/version "0.1.3" :exclusions [cljs.java-time/cljs.java-time]}}
 
  :aliases
- {:dev
-  {:extra-deps
-   {com.bhauman/figwheel-main          {:mvn/version "0.1.9"}
-    com.bhauman/cljs-test-display      {:mvn/version "0.1.1"}
-    org.clojure/clojurescript          {:mvn/version "1.10.764"}
-    org.clojure/data.xml               {:mvn/version "0.2.0-alpha5"}
-    org.clojure/tools.namespace        {:mvn/version "0.2.11"}
-    org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
-    io.aviso/pretty                    {:mvn/version "0.1.34"}
-    spyscope/spyscope                  {:mvn/version "0.1.6"}
-    fipp/fipp                          {:mvn/version "0.6.12"}}
+        {:release
+                      {:extra-deps {applied-science/deps-library {:mvn/version "RELEASE"}}
+                       :main-opts  ["-m" "applied-science.deps-library"]}
+         :dev
+                      {:extra-deps
+                                    {com.bhauman/figwheel-main          {:mvn/version "0.1.9"}
+                                     com.bhauman/cljs-test-display      {:mvn/version "0.1.1"}
+                                     org.clojure/clojurescript          {:mvn/version "1.10.764"}
+                                     org.clojure/data.xml               {:mvn/version "0.2.0-alpha5"}
+                                     org.clojure/tools.namespace        {:mvn/version "0.2.11"}
+                                     org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
+                                     io.aviso/pretty                    {:mvn/version "0.1.34"}
+                                     spyscope/spyscope                  {:mvn/version "0.1.6"}
+                                     fipp/fipp                          {:mvn/version "0.6.12"}}
 
-   :extra-paths ["dev/src" "test"]
-   :jvm-opts    ["-Dclojure.spec.compile-asserts=true"]}
-  :test-chrome {:extra-paths ["test" "cljs-test-runner-out/gen"]
-                :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
-                              org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
-                                        ; this is node using foreign-libs.
-                                        ; although not recommended, whilst tick depends on cljsjs, this should 'just work'
-  :test-node   {:extra-paths ["test" "cljs-test-runner-out/gen"]
-                :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
-                              org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                :main-opts   ["-m" "cljs-test-runner.main" "-x node"]}
-  :docs-index  {:jvm-opts    ["-Xmx500M"]
-                :extra-paths ["docs/src"]
-                :extra-deps  {reagent/reagent           {:mvn/version "0.8.1"}
-                              com.bhauman/figwheel-main {:mvn/version "0.2.6"}
-                              org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                :main-opts   ["-m" "figwheel.main" "--build" "docs"]
-                }
-  :test        {:extra-paths ["test"]
-                :extra-deps  {
-                              com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                                                         :sha     "028a6d41ac9ac5d5c405dfc38e4da6b4cc1255d5"}}
-                :main-opts   ["-m" "cognitect.test-runner"]}
-  :dev-nrepl   {:extra-deps {nrepl/nrepl      {:mvn/version "0.6.0"}
-                             cider/piggieback {:mvn/version "0.4.0"}}}
-  :emacs-nrepl {:jvm-opts    ["-Dnrepl.load=true"]
-                :extra-paths ["aliases/nrepl"]
-                :extra-deps
-                {cider/cider-nrepl       {:mvn/version "0.17.0"}
-                 ;;refactor-nrepl {:mvn/version "2.3.1"}
-                 com.cemerick/piggieback {:mvn/version "0.2.2"}
-                 org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
+                       :extra-paths ["dev/src" "test"]
+                       :jvm-opts    ["-Dclojure.spec.compile-asserts=true"]}
+         :test-chrome {:extra-paths ["test" "cljs-test-runner-out/gen"]
+                       :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
+                                     org.clojure/clojurescript {:mvn/version "1.10.764"}}
+                       :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
+         ; this is node using foreign-libs.
+         ; although not recommended, whilst tick depends on cljsjs, this should 'just work'
+         :test-node   {:extra-paths ["test" "cljs-test-runner-out/gen"]
+                       :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
+                                     org.clojure/clojurescript {:mvn/version "1.10.764"}}
+                       :main-opts   ["-m" "cljs-test-runner.main" "-x node"]}
+         :docs-index  {:jvm-opts    ["-Xmx500M"]
+                       :extra-paths ["docs/src"]
+                       :extra-deps  {reagent/reagent           {:mvn/version "0.8.1"}
+                                     com.bhauman/figwheel-main {:mvn/version "0.2.6"}
+                                     org.clojure/clojurescript {:mvn/version "1.10.764"}}
+                       :main-opts   ["-m" "figwheel.main" "--build" "docs"]
+                       }
+         :test        {:extra-paths ["test"]
+                       :extra-deps  {
+                                     com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                                                :sha     "028a6d41ac9ac5d5c405dfc38e4da6b4cc1255d5"}}
+                       :main-opts   ["-m" "cognitect.test-runner"]}
+         :dev-nrepl   {:extra-deps {nrepl/nrepl      {:mvn/version "0.6.0"}
+                                    cider/piggieback {:mvn/version "0.4.0"}}}
+         :emacs-nrepl {:jvm-opts    ["-Dnrepl.load=true"]
+                       :extra-paths ["aliases/nrepl"]
+                       :extra-deps
+                                    {cider/cider-nrepl       {:mvn/version "0.17.0"}
+                                     ;;refactor-nrepl {:mvn/version "2.3.1"}
+                                     com.cemerick/piggieback {:mvn/version "0.2.2"}
+                                     org.clojure/tools.nrepl {:mvn/version "0.2.12"}}}
 
-  :dev-rebel {:extra-paths ["aliases/rebel"]
-              :extra-deps  {com.bhauman/rebel-readline      {:mvn/version "0.1.1"}
-                            com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-                            io.aviso/pretty                 {:mvn/version "0.1.34"}}
-              :main-opts   ["-m" "tick.rebel.main"]}}}
+         :dev-rebel   {:extra-paths ["aliases/rebel"]
+                       :extra-deps  {com.bhauman/rebel-readline      {:mvn/version "0.1.1"}
+                                     com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
+                                     io.aviso/pretty                 {:mvn/version "0.1.34"}}
+                       :main-opts   ["-m" "tick.rebel.main"]}}}
