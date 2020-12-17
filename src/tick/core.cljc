@@ -836,13 +836,21 @@
 (defn greater [x y]
   (if (neg? (compare x y)) y x))
 
-(defn max [arg & args]
+(defn max
+  "Find the latest of the given arguments. Callers should ensure that no
+  argument is nil."
+  [arg & args]
+  (assert (every? some? (cons arg args)))
   (reduce #(greater %1 %2) arg args))
 
 (defn lesser [x y]
   (if (neg? (compare x y)) x y))
 
-(defn min [arg & args]
+(defn min
+  "Find the earliest of the given arguments. Callers should ensure that no
+  argument is nil."
+  [arg & args]
+  (assert (every? some? (cons arg args)))
   (reduce #(lesser %1 %2) arg args))
 
 (extend-type Instant
