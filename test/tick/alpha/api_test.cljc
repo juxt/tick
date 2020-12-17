@@ -573,3 +573,5 @@
 ;; TODO: +/- should NOT work for intervals, because +/- mean to 'add' an interval to another to make an interval set/seq.
 
 ;; (t/>> (tick.interval/as-interval (t/today)) (t/minutes 4))
+
+;; TODO: Add 'between' tests

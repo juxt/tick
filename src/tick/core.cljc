@@ -982,15 +982,16 @@
   (between [v1 v2] "Return the duration (or period) between two times"))
 
 (extend-protocol IBetween
-  #?@(:cljs
-      [LocalDate
-       (between [v1 v2] (cljc.java-time.period/between v1 (date v2)))
-       LocalDateTime
-       (between [v1 v2] (cljc.java-time.duration/between v1 (date-time v2)))
-       Instant
-       (between [v1 v2] (cljc.java-time.duration/between v1 (instant v2)))])
-  #?@(:clj [LocalDate
-            (between [v1 v2] (Period/between v1 (date v2)))
+  LocalDate
+  (between [v1 v2] (cljc.java-time.period/between v1 (date v2)))
+  ZonedDateTime
+  (between [v1 v2] (cljc.java-time.duration/between v1 (zoned-date-time v2)))
+  LocalDateTime
+  (between [v1 v2] (cljc.java-time.duration/between v1 (date-time v2)))
+  Instant
+  (between [v1 v2] (cljc.java-time.duration/between v1 (instant v2)))
+  #?@(:clj [OffsetDateTime
+            (between [v1 v2] (Duration/between v1 (offset-date-time v2)))
             Temporal
             (between [v1 v2] (Duration/between v1 v2))])
   #?(:clj String :cljs string)
