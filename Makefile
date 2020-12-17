@@ -19,24 +19,24 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 			docs/index.adoc
 
 test-clj:
-			clojure -Atest -e deprecated
+			./bin/kaocha :clj
 test-chrome:
-			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-chrome
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -M:test-chrome
+
 test-node:
-			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -Atest-node
-test:
+			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -M:test-node
+
+test-all:
 			make test-clj && make test-chrome && make test-node
 
 # For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
-			clojure -Adocs-index
+			clojure -A:docs-index
 
 install:
-			clj -Arelease install
-deploy:			
-			clj -A:release
-nrepl:
-			clj -Adev:dev-nrepl -m nrepl.cmdline --middleware "[cider.piggieback/wrap-cljs-repl]" --port 5610
+			clojure -A:release install
+deploy:
+			clojure -A:release
 
 # hooray for stackoverflow
 .PHONY: list

@@ -12,7 +12,6 @@ gh-pages
 /doc/index.html
 .cpcache/
 /DELETE_ME
-/.dir-locals.el
 /.shadow-cljs/
 /doc/js/
 /todo.org
@@ -22,3 +21,5 @@ node_modules/
 /docs/index.html
 /docs/js
 /cljs-test-runner-out
+/.cljs_node_repl/
+/out/

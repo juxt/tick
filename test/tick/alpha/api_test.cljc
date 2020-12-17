@@ -7,6 +7,7 @@
        :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
     [tick.format :as t.f]
+    [tick.locale-en-us]
     [cljc.java-time.clock]
     [cljc.java-time.instant]
     [cljc.java-time.day-of-week]

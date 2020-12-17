@@ -1,0 +1,10 @@
+#kaocha/v1
+{:plugins [:kaocha.plugin.alpha/info
+           ;; :kaocha.plugin.alpha/spec-test-check
+           ;; :kaocha.plugin/orchestra
+           ]
+
+ :tests [{:id         :clj
+          :test-paths ["test"]}]
+
+ :reporter kaocha.report/documentation}

@@ -244,17 +244,16 @@
         [(ti/new-interval (t/date "2017-06-15") (t/date "2017-06-25"))
          (ti/new-interval (t/date "2017-06-26") (t/date "2017-06-28"))
          (ti/new-interval (t/date "2017-06-30") (t/date "2017-07-04"))]]
-    (=
-      [{:tick/intervals
-        [{:tick/beginning (t/date-time "2017-06-15T00:00")
-          :tick/end (t/date-time "2017-06-26T00:00")}
-         {:tick/beginning (t/date-time "2017-06-26T00:00")
-          :tick/end (t/date-time "2017-06-29T00:00")}]}
-       {:tick/intervals
-        [{:tick/beginning (t/date-time "2017-06-30T00:00")
-          :tick/end (t/date-time "2017-07-05T00:00")}]}]
+    (is (= [{:tick/intervals
+             [{:tick/beginning (t/date-time "2017-06-15T00:00")
+               :tick/end (t/date-time "2017-06-26T00:00")}
+              {:tick/beginning (t/date-time "2017-06-26T00:00")
+               :tick/end (t/date-time "2017-06-29T00:00")}]}
+            {:tick/intervals
+             [{:tick/beginning (t/date-time "2017-06-30T00:00")
+               :tick/end (t/date-time "2017-07-05T00:00")}]}]
 
-      (ti/normalize intervals))))
+           (ti/normalize intervals)))))
 
 (deftest union-test
   (testing "counts"
