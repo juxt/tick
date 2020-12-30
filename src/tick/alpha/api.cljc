@@ -11,20 +11,16 @@
              second
              group-by divide format] )
   (:require
-    [clojure.spec.alpha :as s]
     [tick.core :as core]
     [tick.format :as t.f]
     #?(:clj tick.file) ; To ensure protocol extension
-    #?(:clj [net.cgrand.macrovich :as macros])
     [tick.interval :as interval]
-    [clojure.set :as set]
     #?@(:cljs
        [
         [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]
         [java.time.format :refer [DateTimeFormatter]]]))
   #?(:cljs
      (:require-macros
-       [net.cgrand.macrovich :as macros]
        [tick.alpha.api :refer [with-clock]]))
   #?(:clj
      (:import
