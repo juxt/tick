@@ -27,12 +27,12 @@ minor changes.
 
 == Install
 
-Get the latest from https://clojars.org/tick[Clojars] and 
-add to your `project.clj`, `build.boot` or `deps.edn`. 
+Get the latest from https://clojars.org/tick[Clojars] and
+add to your `project.clj`, `build.boot` or `deps.edn`.
 
 Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
 
-There are some extra considerations when using tick from Clojurescript, see file `docs/cljs.adoc` in this repo. 
+There are some extra considerations when using tick from Clojurescript, see file `docs/cljs.adoc` in this repo.
 
 Here is a one-liner to drop into a node repl with tick:
 
@@ -74,10 +74,10 @@ Once in, start cljs build with:
 (figwheel-start!)
 ----
 
-Run tests with:
+Run all tests with:
 
 ----
-make test
+make test-all
 ----
 
 === npm dependencies
@@ -91,7 +91,7 @@ npm install karma-chrome-launcher
 npm install karma-cljs-test
 ----
 
-=== Release 
+=== Release
 
 create a git tag
 
@@ -100,9 +100,6 @@ create a git tag
 `make release`  - you need to have set up clojars creds as per https://github.com/applied-science/deps-library
 
 `git push origin new-tag-name`
-
-
-
 
 == Documentation
 

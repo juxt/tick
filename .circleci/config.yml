@@ -3,43 +3,79 @@
 # Check https://circleci.com/docs/2.0/language-clojure/ for more details
 #
 version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/clojure:tools-deps-1.9.0.394-node-browsers
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
+references:
+  base_docker: &base_docker
     working_directory: ~/repo
+    docker:
+      - image: circleci/clojure:openjdk-11-tools-deps-node-browsers
 
     environment:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
 
+jobs:
+  test_clj:
+    <<: *base_docker
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "deps.edn" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      # need a few bits for cljs test - there must be a better way of including?
-      - run: sudo npm install karma-cli -g
-      - run: npm install karma --save-dev 
-      - run: npm install karma-chrome-launcher  
-      - run: npm install karma-cljs-test
-          
-      - run: sudo apt-get install -y make        
-      - run: make test
+          key: v1-dependencies-{{ checksum "deps.edn" }}
 
       - save_cache:
           paths:
             - ~/.m2
+
           key: v1-dependencies-{{ checksum "deps.edn" }}
+
+      - run: ./bin/kaocha :clj --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
+
+      - store_test_results:
+          path: test-results
+
+  test_cljs_node:
+    <<: *base_docker
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-dependencies-{{ checksum "deps.edn" }}
+
+      - run: sudo npm install karma-cli -g
+      - run: npm install karma --save-dev
+      - run: npm install karma-chrome-launcher
+      - run: npm install karma-cljs-test
+
+      - run: sudo apt-get install -y make
+      - run: make test-node
+
+      - store_test_results:
+          path: test-results
+
+  test_cljs_browser:
+    <<: *base_docker
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "deps.edn" }}
+
+      - run: sudo npm install karma-cli -g
+      - run: npm install karma --save-dev
+      - run: npm install karma-chrome-launcher
+      - run: npm install karma-cljs-test
+
+      - run: sudo apt-get install -y make
+      - run: make test-chrome
+
+      - store_test_results:
+          path: test-results
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test_clj
+      - test_cljs_node
+      - test_cljs_browser
