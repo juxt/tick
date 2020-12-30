@@ -31,12 +31,13 @@
 
     #?@(:clj
         [
-    [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
+         [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
         :cljs
         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
          [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
-         [cljs.java-time.extend-eq-and-compare]]))
+         [cljs.java-time.extend-eq-and-compare]])
+    [cljs.java-time.interop :as jti])
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
      :clj
@@ -126,8 +127,7 @@
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
       :>> (fn [s] (cljc.java-time.instant/parse s))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}"
-      :>> (fn [s] #?(:clj (cljc.java-time.offset-date-time/parse s)
-                     :cljs (cljc.java-time.zoned-date-time/parse s)))
+      :>> (fn [s] (cljc.java-time.offset-date-time/parse s))
       #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:[+-]\d{2}:\d{2}|Z)\[\w+/\w+\]"
       :>> (fn [s] (cljc.java-time.zoned-date-time/parse s))
       #"\d{4}-\d{2}-\d{2}T\S*"
@@ -204,15 +204,13 @@
   Instant
   (inst [i] #?(:clj (Date/from i) :cljs (js/Date. (cljc.java-time.instant/to-epoch-milli i))))
   (instant [i] i)
-  (offset-date-time [i] #?(:clj (cljc.java-time.offset-date-time/of-instant i (current-zone))
-                           :cljs (zoned-date-time i)))
+  (offset-date-time [i] (cljc.java-time.offset-date-time/of-instant i (current-zone)))
   (zoned-date-time [i] (cljc.java-time.zoned-date-time/of-instant i (current-zone)))
 
   #?(:clj String :cljs string)
   (inst [s] (inst (instant s)))
   (instant [s] (instant (parse s)))
-  (offset-date-time [s] #?(:clj (cljc.java-time.offset-date-time/parse s)
-                           :cljs (zoned-date-time s)))
+  (offset-date-time [s] (cljc.java-time.offset-date-time/parse s))
   (zoned-date-time [s] (cljc.java-time.zoned-date-time/parse s))
 
   #?(:clj Number :cljs number)
@@ -221,12 +219,12 @@
   LocalDateTime
   (inst [ldt] (inst (zoned-date-time ldt)))
   (instant [ldt] (instant (zoned-date-time ldt)))
-  (offset-date-time [ldt] #?(:clj (cljc.java-time.local-date-time/at-offset
-                                    ldt
-                                    (-> (current-zone)
-                                        (cljc.java-time.zone-id/get-rules)
-                                        (.getOffset ldt)))
-                             :cljs (zoned-date-time ldt)))
+  (offset-date-time [ldt] (cljc.java-time.local-date-time/at-offset
+                            ldt
+                            (jti/getter offset
+                              (-> (current-zone)
+                                  (cljc.java-time.zone-id/get-rules))
+                              ldt)))
   (zoned-date-time [ldt] (cljc.java-time.local-date-time/at-zone ldt (current-zone)))
 
   #?(:clj Date :cljs js/Date)
@@ -244,8 +242,7 @@
   ZonedDateTime
   (inst [zdt] (inst (instant zdt)))
   (instant [zdt] (.toInstant zdt))
-  (offset-date-time [zdt] #?(:clj (cljc.java-time.zoned-date-time/to-offset-date-time zdt)
-                             :cljs zdt))
+  (offset-date-time [zdt] (cljc.java-time.zoned-date-time/to-offset-date-time zdt))
   (zoned-date-time [zdt] zdt))
 
 (extend-protocol IExtraction
@@ -990,10 +987,10 @@
   (between [v1 v2] (cljc.java-time.duration/between v1 (date-time v2)))
   Instant
   (between [v1 v2] (cljc.java-time.duration/between v1 (instant v2)))
-  #?@(:clj [OffsetDateTime
-            (between [v1 v2] (Duration/between v1 (offset-date-time v2)))
-            Temporal
-            (between [v1 v2] (Duration/between v1 v2))])
+  OffsetDateTime
+  (between [v1 v2] (cljc.java-time.duration/between v1 (offset-date-time v2)))
+  #?@(:clj [Temporal
+            (between [v1 v2] (cljc.java-time.duration/between v1 v2))])
   #?(:clj String :cljs string)
   (between [v1 v2] (between (parse v1) (parse v2)))
   #?(:clj Date :cljs js/Date)
@@ -1071,11 +1068,8 @@
   (offset-by [ldt offset] #?(:clj (.atOffset ldt (zone-offset offset))
                              :cljs (.atZone ldt (zone-offset offset))))
   Instant
-  ; todo - should use Instant/atZone - await js-joda release with https://github.com/js-joda/js-joda/pull/263
-  (in [t z] (cljc.java-time.zoned-date-time/of-instant t z))
-  (offset-by [t offset] #?(:clj (.atOffset t (zone-offset offset))
-                           ; todo - no OffsetDateTime in js-joda yet
-                           :cljs (cljc.java-time.zoned-date-time/of-instant t (zone-offset offset))))
+  (in [t z] (cljc.java-time.instant/at-zone t z))
+  (offset-by [t offset] (cljc.java-time.instant/at-offset t (zone-offset offset)))
   ZonedDateTime
   (in [t z] (.withZoneSameInstant t (zone z)))
   #?(:clj Date :cljs js/Date)

@@ -68,9 +68,8 @@
 
 (deftest offset-date-time-test
   (let [t "2018-09-24T18:57:08.996+01:00"
-        instance-type #?(:clj OffsetDateTime
-                         :cljs ZonedDateTime)]
-    (testing "is zdt in cljs, odt in clj - because odt doesnt yet exist in js-joda"
+        instance-type OffsetDateTime]
+    (testing "offset date time basics"
       (is (instance? instance-type (t/parse t)))
       (is (instance? instance-type (t/offset-date-time (t/now))))
       (is (instance? instance-type (t/offset-date-time t)))

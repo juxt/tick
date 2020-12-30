@@ -67,11 +67,3 @@ Locale data is needed for custom date formatters which need particular symbols, 
 Due to the size and complexity of using the js-joda-locale, the authors of js-joda-locale have created
 https://github.com/js-joda/js-joda-locale#use-prebuilt-locale-packages[prebuilt locale packages], for specific 
 locales. en-US is one which is currently packaged for cljs and can be used as suggested above.
- 
-=== OffsetTime and OffsetDateTime
-
-OffsetTime is currently missing from JS-Joda (see 
-https://github.com/js-joda/js-joda/issues/240[JS-Joda issue 240]). For now, tick uses LocalTime
-as the implementation which is not ideal. 
-
-OffsetDateTime is also missing but ZonedDateTime has the same functionality so this shouldn't be a problem.

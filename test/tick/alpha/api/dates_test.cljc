@@ -59,8 +59,7 @@
               (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
      (testing "date-time to offset-date-time"
        (is (= (t/offset-date-time (t/date-time "2019-08-07T12:00"))
-              #?(:clj (t/offset-date-time "2019-08-07T12:00-04:00")
-                 :cljs (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]")))))))
+             (t/offset-date-time "2019-08-07T12:00-04:00"))))))
 
   (testing "Creating a clock with a zone, and returning that zone"
     (is (= "America/New_York" (str (t/zone (t/clock (t/zone "America/New_York")))))))
