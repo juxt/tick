@@ -60,24 +60,27 @@ Serve the docs directory and navigate to it in a browser
 
 === Develop Tick
 
-REPL with nREPL server
-
-----
-make nrepl
-----
-
-connect to the printed port
-
-Once in, start cljs build with:
+Jack in with cider or equivalent method in other IDEs, and start the cljs build with:
 
 ----
 (figwheel-start!)
 ----
 
+
 Run all tests with:
 
 ----
 make test-all
+----
+
+which will run clojure, clojurescript (node) and clojurescript (chrome) tests.
+JVM tests are currently running with https://github.com/lambdaisland/kaocha[Kaocha] while JS tests are using figwheel-main and the cljs-test-runner.
+
+As long as you have you have started your repl with these aliases "-A:dev:test-clj", you can also run backend clojure tests in the repl with something like
+
+----
+(require '[kaocha.repl :as kr])
+(kr/run :clj)
 ----
 
 === npm dependencies
@@ -97,7 +100,7 @@ create a git tag
 
 `make install` (this installs in ~/.m2 - check that things look ok)
 
-`make release`  - you need to have set up clojars creds as per https://github.com/applied-science/deps-library
+`make release`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
 
 `git push origin new-tag-name`
 
