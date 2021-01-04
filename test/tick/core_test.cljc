@@ -2,7 +2,6 @@
 
 (ns tick.core-test
   (:require
-   [clojure.spec.alpha :as s]
    [tick.core :as t]
    #?(:clj
       [clojure.test :refer :all]
@@ -11,8 +10,6 @@
     #?(:cljs
        [java.time :refer [LocalDate Instant]]))
   #?(:clj (:import [java.time Instant LocalDate])))
-
-(s/check-asserts true)
 
 (deftest basics-test
   (is (instance? Instant (t/now)))

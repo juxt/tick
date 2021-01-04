@@ -2,7 +2,6 @@
 
 (ns tick.interval-test
   (:require
-   [clojure.spec.alpha :as s]
    [tick.alpha.api :as t]
    #?(:clj
       [clojure.test :refer :all]
@@ -14,8 +13,6 @@
   #?(:clj
      (:import
       [java.time.temporal ChronoUnit])))
-
-(s/check-asserts true)
 
 (deftest basic-relations-test
   (is (= (count ti/basic-relations) 13))

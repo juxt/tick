@@ -2,7 +2,6 @@
 
 (ns tick.alpha.api-test
   (:require
-    [clojure.spec.alpha :as s]
     #?(:clj [clojure.test :refer :all]
        :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
     [tick.alpha.api :as t]
@@ -23,8 +22,6 @@
        [java.util Date]
        [java.time Clock Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth Month OffsetDateTime ZoneId ZonedDateTime]
        [java.time.temporal Temporal TemporalAmount])))
-
-(s/check-asserts true)
 
 ;; Constructor test
 
