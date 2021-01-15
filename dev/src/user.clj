@@ -14,7 +14,7 @@
 (defn test-clj* [] (kr/run :clj))
 
 (defn test-clj []
-  (refresh :after 'user/test-clj))
+  (refresh :after 'user/test-clj*))
 
 (comment
   (refresh-all)
