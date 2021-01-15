@@ -41,10 +41,10 @@ jobs:
       - restore_cache:
           key: v1-dependencies-{{ checksum "deps.edn" }}
 
-      - run: sudo npm install karma-cli -g
-      - run: npm install karma --save-dev
-      - run: npm install karma-chrome-launcher
-      - run: npm install karma-cljs-test
+      - run: sudo npm install karma-cli@2.0.0 -g
+      - run: npm install karma@5.2.3 --save-dev
+      - run: npm install karma-chrome-launcher@3.1.0
+      - run: npm install karma-cljs-test@0.1.0
 
       - run: sudo apt-get install -y make
       - run: make test-node
