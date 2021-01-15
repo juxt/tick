@@ -1,6 +1,6 @@
 {:paths ["src" "resources"]
  :deps
- {cljc.java-time/cljc.java-time {:mvn/version "0.1.12-SNAPSHOT"}
+ {cljc.java-time/cljc.java-time {:mvn/version "0.1.14"}
   cljsjs/js-joda-timezone       {:mvn/version "2.2.0-0"}
   cljsjs/js-joda-locale-en-us   {:mvn/version "3.1.1-1"}
   time-literals/time-literals   {:mvn/version "0.1.5" :exclusions [cljs.java-time/cljs.java-time]}}
