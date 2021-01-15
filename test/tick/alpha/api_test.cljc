@@ -159,6 +159,9 @@
 ;; Units test
 
 (deftest units-test
+  (is (=
+        {:seconds 0, :nanos 1}
+        (t/units (t/new-duration 1 :nanos))))
   (is
     (=
       {:years 10, :months 0, :days 0}
@@ -170,8 +173,8 @@
   (is
     (t/<
       (t/now)
-      (t/+ (t/now) (t/new-duration 10 :seconds))
-      (t/+ (t/now) (t/new-duration 20 :seconds))))
+      (t/>> (t/now) (t/new-duration 10 :seconds))
+      (t/>> (t/now) (t/new-duration 20 :seconds))))
   (is
     (t/>
       (t/+ (t/now) (t/new-duration 20 :seconds))

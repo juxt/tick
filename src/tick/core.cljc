@@ -16,6 +16,7 @@
     [cljc.java-time.zone-offset]
     [cljc.java-time.zoned-date-time]
     [cljc.java-time.offset-date-time]
+    [cljc.java-time.offset-time]
     [cljc.java-time.duration]
     [cljc.java-time.year-month]
     [cljc.java-time.month]
@@ -25,6 +26,7 @@
     [cljc.java-time.duration]
     [cljc.java-time.extn.predicates]
     [cljc.java-time.temporal.temporal-amount]
+    [cljc.java-time.temporal.temporal]
     [cljc.java-time.temporal.temporal-adjusters]
     [cljc.java-time.temporal.chrono-field]
     [cljc.java-time.temporal.chrono-unit]
@@ -241,7 +243,7 @@
 
   ZonedDateTime
   (inst [zdt] (inst (instant zdt)))
-  (instant [zdt] (.toInstant zdt))
+  (instant [zdt] (cljc.java-time.zoned-date-time/to-instant zdt))
   (offset-date-time [zdt] (cljc.java-time.zoned-date-time/to-offset-date-time zdt))
   (zoned-date-time [zdt] zdt))
 
@@ -433,18 +435,18 @@
     (->> field-map
          (keep (fn [[k v]]
                  (let [cf (get field-map k)]
-                   (when (.isSupported t cf)
-                     [k (.getLong t cf)]))))
+                   (when (cljc.java-time.temporal.temporal/is-supported t cf)
+                     [k (cljc.java-time.temporal.temporal/get-long t cf)]))))
          (into {})
          seq))
   ILookup
   (#?(:clj valAt :cljs -lookup) [_ fld]
     (when-let [f (get field-map fld)]
-      (.getLong t f)))
+      (cljc.java-time.temporal.temporal/get-long t f)))
   (#?(:clj valAt :cljs -lookup) [_ fld notfound]
     (if-let [f (get field-map fld)]
       (try
-        (.getLong t f)
+        (cljc.java-time.temporal.temporal/get-long t f)
         (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) e
           notfound))
       notfound)))
@@ -457,11 +459,11 @@
 (defn with
   "Adjust a temporal with an adjuster or field"
   ([t adj]
-   (.with t adj)
+   (cljc.java-time.temporal.temporal/with t adj)
     )
   ([t fld new-value]
    (when-let [f (get field-map fld)]
-     (.with t f new-value))))
+     (cljc.java-time.temporal.temporal/with t f new-value))))
 
 ;; Built-in adjusters
 
@@ -527,60 +529,55 @@
 
 (extend-protocol ITimeComparison
   Instant
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.instant/is-before x y))
+  (<= [x y] (not (cljc.java-time.instant/is-after x y)))
+  (> [x y] (cljc.java-time.instant/is-after x y))
+  (>= [x y] (not (cljc.java-time.instant/is-before x y)))
   LocalDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.local-date-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-date-time/is-after x y)))
+  (> [x y] (cljc.java-time.local-date-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-date-time/is-before x y)))
   #?(:clj Date :cljs js/Date)
   (<  [x y] (neg? (compare x y)))
   (<= [x y] (not (pos? (compare x y))))
   (>  [x y] (pos? (compare x y)))
   (>= [x y] (not (neg? (compare x y))))
   LocalDate
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.local-date/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-date/is-after x y)))
+  (> [x y] (cljc.java-time.local-date/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-date/is-before x y)))
   LocalTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
-  LocalDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.local-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-time/is-after x y)))
+  (> [x y] (cljc.java-time.local-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-time/is-before x y)))
   OffsetDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.offset-date-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.offset-date-time/is-after x y)))
+  (> [x y] (cljc.java-time.offset-date-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.offset-date-time/is-before x y)))
   ZonedDateTime
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.zoned-date-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.zoned-date-time/is-after x y)))
+  (> [x y] (cljc.java-time.zoned-date-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.zoned-date-time/is-before x y)))
   Year
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.year/is-before x y))
+  (<= [x y] (not (cljc.java-time.year/is-after x y)))
+  (> [x y] (cljc.java-time.year/is-after x y))
+  (>= [x y] (not (cljc.java-time.year/is-before x y)))
   YearMonth
-  (< [x y] (.isBefore x y))
-  (<= [x y] (not (.isAfter x y)))
-  (> [x y] (.isAfter x y))
-  (>= [x y] (not (.isBefore x y)))
+  (< [x y] (cljc.java-time.year-month/is-before x y))
+  (<= [x y] (not (cljc.java-time.year-month/is-after x y)))
+  (> [x y] (cljc.java-time.year-month/is-after x y))
+  (>= [x y] (not (cljc.java-time.year-month/is-before x y)))
   Duration
-  (< [x y] (neg? (.compareTo x y)))
-  (<= [x y] (or (= x y) (.compareTo x y)))
-  (> [x y] (pos? (.compareTo x y)))
-  (>= [x y] (or (= x y) (pos? (.compareTo x y)))))
+  (< [x y] (neg? (cljc.java-time.duration/compare-to x y)))
+  (<= [x y] (or (= x y) (cljc.java-time.duration/compare-to x y)))
+  (> [x y] (pos? (cljc.java-time.duration/compare-to x y)))
+  (>= [x y] (or (= x y) (pos? (cljc.java-time.duration/compare-to x y)))))
 
 
 ;; Units
@@ -610,11 +607,11 @@
     (for [tu (cljc.java-time.temporal.temporal-amount/get-units x)
           :let [k (reverse-unit-map tu)]
           :when k]
-      [k (.get x tu)])))
+      [k (cljc.java-time.temporal.temporal-amount/get x tu)])))
 
 (defn truncate [x u]
   {:pre [(contains? unit-map u)]}
-  (.truncatedTo ^Instant x (get unit-map u)))
+  (cljc.java-time.instant/truncated-to x (get unit-map u)))
 
 ;; Durations & Periods
 
@@ -638,13 +635,13 @@
 
 (extend-protocol ITimeLength
   Duration
-  (nanos [d] (.toNanos d))
+  (nanos [d] (cljc.java-time.duration/to-nanos d))
   (micros [d] (#?(:clj Long/divideUnsigned :cljs cljs.core//) (nanos d) 1000))
-  (millis [d] (.toMillis d))
+  (millis [d] (cljc.java-time.duration/to-millis d))
   (seconds [d] (cljc.java-time.duration/get-seconds d))
-  (minutes [d] (.toMinutes d))
-  (hours [d] (.toHours d))
-  (days [d] (.toDays d))
+  (minutes [d] (cljc.java-time.duration/to-minutes d))
+  (hours [d] (cljc.java-time.duration/to-hours d))
+  (days [d] (cljc.java-time.duration/to-days d))
 
   Period
   (days [p] (cljc.java-time.period/get-days p))
@@ -682,7 +679,8 @@
   (clock [i] (cljc.java-time.clock/fixed i (current-zone)))
 
   ZonedDateTime
-  (clock [zdt] (cljc.java-time.clock/fixed (.toInstant zdt) (cljc.java-time.zoned-date-time/get-zone zdt)))
+  (clock [zdt] (cljc.java-time.clock/fixed (cljc.java-time.zoned-date-time/to-instant zdt) 
+                 (cljc.java-time.zoned-date-time/get-zone zdt)))
 
   #?(:clj Object :cljs object)
   (clock [o] (clock (zoned-date-time o)))
@@ -704,7 +702,7 @@
 
 (extend-protocol IConversion
   Clock
-  (instant [clk] (.instant clk)))
+  (instant [clk] (cljc.java-time.clock/instant clk)))
 
 (extend-protocol IExtraction
   Clock
@@ -712,7 +710,7 @@
 
 (extend-protocol ITimeReify
   Clock
-  (in [clk zone] (.withZone clk zone)))
+  (in [clk zone] (cljc.java-time.clock/with-zone clk zone)))
 
 ;; Atomic clocks :)
 
@@ -761,11 +759,9 @@
   (+ [t d] "Add to time")
   (- [t d] "Subtract from time, or negate"))
 
-(defn minus_
-  ([d] (.negated d))
-  ([t d] (.minus t d)))
-
 (extend-protocol ITimeArithmetic
+  ;todo - to avoid reflection this protocol should be extended to all the entitity types but...
+  ; IMO that type should just be duration (with shift used for adding amounts to dates etc)
   #?(:clj Object :cljs object)
   (+ [t d] (.plus t d))
   (- [t d] (.minus t d)))
@@ -773,7 +769,7 @@
 (defn negated
   "Return the duration as a negative duration"
   [d]
-  (.negated d))
+  (cljc.java-time.duration/negated d))
 
 (defprotocol ITimeShift
   (forward-number [_ n] "Increment time")
@@ -783,36 +779,36 @@
 
 (extend-protocol ITimeShift
   Instant
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-duration [t d] (cljc.java-time.instant/plus t d))
+  (backward-duration [t d] (cljc.java-time.instant/minus t d))
   #?(:clj Date :cljs js/Date)
-  (forward-duration [t d] (.plus (instant t) d))
-  (backward-duration [t d] (.minus (instant t) d))
+  (forward-duration [t d] (forward-duration (instant t) d))
+  (backward-duration [t d] (backward-duration (instant t) d))
   LocalDate
-  (forward-number [t n] (.plusDays t n))
-  (backward-number [t n] (.minusDays t n))
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-number [t n] (cljc.java-time.local-date/plus-days t n))
+  (backward-number [t n] (cljc.java-time.local-date/minus-days t n))
+  (forward-duration [t d] (cljc.java-time.local-date/plus t d))
+  (backward-duration [t d] (cljc.java-time.local-date/minus t d))
   LocalTime
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-duration [t d] (cljc.java-time.local-time/plus t d))
+  (backward-duration [t d] (cljc.java-time.local-time/minus t d))
   LocalDateTime
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-duration [t d] (cljc.java-time.local-date-time/plus t d))
+  (backward-duration [t d] (cljc.java-time.local-date-time/minus t d))
   OffsetDateTime
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-duration [t d] (cljc.java-time.offset-date-time/plus t d))
+  (backward-duration [t d] (cljc.java-time.offset-date-time/minus t d))
   ZonedDateTime
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-duration [t d] (cljc.java-time.zoned-date-time/plus t d))
+  (backward-duration [t d] (cljc.java-time.zoned-date-time/minus t d))
   Year
-  (forward-number [t n] (.plusYears t n))
-  (backward-number [t n] (.minusYears t n))
+  (forward-number [t n] (cljc.java-time.year/plus-years t n))
+  (backward-number [t n] (cljc.java-time.year/minus-years t n))
   YearMonth
-  (forward-number [t n] (.plusMonths t n))
-  (backward-number [t n] (.minusMonths t n))
-  (forward-duration [t d] (.plus t d))
-  (backward-duration [t d] (.minus t d))
+  (forward-number [t n] (cljc.java-time.year-month/plus-months t n))
+  (backward-number [t n] (cljc.java-time.year-month/minus-months t n))
+  (forward-duration [t d] (cljc.java-time.year-month/plus t d))
+  (backward-duration [t d] (cljc.java-time.year-month/minus t d))
   Clock
   (forward-duration [clk d] (cljc.java-time.clock/offset clk d))
   (backward-duration [clk d] (cljc.java-time.clock/offset clk (negated d))))
@@ -925,7 +921,7 @@
 
 (extend-protocol IDivisibleDuration
   #?(:clj Long :cljs number)
-  (divide-duration [n duration] (.dividedBy duration n))
+  (divide-duration [n duration] (cljc.java-time.duration/divided-by duration n))
   Duration
   (divide-duration [divisor duration]
     (/
@@ -1017,16 +1013,16 @@
   (end [n] (end (time n)))
 
   LocalDate
-  (beginning [date] (.atStartOfDay date))
-  (end [date] (.atStartOfDay (inc date)))
+  (beginning [date] (cljc.java-time.local-date/at-start-of-day date))
+  (end [date] (cljc.java-time.local-date/at-start-of-day (inc date)))
 
   Year
-  (beginning [year] (beginning (.atMonth year 1)))
-  (end [year] (end (.atMonth year 12)))
+  (beginning [year] (beginning (cljc.java-time.year/at-month year 1)))
+  (end [year] (end (cljc.java-time.year/at-month year 12)))
 
   YearMonth
-  (beginning [ym] (beginning (.atDay ym 1)))
-  (end [ym] (end (.atEndOfMonth ym)))
+  (beginning [ym] (beginning (cljc.java-time.year-month/at-day ym 1)))
+  (end [ym] (end (cljc.java-time.year-month/at-end-of-month ym)))
 
   Instant
   (beginning [i] i)
@@ -1058,20 +1054,19 @@
 
 (extend-protocol ITimeReify
   LocalTime
-  (on [t date] (.atTime date t))
+  (on [t date] (cljc.java-time.local-time/at-date t date))
   OffsetTime
-  (on [t date] (.atTime date t))
+  (on [t date] (cljc.java-time.offset-time/at-date t date))
   LocalDate
-  (at [date t] (.atTime date (time t)))
+  (at [date t] (cljc.java-time.local-date/at-time date (time t)))
   LocalDateTime
-  (in [ldt z] (.atZone ldt z))
-  (offset-by [ldt offset] #?(:clj (.atOffset ldt (zone-offset offset))
-                             :cljs (.atZone ldt (zone-offset offset))))
+  (in [ldt z] (cljc.java-time.local-date-time/at-zone ldt z))
+  (offset-by [ldt offset] (cljc.java-time.local-date-time/at-offset ldt (zone-offset offset)))
   Instant
   (in [t z] (cljc.java-time.instant/at-zone t z))
   (offset-by [t offset] (cljc.java-time.instant/at-offset t (zone-offset offset)))
   ZonedDateTime
-  (in [t z] (.withZoneSameInstant t (zone z)))
+  (in [t z] (cljc.java-time.zoned-date-time/with-zone-same-instant t (zone z)))
   #?(:clj Date :cljs js/Date)
   (in [t z] (in (instant t) (zone z))))
 
@@ -1121,9 +1116,6 @@
 
 ;; java.time.temporal/TemporalAmount
 
-#_(defn adjust [t adjuster]
-    (.with t adjuster))
-
 ;; adjust
 
 ;; Conversions
@@ -1137,7 +1129,7 @@
   (forward-duration (now) dur))
 
 (defn midnight? [^LocalDateTime t]
-  (.isZero (cljc.java-time.duration/between t (beginning (date t)))))
+  (cljc.java-time.duration/is-zero (cljc.java-time.duration/between t (beginning (date t)))))
 
 ;; Predicates
 (defn clock?            [v] (cljc.java-time.extn.predicates/clock? v))

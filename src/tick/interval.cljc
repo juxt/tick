@@ -28,14 +28,6 @@
   {:tick/beginning beginning
    :tick/end end})
 
-(defn temporal? [o]
-  #?(:clj (instance? Temporal o)
-     :cljs (.isPrototypeOf Temporal (type o))))
-
-(defn temporal-amount? [o]
-  #?(:clj (instance? TemporalAmount o)
-     :cljs (.isPrototypeOf TemporalAmount (type o))))
-
 (defprotocol ITimeSpanable
   (temporal-value [_] "Return a value of a type that satisfies t/ITimeSpan"))
 
