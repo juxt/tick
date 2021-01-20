@@ -14,18 +14,19 @@
     [tick.core :as core]
     [tick.format :as t.f]
     [cljc.java-time.duration]
+    [cljc.java-time.zone-offset]
+    [cljc.java-time.day-of-week]
+    [cljc.java-time.month]
     #?(:clj tick.file) ; To ensure protocol extension
     [tick.interval :as interval]
     #?@(:cljs
-       [
-        [java.time :refer [Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]]
-        [java.time.format :refer [DateTimeFormatter]]]))
+       [[java.time.format :refer [DateTimeFormatter]]]))
   #?(:cljs
      (:require-macros
        [tick.alpha.api :refer [with-clock]]))
   #?(:clj
      (:import
-       [java.time Duration ZoneId LocalTime LocalDate DayOfWeek Month ZoneOffset]
+       [java.time LocalDate]
        [java.time.format DateTimeFormatter])))
 
 ;; This API is optimises convenience, API stability and (type) safety
@@ -253,7 +254,7 @@ For example:
 ;; Comparisons
 
 (defn <
-  ([x] true)
+  ([_x] true)
   ([x y] (core/< x y))
   ([x y & more] (if (core/< x y)
                   (if (next more)
@@ -262,7 +263,7 @@ For example:
                   false)))
 
 (defn <=
-  ([x] true)
+  ([_x] true)
   ([x y] (core/<= x y))
   ([x y & more] (if (core/<= x y)
                   (if (next more)
@@ -271,7 +272,7 @@ For example:
                   false)))
 
 (defn >
-  ([x] true)
+  ([_x] true)
   ([x y] (core/> x y))
   ([x y & more] (if (core/> x y)
                   (if (next more)
@@ -280,7 +281,7 @@ For example:
                   false)))
 
 (defn >=
-  ([x] true)
+  ([_x] true)
   ([x y] (core/>= x y))
   ([x y & more] (if (core/>= x y)
                   (if (next more)

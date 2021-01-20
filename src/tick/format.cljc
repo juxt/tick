@@ -43,7 +43,7 @@
                 (some->
                   (goog.object/get js/JSJodaLocale "Locale")
                   (goog.object/get "US"))
-                (catch js/Error e)))))
+                (catch js/Error _e)))))
   ([fmt locale]
    (let [^DateTimeFormatter fmt
          (cond (instance? DateTimeFormatter fmt) fmt

@@ -8,15 +8,12 @@
     [tick.core :as t]
     [cljc.java-time.duration]
     #?@(:cljs
-         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
-                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
-          [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters TemporalAdjusters TemporalAmount]]
-          [cljs.java-time.extend-eq-and-compare]]))
+         [[java.time :refer [ Instant Duration Period ZonedDateTime LocalTime
+                             LocalDateTime LocalDate Year YearMonth OffsetDateTime ]]]))
   #?(:clj
      (:import
        [java.util Date]
-       [java.time Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth OffsetDateTime ZoneId ZonedDateTime]
-       [java.time.temporal Temporal TemporalAmount])))
+       [java.time Instant Duration Period LocalDate LocalTime LocalDateTime Year YearMonth OffsetDateTime ZonedDateTime])))
 
 ;; Use of Allen's Interval Algebra, inspired from a working
 ;; demonstration of time-count by Eric Evans.
@@ -242,7 +239,7 @@
 
 (defn compose-r
   "Return the composition of r and s"
-  [r s]
+  [_r _s]
   (throw (not-yet-implemented)))
 
 (defn converse-r
@@ -254,7 +251,7 @@
 
 (defn intersection-r
   "Return the intersection of the r with s"
-  [^GeneralRelation r ^GeneralRelation s]
+  [^GeneralRelation r ^GeneralRelation _s]
   (s/assert r #(instance? GeneralRelation %))
   (->GeneralRelation (set/intersection (set (:relations r))))
   (throw (not-yet-implemented)))
@@ -812,7 +809,7 @@
               [])
 
             :finished-by
-            (let [[seg1 seg2] (split-with-assert ival (t/beginning group))]
+            (let [[_seg1 seg2] (split-with-assert ival (t/beginning group))]
               (recur
                 (next intervals)
                 (next groups)

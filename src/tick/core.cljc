@@ -15,7 +15,6 @@
     [cljc.java-time.zoned-date-time]
     [cljc.java-time.offset-date-time]
     [cljc.java-time.offset-time]
-    [cljc.java-time.duration]
     [cljc.java-time.year-month]
     [cljc.java-time.month]
     [cljc.java-time.year]
@@ -35,7 +34,6 @@
         :cljs
         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
-         [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
          [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
@@ -43,7 +41,7 @@
      (:import
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
-       [java.time.temporal ChronoUnit ChronoField Temporal TemporalAdjusters]
+       [java.time.temporal Temporal ]
        [clojure.lang ILookup Seqable])))
 
 (modify-printing-of-time-literals-if-enabled!)
@@ -428,7 +426,7 @@
   #?(:clj Seqable :cljs ISeqable)
   (#?(:cljs -seq :clj seq) [_]
     (->> field-map
-         (keep (fn [[k v]]
+         (keep (fn [[k _v]]
                  (let [cf (get field-map k)]
                    (when (cljc.java-time.temporal.temporal/is-supported t cf)
                      [k (cljc.java-time.temporal.temporal/get-long t cf)]))))
@@ -442,7 +440,7 @@
     (if-let [f (get field-map fld)]
       (try
         (cljc.java-time.temporal.temporal/get-long t f)
-        (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) e
+        (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) _e
           notfound))
       notfound)))
 
