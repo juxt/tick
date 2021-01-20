@@ -13,6 +13,7 @@
   (:require
     [tick.core :as core]
     [tick.format :as t.f]
+    [cljc.java-time.duration]
     #?(:clj tick.file) ; To ensure protocol extension
     [tick.interval :as interval]
     #?@(:cljs
@@ -185,19 +186,6 @@ For example:
 "} parse core/parse)
 
 ;; Arithmetic
-
-(defn +
-  ([] (. Duration -ZERO))
-  ([arg] arg)
-  ([arg & args]
-   (reduce #(core/+ %1 %2) arg args)))
-
-(defn -
-  ([] (. Duration -ZERO))
-  ([arg] (core/negated arg))
-  ([arg & args]
-   (reduce #(core/- %1 %2) arg args)))
-
 (defn inc [t]
   (core/inc t))
 
@@ -209,6 +197,28 @@ For example:
 
 (defn << [t amt]
   (core/<< t amt))
+
+(defn +
+  "Sum amounts of time.
+  
+  Prefer >> for moving forward a date/time"
+  ([] cljc.java-time.duration/zero)
+  ([arg] arg)
+  ([arg & args]
+   (if (or (core/duration? arg) (core/period? arg))
+     (reduce #(core/+ %1 %2) arg args)
+     (>> arg (first args)))))
+
+(defn -
+  "Subtract amounts of time.
+  
+  Prefer << for moving backward a date/time"
+  ([] cljc.java-time.duration/zero)
+  ([arg] (core/negated arg))
+  ([arg & args]
+   (if (or (core/duration? arg) (core/period? arg))
+     (reduce #(core/- %1 %2) arg args)
+     (<< arg (first args)))))
 
 (def max core/max)
 (def min core/min)

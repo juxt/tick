@@ -756,15 +756,16 @@
 ;; Arithmetic
 
 (defprotocol ITimeArithmetic
-  (+ [t d] "Add to time")
-  (- [t d] "Subtract from time, or negate"))
+  (+ [t d] "Sum amounts of time")
+  (- [t d] "Subtract from amount of time, or negate"))
 
 (extend-protocol ITimeArithmetic
-  ;todo - to avoid reflection this protocol should be extended to all the entitity types but...
-  ; IMO that type should just be duration (with shift used for adding amounts to dates etc)
-  #?(:clj Object :cljs object)
-  (+ [t d] (.plus t d))
-  (- [t d] (.minus t d)))
+  Duration
+  (+ [t d] (cljc.java-time.duration/plus t d))
+  (- [t d] (cljc.java-time.duration/minus t d))
+  Period
+  (+ [t d] (cljc.java-time.period/plus t d))
+  (- [t d] (cljc.java-time.period/minus t d)))
 
 (defn negated
   "Return the duration as a negative duration"

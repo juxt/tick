@@ -71,7 +71,7 @@
         max (- x-cells block-width-in-cells)
 
         now (t/now)
-        ->time #(t/+ now (t/new-duration (inc %) :seconds))
+        ->time #(t/>> now (t/new-duration (inc %) :seconds))
 
         ival1 (t/new-interval
                 (->time value)
