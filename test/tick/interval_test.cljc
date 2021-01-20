@@ -4,16 +4,10 @@
   (:require
    [clojure.spec.alpha :as s]
    [tick.alpha.api :as t]
-   #?(:clj
-      [clojure.test :refer :all]
-      :cljs
-      [cljs.test :refer-macros [deftest is testing run-tests]])
-   #?(:cljs
-      [java.time.temporal :refer [ChronoUnit]])
-   [tick.interval :as ti])
-  #?(:clj
-     (:import
-      [java.time.temporal ChronoUnit])))
+   [clojure.test
+    :refer [deftest is testing run-tests]
+    :refer-macros [deftest is testing run-tests]]
+   [tick.interval :as ti]))
 
 (s/check-asserts true)
 

@@ -117,8 +117,8 @@
 
 (defn zone-offset
   ([offset] (core/zone-offset offset))
-  ([hours minutes] (. ZoneOffset ofHoursMinutes hours minutes))
-  ([hours minutes seconds] (. ZoneOffset ofHoursMinutesSeconds hours minutes seconds)))
+  ([hours minutes] (cljc.java-time.zone-offset/of-hours-minutes hours minutes))
+  ([hours minutes seconds] (cljc.java-time.zone-offset/of-hours-minutes-seconds hours minutes seconds)))
 
 ;; Reification
 
@@ -129,26 +129,26 @@
 
 ;; Constants
 
-(def MONDAY (. DayOfWeek -MONDAY))
-(def TUESDAY (. DayOfWeek -TUESDAY))
-(def WEDNESDAY (. DayOfWeek -WEDNESDAY))
-(def THURSDAY (. DayOfWeek -THURSDAY))
-(def FRIDAY (. DayOfWeek -FRIDAY))
-(def SATURDAY (. DayOfWeek -SATURDAY))
-(def SUNDAY (. DayOfWeek -SUNDAY))
+(def MONDAY cljc.java-time.day-of-week/monday)
+(def TUESDAY cljc.java-time.day-of-week/tuesday)
+(def WEDNESDAY cljc.java-time.day-of-week/wednesday)
+(def THURSDAY cljc.java-time.day-of-week/thursday)
+(def FRIDAY cljc.java-time.day-of-week/friday)
+(def SATURDAY cljc.java-time.day-of-week/saturday)
+(def SUNDAY cljc.java-time.day-of-week/sunday)
 
-(def JANUARY (. Month -JANUARY))
-(def FEBRUARY (. Month -FEBRUARY))
-(def MARCH (. Month -MARCH))
-(def APRIL (. Month -APRIL))
-(def MAY (. Month -MAY))
-(def JUNE (. Month -JUNE))
-(def JULY (. Month -JULY))
-(def AUGUST (. Month -AUGUST))
-(def SEPTEMBER (. Month -SEPTEMBER))
-(def OCTOBER (. Month -OCTOBER))
-(def NOVEMBER (. Month -NOVEMBER))
-(def DECEMBER (. Month -DECEMBER))
+(def JANUARY cljc.java-time.month/january )
+(def FEBRUARY cljc.java-time.month/february)
+(def MARCH cljc.java-time.month/march)
+(def APRIL cljc.java-time.month/april)
+(def MAY cljc.java-time.month/may)
+(def JUNE cljc.java-time.month/june)
+(def JULY cljc.java-time.month/july)
+(def AUGUST cljc.java-time.month/august)
+(def SEPTEMBER cljc.java-time.month/september)
+(def OCTOBER cljc.java-time.month/october)
+(def NOVEMBER cljc.java-time.month/november)
+(def DECEMBER cljc.java-time.month/december)
 
 (defn beginning [v] (core/beginning v))
 (defn end [v] (core/end v))

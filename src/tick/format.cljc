@@ -1,18 +1,19 @@
 (ns tick.format
   "originally copied from https://github.com/dm3/clojure.java-time"
   (:refer-clojure :exclude (format))
-  #?(:cljs (:require [java.time.format :refer [DateTimeFormatter]]))
+  (:require [cljc.java-time.format.date-time-formatter]
+            #?(:cljs [java.time.format :refer [DateTimeFormatter]]))
   #?(:clj
      (:import [java.time.format DateTimeFormatter]
               [java.util Locale])))
 
 (def predefined-formatters
-  {:iso-zoned-date-time  (. DateTimeFormatter -ISO_ZONED_DATE_TIME)
-   :iso-offset-date-time (. DateTimeFormatter -ISO_OFFSET_DATE_TIME)
-   :iso-local-time       (. DateTimeFormatter -ISO_LOCAL_TIME)
-   :iso-local-date-time  (. DateTimeFormatter -ISO_LOCAL_DATE_TIME)
-   :iso-local-date       (. DateTimeFormatter -ISO_LOCAL_DATE)
-   :iso-instant          (. DateTimeFormatter -ISO_INSTANT)
+  {:iso-zoned-date-time  cljc.java-time.format.date-time-formatter/iso-zoned-date-time
+   :iso-offset-date-time cljc.java-time.format.date-time-formatter/iso-offset-date-time
+   :iso-local-time       cljc.java-time.format.date-time-formatter/iso-local-time
+   :iso-local-date-time  cljc.java-time.format.date-time-formatter/iso-local-date-time
+   :iso-local-date       cljc.java-time.format.date-time-formatter/iso-local-date
+   :iso-instant          cljc.java-time.format.date-time-formatter/iso-instant
 
    ; these exist in java but not in js-joda 
    ;:iso-offset-date      (. DateTimeFormatter -ISO_OFFSET_DATE)
@@ -50,9 +51,8 @@
                                (throw
                                  #?(:clj (Exception. "Locale is nil")
                                     :cljs (js/Error. (str "Locale is nil, try adding a require '[tick.locale-en-us]"))))
-                               (.. DateTimeFormatter
-                                 (ofPattern fmt)
-                                 (withLocale locale)))
+                               (-> (cljc.java-time.format.date-time-formatter/of-pattern fmt)
+                                   (cljc.java-time.format.date-time-formatter/with-locale locale)))
                :else (get predefined-formatters fmt))]
      fmt)))
 
@@ -62,4 +62,4 @@
   argument. Given one argument uses the default format."
   ([o] (str o))
   ([fmt o]
-   (.format (formatter fmt) o)))
+   (cljc.java-time.format.date-time-formatter/format (formatter fmt) o)))

@@ -4,21 +4,17 @@
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as t]
-   #?(:clj
-      [clojure.test :refer :all]
-      :cljs
-      [cljs.test :refer-macros [deftest is testing run-tests]])
-    #?(:cljs
-       [java.time :refer [LocalDate Instant]]))
-  #?(:clj (:import [java.time Instant LocalDate])))
+   [clojure.test
+    :refer [deftest is testing run-tests]
+    :refer-macros [deftest is testing run-tests]]))
 
 (s/check-asserts true)
 
 (deftest basics-test
-  (is (instance? Instant (t/now)))
-  (is (instance? LocalDate (t/today)))
-  (is (instance? LocalDate (t/tomorrow)))
-  (is (instance? LocalDate (t/yesterday))))
+  (is (t/instant? (t/now)))
+  (is (t/date? (t/today)))
+  (is (t/date? (t/tomorrow)))
+  (is (t/date? (t/yesterday))))
 
 (deftest divide-test
   (is

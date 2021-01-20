@@ -231,7 +231,7 @@
 
   #?(:clj Date :cljs js/Date)
   (inst [d] d)
-  (instant [d] #?(:clj (.toInstant d) :cljs (cljc.java-time.instant/of-epoch-milli (.getTime d))))
+  (instant [d] #?(:clj (.toInstant ^Date d) :cljs (cljc.java-time.instant/of-epoch-milli (.getTime d))))
   (zoned-date-time [d] (zoned-date-time (instant d)))
   (offset-date-time [d] (offset-date-time (instant d)))
 

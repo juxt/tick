@@ -3,8 +3,9 @@
 (ns tick.alpha.api-test
   (:require
     [clojure.spec.alpha :as s]
-    #?(:clj [clojure.test :refer :all]
-       :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
+    [clojure.test
+     :refer [deftest is testing run-tests]
+     :refer-macros [deftest is testing run-tests]]
     [tick.alpha.api :as t]
     [tick.format :as t.f]
     [tick.locale-en-us]
@@ -12,26 +13,18 @@
     [cljc.java-time.instant]
     [cljc.java-time.day-of-week]
     [cljc.java-time.month]
-    [cljs.java-time.interop :as t.i]
+    [cljc.java-time.year]
     #?(:clj
-       [tick.deprecated.cal :as cal])
-    #?@(:cljs
-        [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]]
-         [java.time.temporal :refer [ChronoUnit ChronoField TemporalAdjusters Temporal TemporalAmount]]]))
-  #?(:clj
-     (:import
-       [java.util Date]
-       [java.time Clock Instant Duration Period ZoneId LocalDate LocalTime LocalDateTime Year YearMonth Month OffsetDateTime ZoneId ZonedDateTime]
-       [java.time.temporal Temporal TemporalAmount])))
+       [tick.deprecated.cal :as cal])))
 
 (s/check-asserts true)
 
 ;; Constructor test
 
 (deftest constructor-test
-  (is (= Year (type (t/year 2017))))
-  (is (= 2017 (t.i/getter value (t/year 2017))))
-  (is (= Month (type (t/month 12))))
+  (is (t/year? (t/year 2017)))
+  (is (= 2017 (cljc.java-time.year/get-value (t/year 2017))))
+  (is (t/month? (t/month 12)))
   (is (= t/DECEMBER (t/month 12)))
   (is (= (t/new-date 3030 3 3)
          (t/date "3030-03-03")))
@@ -68,18 +61,17 @@
     (is (= (t/date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
 (deftest offset-date-time-test
-  (let [t "2018-09-24T18:57:08.996+01:00"
-        instance-type OffsetDateTime]
+  (let [t "2018-09-24T18:57:08.996+01:00"]
     (testing "offset date time basics"
-      (is (instance? instance-type (t/parse t)))
-      (is (instance? instance-type (t/offset-date-time (t/now))))
-      (is (instance? instance-type (t/offset-date-time t)))
-      (is (instance? instance-type (t/offset-date-time (t/date-time))))
-      (is (instance? instance-type (t/offset-date-time (t/zoned-date-time)))))))
+      (is (t/offset-date-time? (t/parse t)))
+      (is (t/offset-date-time? (t/offset-date-time (t/now))))
+      (is (t/offset-date-time? (t/offset-date-time t)))
+      (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
+      (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time)))))))
 
 (deftest zoned-date-time-test
-  (is (instance? java.time.ZonedDateTime (t/parse "2020-12-15T12:00:10Z[Europe/London]")))
-  (is (instance? java.time.ZonedDateTime (t/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
+  (is (t/zoned-date-time? (t/parse "2020-12-15T12:00:10Z[Europe/London]")))
+  (is (t/zoned-date-time? (t/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
 
 (deftest fields-test
   (let [xs [(t/now)
