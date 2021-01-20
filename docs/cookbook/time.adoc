@@ -242,22 +242,22 @@ Give a date a set time in the future:
 
 [source.code,clojure]
 ----
-(t/+ (t/date "2000-01-01") (t/new-period 1 :months))
+(t/>> (t/date "2000-01-01") (t/new-period 1 :months))
 ----
 
 [source.code,clojure]
 ----
-(t/+ (t/date "2000-01-01") (t/new-period 4 :weeks))
+(t/>> (t/date "2000-01-01") (t/new-period 4 :weeks))
 ----
 
 [source.code,clojure]
 ----
-(t/+ (t/date "2000-01-01") (t/new-period 30 :days))
+(t/>> (t/date "2000-01-01") (t/new-period 30 :days))
 ----
 
 [source.code,clojure]
 ----
-(t/+ (t/date "2000-01-01") (t/+ (t/new-period 5 :days)
+(t/>> (t/date "2000-01-01") (t/+ (t/new-period 5 :days)
                                 (t/new-period 1 :weeks)
                                 (t/new-period 10 :months)))
 ----
@@ -266,7 +266,7 @@ Or past:
 
 [source.code,clojure]
 ----
-(t/- (t/date "2000-01-01") (t/new-period 1 :years))
+(t/<< (t/date "2000-01-01") (t/new-period 1 :years))
 ----
 ====
 
@@ -274,12 +274,12 @@ Or past:
 Move around in time:
 [source.code,clojure]
 ----
-(t/+ (t/time "12:00") (t/new-duration 5 :minutes))
+(t/>> (t/time "12:00") (t/new-duration 5 :minutes))
 ----
 
 [source.code,clojure]
 ----
-(t/- (t/time "12:00") (t/new-duration 5 :hours))
+(t/<< (t/time "12:00") (t/new-duration 5 :hours))
 ----
 
 [source.code,clojure]
@@ -295,7 +295,7 @@ alone - `12:00` in 5 days is still `12:00` (ignoring daylight savings)
 
 [source.code,clojure]
 ----
-(t/+ (t/time "12:00") (t/new-duration 5 :days))
+(t/>> (t/time "12:00") (t/new-duration 5 :days))
 ----
 ====
 

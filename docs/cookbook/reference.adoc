@@ -4,19 +4,19 @@
 This section gives, in alphabetical order, examples of how to use each function in the tick api library.
 
 ====
-`+` - Add a duration to an instant:
+`+` - Sum amounts of time:
 [source.code,clojure]
 ----
-(t/+ (t/now)
+(t/+ (t/new-duration 10 :hours)
      (t/new-duration 10 :minutes))
 ----
 ====
 
 ====
-`-` - Subtract a duration to an instant:
+`-` - Subtract amounts of time:
 [source.code,clojure]
 ----
-(t/- (t/now)
+(t/- (t/new-duration 12 :hours)
      (t/new-duration 10 :hours))
 ----
 ====

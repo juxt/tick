@@ -108,7 +108,11 @@
 
 (deftest addition-test
   (is (= (t/new-duration 5 :seconds) (t/+ (t/new-duration 2 :seconds) (t/new-duration 3 :seconds))))
-  (is (= (t/new-duration 2 :minutes) (t/+ (t/new-duration 90 :seconds) (t/new-duration 30 :seconds)))))
+  (is (= (t/new-duration 2 :minutes) (t/+ (t/new-duration 90 :seconds) (t/new-duration 30 :seconds))))
+
+  (testing "alpha.api non-assocative use of +/-"
+    (is (= (t/date "2020-02-02") (t/- (t/date "2020-02-03") (t/new-period 1 :days))))
+    (is (= (t/date "2020-02-03") (t/+ (t/date "2020-02-02") (t/new-period 1 :days))))))
 
 (deftest subtraction-test
   (is (= (t/new-duration 3 :seconds) (t/- (t/new-duration 5 :seconds) (t/new-duration 2 :seconds)))))
@@ -464,7 +468,7 @@
 (defn moment [t]
   (t/new-interval
     t
-    (t/+ t (t/new-duration 3 :seconds))))
+    (t/>> t (t/new-duration 3 :seconds))))
 
 ;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
 

@@ -13,13 +13,13 @@ Operating on an instant it will return another instant in time.
 Addition:
 [source.code,clojure]
 ----
-(t/+ (t/now)
+(t/>> (t/now)
      (t/new-duration 15 :minutes))
 ----
 Subtraction:
 [source.code,clojure]
 ----
-(t/- (t/now)
+(t/<< (t/now)
      (t/new-duration 10 :days))
 ----
 ====
