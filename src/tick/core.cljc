@@ -3,7 +3,6 @@
 (ns tick.core
   (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
   (:require
-    [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [time-literals.read-write]
 
@@ -77,8 +76,6 @@
   ([] cljc.java-time.local-time/noon)
   ([^LocalDate date]
    (at date cljc.java-time.local-time/noon)))
-
-(s/def ::instant #(instance? Instant %))
 
 (defn parse-day [input]
   (condp re-matches (str/lower-case input)
