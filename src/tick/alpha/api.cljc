@@ -206,8 +206,10 @@ For example:
   ([arg] arg)
   ([arg & args]
    (if (or (core/duration? arg) (core/period? arg))
-     (reduce #(core/+ %1 %2) arg args)
-     (>> arg (first args)))))
+     (reduce core/+ arg args)
+     (do
+       (assert (= 1 (count args)))
+       (>> arg (first args))))))
 
 (defn -
   "Subtract amounts of time.
@@ -217,8 +219,10 @@ For example:
   ([arg] (core/negated arg))
   ([arg & args]
    (if (or (core/duration? arg) (core/period? arg))
-     (reduce #(core/- %1 %2) arg args)
-     (<< arg (first args)))))
+     (reduce core/- arg args)
+     (do
+       (assert (= 1 (count args)))
+       (<< arg (first args))))))
 
 (def max core/max)
 (def min core/min)
