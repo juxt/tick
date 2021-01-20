@@ -6,7 +6,6 @@
     [clojure.spec.alpha :as s]
     [clojure.string :as str]
     [time-literals.read-write]
-
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
     [cljc.java-time.local-time]
@@ -38,8 +37,7 @@
         [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
          [java.time.temporal :refer [ChronoUnit ChronoField Temporal TemporalAdjusters]]
-         [cljs.java-time.extend-eq-and-compare]])
-    [cljs.java-time.interop :as jti])
+         [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
      :clj
@@ -223,7 +221,7 @@
   (instant [ldt] (instant (zoned-date-time ldt)))
   (offset-date-time [ldt] (cljc.java-time.local-date-time/at-offset
                             ldt
-                            (jti/getter offset
+                            (#?(:clj .getOffset :cljs .offset)
                               (-> (current-zone)
                                   (cljc.java-time.zone-id/get-rules))
                               ldt)))
@@ -231,7 +229,7 @@
 
   #?(:clj Date :cljs js/Date)
   (inst [d] d)
-  (instant [d] #?(:clj (.toInstant d) :cljs (cljc.java-time.instant/of-epoch-milli (.getTime d))))
+  (instant [d] #?(:clj (.toInstant ^Date d) :cljs (cljc.java-time.instant/of-epoch-milli (.getTime d))))
   (zoned-date-time [d] (zoned-date-time (instant d)))
   (offset-date-time [d] (offset-date-time (instant d)))
 
