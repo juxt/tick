@@ -31,9 +31,6 @@
 ;; over performance. Where performance is critical, use tick.core and
 ;; friends.
 
-;; clojure.spec assertions are used to check correctness, but these
-;; are disabled by default (except when testing).
-
 ;; Construction
 
 (def new-time core/new-time)
