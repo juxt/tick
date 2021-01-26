@@ -37,6 +37,11 @@
          [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
      (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]])
+     :bb
+     (:import
+       [java.util Date]
+       [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
+       [java.time.temporal ChronoUnit ChronoField Temporal TemporalAdjusters])
      :clj
      (:import
        [java.util Date]
@@ -422,7 +427,7 @@
    :year                         cljc.java-time.temporal.chrono-field/year
    :year-of-era                  cljc.java-time.temporal.chrono-field/year-of-era                 })
 
-(deftype FieldsLookup [t]
+#_(deftype FieldsLookup [t]
   #?(:clj Seqable :cljs ISeqable)
   (#?(:cljs -seq :clj seq) [_]
     (->> field-map
@@ -445,7 +450,8 @@
       notfound)))
 
 (defn fields [t]
-  (->FieldsLookup t))
+  ;(->FieldsLookup t)
+  )
 
 ;; With
 

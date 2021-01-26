@@ -235,7 +235,8 @@
   (assoc r :relations (remove (set (:relations r)) basic-relations)))
 
 (defn not-yet-implemented []
-  #?(:clj (new UnsupportedOperationException "Not yet implemented")
+  #?(:bb (Exception. "Not yet implemented") 
+     :clj (new UnsupportedOperationException "Not yet implemented")
      :cljs (js/Error. "Not yet implemented")))
 
 (defn compose-r
