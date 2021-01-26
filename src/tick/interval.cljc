@@ -4,7 +4,6 @@
   (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide flatten])
   (:require
     [clojure.set :as set]
-    [clojure.spec.alpha :as s]
     [tick.core :as t]
     [cljc.java-time.duration]
     #?@(:cljs
@@ -89,7 +88,8 @@
     (t/forward-duration (t/beginning ival) (cljc.java-time.duration/multiplied-by (t/duration ival) factor))))
 
 (extend-protocol t/ITimeShift
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
+  ;todo - impl for cljs.core.PersistentHashMap
+  #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
   (forward-duration [ival d]
     (-> ival
         (update :tick/beginning #(t/forward-duration % d))
@@ -117,7 +117,8 @@
 ;; Reification
 
 (extend-protocol t/ITimeReify
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
+  ;todo - impl for cljs.core.PersistentHashMap
+  #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
   (on [i date] (new-interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
   (in [i zone] (new-interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
 
@@ -252,7 +253,7 @@
 (defn intersection-r
   "Return the intersection of the r with s"
   [^GeneralRelation r ^GeneralRelation _s]
-  (s/assert r #(instance? GeneralRelation %))
+  (assert (instance? GeneralRelation r))
   (->GeneralRelation (set/intersection (set (:relations r))))
   (throw (not-yet-implemented)))
 
@@ -304,7 +305,8 @@
     s))
 
 (extend-protocol IIntervalOps
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
+  ;todo - impl for cljs.core.PersistentHashMap
+  #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
   (slice [this beginning end]
     (if-let [intervals (:tick/intervals this)]
       (assoc this :tick/intervals (vec (keep #(slice % beginning end) intervals)))
@@ -386,7 +388,8 @@
   (new-interval (t/beginning t) (t/end t)))
 
 (extend-protocol t/ITimeComparison
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
+  ;todo - impl for cljs.core.PersistentHashMap
+  #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
   (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
@@ -755,7 +758,8 @@
   (divide [n d] (divide-interval d n))
   YearMonth
   (divide [n d] (divide-interval d n))
-  #?(:clj clojure.lang.APersistentMap :cljs PersistentArrayMap)
+  ;todo - impl for cljs.core.PersistentHashMap
+  #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
   (divide [ival o] (divide-interval o ival)))
 
 ;; Grouping (similar to Division)

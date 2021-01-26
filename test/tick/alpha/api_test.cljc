@@ -2,7 +2,6 @@
 
 (ns tick.alpha.api-test
   (:require
-    [clojure.spec.alpha :as s]
     [clojure.test
      :refer [deftest is testing run-tests]
      :refer-macros [deftest is testing run-tests]]
@@ -16,8 +15,6 @@
     [cljc.java-time.year]
     #?(:clj
        [tick.deprecated.cal :as cal])))
-
-(s/check-asserts true)
 
 ;; Constructor test
 

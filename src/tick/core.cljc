@@ -947,7 +947,7 @@
 
 #?(:clj
    (extend-protocol ITimeSpan
-     clojure.lang.APersistentMap
+     clojure.lang.IPersistentMap
      (beginning [m] (beginning-composite m))
      (end [m] (end-composite m))))
 
