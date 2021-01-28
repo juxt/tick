@@ -36,7 +36,7 @@
   (temporal-value [i] i)
 
   #?(:clj String :cljs string)
-  (temporal-value [s] (temporal-value (t/parse s)))
+  (temporal-value [s] (temporal-value (p/parse s)))
 
   LocalDate
   (temporal-value [d] d)

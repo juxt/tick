@@ -96,14 +96,11 @@
     #"^(dec)(ember)?$" cljc.java-time.month/december
     nil))
 
-(defprotocol IParseable
-  (parse [_] "Parse to most applicable instance."))
-
 (defn parse-int [x]
   #?(:clj (Integer/parseInt x)
      :cljs (js/Number x)))
 
-(extend-protocol IParseable
+(extend-protocol p/IParseable
   #?(:clj String :cljs string)
   (parse [s]
     (condp re-matches s
@@ -200,7 +197,7 @@
 
   #?(:clj String :cljs string)
   (inst [s] (inst (instant s)))
-  (instant [s] (instant (parse s)))
+  (instant [s] (instant (p/parse s)))
   (offset-date-time [s] (cljc.java-time.offset-date-time/parse s))
   (zoned-date-time [s] (cljc.java-time.zoned-date-time/parse s))
 
@@ -282,14 +279,14 @@
   (zone-offset [i] cljc.java-time.zone-offset/utc)
 
   #?(:clj String :cljs string)
-  (time [s] (time (parse s)))
-  (date [s] (date (parse s)))
+  (time [s] (time (p/parse s)))
+  (date [s] (date (p/parse s)))
   (date-time [s] (cljc.java-time.local-date-time/parse s))
   (day-of-week [s] (or (parse-day s) (day-of-week (date s))))
   (day-of-month [s] (day-of-month (date s)))
   (month [s] (or (parse-month s) (month (date s))))
-  (year [s] (year (parse s)))
-  (year-month [s] (year-month (parse s)))
+  (year [s] (year (p/parse s)))
+  (year-month [s] (year-month (p/parse s)))
   (zone [s] (cljc.java-time.zone-id/of s))
   (zone-offset [s] (cljc.java-time.zone-offset/of s))
   (int [s] (cljc.java-time.instant/get-nano (instant s)))
@@ -681,7 +678,7 @@
   (clock [z] (cljc.java-time.clock/system z))
 
   #?(:clj String :cljs string)
-  (clock [s] (clock (parse s))))
+  (clock [s] (clock (p/parse s))))
 
 (defn advance
   ([clk]
@@ -906,7 +903,7 @@
 
 (extend-protocol IDivisible
   #?(:clj String :cljs string)
-  (divide [s d] (divide (parse s) d)))
+  (divide [s d] (divide (p/parse s) d)))
 
 (defprotocol IDivisibleDuration
   (divide-duration [divisor duration] "Divide a duration"))
@@ -980,7 +977,7 @@
   #?@(:clj [Temporal
             (between [v1 v2] (cljc.java-time.duration/between v1 v2))])
   #?(:clj String :cljs string)
-  (between [v1 v2] (between (parse v1) (parse v2)))
+  (between [v1 v2] (between (p/parse v1) (p/parse v2)))
   #?(:clj Date :cljs js/Date)
   (between [x y] (between (instant x) (instant y))))
 
@@ -997,8 +994,8 @@
 
 (extend-protocol ITimeSpan
   #?(:clj String :cljs string)
-  (beginning [s] (beginning (parse s)))
-  (end [s] (end (parse s)))
+  (beginning [s] (beginning (p/parse s)))
+  (end [s] (end (p/parse s)))
 
   #?(:clj Number :cljs number)
   (beginning [n] (beginning (time n)))

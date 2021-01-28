@@ -182,7 +182,7 @@ If you have a string in a non-standard format, use a formatter and the parse fn 
 For example:
 
 (cljc.java-time.local-date/parse \"20200202\" (t/formatter \"yyyyMMdd\"))
-"} parse core/parse)
+"} parse p/parse)
 
 ;; Arithmetic
 (defn inc [t]

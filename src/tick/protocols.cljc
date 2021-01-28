@@ -7,3 +7,6 @@
   (at [date time] "Set date to be AT a time")
   (in [dt zone] "Set a date-time to be in a time-zone")
   (offset-by [dt amount] "Set a date-time to be offset by an amount"))
+
+(defprotocol IParseable
+  (parse [_] "Parse to most applicable instance."))
