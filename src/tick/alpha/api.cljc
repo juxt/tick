@@ -13,6 +13,7 @@
   (:require
     [tick.core :as core]
     [tick.format :as t.f]
+    [tick.protocols :as p]
     [cljc.java-time.duration]
     [cljc.java-time.zone-offset]
     [cljc.java-time.day-of-week]
@@ -120,10 +121,10 @@
 
 ;; Reification
 
-(defn on [t d] (core/on t (date d)))
-(defn at [d t] (core/at d (time t)))
-(defn in [ldt z] (core/in ldt (zone z)))
-(defn offset-by [ldt offset] (core/offset-by ldt (zone-offset offset)))
+(defn on [t d] (p/on t (date d)))
+(defn at [d t] (p/at d (time t)))
+(defn in [ldt z] (p/in ldt (zone z)))
+(defn offset-by [ldt offset] (p/offset-by ldt (zone-offset offset)))
 
 ;; Constants
 
@@ -172,11 +173,11 @@
 ;; Parsing
 
 (def ^{:doc "Do not use this function if you know the expected format of the string
-that you want to parse. This is partly because for example t/instant, t/date etc  will 
-be much faster, but also because if the string you pass it is not in the format you 
+that you want to parse. This is partly because for example t/instant, t/date etc  will
+be much faster, but also because if the string you pass it is not in the format you
 expect, this function may still convert it into some entity that you weren't expecting.
 
-If you have a string in a non-standard format, use a formatter and the parse fn of they entity you want. 
+If you have a string in a non-standard format, use a formatter and the parse fn of they entity you want.
 
 For example:
 
@@ -198,7 +199,7 @@ For example:
 
 (defn +
   "Sum amounts of time.
-  
+
   Prefer >> for moving forward a date/time"
   ([] cljc.java-time.duration/zero)
   ([arg] arg)
@@ -211,7 +212,7 @@ For example:
 
 (defn -
   "Subtract amounts of time.
-  
+
   Prefer << for moving backward a date/time"
   ([] cljc.java-time.duration/zero)
   ([arg] (core/negated arg))

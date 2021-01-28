@@ -5,6 +5,7 @@
   (:require
     [clojure.set :as set]
     [tick.core :as t]
+    [tick.protocols :as p]
     [cljc.java-time.duration]
     #?@(:cljs
          [[java.time :refer [ Instant Duration Period ZonedDateTime LocalTime
@@ -116,11 +117,11 @@
 
 ;; Reification
 
-(extend-protocol t/ITimeReify
+(extend-protocol p/ITimeReify
   ;todo - impl for cljs.core.PersistentHashMap
   #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
-  (on [i date] (new-interval (t/on (t/beginning i) date) (t/on (t/end i) date)))
-  (in [i zone] (new-interval (t/in (t/beginning i) zone) (t/in (t/end i) zone))))
+  (on [i date] (new-interval (p/on (t/beginning i) date) (p/on (t/end i) date)))
+  (in [i zone] (new-interval (p/in (t/beginning i) zone) (p/in (t/end i) zone))))
 
 (defn bounds [& args]
   (make-interval

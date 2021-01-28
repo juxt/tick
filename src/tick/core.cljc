@@ -4,6 +4,7 @@
   (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
   (:require
     [clojure.string :as str]
+    [tick.protocols :as p]
     [time-literals.read-write]
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
@@ -57,21 +58,16 @@
 (defn epoch []
   cljc.java-time.instant/epoch)
 
-(defprotocol ITimeReify
-  (on [time date] "Set time be ON a date")
-  (at [date time] "Set date to be AT a time")
-  (in [dt zone] "Set a date-time to be in a time-zone")
-  (offset-by [dt amount] "Set a date-time to be offset by an amount"))
 
 (defn midnight
   ([] cljc.java-time.local-time/midnight)
   ([^LocalDate date]
-   (at date cljc.java-time.local-time/midnight)))
+   (p/at date cljc.java-time.local-time/midnight)))
 
 (defn noon
   ([] cljc.java-time.local-time/noon)
   ([^LocalDate date]
-   (at date cljc.java-time.local-time/noon)))
+   (p/at date cljc.java-time.local-time/noon)))
 
 (defn parse-day [input]
   (condp re-matches (str/lower-case input)
@@ -672,7 +668,7 @@
   (clock [i] (cljc.java-time.clock/fixed i (current-zone)))
 
   ZonedDateTime
-  (clock [zdt] (cljc.java-time.clock/fixed (cljc.java-time.zoned-date-time/to-instant zdt) 
+  (clock [zdt] (cljc.java-time.clock/fixed (cljc.java-time.zoned-date-time/to-instant zdt)
                  (cljc.java-time.zoned-date-time/get-zone zdt)))
 
   #?(:clj Object :cljs object)
@@ -701,7 +697,7 @@
   Clock
   (zone [clk] (cljc.java-time.clock/get-zone clk)))
 
-(extend-protocol ITimeReify
+(extend-protocol p/ITimeReify
   Clock
   (in [clk zone] (cljc.java-time.clock/with-zone clk zone)))
 
@@ -1048,7 +1044,7 @@
   (beginning [_] nil)
   (end [_] nil))
 
-(extend-protocol ITimeReify
+(extend-protocol p/ITimeReify
   LocalTime
   (on [t date] (cljc.java-time.local-time/at-date t date))
   OffsetTime
@@ -1064,7 +1060,7 @@
   ZonedDateTime
   (in [t z] (cljc.java-time.zoned-date-time/with-zone-same-instant t (zone z)))
   #?(:clj Date :cljs js/Date)
-  (in [t z] (in (instant t) (zone z))))
+  (in [t z] (p/in (instant t) (zone z))))
 
 (defprotocol ILocalTime
   (local? [t] "Is the time a java.time.LocalTime or java.time.LocalDateTime?"))
