@@ -94,15 +94,28 @@ As long as you have you have started your repl with these aliases "-A:dev:test-c
 For running the ClojureScript tests you will need the following npm dependencies installed:
 
 ----
-sudo npm install karma-cli -g
-npm install karma --save-dev
-npm install karma-chrome-launcher
-npm install karma-cljs-test
+sudo npm install -g karma-cli
+sudo npm install -g karma
+sudo npm install -g karma-chrome-launcher
+sudo npm install -g karma-cljs-test
 ----
+
+Check `.circleci/config.yml` for the versions that are known to work.
+
+==== Setting `CHROME_BIN`
+
+If you get an error similar to the following:
+
+----
+No binary for ChromeHeadless browser on your platform.
+----
+
+Set the environment variable `CHROME_BIN` to wherever Chrome or Chromium is installed on your platform.
+
 
 === Release
 
-create a git tag 
+create a git tag
 
 `make install` (this installs in ~/.m2 - check that things look ok)
 
