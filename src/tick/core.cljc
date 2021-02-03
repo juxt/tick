@@ -798,6 +798,8 @@
   Year
   (forward-number [t n] (cljc.java-time.year/plus-years t n))
   (backward-number [t n] (cljc.java-time.year/minus-years t n))
+  (forward-duration [t d] (cljc.java-time.year/plus t d))
+  (backward-duration [t d] (cljc.java-time.year/minus t d))
   YearMonth
   (forward-number [t n] (cljc.java-time.year-month/plus-months t n))
   (backward-number [t n] (cljc.java-time.year-month/minus-months t n))
