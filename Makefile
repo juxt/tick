@@ -34,9 +34,9 @@ dev-docs-cljs:
 			clojure -A:docs-index
 
 install:
-			clojure -A:release install
+			clojure -M:release install --version $(VERSION)
 deploy:
-			clojure -A:release
+			clojure -M:release --version $(VERSION)
 
 # hooray for stackoverflow
 .PHONY: list

@@ -115,11 +115,11 @@ Set the environment variable `CHROME_BIN` to wherever Chrome or Chromium is inst
 
 === Release
 
-create a git tag
+create a git tag.
 
-`make install` (this installs in ~/.m2 - check that things look ok)
+`make install VERSION=your-tag` (this installs in ~/.m2 - check that things look ok)
 
-`make deploy`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
+`make deploy VERSION=your-tag`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
 
 `git push origin new-tag-name`
 
