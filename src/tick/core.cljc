@@ -878,13 +878,13 @@
      (end [m] (end-composite m))))
 
 #?(:cljs
-   (extend-protocol ITimeSpan
+   (extend-protocol p/ITimeSpan
      PersistentArrayMap
      (beginning [m] (beginning-composite m))
      (end [m] (end-composite m))))
 
 #?(:cljs
-   (extend-protocol ITimeSpan
+   (extend-protocol p/ITimeSpan
      PersistentHashMap
      (beginning [m] (beginning-composite m))
      (end [m] (end-composite m))))
