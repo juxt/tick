@@ -54,68 +54,68 @@
 ;; Conversions, with 0-arity defaults
 
 (defn time
-  ([] (core/time (now)))
-  ([v] (core/time v)))
+  ([] (p/time (now)))
+  ([v] (p/time v)))
 
 (defn date
   ([] (today))
-  ([v] (core/date v)))
+  ([v] (p/date v)))
 
 (defn inst
-  ([] (core/inst (now)))
-  ([v] (core/inst v)))
+  ([] (p/inst (now)))
+  ([v] (p/inst v)))
 
 (defn instant
-  ([] (core/instant (now)))
-  ([v] (core/instant v)))
+  ([] (p/instant (now)))
+  ([v] (p/instant v)))
 
 (defn date-time
-  ([] (core/date-time (now)))
-  ([v] (core/date-time v)))
+  ([] (p/date-time (now)))
+  ([v] (p/date-time v)))
 
 (defn offset-date-time
-  ([] (core/offset-date-time (now)))
-  ([v] (core/offset-date-time v)))
+  ([] (p/offset-date-time (now)))
+  ([v] (p/offset-date-time v)))
 
 (defn zoned-date-time
-  ([] (core/zoned-date-time (now)))
-  ([v] (core/zoned-date-time v)))
+  ([] (p/zoned-date-time (now)))
+  ([v] (p/zoned-date-time v)))
 
 ;; Extraction
 
-(defn nanosecond [t] (core/nanosecond t))
-(defn microsecond [t] (core/microsecond t))
-(defn millisecond [t] (core/millisecond t))
-(defn second [t] (core/second t))
-(defn minute [t] (core/minute t))
-(defn hour [t] (core/hour t))
+(defn nanosecond [t] (p/nanosecond t))
+(defn microsecond [t] (p/microsecond t))
+(defn millisecond [t] (p/millisecond t))
+(defn second [t] (p/second t))
+(defn minute [t] (p/minute t))
+(defn hour [t] (p/hour t))
 
 (defn day-of-week
-  ([] (core/day-of-week (today)))
-  ([v] (core/day-of-week v)))
+  ([] (p/day-of-week (today)))
+  ([v] (p/day-of-week v)))
 
 (defn day-of-month
-  ([] (core/day-of-month (today)))
-  ([v] (core/day-of-month v)))
+  ([] (p/day-of-month (today)))
+  ([v] (p/day-of-month v)))
 
 (defn month
-  ([] (core/month (today)))
-  ([v] (core/month v)))
+  ([] (p/month (today)))
+  ([v] (p/month v)))
 
 (defn year
-  ([] (core/year (today)))
-  ([v] (core/year v)))
+  ([] (p/year (today)))
+  ([v] (p/year v)))
 
 (defn year-month
-  ([] (core/year-month (today)))
-  ([v] (core/year-month v)))
+  ([] (p/year-month (today)))
+  ([v] (p/year-month v)))
 
 (defn zone
   ([] (core/current-zone))
-  ([z] (core/zone z)))
+  ([z] (p/zone z)))
 
 (defn zone-offset
-  ([offset] (core/zone-offset offset))
+  ([offset] (p/zone-offset offset))
   ([hours minutes] (cljc.java-time.zone-offset/of-hours-minutes hours minutes))
   ([hours minutes seconds] (cljc.java-time.zone-offset/of-hours-minutes-seconds hours minutes seconds)))
 
@@ -149,8 +149,8 @@
 (def NOVEMBER cljc.java-time.month/november)
 (def DECEMBER cljc.java-time.month/december)
 
-(defn beginning [v] (core/beginning v))
-(defn end [v] (core/end v))
+(defn beginning [v] (p/beginning v))
+(defn end [v] (p/end v))
 (defn duration [v] (core/duration v))
 
 (def coincident? core/coincident?)
@@ -205,7 +205,7 @@ For example:
   ([arg] arg)
   ([arg & args]
    (if (or (core/duration? arg) (core/period? arg))
-     (reduce core/+ arg args)
+     (reduce p/+ arg args)
      (do
        (assert (= 1 (count args)))
        (>> arg (first args))))))
@@ -218,7 +218,7 @@ For example:
   ([arg] (core/negated arg))
   ([arg & args]
    (if (or (core/duration? arg) (core/period? arg))
-     (reduce core/- arg args)
+     (reduce p/- arg args)
      (do
        (assert (= 1 (count args)))
        (<< arg (first args))))))
@@ -226,25 +226,25 @@ For example:
 (def max core/max)
 (def min core/min)
 
-(def min-of-type core/min-of-type)
-(def max-of-type core/max-of-type)
+(def min-of-type p/min-of-type)
+(def max-of-type p/max-of-type)
 
-(def range core/range)
+(def range p/range)
 
-(defn int [arg] (core/int arg))
-(defn long [arg] (core/long arg))
+(defn int [arg] (p/int arg))
+(defn long [arg] (p/long arg))
 
 ;; Lengths of time (durations & periods)
 
-(defn nanos [v] (core/nanos v))
-(defn micros [v] (core/micros v))
-(defn millis [v] (core/millis v))
-(defn seconds [v] (core/seconds v))
-(defn minutes [v] (core/minutes v))
-(defn hours [v] (core/hours v))
-(defn days [v] (core/days v))
-(defn months [v] (core/months v))
-(defn years [v] (core/years v))
+(defn nanos [v] (p/nanos v))
+(defn micros [v] (p/micros v))
+(defn millis [v] (p/millis v))
+(defn seconds [v] (p/seconds v))
+(defn minutes [v] (p/minutes v))
+(defn hours [v] (p/hours v))
+(defn days [v] (p/days v))
+(defn months [v] (p/months v))
+(defn years [v] (p/years v))
 
 ;; Units
 (def units core/units)
@@ -256,38 +256,38 @@ For example:
 
 (defn <
   ([_x] true)
-  ([x y] (core/< x y))
-  ([x y & more] (if (core/< x y)
+  ([x y] (p/< x y))
+  ([x y & more] (if (p/< x y)
                   (if (next more)
                     (recur y (first more) (next more))
-                    (core/< y (first more)))
+                    (p/< y (first more)))
                   false)))
 
 (defn <=
   ([_x] true)
-  ([x y] (core/<= x y))
-  ([x y & more] (if (core/<= x y)
+  ([x y] (p/<= x y))
+  ([x y & more] (if (p/<= x y)
                   (if (next more)
                     (recur y (first more) (next more))
-                    (core/<= y (first more)))
+                    (p/<= y (first more)))
                   false)))
 
 (defn >
   ([_x] true)
-  ([x y] (core/> x y))
-  ([x y & more] (if (core/> x y)
+  ([x y] (p/> x y))
+  ([x y & more] (if (p/> x y)
                   (if (next more)
                     (recur y (first more) (next more))
-                    (core/> y (first more)))
+                    (p/> y (first more)))
                   false)))
 
 (defn >=
   ([_x] true)
-  ([x y] (core/>= x y))
-  ([x y & more] (if (core/>= x y)
+  ([x y] (p/>= x y))
+  ([x y & more] (if (p/>= x y)
                   (if (next more)
                     (recur y (first more) (next more))
-                    (core/>= y (first more)))
+                    (p/>= y (first more)))
                   false)))
 
 ;; TODO: Multiplication (of durations)
@@ -298,10 +298,10 @@ For example:
 
 (defn clock
   ([] (core/current-clock))
-  ([i] (core/clock i)))
+  ([i] (p/clock i)))
 
 (defmacro with-clock [^java.time.Clock clock & body]
-  `(binding [tick.core/*clock* (core/clock ~clock)]
+  `(binding [tick.core/*clock* (p/clock ~clock)]
      ~@body))
 
 ;(def tick core/tick)
@@ -340,7 +340,7 @@ For example:
   [n u]
   (core/new-period n u))
 
-(defn between [v1 v2] (core/between v1 v2))
+(defn between [v1 v2] (p/between v1 v2))
 
 (defn concur
   ([] nil)
@@ -354,11 +354,11 @@ For example:
 ;; Divisions
 
 (defn divide-by [divisor t]
-  (core/divide t divisor))
+  (p/divide t divisor))
 
 ;; Alternative useful for -> threading
 (defn divide [t divisor]
-  (core/divide t divisor))
+  (p/divide t divisor))
 
 ;; Temporal adjusters
 

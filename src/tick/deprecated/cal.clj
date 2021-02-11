@@ -3,7 +3,8 @@
 (ns tick.deprecated.cal
   (:require
    [clojure.spec.alpha :as s]
-   [tick.core :as t])
+   [tick.core :as t]
+   [tick.protocols :as p])
   (:import
    [java.time Clock ZoneId Instant Duration DayOfWeek Month ZonedDateTime LocalDate YearMonth Month MonthDay]
    [java.time.temporal ChronoUnit]))
@@ -29,10 +30,10 @@
   (fn [d] (.isBefore d now)))
 
 (defn- first-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (t/range ld))))
+  (first (drop-while #(not= (day-of-week %) day) (p/range ld))))
 
 (defn- last-named-day-from [ld day]
-  (first (drop-while #(not= (day-of-week %) day) (t/range ld nil (t/new-period -1 :days)))))
+  (first (drop-while #(not= (day-of-week %) day) (p/range ld nil (t/new-period -1 :days)))))
 
 (defn first-monday-of-month [^YearMonth ym]
   (first-named-day-from (.atDay ym 1) DayOfWeek/MONDAY))
@@ -60,10 +61,10 @@
         :ret ::holiday)
 
 (defn new-years-day [year]
-  (LocalDate/of (t/int (t/year year)) 1 1))
+  (LocalDate/of (p/int (p/year year)) 1 1))
 
 (defn new-years-day-holiday [year]
-  (let [day (new-years-day (t/int (t/year year)))
+  (let [day (new-years-day (p/int (p/year year)))
         hol (cond-> day (weekend? day) (first-named-day-from DayOfWeek/MONDAY))]
     (holiday "New Year's Day" day hol)))
 
@@ -75,7 +76,7 @@
   ;; TODO: From what year does this algorithm makes sense from, need
   ;; to throw an exception outside this range.
   [year]
-  (let [year (t/int (t/year year))
+  (let [year (p/int (p/year year))
         a (mod year 19)
         b (quot year 100)
         c (mod year 100)
@@ -108,32 +109,32 @@
   ([]
    (MonthDay/of Month/MAY 1))
   ([year]
-   (.atMonthDay (t/year year) (may-day))))
+   (.atMonthDay (p/year year) (may-day))))
 
 (defn early-may-bank-holiday [year]
   (holiday "Early May bank holiday"
-           (first-named-day-from (may-day (t/year year)) DayOfWeek/MONDAY)))
+           (first-named-day-from (may-day (p/year year)) DayOfWeek/MONDAY)))
 
 (defn spring-bank-holiday [year]
   (holiday "Spring bank holiday"
-           (last-monday-of-month (.atMonth (t/year year) Month/MAY))))
+           (last-monday-of-month (.atMonth (p/year year) Month/MAY))))
 
 (defn summer-bank-holiday [year]
   (holiday "Summer bank holiday"
-           (last-monday-of-month (.atMonth (t/year year) Month/AUGUST))))
+           (last-monday-of-month (.atMonth (p/year year) Month/AUGUST))))
 
 (defn christmas-day
   ([]
    (MonthDay/of Month/DECEMBER 25))
   ([year]
-   (.atMonthDay (t/year year) (christmas-day))))
+   (.atMonthDay (p/year year) (christmas-day))))
 
 (s/fdef christmas-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn christmas-day-holiday [year]
-  (let [day (christmas-day (t/year year))
+  (let [day (christmas-day (p/year year))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Christmas Day" day hol)))
@@ -146,14 +147,14 @@
   ([]
    (MonthDay/of Month/DECEMBER 26))
   ([year]
-   (.atMonthDay (t/year year) (boxing-day))))
+   (.atMonthDay (p/year year) (boxing-day))))
 
 (s/fdef boxing-day
         :args (s/cat :year ::year)
         :ret ::date)
 
 (defn boxing-day-holiday [year]
-  (let [day (boxing-day (t/int (t/year year)))
+  (let [day (boxing-day (p/int (p/year year)))
         hol (cond-> day
               (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (.getDayOfWeek day)) (.plusDays 2))]
     (holiday "Boxing Day" day hol)))

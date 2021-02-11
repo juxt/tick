@@ -4,6 +4,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [tick.core :as t]
+   [tick.protocols :as p]
    [clojure.test
     :refer [deftest is testing run-tests]
     :refer-macros [deftest is testing run-tests]]))
@@ -19,10 +20,10 @@
 (deftest divide-test
   (is
     ;; Duration -> Long -> Duration
-    (= (t/new-duration 6 :hours) (t/divide (t/new-duration 6 :days) 24))
+    (= (t/new-duration 6 :hours) (p/divide (t/new-duration 6 :days) 24))
     ;; Duration -> Duration -> Long
-    (= 63 (t/divide (t/new-duration 21 :days) (t/new-duration 8 :hours)))))
+    (= 63 (p/divide (t/new-duration 21 :days) (t/new-duration 8 :hours)))))
 
 (deftest construction-test
-  (is (= (t/date "2018-01-11")
-         (t/date (t/instant 1515691416624)))))
+  (is (= (p/date "2018-01-11")
+         (p/date (p/instant 1515691416624)))))

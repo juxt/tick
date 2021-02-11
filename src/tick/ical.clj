@@ -7,6 +7,7 @@
    [clojure.java.io :as io]
    [clojure.spec.alpha :as s]
    [tick.core :as t]
+   [tick.protocols :as p]
    [tick.interval :as ival])
   (:import
    [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId ZoneRegion]
@@ -64,7 +65,7 @@
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-1-PATTERN)})
   ZonedDateTime
   (serialize-value [s] {:value (.format s DATE-TIME-FORM-3-PATTERN)
-                        :params {:tzid (t/zone s)}})
+                        :params {:tzid (p/zone s)}})
   ZoneRegion
   (serialize-value [zr] {:value (str zr)})
   clojure.lang.APersistentMap
@@ -102,12 +103,12 @@
     (print-property prop-name prop-value)))
 
 (defrecord VEvent []
-  t/ITimeSpan
-  (beginning [this] (t/beginning (property-value this :dtstart)))
+  p/ITimeSpan
+  (beginning [this] (p/beginning (property-value this :dtstart)))
   ;; This might seem wrong but we use t/beginning to convert a
   ;; date-time to the same date-time, and a date to midnight (the
   ;; start of that date). TODO: Is this explained in the RFC anywhere?
-  (end [this] (t/beginning (property-value this :dtend)))
+  (end [this] (p/beginning (property-value this :dtend)))
 
   IPrintable
   (print-object [this]
@@ -125,32 +126,32 @@
   (property-value [this prop-name]
     (first (property-values this prop-name)))
 
-  t/IConversion
-  (inst [this] (t/inst (property-value this :dtstart)))
-  (instant [this] (t/inst (property-value this :dtstart)))
-  (offset-date-time [this] (t/offset-date-time (property-value this :dtstart)))
-  (zoned-date-time [this] (t/zoned-date-time (property-value this :dtstart)))
+  p/IConversion
+  (inst [this] (p/inst (property-value this :dtstart)))
+  (instant [this] (p/inst (property-value this :dtstart)))
+  (offset-date-time [this] (p/offset-date-time (property-value this :dtstart)))
+  (zoned-date-time [this] (p/zoned-date-time (property-value this :dtstart)))
 
-  t/IExtraction
-  (time [this] (t/time (property-value this :dtstart)))
-  (date [this] (t/date (property-value this :dtstart)))
-  (date-time [this] (t/date-time (property-value this :dtstart)))
-  (nanosecond [this] (t/nanosecond (property-value this :dtstart)))
-  (microsecond [this] (t/microsecond (property-value this :dtstart)))
-  (millisecond [this] (t/millisecond (property-value this :dtstart)))
-  (second [this] (t/second (property-value this :dtstart)))
-  (minute [this] (t/minute (property-value this :dtstart)))
-  (hour [this] (t/hour (property-value this :dtstart)))
-  (day-of-week [this] (t/day-of-week (property-value this :dtstart)))
-  (day-of-month [this] (t/day-of-month (property-value this :dtstart)))
-  (month [this] (t/month (property-value this :dtstart)))
-  (year [this] (t/year (property-value this :dtstart)))
-  (year-month [this] (t/year-month (property-value this :dtstart)))
-  (zone [this] (t/zone (property-value this :dtstart)))
-  (zone-offset [this] (t/zone-offset (property-value this :dtstart))))
+  p/IExtraction
+  (time [this] (p/time (property-value this :dtstart)))
+  (date [this] (p/date (property-value this :dtstart)))
+  (date-time [this] (p/date-time (property-value this :dtstart)))
+  (nanosecond [this] (p/nanosecond (property-value this :dtstart)))
+  (microsecond [this] (p/microsecond (property-value this :dtstart)))
+  (millisecond [this] (p/millisecond (property-value this :dtstart)))
+  (second [this] (p/second (property-value this :dtstart)))
+  (minute [this] (p/minute (property-value this :dtstart)))
+  (hour [this] (p/hour (property-value this :dtstart)))
+  (day-of-week [this] (p/day-of-week (property-value this :dtstart)))
+  (day-of-month [this] (p/day-of-month (property-value this :dtstart)))
+  (month [this] (p/month (property-value this :dtstart)))
+  (year [this] (p/year (property-value this :dtstart)))
+  (year-month [this] (p/year-month (property-value this :dtstart)))
+  (zone [this] (p/zone (property-value this :dtstart)))
+  (zone-offset [this] (p/zone-offset (property-value this :dtstart))))
 
 (defrecord VCalendar [objects]
-  ;; TODO: Add t/ITimeSpan
+  ;; TODO: Add p/ITimeSpan
   IPrintable
   (print-object [this]
     (wrap-with
@@ -172,8 +173,8 @@
     (print-object
       (vcalendar
         (vevent "Malcolm is on holiday!"
-                (t/date "2018-07-21")
-                (t/date "2018-07-31")
+                (p/date "2018-07-21")
+                (p/date "2018-07-31")
                 :description "The content information associated with an iCalendar object is formatted using a syntax similar to that defined by [RFC 2425]. That is, the content information consists of CRLF-separated content lines."))))
 
   ;; Form 2: DATE WITH UTC TIME
@@ -182,7 +183,7 @@
       (vcalendar
         (vevent "Malcolm is in a meeting!"
                 (t/now)
-                (t/+ (t/now) (t/minutes 50))
+                (p/+ (t/now) (p/minutes 50))
                 :description "The content information associated with an iCalendar object is formatted using a syntax similar to that defined by [RFC 2425]. That is, the content information consists of CRLF-separated content lines."))))
 
   ;; Form 3: DATE WITH LOCAL TIME AND TIME ZONE REFERENCE

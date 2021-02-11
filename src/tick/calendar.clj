@@ -2,6 +2,7 @@
 
 (ns tick.calendar
   (:require
+    [tick.protocols :as p]
    [tick.core :as t]
    [tick.ical :as ical]
    [tick.interval :as ival]
@@ -14,8 +15,8 @@
 (defn select-by-year
   "Given the sequence of holidays (which must be intervals, such as iCalendar VEvent objects), select only those of a given year."
   [year holidays]
-  (let [year (t/year year)]
-    (filter (fn [hol] (= year (t/year hol))) holidays))
+  (let [year (p/year year)]
+    (filter (fn [hol] (= year (p/year hol))) holidays))
   #_(ival/intersection holidays (list (t/year year))))
 
 ;; TODO: Promote to API
@@ -37,7 +38,7 @@
 (defn weekend?
   "Is the ZonedDateTime during the weekend?"
   [dt]
-  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (t/day-of-week dt)))
+  (#{DayOfWeek/SATURDAY DayOfWeek/SUNDAY} (p/day-of-week dt)))
 
 ;;(t/year (first (bank-holidays-in-england-and-wales)))
 

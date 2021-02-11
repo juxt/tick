@@ -2,12 +2,13 @@
 
 (ns tick.file
   (:require
-   [tick.core :as t])
+   [tick.core :as t]
+   [tick.protocols :as p])
   (:import
    [java.time Instant]))
 
-(extend-protocol t/IConversion
+(extend-protocol p/IConversion
   java.io.File
   (instant [f] (Instant/ofEpochMilli (.lastModified f)))
   java.nio.file.Path
-  (instant [f] (t/instant (.toFile f))))
+  (instant [f] (p/instant (.toFile f))))
