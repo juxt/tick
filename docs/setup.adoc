@@ -3,7 +3,7 @@
 Get the latest from https://clojars.org/tick[Clojars] and 
 add to your `project.clj`, `build.boot` or `deps.edn`. 
 
-There are some docs/cljs.adoc[extra considerations when using tick from Clojurescript]. 
+There are some https://www.juxt.land/tick/docs/index.html#_clojurescript[extra considerations when using tick from Clojurescript]. 
 
 Here is a one-liner to drop into a node repl with tick:
 

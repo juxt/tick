@@ -2,30 +2,46 @@
 
 Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
 
-There are extra considerations when using tick with Clojurescript
+Tick currently uses the https://js-joda.github.io/js-joda/[js-joda] library, which aims to replicate the http://www.threeten.org/threetenbp/[three-ten-backport]
+project.
 
-Tick uses the https://js-joda.github.io/js-joda/[js-joda] library, which aims to replicate the http://www.threeten.org/threetenbp/[three-ten-backport]
-project. JS-Joda is broken down into a core project (what tick depends on) and additional timezone
-and locale projects. 
+There is a plan to move to the new platform Javascript Date API, called https://github.com/tc39/proposal-temporal[Temporal]
 
 === NPM Setup
 
-If you are using npm in your build, first add the transitive npm dependencies to your package.json. Assuming you have 
-tick in your deps.edn, from your project directory, run 
+If you are using Shadow-cljs or just foreign-libs (via Figwheel for example) then there is 
+no npm setup you need to do.
+
+If you are using webpack (cljs :bundle option) in your build, first add the transitive npm dependencies to your package.json. 
+Assuming you have tick in your deps.edn, from your project directory, run 
 
 ----
 clj -m cljs.main --install-deps
 ----
 
-Now your package.json has the required npm libs added. Shadow actually does this for you, if you are using that. 
+Now your package.json has the required npm libs added. 
 
-The only other thing to be aware of is if your build tool supports
-`:foreign-libs` (Shadow doesn't) then you should exclude the transitive cljsjs dependencies. 
-https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides more info. 
+Exclude the transitive cljsjs dependencies so that js-joda is not included twice. 
+https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides more info.
 
-Note: For tick versions 0.4.23-alpha and earlier, to use tick on shadow follow https://github.com/henryw374/tick-on-shadow-cljs-demo[this demo]
+=== Optional Timezone & Locale data for reducing build size
 
-=== Timezones 
+The use of timezones and locales is optional to allow a smaller build size. 
+
+Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped) and it https://clojureverse.org/t/cljc-java-time-will-drop-all-npm-foreign-lib-dependencies/6208/5?u=henry_w[doesn't seem possible to reduce this].
+
+For comparison, a basic cljs app with React is about 330k unzipped. 
+
+So by using tick you might be close to doubling your build size. Is that a problem? That depends, but really 
+330k is my no means small to start with, so likely for the majority of potential users it would
+not be an issue at all.
+  
+Moving the implementation to https://github.com/tc39/proposal-temporal[Temporal] will mean the 
+build includes only the compiled Clojurescript of tick itself.
+
+Timezone is an extra 26k, and Locale (just en-US) is an extra 45k
+
+==== Timezones 
 
 If you want to work with timezones, something like this, for example:
                      
@@ -42,26 +58,13 @@ add the following require:
 Note that this is pulling in all of the history of timezones as well. If you don't need historic data and you 
 want to reduce build size, js-joda provides pre-build packages for just the more recent data.
 
-=== Formatting
+==== Formatting & Parsing
 
 If you want to create custom formatters from patterns, such as "dd MMM yyyy", add this require:
 
 ----
 [tick.locale-en-us]
 ----
-
-==== Reducing Tick Build Size
-
-The extra requires for timezones and locales are have been done that way to allow a smaller payload, when the extra 
-libraries are not being used. 
-
-Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k. It could be possible to take advantage
-of tree-shaking with JSJoda, see https://github.com/juxt/tick/issues/33[this ticket] for discussion.
-  
-Timezone is an extra 26k, and Locale (just en-US) is an extra 45k
-
-The js-joda timezone dependency contains the timezone database, containing mappings between zone
-names, their offsets from UTC, and daylight savings(DST) data.
 
 Locale data is needed for custom date formatters which need particular symbols, such as M for month. 
 Due to the size and complexity of using the js-joda-locale, the authors of js-joda-locale have created

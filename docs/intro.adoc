@@ -19,7 +19,8 @@ strings. It's often desirable to have date-heavy business logic
 portable across platforms. _Tick_ supports both Clojure and
 ClojureScript, with an identical API.
 
-Tick is implemented using the api of `java.time` and an understanding of the https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[concepts behind java.time] will be very useful when working with tick, 
+Tick is implemented using https://github.com/henryw374/cljc.java-time[(a very thin wrapper over) the api of `java.time`] and an understanding of the https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[concepts behind java.time] 
+will be very useful when working with tick, 
 because tick entities are java.time entities (Instant, LocalTime etc). Where tick doesn't provide the api you need,
 you can look at the java.time api to see if there alternatives. If you cannot find the help you need in the tick documentation, it 
 is quite likely that someone will have had the same query and had it resolved on https://stackoverflow.com/questions/tagged/java-time[Stack Overflow].
@@ -56,7 +57,8 @@ Java 8's link:http://www.oracle.com/technetwork/articles/java/jf14-date-time-212
 Joda Time.
 
 Unlike older JDK dates and calendars, instances in
-`java.time` are immutable so can be considered values in Clojure. For this reason, there is no reason to wrap these values. Consequently, there is full interoperability between _tick_ and `java.time`. Where _tick_ does not provide a part of java.time's functionality, `java.time` can be called directly.
+`java.time` are immutable so can be considered values in Clojure. For this reason, there is no reason to wrap these values. Consequently, there is full interoperability between _tick_ and `java.time`. Where _tick_ does not provide a part of java.time's functionality, 
+`java.time` can be called https://github.com/henryw374/cljc.java-time[directly] in either Clojure or Clojurescript.
 
 CAUTION: Because _tick_ is built on `java.time`, Clojure programs must run on Java 8 or higher.
 
@@ -82,11 +84,6 @@ expressive, cross-platform Clojure(Script) API.
 For some use cases it is possible to write cross-platform code with clj/s-time, conditionally requiring clj-time 
 or cljs-time in a cljc file. In our experience though, the fact that cljs-time doesn't have complete fidelity
 with clj-time often comes to be a problem.
-
-=== Dropping to java.time
-
-Tick depends on https://github.com/henryw374/cljc.java-time[cljc.java-time] which is the easiest way to access the full
-java.time api underneath tick. 
 
 === Quartz
 
