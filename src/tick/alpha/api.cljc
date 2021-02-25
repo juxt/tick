@@ -62,8 +62,8 @@
   ([v] (p/date v)))
 
 (defn inst
-  ([] (p/inst (now)))
-  ([v] (p/inst v)))
+  (^java.util.Date [] (p/inst (now)))
+  (^java.util.Date [v] (p/inst v)))
 
 (defn instant
   ([] (p/instant (now)))
