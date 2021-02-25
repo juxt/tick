@@ -27,13 +27,13 @@
          :test-chrome {:extra-paths ["test" "cljs-test-runner-out/gen"]
                        :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
                                      org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                       :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn -x chrome-headless"]}
+                       :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn" "-x" "chrome-headless"]}
          ; this is node using foreign-libs.
          ; although not recommended, whilst tick depends on cljsjs, this should 'just work'
          :test-node   {:extra-paths ["test" "cljs-test-runner-out/gen"]
                        :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
                                      org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                       :main-opts   ["-m" "cljs-test-runner.main" "-x node"]}
+                       :main-opts   ["-m" "cljs-test-runner.main" "-x" "node"]}
          :docs-index  {:jvm-opts    ["-Xmx500M"]
                        :extra-paths ["docs/src"]
                        :extra-deps  {reagent/reagent           {:mvn/version "0.8.1"}
