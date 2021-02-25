@@ -3,7 +3,7 @@
 # If you don't have GNU Make on your system, use this file as a
 # cribsheet for how to build various aspects of tick.
 
-STYLESDIR = ../asciidoctor-stylesheet-factory/stylesheets
+STYLESDIR = .
 STYLESHEET = juxt.css
 
 .PHONY: 		watch default deploy test dev-docs-cljs
@@ -31,7 +31,7 @@ test-all:
 
 # For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
 dev-docs-cljs:
-			clojure -A:docs-index
+			clojure -M:docs-index
 
 install:
 			clojure -M:release install --version $(VERSION)
