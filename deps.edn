@@ -1,4 +1,4 @@
-{:paths ["src" "resources"]
+{:paths ["src"]
  :deps  {cljc.java-time/cljc.java-time {:mvn/version "0.1.15"}
          cljsjs/js-joda-timezone       {:mvn/version "2.2.0-0"}
          cljsjs/js-joda-locale-en-us   {:mvn/version "3.1.1-1"}

@@ -4,11 +4,9 @@
   (:require
    [clojure.set :as set]
    [clojure.string :as str]
-   [clojure.java.io :as io]
    [clojure.spec.alpha :as s]
    [tick.core :as t]
-   [tick.protocols :as p]
-   [tick.interval :as ival])
+   [tick.protocols :as p])
   (:import
    [java.time Instant LocalDate LocalDateTime ZonedDateTime ZoneId ZoneRegion]
    [java.time.format DateTimeFormatter]))
@@ -167,36 +165,6 @@
   (property-value [this prop-name]
     (first (property-values this prop-name))))
 
-(comment
-  ;; Form 1: DATE WITH LOCAL TIME
-  (with-out-str
-    (print-object
-      (vcalendar
-        (vevent "Malcolm is on holiday!"
-                (p/date "2018-07-21")
-                (p/date "2018-07-31")
-                :description "The content information associated with an iCalendar object is formatted using a syntax similar to that defined by [RFC 2425]. That is, the content information consists of CRLF-separated content lines."))))
-
-  ;; Form 2: DATE WITH UTC TIME
-  (with-out-str
-    (print-object
-      (vcalendar
-        (vevent "Malcolm is in a meeting!"
-                (t/now)
-                (p/+ (t/now) (p/minutes 50))
-                :description "The content information associated with an iCalendar object is formatted using a syntax similar to that defined by [RFC 2425]. That is, the content information consists of CRLF-separated content lines."))))
-
-  ;; Form 3: DATE WITH LOCAL TIME AND TIME ZONE REFERENCE
-  (with-out-str
-    (print-object
-      (vcalendar
-        (vevent
-          "Malcolm is in a meeting, in New York!"
-          (t/at-zone (t/at (t/today) "14:00") "America/New_York")
-          (t/at-zone (t/at (t/today) "14:50") "America/New_York")
-          :description "The content information associated with an iCalendar object is formatted using a syntax similar to that defined by [RFC 2425]. That is, the content information consists of CRLF-separated content lines.")))))
-
-
 ;; Parsing with spec
 
 (s/def ::contentline
@@ -227,6 +195,7 @@
 (def VALUE-CHAR
   (set (concat [\space \t]
                (char-range 0x21 0x7e))))
+
 ;; TODO: Add NON-US-ASCII
 
 (def CONTROL
