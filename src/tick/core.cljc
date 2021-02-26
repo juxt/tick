@@ -330,6 +330,7 @@
 
   ZoneOffset
   (zone-offset [z] z)
+  (zone [z] z)
 
   OffsetDateTime
   (time [odt] (cljc.java-time.offset-date-time/to-local-time odt))
