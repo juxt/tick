@@ -12,7 +12,6 @@ easier to write programs that involve time and date calculations:
 * Powerful functions for slicing and dicing time intervals (stable)
 * Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra] (stable)
 * Support for iCalendar serialization (work-in-progress)
-* Scheduling (work-in-progress)
 
 In many business domains, dates are as fundamental as numbers and
 strings. It's often desirable to have date-heavy business logic
@@ -84,7 +83,3 @@ expressive, cross-platform Clojure(Script) API.
 For some use cases it is possible to write cross-platform code with clj/s-time, conditionally requiring clj-time 
 or cljs-time in a cljc file. In our experience though, the fact that cljs-time doesn't have complete fidelity
 with clj-time often comes to be a problem.
-
-=== Quartz
-
-See https://dzone.com/articles/why-you-shouldnt-use-quartz
