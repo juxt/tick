@@ -4,7 +4,8 @@ A Clojure(Script) library for dealing with time. Intended as a
 replacement for clj-time.
 
 Based on Java 8 time (on the JVM) and js-joda (on JavaScript
-runtimes).
+runtimes). We hope to do an implementation based on https://github.com/tc39/proposal-temporal[Temporal],
+when it is available.
 
 [source,clojure]
 ----
