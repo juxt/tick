@@ -35,7 +35,7 @@
                                      org.clojure/clojurescript {:mvn/version "1.10.764"}}
                        :main-opts   ["-m" "cljs-test-runner.main" "-x" "node"]}
          :docs-index  {:jvm-opts    ["-Xmx500M"]
-                       :extra-paths ["docs/src"]
+                       :extra-paths ["docs/src" "docs"]
                        :extra-deps  {reagent/reagent           {:mvn/version "0.8.1"}
                                      com.bhauman/figwheel-main {:mvn/version "0.2.12"}
                                      org.clojure/clojurescript {:mvn/version "1.10.764"}}

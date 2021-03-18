@@ -2,8 +2,9 @@
   :open-url false
   :watch-dirs ["docs/src" ]}
 {:main          tick.docs.app
- :output-to     "docs/js/main.js"
+ :output-to     "docs/public/js/main.js"
+ :output-dir    "docs/public/js"
  :verbose       true
- :optimizations :simple
+ :optimizations :none
  ;:cache-analysis true
  }
