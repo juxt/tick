@@ -14,8 +14,8 @@
   (testing "(time)"
     (is (t/time? (t/time))))
   (testing "(time \"4pm\")"
-    (is (t/time? (t/time "4pm")))
-    (is (= "16:00" (str (t/time "4pm")))))
+    (is (t/time? (t/parse "4pm")))
+    (is (= "16:00" (str (t/parse "4pm")))))
   (testing "(midnight)"
     (is (t/time? (t/midnight)))
     (is (= "00:00" (str (t/midnight)))))

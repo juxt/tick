@@ -171,7 +171,7 @@
 
   #?(:clj String :cljs string)
   (inst [s] (p/inst (p/instant s)))
-  (instant [s] (p/instant (p/parse s)))
+  (instant [s] (cljc.java-time.instant/parse s))
   (offset-date-time [s] (cljc.java-time.offset-date-time/parse s))
   (zoned-date-time [s] (cljc.java-time.zoned-date-time/parse s))
 
@@ -253,14 +253,14 @@
   (zone-offset [i] cljc.java-time.zone-offset/utc)
 
   #?(:clj String :cljs string)
-  (time [s] (p/time (p/parse s)))
-  (date [s] (p/date (p/parse s)))
+  (time [s] (cljc.java-time.local-time/parse s))
+  (date [s] (cljc.java-time.local-date/parse s))
   (date-time [s] (cljc.java-time.local-date-time/parse s))
   (day-of-week [s] (or (parse-day s) (p/day-of-week (p/date s))))
   (day-of-month [s] (p/day-of-month (p/date s)))
   (month [s] (or (parse-month s) (p/month (p/date s))))
-  (year [s] (p/year (p/parse s)))
-  (year-month [s] (p/year-month (p/parse s)))
+  (year [s] (cljc.java-time.year/parse s))
+  (year-month [s] (cljc.java-time.year-month/parse s))
   (zone [s] (cljc.java-time.zone-id/of s))
   (zone-offset [s] (cljc.java-time.zone-offset/of s))
   (int [s] (cljc.java-time.instant/get-nano (p/instant s)))

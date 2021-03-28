@@ -55,14 +55,20 @@
     (is (= (t/date-time "2017-08-08T12:00:00") (t/noon (t/today))))
     (is (= (t/date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
-(deftest offset-date-time-test
-  (let [t "2018-09-24T18:57:08.996+01:00"]
-    (testing "offset date time basics"
-      (is (t/offset-date-time? (t/parse t)))
-      (is (t/offset-date-time? (t/offset-date-time (t/now))))
-      (is (t/offset-date-time? (t/offset-date-time t)))
-      (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
-      (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time)))))))
+(deftest instant-test
+  (testing "instant basics"
+    (is (t/instant? (t/instant (t/now))))
+    (is (t/instant? (t/instant (str cljc.java-time.instant/min))))
+    (is (t/instant? (t/instant (t/zoned-date-time)))))
+
+  (deftest offset-date-time-test
+    (let [t "2018-09-24T18:57:08.996+01:00"]
+      (testing "offset date time basics"
+        (is (t/offset-date-time? (t/parse t)))
+        (is (t/offset-date-time? (t/offset-date-time (t/now))))
+        (is (t/offset-date-time? (t/offset-date-time t)))
+        (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
+        (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time))))))))
 
 (deftest zoned-date-time-test
   (is (t/zoned-date-time? (t/parse "2020-12-15T12:00:10Z[Europe/London]")))
@@ -301,9 +307,9 @@
      no-disturb-interval (t/complement disturb-interval)
      can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
      ]
-    (is (not (can-disturb? (t/time "3:00"))))
-    (is (not (can-disturb? (t/time "7:00"))))
-    (is (can-disturb? (t/time "7:01")))
+    (is (not (can-disturb? (t/time "03:00"))))
+    (is (not (can-disturb? (t/time "07:00"))))
+    (is (can-disturb? (t/time "07:01")))
     (is (can-disturb? (t/time "12:00")))
     (is (can-disturb? (t/time "21:59")))
     (is (not (can-disturb? (t/time "22:00"))))
