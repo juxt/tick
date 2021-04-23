@@ -334,3 +334,14 @@
   (is (true? (t/interval? (moment (t/now)))))
   (is (false? (t/date? 16)))
   (is (false? (t/month? 16))))
+
+(deftest in-test
+  (is (= (t/zoned-date-time "2021-04-23T11:23:24.576270-04:00[America/Toronto]")
+         (t/in (t/instant "2021-04-23T15:23:24.576270Z")
+               (t/zone "America/Toronto"))))
+  (is (= (t/zoned-date-time "2021-04-23T11:18:46.594720-04:00[America/Toronto]")
+         (t/in (t/offset-date-time "2021-04-23T13:18:46.594720-02:00")
+               (t/zone "America/Toronto"))))
+  (is (= (t/zoned-date-time "2021-04-23T11:18:46.594720-04:00[America/Toronto]")
+         (t/in (t/zoned-date-time "2021-04-23T08:18:46.594720-07:00[America/Los_Angeles]")
+               (t/zone "America/Toronto")))))

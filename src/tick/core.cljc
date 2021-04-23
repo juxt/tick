@@ -983,6 +983,8 @@
   Instant
   (in [t z] (cljc.java-time.instant/at-zone t z))
   (offset-by [t offset] (cljc.java-time.instant/at-offset t (p/zone-offset offset)))
+  OffsetDateTime
+  (in [t z] (cljc.java-time.offset-date-time/at-zone-same-instant t (p/zone z)))
   ZonedDateTime
   (in [t z] (cljc.java-time.zoned-date-time/with-zone-same-instant t (p/zone z)))
   #?(:clj Date :cljs js/Date)
