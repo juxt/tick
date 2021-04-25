@@ -141,11 +141,11 @@
 
 (defn equals? [x y]
   (and
-    (= (p/beginning x) (p/beginning y))
-    (= (p/end x) (p/end y))))
+    (p/=== (p/beginning x) (p/beginning y))
+    (p/=== (p/end x) (p/end y))))
 
 (defn meets? [x y]
-  (= (p/end x) (p/beginning y)))
+  (p/=== (p/end x) (p/beginning y)))
 
 (defn overlaps? [x y]
   (and
@@ -160,13 +160,13 @@
 
 (defn starts? [x y]
   (and
-   (= (p/beginning x) (p/beginning y))
+   (p/=== (p/beginning x) (p/beginning y))
    (p/< (p/end x) (p/end y))))
 
 (defn finishes? [x y]
   (and
    (p/> (p/beginning x) (p/beginning y))
-   (= (p/end x) (p/end y))))
+   (p/=== (p/end x) (p/end y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.
 (defn conv

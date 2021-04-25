@@ -67,3 +67,14 @@
 ;; TODO: tick function
 
 ;; TODO: Atomic clocks
+
+(deftest date-relation-test
+  (is (=
+       (t/relation
+        (t/new-interval
+         (t/zoned-date-time "2021-02-24T00:00Z[GMT]")
+         (t/zoned-date-time "2021-02-25T00:00Z[GMT]"))
+        (t/new-interval
+         (t/zoned-date-time "2021-02-23T00:00Z[Europe/London]")
+         (t/zoned-date-time "2021-02-24T00:00Z[Europe/London]")))
+       :met-by)))
