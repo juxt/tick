@@ -321,7 +321,7 @@ For example:
   (reduce interval/extend ival durations))
 
 (defn scale [ival & durations]
-  (reduce interval/extend ival durations))
+  (reduce interval/scale ival durations))
 
 (def ^{:doc "Return an interval which forms the bounding-box of the given arguments."}
   bounds interval/bounds)
