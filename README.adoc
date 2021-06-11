@@ -26,6 +26,9 @@ http://juxt.pro/tick/docs/index.html[Tick Documentation]
 Alpha: Ready to use with the caveat that the API might still undergo
 minor changes.
 
+See the https://github.com/juxt/tick/issues/135[1.0 checklist] for what we think is needed for moving out of 
+alpha - not that much.
+
 == Install
 
 Get the latest from https://clojars.org/tick[Clojars] and
