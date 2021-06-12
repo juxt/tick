@@ -134,7 +134,10 @@
     (=
       (t/new-duration 2 :minutes)
       (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
-
+  (is
+    (=
+      (t/new-duration 30 :minutes)
+      (t/between (t/new-time 11 0 0) (t/new-time 11 30 0))))
   (is
    (=
     (t/new-duration 2 :minutes)

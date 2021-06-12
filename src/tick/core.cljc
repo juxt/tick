@@ -895,6 +895,8 @@
 (extend-protocol p/IBetween
   LocalDate
   (between [v1 v2] (cljc.java-time.period/between v1 (p/date v2)))
+  LocalTime
+  (between [v1 v2] (cljc.java-time.duration/between v1 (p/time v2)))
   ZonedDateTime
   (between [v1 v2] (cljc.java-time.duration/between v1 (p/zoned-date-time v2)))
   LocalDateTime
