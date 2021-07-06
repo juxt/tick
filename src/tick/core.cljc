@@ -488,51 +488,61 @@
   (<= [x y] (not (cljc.java-time.instant/is-after x y)))
   (> [x y] (cljc.java-time.instant/is-after x y))
   (>= [x y] (not (cljc.java-time.instant/is-before x y)))
+  (=== [x y] (= x y))
   LocalDateTime
   (< [x y] (cljc.java-time.local-date-time/is-before x y))
   (<= [x y] (not (cljc.java-time.local-date-time/is-after x y)))
   (> [x y] (cljc.java-time.local-date-time/is-after x y))
   (>= [x y] (not (cljc.java-time.local-date-time/is-before x y)))
+  (=== [x y] (= x y))
   #?(:clj Date :cljs js/Date)
   (<  [x y] (neg? (compare x y)))
   (<= [x y] (not (pos? (compare x y))))
   (>  [x y] (pos? (compare x y)))
   (>= [x y] (not (neg? (compare x y))))
+  (=== [x y] (= x y))
   LocalDate
   (< [x y] (cljc.java-time.local-date/is-before x y))
   (<= [x y] (not (cljc.java-time.local-date/is-after x y)))
   (> [x y] (cljc.java-time.local-date/is-after x y))
   (>= [x y] (not (cljc.java-time.local-date/is-before x y)))
+  (=== [x y] (= x y))
   LocalTime
   (< [x y] (cljc.java-time.local-time/is-before x y))
   (<= [x y] (not (cljc.java-time.local-time/is-after x y)))
   (> [x y] (cljc.java-time.local-time/is-after x y))
   (>= [x y] (not (cljc.java-time.local-time/is-before x y)))
+  (=== [x y] (= x y))
   OffsetDateTime
   (< [x y] (cljc.java-time.offset-date-time/is-before x y))
   (<= [x y] (not (cljc.java-time.offset-date-time/is-after x y)))
   (> [x y] (cljc.java-time.offset-date-time/is-after x y))
   (>= [x y] (not (cljc.java-time.offset-date-time/is-before x y)))
+  (=== [x y] (= x y))
   ZonedDateTime
   (< [x y] (cljc.java-time.zoned-date-time/is-before x y))
   (<= [x y] (not (cljc.java-time.zoned-date-time/is-after x y)))
   (> [x y] (cljc.java-time.zoned-date-time/is-after x y))
   (>= [x y] (not (cljc.java-time.zoned-date-time/is-before x y)))
+  (=== [x y] (cljc.java-time.zoned-date-time/is-equal x y))
   Year
   (< [x y] (cljc.java-time.year/is-before x y))
   (<= [x y] (not (cljc.java-time.year/is-after x y)))
   (> [x y] (cljc.java-time.year/is-after x y))
   (>= [x y] (not (cljc.java-time.year/is-before x y)))
+  (=== [x y] (= x y))
   YearMonth
   (< [x y] (cljc.java-time.year-month/is-before x y))
   (<= [x y] (not (cljc.java-time.year-month/is-after x y)))
   (> [x y] (cljc.java-time.year-month/is-after x y))
   (>= [x y] (not (cljc.java-time.year-month/is-before x y)))
+  (=== [x y] (= x y))
   Duration
   (< [x y] (neg? (cljc.java-time.duration/compare-to x y)))
   (<= [x y] (or (= x y) (cljc.java-time.duration/compare-to x y)))
   (> [x y] (pos? (cljc.java-time.duration/compare-to x y)))
-  (>= [x y] (or (= x y) (pos? (cljc.java-time.duration/compare-to x y)))))
+  (>= [x y] (or (= x y) (pos? (cljc.java-time.duration/compare-to x y))))
+  (=== [x y] (= x y)))
 
 
 ;; Units

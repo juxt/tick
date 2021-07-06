@@ -41,7 +41,8 @@
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
   (> [x y] "Is x after y?")
-  (>= [x y] "Is x after or at the same time as y?"))
+  (>= [x y] "Is x after or at the same time as y?")
+  (=== [x y] "Is x equals to y?"))
 
 (defprotocol MinMax
   (min-of-type [_] "Return the min")
