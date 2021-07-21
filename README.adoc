@@ -36,7 +36,8 @@ add to your `project.clj`, `build.boot` or `deps.edn`.
 
 Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
 
-There are some extra considerations when using tick from Clojurescript, see file `docs/cljs.adoc` in this repo.
+For Clojurescript users of Tick, see https://github.com/juxt/tick/blob/master/docs/cljs.adoc[docs/cljs.adoc], for
+some discussion around Clojurescript build size.
 
 Here is a one-liner to drop into a node repl with tick:
 
