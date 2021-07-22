@@ -3,7 +3,7 @@
    [cljs :refer :all]
    [clojure.tools.namespace.repl :refer [refresh refresh-all]]
    [kaocha.repl :as kr]
-   [tick.alpha.api :as t]
+   [tick.core :as t]
    [tick.viz :refer [show-canvas view label]]))
 
 (set! *warn-on-reflection* true)
@@ -18,5 +18,6 @@
 
 (comment
   (refresh-all)
+  (clojure.tools.namespace.repl/clear)
   (test-clj)
 )

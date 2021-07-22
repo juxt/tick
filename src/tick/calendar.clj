@@ -5,7 +5,7 @@
     [tick.protocols :as p]
    [tick.core :as t]
    [tick.ical :as ical]
-   [tick.interval :as ival]
+   [tick.alpha.interval :as ival]
    [clojure.java.io :as io])
   (:import
    [java.time DayOfWeek]))

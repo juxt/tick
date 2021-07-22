@@ -1,12 +1,13 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.alpha.api-test
+(ns tick.api-test
   (:require
     [clojure.test
      :refer [deftest is testing run-tests]
      :refer-macros [deftest is testing run-tests]]
-    [tick.alpha.api :as t]
+    [tick.core :as t]
     [tick.format :as t.f]
+    [tick.protocols :as p]
     [tick.locale-en-us]
     [cljc.java-time.clock]
     [cljc.java-time.instant]
@@ -64,15 +65,15 @@
   (deftest offset-date-time-test
     (let [t "2018-09-24T18:57:08.996+01:00"]
       (testing "offset date time basics"
-        (is (t/offset-date-time? (t/parse t)))
+        (is (t/offset-date-time? (p/parse t)))
         (is (t/offset-date-time? (t/offset-date-time (t/now))))
         (is (t/offset-date-time? (t/offset-date-time t)))
         (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
         (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time))))))))
 
 (deftest zoned-date-time-test
-  (is (t/zoned-date-time? (t/parse "2020-12-15T12:00:10Z[Europe/London]")))
-  (is (t/zoned-date-time? (t/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
+  (is (t/zoned-date-time? (p/parse "2020-12-15T12:00:10Z[Europe/London]")))
+  (is (t/zoned-date-time? (p/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
 
 (deftest fields-test
   (let [xs [(t/now)
@@ -96,11 +97,11 @@
     (doseq [pre-defined (vals t.f/predefined-formatters)]
       (is pre-defined)))
   (let [d "3030-05-03"]
-    (is (= d (t/format :iso-local-date (t/parse d))))
-    (is (= d (t/format (t/formatter :iso-local-date) (t/parse d))))
-    (is (= d (t/format (t/formatter "YYYY-MM-dd") (t/parse d))))
+    (is (= d (t/format :iso-local-date (p/parse d))))
+    (is (= d (t/format (t/formatter :iso-local-date) (p/parse d))))
+    (is (= d (t/format (t/formatter "YYYY-MM-dd") (p/parse d))))
     #?(:clj
-       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) (t/parse d)))))))
+       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) (p/parse d)))))))
 
 (deftest epoch-test
   (is (= (cljc.java-time.instant/parse "1970-01-01T00:00:00Z") (t/epoch))))
@@ -109,11 +110,7 @@
 
 (deftest addition-test
   (is (= (t/new-duration 5 :seconds) (t/+ (t/new-duration 2 :seconds) (t/new-duration 3 :seconds))))
-  (is (= (t/new-duration 2 :minutes) (t/+ (t/new-duration 90 :seconds) (t/new-duration 30 :seconds))))
-
-  (testing "alpha.api non-assocative use of +/-"
-    (is (= (t/date "2020-02-02") (t/- (t/date "2020-02-03") (t/new-period 1 :days))))
-    (is (= (t/date "2020-02-03") (t/+ (t/date "2020-02-02") (t/new-period 1 :days))))))
+  (is (= (t/new-duration 2 :minutes) (t/+ (t/new-duration 90 :seconds) (t/new-duration 30 :seconds)))))
 
 (deftest subtraction-test
   (is (= (t/new-duration 3 :seconds) (t/- (t/new-duration 5 :seconds) (t/new-duration 2 :seconds)))))
@@ -216,15 +213,6 @@
     (is (t/>= t1 t1))
     (is (t/>= t2 t1))))
 
-(deftest am-test
-  (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
-    (is (= (t/new-interval (t/date-time "2017-08-08T00:00:00")
-             (t/date-time "2017-08-08T12:00:00"))
-          (t/am (t/today))))
-    (is (= (t/new-interval (t/date-time "2017-08-08T12:00:00")
-             (t/date-time "2017-08-09T00:00:00"))
-          (t/pm (t/today))))))
-
 (deftest day-of-week
   (let [days (fn [strings] (map t/day-of-week strings))]
     (is (every? #{cljc.java-time.day-of-week/sunday} (days ["sun" "sunday"])))
@@ -260,64 +248,6 @@
 
   (is (= (t/new-duration 24 :hours) (t/duration (t/tomorrow)))))
 
-;; TODO: Interval testing
-
-(deftest division-test
-  (is (= 365 (count (t/divide-by t/date (t/year 2017)))))
-  (is (= 12 (count (t/divide-by t/year-month (t/year 2017)))))
-  (is (= 30 (count (t/divide-by t/date "2017-09"))))
-  (is (= (t/date "2017-09-01") (first (t/divide-by t/date "2017-09"))))
-  (is (= (t/date "2017-09-30") (last (t/divide-by t/date "2017-09"))))
-  (is (= 31 (count (t/divide-by t/date "2017-10"))))
-  (is (= 8 (count (t/divide-by t/date (t/bounds "2017-10-03" "2017-10-10")))))
-  (is (= [(t/date "2017-09-10")] (t/divide-by t/date (t/bounds "2017-09-10T12:00" "2017-09-10T14:00"))))
-  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (t/divide-by t/date (t/bounds "2017-09-10T12:00" "2017-09-11T14:00"))))
-  (is (= 2 (count (t/divide-by t/year-month (t/bounds "2017-09-10" "2017-10-10")))))
-  (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019")))))
-  (is (= 3 (count (t/divide-by t/year (t/bounds "2017-09-10T12:00" "2019-02")))))
-  (is (= 24 (count (t/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10"))))))
-
-;; TODO: Divide by duration
-
-;; Concur test
-
-(deftest concur-test
-  (is
-    (= 2
-      (t/hours
-        (t/duration
-          (t/concur (t/new-interval (t/at (t/today) "16:00")
-                      (t/end (t/today)))
-            (t/today)
-            (t/new-interval (t/at (t/today) "20:00")
-              (t/at (t/today) "22:00"))))))))
-
-;; Do not disturb tests
-
-;; Example: We mustn't disturb people between 10pm and 7am the following morning, in their locale.
-
-(defn moment [t]
-  (t/new-interval
-    t
-    (t/>> t (t/new-duration 3 :seconds))))
-
-;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
-
-;; Can we disturb?
-(deftest cannot-disturb-test
-  (let
-    [disturb-interval [(t/new-interval (t/time "07:00") (t/time "22:00"))]
-     no-disturb-interval (t/complement disturb-interval)
-     can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
-     ]
-    (is (not (can-disturb? (t/time "03:00"))))
-    (is (not (can-disturb? (t/time "07:00"))))
-    (is (can-disturb? (t/time "07:01")))
-    (is (can-disturb? (t/time "12:00")))
-    (is (can-disturb? (t/time "21:59")))
-    (is (not (can-disturb? (t/time "22:00"))))
-    (is (not (can-disturb? (t/time "00:00"))))))
-
 (deftest predicates-test
   (is (true? (t/clock? (t/clock))))
   (is (true? (t/day-of-week? t/MONDAY)))
@@ -334,7 +264,6 @@
   (is (true? (t/zone? (t/zone))))
   (is (true? (t/zone-offset? (t/zone-offset (t/zoned-date-time)))))
   (is (true? (t/zoned-date-time? (t/zoned-date-time))))
-  (is (true? (t/interval? (moment (t/now)))))
   (is (false? (t/date? 16)))
   (is (false? (t/month? 16))))
 

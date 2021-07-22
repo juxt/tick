@@ -2,7 +2,8 @@
   (:require
    [clojure.xml :refer [parse]]
    [clojure.java.io :as io]
-   [tick.alpha.api :as t]
+   [tick.core :as t]
+   [tick.alpha.interval :as interval]
    [clojure.data.xml :as x]
    )
   (:import
@@ -29,7 +30,7 @@
 
 (defn view [& ival-sets]
   (let [tmpfile (java.io.File/createTempFile "tick" ".svg" (io/file (System/getProperty "java.io.tmpdir")))
-        _ (assert (every? t/ordered-disjoint-intervals? ival-sets))
+        _ (assert (every? interval/ordered-disjoint-intervals? ival-sets))
         left-edge (apply t/min (map first (apply concat ival-sets)))
         right-edge (apply t/max (map second (apply concat ival-sets)))
         width (until-seconds left-edge right-edge)

@@ -9,7 +9,7 @@ https://github.com/henryw374/tempo[Tempo] when it is available.
 
 [source,clojure]
 ----
-(require '[tick.alpha.api :as t])
+(require '[tick.core :as t])
 
 ;; Get the current time
 (t/now)
@@ -23,11 +23,9 @@ http://juxt.pro/tick/docs/index.html[Tick Documentation]
 
 == Status
 
-Alpha: Ready to use with the caveat that the API might still undergo
+* tick.core - stable
+* tick.alpha.interval - Alpha: Ready to use with the caveat that the API might still undergo
 minor changes.
-
-See the https://github.com/juxt/tick/issues/135[1.0 checklist] for what we think is needed for moving out of 
-alpha - not that much.
 
 == Install
 

@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.interval
+(ns tick.alpha.interval
   (:refer-clojure :exclude [contains? complement partition-by group-by conj extend divide flatten])
   (:require
     [clojure.set :as set]
@@ -360,13 +360,15 @@
   "Return the interval representing the interval, if there is one,
   representing the interval of time the given intervals are
   concurrent."
-  [x y]
-  (case (relation x y)
-    :overlaps (slice x (p/beginning y) (p/end x))
-    :overlapped-by (slice x (p/beginning x) (p/end y))
-    (:starts :finishes :during :equals) x
-    (:started-by :finished-by :contains) (slice x (p/beginning y) (p/end y))
-    nil))
+  ([x y]
+   (case (relation x y)
+     :overlaps (slice x (p/beginning y) (p/end x))
+     :overlapped-by (slice x (p/beginning x) (p/end y))
+     (:starts :finishes :during :equals) x
+     (:started-by :finished-by :contains) (slice x (p/beginning y) (p/end y))
+     nil))
+  ([x y & args]
+   (reduce concur (concur x y) args)))
 
 (defn ^:experimental concurrencies
   "Return a sequence of occurances where intervals coincide (having
@@ -886,3 +888,14 @@
   #?(:cljs
      (group-by [groups ivals]
        (group-by-intervals groups ivals))))
+
+;; Divisions
+
+(defn divide-by [divisor t]
+  (p/divide t divisor))
+
+;; Alternative useful for -> threading
+(defn divide [t divisor]
+  (p/divide t divisor))
+
+

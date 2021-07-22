@@ -2,7 +2,7 @@
   (:require-macros [tick.docs.app :refer [analyzer-state]])
   (:require
     [reagent.core :as r]
-    [tick.alpha.api :as t]
+    [tick.core :as t]
     [tick.timezone]
     [clojure.string :refer [lower-case capitalize]]
     [cljs.js :refer [empty-state eval js-eval eval-str]]
@@ -15,14 +15,14 @@
   (cljs.js/eval-str 
     state
     ; don't know how to do namespacing
-    (clojure.string/replace source "t/" "tick.alpha.api/")
+    (clojure.string/replace source "t/" "tick.core/")
     (str "[" label "]") 
     {:eval cljs.js/js-eval :context :expr} 
     cb))
 
 (defn load-library-analysis-cache! []
-  (cljs.js/load-analysis-cache! state 'tick.alpha.api (analyzer-state 'tick.alpha.api))
-  ;(cljs.js/load-analysis-cache! state 't (analyzer-state 'tick.alpha.api))
+  (cljs.js/load-analysis-cache! state 'tick.core (analyzer-state 'tick.core))
+  ;(cljs.js/load-analysis-cache! state 't (analyzer-state 'tick.core))
   (cljs.js/load-analysis-cache! state 'tick.timezone (analyzer-state 'tick.timezone))
   nil)
 

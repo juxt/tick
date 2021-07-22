@@ -12,7 +12,7 @@
          :dev         {:extra-deps  {com.bhauman/figwheel-main          {:mvn/version "0.2.12"}
                                      cider/piggieback                   {:mvn/version "0.4.0"}
                                      com.bhauman/cljs-test-display      {:mvn/version "0.1.1"}
-                                     org.clojure/clojurescript          {:mvn/version "1.10.764"}
+                                     org.clojure/clojurescript          {:mvn/version "1.10.844"}
                                      org.clojure/data.xml               {:mvn/version "0.2.0-alpha5"}
                                      org.clojure/tools.namespace        {:mvn/version "0.2.11"}
                                      org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}

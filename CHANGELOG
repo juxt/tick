@@ -1,0 +1,6 @@
+# 0.5
+
+tick.core is the main api ns now. tick.alpha.api has been removed
+interval functions in the main api have moved to tick.alpha.interval
++/- functions now only work on periods or durations. Use >>/<< to move a date by an amount
+parse function has moved out of the main api. 

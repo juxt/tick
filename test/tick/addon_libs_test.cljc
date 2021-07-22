@@ -1,6 +1,6 @@
 (ns tick.addon-libs-test
   (:require
-    [tick.alpha.api :as t]
+    [tick.core :as t]
     [tick.timezone]
     [tick.locale-en-us]
     [clojure.test
