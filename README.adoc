@@ -74,9 +74,9 @@ Jack in with cider or equivalent method in other IDEs, and start the cljs build 
 
 And when you get a REPL you can run all the JVM tests with
 
----
+----
 (test-clj)
----
+----
 
 Or outside of the REPL run:
 
