@@ -126,10 +126,6 @@ create a git tag.
 
 `git push origin new-tag-name`
 
-== Documentation
-
-- https://juxt.github.io/tick[Generated API docs]
-
 == Acknowledgements
 
 In particular, special credit to Eric Evans for discovering Allen's
