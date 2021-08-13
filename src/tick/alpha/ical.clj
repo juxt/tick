@@ -1,6 +1,6 @@
 ;; Copyright © 2016-2018, JUXT LTD.
 
-(ns tick.ical
+(ns tick.alpha.ical
   (:require
    [clojure.set :as set]
    [clojure.string :as str]

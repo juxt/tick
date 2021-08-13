@@ -5,10 +5,9 @@
   (:require
     [clojure.string :as str]
     [tick.protocols :as p]
-    [tick.format :as t.f]
     #?(:clj [tick.file]) ; for protocol extn
-    [tick.impl] ; for protocol extn
     [time-literals.read-write]
+    [time-literals.data-readers] ; must be required for literals to work on jvm
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
     [cljc.java-time.local-time]
@@ -31,26 +30,71 @@
     [cljc.java-time.temporal.temporal-adjusters]
     [cljc.java-time.temporal.chrono-field]
     [cljc.java-time.temporal.chrono-unit]
-
-    #?@(:clj
-        [
-         [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]]
-        :cljs
-        [[java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
+    [cljc.java-time.format.date-time-formatter]
+    #?@(:cljs
+        [[java.time.format :refer [DateTimeFormatter]]
+         [java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
          [cljs.java-time.extend-eq-and-compare]]))
   #?(:cljs
-     (:require-macros [tick.time-literals :refer [modify-printing-of-time-literals-if-enabled!]]
-                      [tick.core :refer [with-clock]])
+     (:require-macros [tick.core :refer [with-clock modify-printing-of-time-literals-if-enabled!]])
      :clj
      (:import
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
        [java.time.format DateTimeFormatter]
        [java.time.temporal Temporal ]
-       [clojure.lang ILookup Seqable])))
+       [clojure.lang ILookup Seqable]
+       [java.util Locale])))
+
+#?(:clj
+   (defonce
+     ^{:dynamic true
+       :doc     "If true, include the time-literals printer, which will affect the way java.time and js-joda objects are printed"}
+     *time-literals-printing*
+     (not= "false" (System/getProperty "tick.time-literals.printing"))))
+
+#?(:clj
+   (defmacro modify-printing-of-time-literals-if-enabled! []
+     (when *time-literals-printing*
+       '(do
+          (time-literals.read-write/print-time-literals-clj!)
+          (time-literals.read-write/print-time-literals-cljs!)))))
 
 (modify-printing-of-time-literals-if-enabled!)
+
+(defn- parse-int [x]
+  #?(:clj (Integer/parseInt x)
+     :cljs (js/Number x)))
+
+(extend-protocol p/IParseable
+  #?(:clj String :cljs string)
+  (parse [s]
+    (condp re-matches s
+      #"(\d{1,2})\s*(am|pm)"
+      :>> (fn [[_ h ap]] (cljc.java-time.local-time/of (cond-> (parse-int h) (= "pm" ap) (clojure.core/+ 12)) 0))
+      #"(\d{1,2})"
+      :>> (fn [[_ h]] (cljc.java-time.local-time/of (parse-int h) 0))
+      #"\d{2}:\d{2}\S*"
+      :>> (fn [s] (cljc.java-time.local-time/parse s))
+      #"(\d{1,2}):(\d{2})"
+      :>> (fn [[_ h m]] (cljc.java-time.local-time/of (parse-int h) (parse-int m)))
+      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z"
+      :>> (fn [s] (cljc.java-time.instant/parse s))
+      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?[+-]\d{2}:\d{2}"
+      :>> (fn [s] (cljc.java-time.offset-date-time/parse s))
+      #"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:[+-]\d{2}:\d{2}|Z)\[\w+/\w+\]"
+      :>> (fn [s] (cljc.java-time.zoned-date-time/parse s))
+      #"\d{4}-\d{2}-\d{2}T\S*"
+      :>> (fn [s] (cljc.java-time.local-date-time/parse s))
+      #"\d{4}-\d{2}-\d{2}"
+      :>> (fn [s] (cljc.java-time.local-date/parse s))
+      #"\d{4}-\d{2}"
+      :>> (fn [s] (cljc.java-time.year-month/parse s))
+      #"\d{4}"
+      :>> (fn [s] (cljc.java-time.year/parse s))
+      (throw (ex-info "Unparseable time string" {:input s})))))
+
 
 (def ^{:dynamic true} *clock* (cljc.java-time.clock/system-default-zone))
 
@@ -191,8 +235,8 @@
 
 (extend-protocol p/IExtraction
   #?(:clj Object :cljs object)
-  (int [v] (#?(:clj clojure.core/int :cljs tick.impl/parse-int) v))
-  (long [v] (#?(:clj clojure.core/long :cljs tick.impl/parse-int) v))
+  (int [v] (#?(:clj clojure.core/int :cljs parse-int) v))
+  (long [v] (#?(:clj clojure.core/long :cljs parse-int) v))
 
   #?(:clj clojure.lang.Fn :cljs function)
   (time [f] (p/time (f)))
@@ -1167,22 +1211,64 @@
      ~@body))
 
 ;; Formatting
-(defn format
-  ([o] (t.f/format o))
-  ([fmt o]
-   (t.f/format fmt o)))
+(def predefined-formatters
+  {:iso-zoned-date-time  cljc.java-time.format.date-time-formatter/iso-zoned-date-time
+   :iso-offset-date-time cljc.java-time.format.date-time-formatter/iso-offset-date-time
+   :iso-local-time       cljc.java-time.format.date-time-formatter/iso-local-time
+   :iso-local-date-time  cljc.java-time.format.date-time-formatter/iso-local-date-time
+   :iso-local-date       cljc.java-time.format.date-time-formatter/iso-local-date
+   :iso-instant          cljc.java-time.format.date-time-formatter/iso-instant
+
+   ; these exist in java but not in js-joda 
+   ;:iso-offset-date      (. DateTimeFormatter -ISO_OFFSET_DATE)
+   ;:rfc-1123-date-time   (. DateTimeFormatter -RFC_1123_DATE_TIME)
+   ;:iso-week-date        (. DateTimeFormatter -ISO_WEEK_DATE)
+   ;:iso-ordinal-date     (. DateTimeFormatter -ISO_ORDINAL_DATE)
+   ;:iso-time             (. DateTimeFormatter -ISO_TIME)
+   ;:iso-date             (. DateTimeFormatter -ISO_DATE)
+   ;:basic-iso-date       (. DateTimeFormatter -BASIC_ISO_DATE)
+   ;:iso-date-time        (. DateTimeFormatter -ISO_DATE_TIME)
+   ;:iso-offset-time      (. DateTimeFormatter -ISO_OFFSET_TIME)
+   })
 
 (defn ^DateTimeFormatter formatter
   "Constructs a DateTimeFormatter out of either a
 
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
   or
-  * formatter name - :iso-instant :iso-date etc"
+  * formatter name - :iso-instant :iso-local-date etc
+  
+  and a Locale, which is optional."
   ([fmt]
-   (t.f/formatter fmt))
+   (formatter
+     fmt
+     #?(:clj (Locale/getDefault)
+        :cljs (try
+                (some->
+                  (goog.object/get js/JSJodaLocale "Locale")
+                  (goog.object/get "US"))
+                (catch js/Error _e)))))
   ([fmt locale]
-   (t.f/formatter fmt locale)))
+   (let [^DateTimeFormatter fmt
+         (cond (instance? DateTimeFormatter fmt) fmt
+               (string? fmt) (if (nil? locale)
+                               (throw
+                                 #?(:clj (Exception. "Locale is nil")
+                                    :cljs (js/Error. (str "Locale is nil, try adding a require '[tick.locale-en-us]"))))
+                               (-> (cljc.java-time.format.date-time-formatter/of-pattern fmt)
+                                   (cljc.java-time.format.date-time-formatter/with-locale locale)))
+               :else (get predefined-formatters fmt))]
+     fmt)))
 
+(defn format
+  "Formats the given time entity as a string.
+  Accepts something that can be converted to a `DateTimeFormatter` as a first
+  argument. Given one argument uses the default format."
+  ([o] (str o))
+  ([fmt o]
+   (cljc.java-time.format.date-time-formatter/format (formatter fmt) o)))
+
+;;;
 (defn between [v1 v2] (p/between v1 v2))
 (defn beginning [v] (p/beginning v))
 (defn end [v] (p/end v))

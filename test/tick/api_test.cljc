@@ -6,7 +6,6 @@
      :refer [deftest is testing run-tests]
      :refer-macros [deftest is testing run-tests]]
     [tick.core :as t]
-    [tick.format :as t.f]
     [tick.protocols :as p]
     [tick.locale-en-us]
     [cljc.java-time.clock]
@@ -94,7 +93,7 @@
 
 (deftest formatting-test
   (testing "all predefined formatters exist"
-    (doseq [pre-defined (vals t.f/predefined-formatters)]
+    (doseq [pre-defined (vals t/predefined-formatters)]
       (is pre-defined)))
   (let [d "3030-05-03"]
     (is (= d (t/format :iso-local-date (p/parse d))))

@@ -653,7 +653,7 @@
 
 ;; TODO: Interval testing
 
-(deftest division-test
+(deftest division-test2
   (is (= 365 (count (ti/divide-by t/date (t/year 2017)))))
   (is (= 12 (count (ti/divide-by t/year-month (t/year 2017)))))
   (is (= 30 (count (ti/divide-by t/date "2017-09"))))
@@ -672,7 +672,7 @@
 
 ;; Concur test
 
-(deftest concur-test
+(deftest concur-test2
   (is
     (= 2
       (t/hours

@@ -1,10 +1,10 @@
 ;; Copyright © 2016-2018, JUXT LTD.
 
-(ns tick.calendar
+(ns tick.alpha.calendar
   (:require
     [tick.protocols :as p]
    [tick.core :as t]
-   [tick.ical :as ical]
+   [tick.alpha.ical :as ical]
    [tick.alpha.interval :as ival]
    [clojure.java.io :as io])
   (:import

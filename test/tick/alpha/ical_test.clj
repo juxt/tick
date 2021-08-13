@@ -1,8 +1,8 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.ical-test
+(ns tick.alpha.ical-test
   (:require
-   [tick.ical :as ical]
+   [tick.alpha.ical :as ical]
    [clojure.java.io :as io]
    [clojure.test :refer [deftest is]]))
 

@@ -11,4 +11,4 @@
   (is (t/zone "Europe/Berlin")))
 
 (deftest locale-test 
-  (is (tick.format/formatter "yyyy-MMM-dd")))
+  (is (t/formatter "yyyy-MMM-dd")))
