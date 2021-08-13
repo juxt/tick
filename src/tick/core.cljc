@@ -617,9 +617,9 @@
   #?(:clj String :cljs string)
   (clock [s] (p/clock (p/parse s))))
 
-(defn advance
+(defn tick-resolution
   ([clk]
-   (advance clk (new-duration 1 :seconds)))
+   (tick-resolution clk (new-duration 1 :seconds)))
   ([clk dur]
    (cljc.java-time.clock/tick clk dur)))
 
