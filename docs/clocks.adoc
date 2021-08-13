@@ -50,6 +50,14 @@ Shift a clock to run 2 hours slow.
 |(t/>> (t/clock) (t/new-duration 2 :minutes))|Return a clock running 2 minutes fast|java.time.Clock
 |===
 
+== Mutable Clocks
+
+Sometimes when testing it's handy to have a mutable clock.
+
+Tick does not provide that because there is already  https://github.com/state-machine-systems/mock-clock[Mock Clock].
+
+That is written in Java. A JS implementation would be possible to do.
+
 == Comparison
 
 NOTE: TBD
