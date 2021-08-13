@@ -8,7 +8,7 @@ There are some https://www.juxt.land/tick/docs/index.html#_clojurescript[extra c
 Here is a one-liner to drop into a node repl with tick:
 
 ----
-clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.764" } tick {:mvn/version "0.4.24-alpha"} }}' -m cljs.main  -re node  --repl
+clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.764" } tick/tick {:mvn/version "RELEASE"} }}' -m cljs.main  -re node  --repl
 ----
 
 == Serialization 
