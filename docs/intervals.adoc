@@ -6,6 +6,15 @@ Intervals are maps containing both a `tick/beginning` and a `tick/end` entry. Th
 
 Intervals can be represented two local times as well as instants.
 
+Interval functions are currently alpha status and so reside in the `tick.alpha.interval` namespace, rather than the 
+main `tick.core` namespace.
+
+For example, bring in the interval functions like so:
+
+----
+(require '[tick.alpha.interval :as t.i])
+----
+
 == Construction
 
 Obviously, the Clojure's literal syntax for maps can be used to create intervals.
@@ -26,7 +35,7 @@ Alternatively, we can use the `t/new-interval` function which takes the two boun
 ====
 [source.code,clojure]
 ----
-(t/new-interval
+(t.i/new-interval
   (t/instant "2018-12-31T23:55:00Z")
   (t/instant "2019-01-01T00:00:00Z"))
 ----
@@ -41,7 +50,7 @@ To return today as an interval:
 
 [source.code,clojure]
 ----
-(t/bounds (t/today))
+(t.i/bounds (t/today))
 ----
 ====
 
@@ -53,7 +62,7 @@ To return a 2-day interval spanning midnight this morning to midnight [#eval-two
 
 [source.code,clojure]
 ----
-(t/new-interval (t/today) (t/tomorrow))
+(t.i/new-interval (t/today) (t/tomorrow))
 ----
 ====
 
@@ -67,14 +76,14 @@ Consider the time-span represented by the word 'yesterday' and compare it to the
 
 [source.code#relation-yesterday-tomorrow,clojure]
 ----
-(t/relation (t/yesterday) (t/tomorrow))
+(t.i/relation (t/yesterday) (t/tomorrow))
 ----
 
 If the two intervals touch each other, in the case of 'today' and 'tomorrow', then we say the first interval (today) _meets_ the second interval (tomorrow).
 
 [source.code#relation-today-tomorrow,clojure]
 ----
-(t/relation (t/today) (t/tomorrow))
+(t.i/relation (t/today) (t/tomorrow))
 ----
 
 To see other possible relations, use the slider in the diagram below to move the top interval along:

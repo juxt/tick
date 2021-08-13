@@ -1,6 +1,6 @@
 = API
 
-_Tick_ provides a single namespace—`tick.api`—containing the functions that make up the library's API.
+_Tick_ provides the `tick.core` namespace, containing the functions that make up the library's stable API.
 
 When you are using _tick_ in programs, it is a recommended idiom that you require _tick_'s api under the `t` alias as follows:
 
@@ -8,4 +8,5 @@ When you are using _tick_ in programs, it is a recommended idiom that you requir
 (require '[tick.core :as t])
 ----
 
-CAUTION: Try to restrict your use of _tick_ to the `tick.api` namespace. Functions in other namespaces, which may not be marked private, are not part of the official API and could change.
+CAUTION: Try to restrict your use of _tick_ to the `tick.core` namespace and tick.alpha.* namespaces. 
+Functions in other namespaces, which may not be marked private, are not part of the official API and could change.
