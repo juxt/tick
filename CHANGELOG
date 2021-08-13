@@ -2,12 +2,12 @@
 
 * tick.core is the main api ns now. tick.alpha.api has been removed
 
-* interval functions in the main api have moved to tick.alpha.interval
-* calendar and ical namespaces marked as alpha 
+* interval functions in tick.alpha.api have moved to tick.alpha.interval
+* calendar and ical namespaces have also moved to tick.alpha 
 
 * +/- functions now only work on periods or durations. Use >>/<< to move a date by an amount
 
-This is so +/- args are commutative etc, same as clojure.core +/-
+This is so args to +/-  are associative, commutative etc, same as clojure.core +/-
 
 * parse function has moved out of the main api. 
 
