@@ -6,16 +6,17 @@
 STYLESDIR = .
 STYLESHEET = juxt.css
 
-.PHONY: 		watch default deploy test dev-docs-cljs
+.PHONY: 		watch default deploy test dev-docs-cljs docs/public/index.html
 
-default:		docs/index.html
+default:		docs/public/index.html
 
 # Build the docs
-docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
+docs/public/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 			asciidoctor -d book \
 			-a "webfonts!" \
 			-a stylesdir=../${STYLESDIR} \
 			-a stylesheet=${STYLESHEET} \
+			-D docs/public \
 			docs/index.adoc
 
 test-clj:

@@ -45,14 +45,14 @@ The duration of an interval can be modified using `extend`.
 Extend an instant to a interval
 [source.code,clojure]
 ----
-(t.i/extend (t/instant "2000-01-01T00:00")
+(t.i/extend (t/instant "2000-01-01T00:00:00.00Z")
   (t/new-period 3 :weeks))
 ----
 
 Extend an interval:
 [source.code,clojure]
 ----
-(t.i/extend (t/bounds (t/year 2000)) (t/new-period 1 :years))
+(t.i/extend (t.i/bounds (t/year 2000)) (t/new-period 1 :years))
 ----
 
 Shorten an interval:
