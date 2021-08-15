@@ -5,6 +5,29 @@ increasing efficiency.
 Times and dates can be easily stripped down to smaller modules of time,
 likewise they can be built up into complete instants.
 
+CAUTION: Extracting the date from an Instant (or other fields, such as time) you will 
+         get a local result.
+
+For example: 
+
+[source.code,clojure]
+----
+(t/date (t/instant "1999-12-31T00:59:59Z"))
+----
+
+The result maybe be `#time/date"1999-12-31"` or not, depending on your browser timezone 
+(or timezone of the jvm). 
+
+To get the date (or other fields) from an Instant in UTC, we must first go via a UTC ZonedDateTime"
+
+[source.code,clojure]
+----
+(->
+   (t/instant "1999-12-31T00:59:59Z")
+   (cljc.java-time.zoned-date-time/of-instant (t/zone "UTC"))
+   (t/date))
+----
+
 === Create time
 
 ====
@@ -51,7 +74,7 @@ Or the time from an instant:
 
 [source.code,clojure]
 ----
-(t/time (t/instant "1999-12-31T23:59:59Z"))
+(t/time (t/instant "1999-12-31T00:59:59Z"))
 ----
 ====
 

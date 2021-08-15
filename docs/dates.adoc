@@ -345,6 +345,30 @@ To convert between any of these types, simply call the eponymous
 function corresponding to the destination type with the source type as
 an argument.
 
+CAUTION: When converting between Instants (which are always UTC) and other data types, please
+be aware that current default zone of the browser or jvm will affect the result.
+
+For example: 
+
+[source.code,clojure]
+----
+(t/date (t/instant "1999-12-31T00:00:00Z"))
+----
+
+The result maybe be `1999-12-31` or not, depending on your browser timezone 
+(or timezone of the jvm). 
+
+To get the date (or other fields) from an Instant in UTC, we must first go via a UTC ZonedDateTime"
+
+[source.code,clojure]
+----
+(->
+   (t/instant "1999-12-31T00:59:59Z")
+   (cljc.java-time.zoned-date-time/of-instant (t/zone "UTC"))
+   (t/date))
+----
+
+
 .Converting between types
 ====
 To convert between an `instant` and a `zoned-date-time`:
