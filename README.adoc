@@ -56,7 +56,7 @@ make dev-docs-cljs
 
 Build the html
 ----
-make docs/index.html
+make
 ----
 
 Serve the docs directory and navigate to it in a browser
