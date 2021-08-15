@@ -15,7 +15,11 @@
     (constantly (cljc.java-time.zone-id/system-default)))
   )
 
-(set-zone "America/New_York")
+(comment
+  
+  (set-zone "America/New_York")
+  
+  )
 
 (when (System/getProperty "nrepl.load")
   (require 'nrepl))

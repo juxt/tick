@@ -5,7 +5,11 @@
          time-literals/time-literals   {:mvn/version "0.1.5"
                                         :exclusions  [cljs.java-time/cljs.java-time]}}
  :aliases
-        {:release     {:extra-deps {applied-science/deps-library {:mvn/version "RELEASE"}}
+        {
+         :nyc {:jvm-opts ["-Duser.timezone=America/New_York"]}
+         :minus-four {:jvm-opts ["-Duser.timezone=\"GMT-04:00\""]}
+         
+         :release     {:extra-deps {applied-science/deps-library {:mvn/version "RELEASE"}}
                        :main-opts  ["-m" "applied-science.deps-library"]}
          :bb          {:extra-deps  {tubular/tubular {:mvn/version "1.3.0"}}
                        :extra-paths ["dev" "test"]}
