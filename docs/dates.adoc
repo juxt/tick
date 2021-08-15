@@ -364,7 +364,7 @@ To get the date (or other fields) from an Instant in UTC, we must first go via a
 ----
 (->
    (t/instant "1999-12-31T00:59:59Z")
-   (cljc.java-time.zoned-date-time/of-instant (t/zone "UTC"))
+   (t/in "UTC")
    (t/date))
 ----
 
