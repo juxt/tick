@@ -17,6 +17,7 @@ docs/public/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET
 			-a stylesdir=../${STYLESDIR} \
 			-a stylesheet=${STYLESHEET} \
 			-D docs/public \
+			-o $@ \
 			docs/index.adoc
 
 test-clj:
