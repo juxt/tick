@@ -5,6 +5,5 @@
  :output-to     "docs/public/js/main.js"
  :output-dir    "docs/public/js"
  :verbose       true
- :optimizations :simple
  ;:cache-analysis true
  }

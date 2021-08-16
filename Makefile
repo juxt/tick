@@ -16,7 +16,6 @@ docs/public/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET
 			-a "webfonts!" \
 			-a stylesdir=../${STYLESDIR} \
 			-a stylesheet=${STYLESHEET} \
-			-D docs/public \
 			-o $@ \
 			docs/index.adoc
 
@@ -31,10 +30,12 @@ test-node:
 test-all:
 			make test-clj && make test-chrome && make test-node
 
-# For developing the cljs used by the documentation, add --repl and change docs.cljs.edn optimizations to :none to develop interactively
+# For developing the cljs used by the documentation, starts a REPL and a server at localhost:9500
 dev-docs-cljs:
-			clojure -M:docs-index
-
+			clojure -M:docs-watch
+# Builds production js and html files
+release-docs-cljs:
+			make && clojure -A:docs-release
 install:
 			clojure -M:release install --version $(VERSION)
 deploy:

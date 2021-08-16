@@ -49,17 +49,23 @@ image:https://circleci.com/gh/juxt/tick/tree/master.svg?style=svg["CircleCI", li
 
 === Develop The Documentation Site
 
-Build the Cljs
-----
-make dev-docs-cljs
-----
-
 Build the html
 ----
 make
 ----
 
-Serve the docs directory and navigate to it in a browser
+Build the CLJS and start a figwheel repl+server
+----
+make dev-docs-cljs
+----
+
+Navigate to localhost:9500 in your browser
+
+=== Build a production version of the Documentation Site
+
+----
+make release-docs-cljs
+----
 
 === Develop Tick
 
