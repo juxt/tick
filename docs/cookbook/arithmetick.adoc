@@ -31,25 +31,16 @@ will return a modified interval.
 Addition:
 [source.code,clojure]
 ----
-(t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
-           :tick/end (t/instant "2018-01-10T00:00")}
+(t.i/extend {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+           :tick/end (t/instant "2018-01-10T00:00:00.00Z")}
   (t/new-period 10 :weeks))
 ----
 Subtraction:
 [source.code,clojure]
 ----
-(t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
-           :tick/end (t/instant "2018-01-10T00:00")}
+(t.i/extend {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+           :tick/end (t/instant "2018-01-10T00:00:00.00Z")}
   (t/new-duration -1 :days))
-----
-This can be done with `scale` too:
-
-[source.code,clojure]
-----
-(= (t/extend (t/today)
-     (t/new-period 10 :weeks))
-   (t/scale (t/today)
-	    (t/new-period 10 :weeks)))
 ----
 
 ====
@@ -60,20 +51,20 @@ An interval can be divided into smaller intervals:
 Divide the day by 24, to get hour long intervals:
 
 ----
-(map #(apply t/new-interval %)
-     (t/divide-by 24 {:tick/beginning (t/instant "2000-01-01T00:00")
-                      :tick/end (t/instant "2000-01-02T00:00")}))
+(map #(apply t.i/new-interval %)
+     (t.i/divide-by 24 {:tick/beginning (t/instant "2000-01-01T00:00:00.00Z")
+                      :tick/end (t/instant "2000-01-02T00:00:00.00Z")}))
 ----
 
 Or just divide the day by a duration of 1 hour to get the same result:
 [source.code,clojure]
 ----
-(= (t/divide-by (t/new-duration 1 :hours)
-                {:tick/beginning (t/instant "2000-01-01T00:00")
-                 :tick/end (t/instant "2000-01-02T00:00")})
-   (t/divide-by 24
-                {:tick/beginning (t/instant "2000-01-01T00:00")
-                 :tick/end (t/instant "2000-01-02T00:00")}))
+(= (t.i/divide-by (t/new-duration 1 :hours)
+                {:tick/beginning (t/instant "2000-01-01T00:00:00.00Z")
+                 :tick/end (t/instant "2000-01-02T00:00:00.00Z")})
+   (t.i/divide-by 24
+                {:tick/beginning (t/instant "2000-01-01T00:00:00.00Z")
+                 :tick/end (t/instant "2000-01-02T00:00:00.00Z")}))
 ----
 ====
 
@@ -96,7 +87,7 @@ Subtraction:
 Division:
 [source.code,clojure]
 ----
-(t/divide (t/new-duration 1 :hours)
+(t.i/divide (t/new-duration 1 :hours)
           (t/new-duration 1 :minutes))
 ----
 ====

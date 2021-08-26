@@ -4,12 +4,12 @@ A Clojure(Script) library for dealing with time. Intended as a
 replacement for clj-time.
 
 Based on Java 8 time (on the JVM) and js-joda (on JavaScript
-runtimes). We hope to do an implementation based on https://github.com/tc39/proposal-temporal[Temporal],
-when it is available.
+runtimes). We are considering an implementation based on https://github.com/tc39/proposal-temporal[Temporal], via
+https://github.com/henryw374/tempo[Tempo] when it is available.
 
 [source,clojure]
 ----
-(require '[tick.alpha.api :as t])
+(require '[tick.core :as t])
 
 ;; Get the current time
 (t/now)
@@ -23,7 +23,8 @@ http://juxt.pro/tick/docs/index.html[Tick Documentation]
 
 == Status
 
-Alpha: Ready to use with the caveat that the API might still undergo
+* tick.core - stable
+* tick.alpha.interval - Alpha: Ready to use with the caveat that the API might still undergo
 minor changes.
 
 == Install
@@ -33,12 +34,13 @@ add to your `project.clj`, `build.boot` or `deps.edn`.
 
 Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
 
-There are some extra considerations when using tick from Clojurescript, see file `docs/cljs.adoc` in this repo.
+For Clojurescript users of Tick, see https://github.com/juxt/tick/blob/master/docs/cljs.adoc[docs/cljs.adoc], for
+some discussion around Clojurescript build size.
 
 Here is a one-liner to drop into a node repl with tick:
 
 ----
-clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.741" } tick {:mvn/version "0.4.24-alpha"} }}' -m cljs.main  -re node  --repl
+clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "1.10.741" } tick/tick {:mvn/version "RELEASE"} }}' -m cljs.main  -re node  --repl
 ----
 
 == Development
@@ -47,17 +49,23 @@ image:https://circleci.com/gh/juxt/tick/tree/master.svg?style=svg["CircleCI", li
 
 === Develop The Documentation Site
 
-Build the Cljs
+Build the html
+----
+make
+----
+
+Build the CLJS and start a figwheel repl+server
 ----
 make dev-docs-cljs
 ----
 
-Build the html
-----
-make docs/index.html
-----
+Navigate to localhost:9500 in your browser
 
-Serve the docs directory and navigate to it in a browser
+=== Build a production version of the Documentation Site
+
+----
+make release-docs-cljs
+----
 
 === Develop Tick
 
@@ -70,9 +78,9 @@ Jack in with cider or equivalent method in other IDEs, and start the cljs build 
 
 And when you get a REPL you can run all the JVM tests with
 
----
+----
 (test-clj)
----
+----
 
 Or outside of the REPL run:
 
@@ -123,10 +131,6 @@ create a git tag.
 `make deploy VERSION=your-tag`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
 
 `git push origin new-tag-name`
-
-== Documentation
-
-- https://juxt.github.io/tick[Generated API docs]
 
 == Acknowledgements
 

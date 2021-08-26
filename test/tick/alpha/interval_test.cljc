@@ -1,13 +1,14 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
-(ns tick.interval-test
+(ns tick.alpha.interval-test
   (:require
    [clojure.spec.alpha :as s]
-   [tick.alpha.api :as t]
+   [tick.core :as t]
+   [tick.protocols :as p]
    [clojure.test
     :refer [deftest is testing run-tests]
     :refer-macros [deftest is testing run-tests]]
-   [tick.interval :as ti]))
+   [tick.alpha.interval :as ti]))
 
 (s/check-asserts true)
 
@@ -357,46 +358,46 @@
                              (t/instant "2017-01-01T14:00:00Z"))]
            (ti/intersection coll1 coll2))))
 
-  (let [coll1 [(ti/new-interval (t/parse "2017-04-11T00:00")
-                                (t/parse "2017-04-14T00:00"))
-               (ti/new-interval (t/parse "2017-04-18T00:00")
-                                (t/parse "2017-04-20T00:00"))
-               (ti/new-interval (t/parse "2017-12-20T00:00")
-                                (t/parse "2017-12-23T00:00"))
-               (ti/new-interval (t/parse "2017-12-27T00:00")
-                                (t/parse "2018-01-01T00:00"))
-               (ti/new-interval (t/parse "2018-01-02T00:00")
-                                (t/parse "2018-01-08T00:00"))]
+  (let [coll1 [(ti/new-interval (p/parse "2017-04-11T00:00")
+                                (p/parse "2017-04-14T00:00"))
+               (ti/new-interval (p/parse "2017-04-18T00:00")
+                                (p/parse "2017-04-20T00:00"))
+               (ti/new-interval (p/parse "2017-12-20T00:00")
+                                (p/parse "2017-12-23T00:00"))
+               (ti/new-interval (p/parse "2017-12-27T00:00")
+                                (p/parse "2018-01-01T00:00"))
+               (ti/new-interval (p/parse "2018-01-02T00:00")
+                                (p/parse "2018-01-08T00:00"))]
         coll2 [(ti/bounds "2017")]]
-    (is (= [(ti/new-interval (t/parse "2017-04-11T00:00")
-                             (t/parse "2017-04-14T00:00"))
-            (ti/new-interval (t/parse "2017-04-18T00:00")
-                             (t/parse "2017-04-20T00:00"))
-            (ti/new-interval (t/parse "2017-12-20T00:00")
-                             (t/parse "2017-12-23T00:00"))
-            (ti/new-interval (t/parse "2017-12-27T00:00")
-                             (t/parse "2018-01-01T00:00"))]
+    (is (= [(ti/new-interval (p/parse "2017-04-11T00:00")
+                             (p/parse "2017-04-14T00:00"))
+            (ti/new-interval (p/parse "2017-04-18T00:00")
+                             (p/parse "2017-04-20T00:00"))
+            (ti/new-interval (p/parse "2017-12-20T00:00")
+                             (p/parse "2017-12-23T00:00"))
+            (ti/new-interval (p/parse "2017-12-27T00:00")
+                             (p/parse "2018-01-01T00:00"))]
            (ti/intersection coll1 coll2))))
 
-  (let [coll1 [(ti/new-interval (t/parse "2017-04-11T00:00")
-                                (t/parse "2017-04-14T00:00"))
-               (ti/new-interval (t/parse "2017-04-18T00:00")
-                                (t/parse "2017-04-20T00:00"))
-               (ti/new-interval (t/parse "2017-12-20T00:00")
-                                (t/parse "2017-12-23T00:00"))
-               (ti/new-interval (t/parse "2017-12-27T00:00")
-                                (t/parse "2018-01-01T00:00"))
-               (ti/new-interval (t/parse "2018-01-02T00:00")
-                                (t/parse "2018-01-08T00:00"))]
+  (let [coll1 [(ti/new-interval (p/parse "2017-04-11T00:00")
+                                (p/parse "2017-04-14T00:00"))
+               (ti/new-interval (p/parse "2017-04-18T00:00")
+                                (p/parse "2017-04-20T00:00"))
+               (ti/new-interval (p/parse "2017-12-20T00:00")
+                                (p/parse "2017-12-23T00:00"))
+               (ti/new-interval (p/parse "2017-12-27T00:00")
+                                (p/parse "2018-01-01T00:00"))
+               (ti/new-interval (p/parse "2018-01-02T00:00")
+                                (p/parse "2018-01-08T00:00"))]
         coll2 [(ti/bounds "2017")]]
-    (is (= [(ti/new-interval (t/parse "2017-04-11T00:00")
-                             (t/parse "2017-04-14T00:00"))
-            (ti/new-interval (t/parse "2017-04-18T00:00")
-                             (t/parse "2017-04-20T00:00"))
-            (ti/new-interval (t/parse "2017-12-20T00:00")
-                             (t/parse "2017-12-23T00:00"))
-            (ti/new-interval (t/parse "2017-12-27T00:00")
-                             (t/parse "2018-01-01T00:00"))]
+    (is (= [(ti/new-interval (p/parse "2017-04-11T00:00")
+                             (p/parse "2017-04-14T00:00"))
+            (ti/new-interval (p/parse "2017-04-18T00:00")
+                             (p/parse "2017-04-20T00:00"))
+            (ti/new-interval (p/parse "2017-12-20T00:00")
+                             (p/parse "2017-12-23T00:00"))
+            (ti/new-interval (p/parse "2017-12-27T00:00")
+                             (p/parse "2018-01-01T00:00"))]
            (ti/intersection coll1 coll2)))
 
     (testing "Empty sets"
@@ -539,7 +540,7 @@
 ;; Division test
 
 (deftest division-test
-  (is (= 7 (count (t/divide (ti/bounds (t/year 2012) (t/year 2018)) t/year)))))
+  (is (= 7 (count (ti/divide (ti/bounds (t/year 2012) (t/year 2018)) t/year)))))
 
 (deftest group-by-intervals-test
   (testing "p and s"
@@ -553,7 +554,7 @@
                             (t/date-time "2018-01-01T00:00")
                             (t/date-time "2018-01-10T00:00"))]}
           (ti/group-by
-            (t/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
+            (ti/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
             [(ti/new-interval (t/date-time #inst "2017-12-20")
                (t/date-time #inst "2018-01-10"))])))))
 
@@ -564,7 +565,7 @@
          (t/year 2016) [(ti/bounds (t/year 2016))]
          (t/year 2017) [(ti/bounds (t/year-month "2017-01") (t/year-month "2017-06"))]}
         (ti/group-by
-          (t/divide (ti/bounds (t/year 2014) (t/year 2018)) t/year)
+          (ti/divide (ti/bounds (t/year 2014) (t/year 2018)) t/year)
           [(ti/bounds (t/year-month "2015-06") (t/year-month "2017-06"))]))))
 
   (testing "M and e"
@@ -573,15 +574,15 @@
         {(t/year 2015) [(t/year 2015)]
          (t/year 2016) [(t/year 2016)]}
         (ti/group-by
-          (t/divide (ti/bounds (t/year 2014) (t/year 2017)) t/year)
-          (t/divide (ti/bounds (t/year 2015) (t/year 2016)) t/year)))))
+          (ti/divide (ti/bounds (t/year 2014) (t/year 2017)) t/year)
+          (ti/divide (ti/bounds (t/year 2015) (t/year 2016)) t/year)))))
 
   (testing "s"
     (is (=
           {(t/year 2015) [(ti/bounds (t/year 2015))]
            (t/year 2016) [(ti/bounds (t/year 2016))]}
           (ti/group-by
-            (t/divide (ti/bounds (t/year 2014) (t/year 2017)) t/year)
+            (ti/divide (ti/bounds (t/year 2014) (t/year 2017)) t/year)
             [(ti/bounds (t/year 2015) (t/year 2016))]))))
 
   (testing "f"
@@ -628,7 +629,7 @@
           (ti/bounds (t/year-month "2017-01") (t/year-month "2017-06"))]}
         (ti/group-by
           [(ti/bounds (t/year-month "2015-06") (t/year-month "2017-06"))]
-          (t/divide (ti/bounds (t/year 2014) (t/year 2018)) t/year))))))
+          (ti/divide (ti/bounds (t/year 2014) (t/year 2018)) t/year))))))
 
 (deftest group-by-test
   (is
@@ -640,3 +641,84 @@
 
 (deftest group-by-empty-test
   (is (= {} (ti/group-by t/date []))))
+
+(deftest am-test
+  (t/with-clock (cljc.java-time.clock/fixed (t/instant "2017-08-08T12:00:00Z") t/UTC)
+    (is (= (ti/new-interval (t/date-time "2017-08-08T00:00:00")
+             (t/date-time "2017-08-08T12:00:00"))
+          (ti/am (t/today))))
+    (is (= (ti/new-interval (t/date-time "2017-08-08T12:00:00")
+             (t/date-time "2017-08-09T00:00:00"))
+          (ti/pm (t/today))))))
+
+;; TODO: Interval testing
+
+(deftest division-test2
+  (is (= 365 (count (ti/divide-by t/date (t/year 2017)))))
+  (is (= 12 (count (ti/divide-by t/year-month (t/year 2017)))))
+  (is (= 30 (count (ti/divide-by t/date "2017-09"))))
+  (is (= (t/date "2017-09-01") (first (ti/divide-by t/date "2017-09"))))
+  (is (= (t/date "2017-09-30") (last (ti/divide-by t/date "2017-09"))))
+  (is (= 31 (count (ti/divide-by t/date "2017-10"))))
+  (is (= 8 (count (ti/divide-by t/date (ti/bounds "2017-10-03" "2017-10-10")))))
+  (is (= [(t/date "2017-09-10")] (ti/divide-by t/date (ti/bounds "2017-09-10T12:00" "2017-09-10T14:00"))))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (ti/divide-by t/date (ti/bounds "2017-09-10T12:00" "2017-09-11T14:00"))))
+  (is (= 2 (count (ti/divide-by t/year-month (ti/bounds "2017-09-10" "2017-10-10")))))
+  (is (= 3 (count (ti/divide-by t/year (ti/bounds "2017-09-10T12:00" "2019")))))
+  (is (= 3 (count (ti/divide-by t/year (ti/bounds "2017-09-10T12:00" "2019-02")))))
+  (is (= 24 (count (ti/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10"))))))
+
+;; TODO: Divide by duration
+
+;; Concur test
+
+(deftest concur-test2
+  (is
+    (= 2
+      (t/hours
+        (t/duration
+          (ti/concur (ti/new-interval (t/at (t/today) "16:00")
+                      (t/end (t/today)))
+            (t/today)
+            (ti/new-interval (t/at (t/today) "20:00")
+              (t/at (t/today) "22:00"))))))))
+
+
+;; Do not disturb tests
+
+;; Example: We mustn't disturb people between 10pm and 7am the following morning, in their locale.
+
+(defn moment [t]
+  (ti/new-interval
+    t
+    (t/>> t (t/new-duration 3 :seconds))))
+
+;; TODO: Think about conversions between single instants and intervals. Feather? Widen? Smudge?
+
+;; Can we disturb?
+(deftest cannot-disturb-test
+  (let
+    [disturb-interval [(ti/new-interval (t/time "07:00") (t/time "22:00"))]
+     no-disturb-interval (ti/complement disturb-interval)
+     can-disturb? (fn [t] (not (some #(t/coincident? % t) no-disturb-interval)))
+     ]
+    (is (not (can-disturb? (t/time "03:00"))))
+    (is (not (can-disturb? (t/time "07:00"))))
+    (is (can-disturb? (t/time "07:01")))
+    (is (can-disturb? (t/time "12:00")))
+    (is (can-disturb? (t/time "21:59")))
+    (is (not (can-disturb? (t/time "22:00"))))
+    (is (not (can-disturb? (t/time "00:00"))))))
+
+(deftest predicate-test
+  (is (true? (t/interval? (moment (t/now))))))
+
+(deftest interval-relation-test
+  (is (= :met-by
+       (ti/relation
+        (ti/new-interval
+         (t/zoned-date-time "2021-02-24T00:00Z[GMT]")
+         (t/zoned-date-time "2021-02-25T00:00Z[GMT]"))
+        (ti/new-interval
+         (t/zoned-date-time "2021-02-23T00:00Z[Europe/London]")
+         (t/zoned-date-time "2021-02-24T00:00Z[Europe/London]"))))))

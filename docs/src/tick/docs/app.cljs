@@ -2,7 +2,8 @@
   (:require-macros [tick.docs.app :refer [analyzer-state]])
   (:require
     [reagent.core :as r]
-    [tick.alpha.api :as t]
+    [tick.core :as t]
+    [tick.alpha.interval :as t.i]
     [tick.timezone]
     [clojure.string :refer [lower-case capitalize]]
     [cljs.js :refer [empty-state eval js-eval eval-str]]
@@ -15,22 +16,24 @@
   (cljs.js/eval-str 
     state
     ; don't know how to do namespacing
-    (clojure.string/replace source "t/" "tick.alpha.api/")
+    (-> source
+        (clojure.string/replace "t/" "tick.core/")
+        (clojure.string/replace "t.i/" "tick.alpha.interval/"))
     (str "[" label "]") 
     {:eval cljs.js/js-eval :context :expr} 
     cb))
 
 (defn load-library-analysis-cache! []
-  (cljs.js/load-analysis-cache! state 'tick.alpha.api (analyzer-state 'tick.alpha.api))
-  ;(cljs.js/load-analysis-cache! state 't (analyzer-state 'tick.alpha.api))
+  (cljs.js/load-analysis-cache! state 'tick.core (analyzer-state 'tick.core))
+  ;(cljs.js/load-analysis-cache! state 't (analyzer-state 'tick.core))
   (cljs.js/load-analysis-cache! state 'tick.timezone (analyzer-state 'tick.timezone))
   nil)
 
 (defn day-midnight-today []
-  (t/day-of-week (t/end (t/bounds (t/today)))))
+  (t/day-of-week (t/end (t.i/bounds (t/today)))))
 
 (defn day-midnight-tomorrow []
-  (t/day-of-week (t/end (t/bounds (t/tomorrow)))))
+  (t/day-of-week (t/end (t.i/bounds (t/tomorrow)))))
 
 (defn two-days-from-today []
   (str "on " (capitalize (str (day-midnight-tomorrow))) " morning"))
@@ -73,11 +76,11 @@
         now (t/now)
         ->time #(t/>> now (t/new-duration (inc %) :seconds))
 
-        ival1 (t/new-interval
+        ival1 (t.i/new-interval
                 (->time value)
                 (->time (+ value block-width-in-cells)))
 
-        ival2 (t/new-interval
+        ival2 (t.i/new-interval
                 (->time (- (/ x-cells 2) (/ fixed-block-width-in-cells 2)))
                 (->time (+ (/ x-cells 2) (/ fixed-block-width-in-cells 2))))]
 
@@ -115,12 +118,12 @@
                         ))]
        [:div
         [:p "The higher interval "
-         [:em (f (t/relation ival1 ival2))]
+         [:em (f (t.i/relation ival1 ival2))]
          " the lower interval, whereas the lower interval "
-         [:em (f (t/relation ival2 ival1))]
+         [:em (f (t.i/relation ival2 ival1))]
          " the higher interval."]
-        [:p "Relation between higher and lower interval: " [:tt (pr-str (t/relation ival1 ival2))]]
-        [:p "Relation between lower and higher interval: " [:tt (pr-str (t/relation ival2 ival1))]]])]))
+        [:p "Relation between higher and lower interval: " [:tt (pr-str (t.i/relation ival1 ival2))]]
+        [:p "Relation between lower and higher interval: " [:tt (pr-str (t.i/relation ival2 ival1))]]])]))
 
 (defonce code-blocks
   (for [el (array-seq (.querySelectorAll js/document ".code"))]

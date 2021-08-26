@@ -1,12 +1,13 @@
 ;; Copyright © 2016-2018, JUXT LTD.
 
-(ns tick.alpha.api.dates-test
+(ns tick.dates-test
   (:refer-clojure :exclude [dec < range <= min long int > extend - time / >= inc + max complement atom swap-vals! reset-vals! compare-and-set! reset! swap! second group-by conj])
   (:require [clojure.test
              :refer [deftest is testing run-tests]
              :refer-macros [deftest is testing run-tests]]
             [tick.timezone]
-            [tick.alpha.api :as t :refer [with-clock] :refer-macros [with-clock]]))
+            [tick.protocols :as p]
+            [tick.core :as t :refer [with-clock] :refer-macros [with-clock]]))
 
 ;; See doc/dates.adoc
 
@@ -14,8 +15,8 @@
   (testing "(time)"
     (is (t/time? (t/time))))
   (testing "(time \"4pm\")"
-    (is (t/time? (t/parse "4pm")))
-    (is (= "16:00" (str (t/parse "4pm")))))
+    (is (t/time? (p/parse "4pm")))
+    (is (= "16:00" (str (p/parse "4pm")))))
   (testing "(midnight)"
     (is (t/time? (t/midnight)))
     (is (= "00:00" (str (t/midnight)))))
@@ -67,14 +68,3 @@
 ;; TODO: tick function
 
 ;; TODO: Atomic clocks
-
-(deftest date-relation-test
-  (is (=
-       (t/relation
-        (t/new-interval
-         (t/zoned-date-time "2021-02-24T00:00Z[GMT]")
-         (t/zoned-date-time "2021-02-25T00:00Z[GMT]"))
-        (t/new-interval
-         (t/zoned-date-time "2021-02-23T00:00Z[Europe/London]")
-         (t/zoned-date-time "2021-02-24T00:00Z[Europe/London]")))
-       :met-by)))

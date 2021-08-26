@@ -23,3 +23,5 @@ node_modules/
 /cljs-test-runner-out
 /.cljs_node_repl/
 /out/
+/docs/public/
+.lsp

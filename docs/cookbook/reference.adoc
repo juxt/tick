@@ -41,7 +41,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `<` - Before?
 [source.code,clojure]
 ----
-(t/< (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
+(t/< (t/instant "2000-01-01T00:00:00.00Z") (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -49,7 +49,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `>` - After?
 [source.code,clojure]
 ----
-(t/> (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
+(t/> (t/instant "2000-01-01T00:00:00.00Z") (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -57,7 +57,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `\<=` - Before or same time?
 [source.code,clojure]
 ----
-(t/<= (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
+(t/<= (t/instant "2000-01-01T00:00:00.00Z") (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -65,7 +65,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `>=` - After or same time?
 [source.code,clojure]
 ----
-(t/>= (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
+(t/>= (t/instant "2000-01-01T00:00:00.00Z") (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -81,7 +81,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `am` - Create an interval spanning the morning of a given date:
 [source.code,clojure]
 ----
-(t/am (t/date "2018-01-01"))
+(t.i/am (t/date "2018-01-01"))
 ----
 ====
 
@@ -114,7 +114,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `between` - Give a value for the duration between two instances:
 [source.code,clojure]
 ----
-(t/between (t/instant "2000-01-01T00:00") (t/instant "2018-01-01T00:00"))
+(t/between (t/instant "2000-01-01T00:00:00.00Z") (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -122,7 +122,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `bounds` - Give the beginning and end of an interval:
 [source.code,clojure]
 ----
-(t/bounds (t/yesterday))
+(t.i/bounds (t/yesterday))
 ----
 ====
 
@@ -134,7 +134,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/clock (t/instant "2018-01-01T00:00"))
+(t/clock (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -150,9 +150,9 @@ This section gives, in alphabetical order, examples of how to use each function 
 `complement` - Give the inverse of a list of intervals.
 [source.code,clojure]
 ----
-(t/complement [(t/instant "2010-01-01T00:00")
-	       (t/instant "2010-02-01T00:00")
-	       (t/instant "2010-03-01T00:00")])
+(t.i/complement [(t/instant "2010-01-01T00:00:00.00Z")
+	       (t/instant "2010-02-01T00:00:00.00Z")
+	       (t/instant "2010-03-01T00:00:00.00Z")])
 ----
 ====
 
@@ -160,7 +160,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `concur` - Get the common interval (if any) of two intervals.
 [source.code,clojure]
 ----
-(t/concur (t/today) (t/new-interval (t/yesterday) (t/tomorrow)))
+(t.i/concur (t/today) (t.i/new-interval (t/yesterday) (t/tomorrow)))
 ----
 ====
 
@@ -168,7 +168,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `concurrencies` - A sequence of times when intervals overlap:
 [source.code,clojure]
 ----
-(t/concurrencies (t/pm (t/today)) (t/new-interval (t/today) (t/tomorrow)))
+(t.i/concurrencies (t.i/pm (t/today)) (t.i/new-interval (t/today) (t/tomorrow)))
 ----
 ====
 
@@ -176,7 +176,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `conj` - Return new collection with the original collection including a new date:
 [source.code,clojure]
 ----
-(t/conj [(t/yesterday) (t/today)] (t/tomorrow))
+(t.i/conj [(t/yesterday) (t/today)] (t/tomorrow))
 ----
 ====
 
@@ -188,11 +188,11 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/date) (t/tomorrow)
+(t/tomorrow)
 ----
 [source.code,clojure]
 ----
-(t/date (t/instant "2018-01-01T00:00"))
+(t/date (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 [source.code,clojure]
 ----
@@ -208,15 +208,11 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/date-time (t/tomorrow)) 
+(t/date-time (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 [source.code,clojure]
 ----
-(t/date-time (t/instant "2018-01-01T00:00"))
-----
-[source.code,clojure]
-----
-(t/date "2018-01-01T00:00")
+(t/date-time "2018-01-01T00:00")
 ----
 ====
 
@@ -236,7 +232,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/day-of-month (t/instant "2018-01-01T00:00"))
+(t/day-of-month (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -252,7 +248,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/day-of-week (t/instant "2018-01-01T00:00"))
+(t/day-of-week (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 [source.code,clojure]
 ----
@@ -280,7 +276,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `difference` - Return the first collection without the second collection elements.
 [source.code,clojure]
 ----
-(t/difference [(t/yesterday) (t/today) (t/tomorrow)] [(t/today)])
+(t.i/difference [(t/yesterday) (t/today) (t/tomorrow)] [(t/today)])
 ----
 ====
 
@@ -288,7 +284,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `divide` - Divide a duration by another duration:
 [source.code,clojure]
 ----
-(t/divide (t/new-duration 1 :days) (t/new-duration 1 :hours))
+(t.i/divide (t/new-duration 1 :days) (t/new-duration 1 :hours))
 ----
 ====
 
@@ -296,8 +292,8 @@ This section gives, in alphabetical order, examples of how to use each function 
 `divide-by` - Split an interval into even sections of time:
 [source.code,clojure]
 ----
-(t/divide-by 10 {:tick/beginning (t/instant "2018-01-01T00:00")
-	         :tick/end (t/instant "2018-01-10T00:00")})
+(t.i/divide-by 10 {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+	         :tick/end (t/instant "2018-01-10T00:00:00.00Z")})
 ----
 ====
 
@@ -305,8 +301,8 @@ This section gives, in alphabetical order, examples of how to use each function 
 `duration` - Give the duration of an interval:
 [source.code,clojure]
 ----
-(t/duration {:tick/beginning (t/instant "2018-01-01T00:00")
-	     :tick/end (t/instant "2018-01-10T00:00")})
+(t/duration {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+	     :tick/end (t/instant "2018-01-10T00:00:00.00Z")})
 ----
 ====
 
@@ -314,8 +310,8 @@ This section gives, in alphabetical order, examples of how to use each function 
 `end` - Give the end instance of an interval:
 [source.code,clojure]
 ----
-(t/end {:tick/beginning (t/instant "2018-01-01T00:00")
-	:tick/end (t/instant "2018-01-10T00:00")})
+(t/end {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+	:tick/end (t/instant "2018-01-10T00:00:00.00Z")})
 ----
 ====
 
@@ -331,8 +327,8 @@ This section gives, in alphabetical order, examples of how to use each function 
 `extend` - Extend an interval by a duration:
 [source.code,clojure]
 ----
-(t/extend {:tick/beginning (t/instant "2018-01-01T00:00")
-           :tick/end (t/instant "2018-01-10T00:00")}
+(t.i/extend {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+           :tick/end (t/instant "2018-01-10T00:00:00.00Z")}
   (t/new-period 10 :weeks))
 ----
 ====
@@ -349,10 +345,10 @@ This section gives, in alphabetical order, examples of how to use each function 
 `group-by` - Group a collection of intervals by a given function.
 [source.code,clojure]
 ----
-(t/group-by t/year
-            (map #(apply t/new-interval %)
-                 (t/divide-by (t/new-duration 1 :days)
-                              (t/new-interval (t/new-date 2000 12 29)
+(t.i/group-by t/year
+            (map #(apply t.i/new-interval %)
+                 (t.i/divide-by (t/new-duration 1 :days)
+                              (t.i/new-interval (t/new-date 2000 12 29)
                                               (t/new-date 2001 1 2)))))
 ----
 ====
@@ -385,7 +381,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `in` - Give an instance in a time zone:
 [source.code,clojure]
 ----
-(t/in (t/instant "2018-01-01T10:00") "Australia/Darwin")
+(t/in (t/instant "2018-01-01T10:00:00.00Z") "Australia/Darwin")
 ----
 ====
 
@@ -405,7 +401,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/inst (t/instant "2018-01-01T00:00"))
+(t/inst (t/instant "2018-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -417,7 +413,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 [source.code,clojure]
 ----
-(t/instant "2018-01-01T00:00:00.000+09:30[Australia/Darwin]")
+(t/instant (t/zoned-date-time "2018-01-01T00:00:00.000+09:30[Australia/Darwin]"))
 ----
 ====
 
@@ -433,7 +429,7 @@ This section gives, in alphabetical order, examples of how to use each function 
 `intersection` - Give the intersection of two sequences:
 [source.code,clojure]
 ----
-(t/intersection [(t/year)]
+(t.i/intersection [(t/year)]
                 [(t/date "2019-01-01")
                  (t/date "2020-01-01")
                  (t/date "2021-01-01")])
@@ -444,13 +440,13 @@ This section gives, in alphabetical order, examples of how to use each function 
 `intersects?` - Does an interval intersect with another? Return `nil` if not, or the intersection if so.
 [source.code,clojure]
 ----
-(t/intersects? [(t/year)]
+(t.i/intersects? [(t/year)]
                (t/inc (t/year)))
 ----
 
 [source.code,clojure]
 ----
-(t/intersects? [(t/year)]
+(t.i/intersects? [(t/year)]
                 (t/today))
 ----
 
@@ -600,14 +596,14 @@ This section gives, in alphabetical order, examples of how to use each function 
 ----
 (t/new-duration 10 :minutes)
 ----
-NOTE: `new-duration` units are from _nanos_ to _days_. For larger units of time, see <<new-period,`new-period`>>.
+NOTE: `new-duration` units are from _nanos_ to _days_. For date-based units of time, see <<new-period,`new-period`>>.
 ====
 
 ====
 `new-interval` - Create a new interval: a map with a `:tick/beginning` and a `:tick/end`
 [source.code,clojure]
 ----
-(t/new-interval (t/instant "2018-01-01T00:00") (t/instant "2019-01-01T00:00"))
+(t.i/new-interval (t/instant "2018-01-01T00:00:00.00Z") (t/instant "2019-01-01T00:00:00.00Z"))
 ----
 ====
 
@@ -618,7 +614,7 @@ NOTE: `new-duration` units are from _nanos_ to _days_. For larger units of time,
 ----
 (t/new-period 10 :weeks)
 ----
-NOTE: `new period` is in units greater than days. For smaller units,
+NOTE: `new period` is in units greater than days. For time-based units,
 see <<new-duration,`new-duration`>>.
 ====
 
@@ -647,12 +643,12 @@ see <<new-duration,`new-duration`>>.
 sequence of interval groups:
 [source.code,clojure]
 ----
-(count (t/normalize [(t/new-interval (t/instant "2000-01-01T00:00")
-	     		             (t/instant "2000-01-02T00:00"))
-                     (t/new-interval (t/instant "2000-01-02T00:00")
-	      		             (t/instant "2000-02-02T00:00"))
-                     (t/new-interval (t/instant "2000-06-01T00:00")
-	      		             (t/instant "2000-06-09T00:00"))]))
+(count (t.i/normalize [(t.i/new-interval (t/instant "2000-01-01T00:00:00.00Z")
+	     		             (t/instant "2000-01-02T00:00:00.00Z"))
+                     (t.i/new-interval (t/instant "2000-01-02T00:00:00.00Z")
+	      		             (t/instant "2000-02-02T00:00:00.00Z"))
+                     (t.i/new-interval (t/instant "2000-06-01T00:00:00.00Z")
+	      		             (t/instant "2000-06-09T00:00:00.00Z"))]))
 ----
 ====
 
@@ -698,26 +694,20 @@ specified offset:
 `ordered-disjoint-intervals?` - Are the given intervals time-ordered and disjointed?
 [source.code,clojure]
 ----
-(t/ordered-disjoint-intervals? [(t/new-interval (t/instant "2000-01-01T00:00")
-			       			(t/instant "2000-01-02T00:00"))
-				(t/new-interval (t/instant "2000-01-02T00:00")
-						(t/instant "2000-02-02T00:00"))])
+(t.i/ordered-disjoint-intervals? [(t.i/new-interval (t/instant "2000-01-01T00:00:00.00Z")
+			       			(t/instant "2000-01-02T00:00:00.00Z"))
+				(t.i/new-interval (t/instant "2000-01-02T00:00:00.00Z")
+						(t/instant "2000-02-02T00:00:00.00Z"))])
 ----
 ====
 
-====
-`parse` - Give the most applicable instance for the input string:
-[source.code,clojure]
-----
-(t/parse "1pm")
-----
 ====
 
 ====
 `pm` - Give an interval covering the afternoon of a given date:
 [source.code,clojure]
 ----
-(t/pm (t/today))
+(t.i/pm (t/today))
 ----
 ====
 
@@ -735,14 +725,14 @@ specified offset:
 `relation` - Show the relation of two intervals:
 [source.code,clojure]
 ----
-(t/relation {:tick/beginning (t/instant "2018-01-01T00:00")
-	     :tick/end (t/instant "2019-01-01T00:00")}
-            {:tick/beginning (t/instant "2018-06-01T00:00")
-	     :tick/end (t/instant "2019-06-01T00:00")})
+(t.i/relation {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+	     :tick/end (t/instant "2019-01-01T00:00:00.00Z")}
+            {:tick/beginning (t/instant "2018-06-01T00:00:00.00Z")
+	     :tick/end (t/instant "2019-06-01T00:00:00.00Z")})
 ----
 [source.code,clojure]
 ----
-(t/relation (t/today) (t/yesterday))
+(t.i/relation (t/today) (t/yesterday))
 ----
 NOTE: see <<relation-yesterday-tomorrow,above>> for more.
 ====
@@ -772,8 +762,8 @@ value of before and after.
 `scale` - Increase an interval by a given duration:
 [source.code,clojure]
 ----
-(t/scale {:tick/beginning (t/instant "2018-01-01T00:00")
-	  :tick/end (t/instant "2019-01-01T00:00")}
+(t.i/scale {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
+	  :tick/end (t/instant "2019-01-01T00:00:00.00Z")}
          (t/new-duration 10 :minutes))
 ----
 ====
@@ -830,7 +820,7 @@ value of before and after.
 `union` - Join two time-ordered sequences together into one ordered sequence
 [source.code,clojure]
 ----
-(t/union [(t/today)] [(t/yesterday) (t/tomorrow)])
+(t.i/union [(t/today)] [(t/yesterday) (t/tomorrow)])
 ----
 ====
 
@@ -850,10 +840,10 @@ value of before and after.
 `unite` - Unite concurrent intervals ordered by beginning:
 [source.code,clojure]
 ----
-(t/unite [(t/new-interval (t/instant "2000-01-01T00:00")
-	 		  (t/instant "2000-01-02T00:00"))
-	  (t/new-interval (t/instant "2000-01-01T00:00")
-	  		  (t/instant "2000-02-02T00:00"))])
+(t.i/unite [(t.i/new-interval (t/instant "2000-01-01T00:00:00.00Z")
+	 		  (t/instant "2000-01-02T00:00:00.00Z"))
+	  (t.i/new-interval (t/instant "2000-01-01T00:00:00.00Z")
+	  		  (t/instant "2000-02-02T00:00:00.00Z"))])
 ----
 ====
 
@@ -876,7 +866,7 @@ value of before and after.
 ====
 
 ====
-`with-clock` - Get the time from a clock:
+`with-clock` - macro to evaluate code in the context of a given clock:
 [source.code,clojure]
 ----
 (let [clk (t/>> (t/clock) (t/new-duration 5 :minutes))]
@@ -892,7 +882,7 @@ value of before and after.
 ----
 [source.code,clojure]
 ----
-(t/year "2000-01-01")
+(t/year (t/date "2000-01-01"))
 ----
 ====
 
@@ -904,7 +894,7 @@ value of before and after.
 ----
 [source.code,clojure]
 ----
-(t/year-month "2000-01-01")
+(t/year-month (t/date "2000-01-01"))
 ----
 ====
 

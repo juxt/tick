@@ -1,4 +1,4 @@
 ^{:auto-testing true
   :open-url "http://localhost:9500"
   :watch-dirs ["src" "test"]}
-{:main tick.alpha.api}
+{:main tick.core}

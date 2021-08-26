@@ -10,7 +10,7 @@ easier to write programs that involve time and date calculations:
 
 * Functions to manipulating time, easily and succinctly (stable)
 * Powerful functions for slicing and dicing time intervals (stable)
-* Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra] (stable)
+* Implementation of link:https://en.wikipedia.org/wiki/Allen%27s_interval_algebra[Allen's interval algebra] (alpha)
 * Support for iCalendar serialization (work-in-progress)
 
 In many business domains, dates are as fundamental as numbers and
@@ -26,10 +26,10 @@ is quite likely that someone will have had the same query and had it resolved on
 
 == Status
 
-_Tick_ is currently in _alpha_ status. By _alpha_, we mean that the
-library's API may change in future. The quality of _tick_ is deemed
-adequate for real-world use but do let us know if you come across
-any unexpected behaviour and bugs.
+_tick.core_ (the main API)is stable. The namespaces under tick.alpha.*, such as tick.alpha.interval are _alpha_ status. 
+By _alpha_, we mean that the
+library's API may change in future. Do let us know if you come across
+any unexpected behaviour or bugs anywhere in _tick_.
 
 == License
 

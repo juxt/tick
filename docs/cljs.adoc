@@ -30,13 +30,15 @@ The use of timezones and locales is optional to allow a smaller build size.
 
 Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped) and it https://clojureverse.org/t/cljc-java-time-will-drop-all-npm-foreign-lib-dependencies/6208/5?u=henry_w[doesn't seem possible to reduce this].
 
-For comparison, a basic cljs app with React is about 330k unzipped. 
+For comparison, a basic Cljs app with React is about 330k unzipped. 
 
-So by using tick you might be close to doubling your build size. Is that a problem? That depends, but really 
+So by using Tick you might come close to doubling your build size! 
+
+But is that a problem? That depends, but really 
 330k is my no means small to start with, so likely for the majority of potential users it would
 not be an issue at all.
   
-Moving the implementation to https://github.com/tc39/proposal-temporal[Temporal] will mean the 
+Moving the implementation to https://github.com/henryw374/tempo[Tempo] will mean the 
 build includes only the compiled Clojurescript of tick itself.
 
 Timezone is an extra 26k, and Locale (just en-US) is an extra 45k

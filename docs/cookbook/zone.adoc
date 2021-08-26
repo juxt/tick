@@ -20,7 +20,7 @@ Create a `java.time.ZonedDateTime` in a particular time zone:
 
 [source.code,clojure]
 ----
-(t/in (t/instant "2000-01-01T00:00") "Australia/Darwin")
+(t/in (t/instant "2000-01-01T00:00:00.00Z") "Australia/Darwin")
 ----
 ====
 
