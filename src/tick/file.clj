@@ -2,7 +2,6 @@
 
 (ns tick.file
   (:require
-   [tick.core :as t]
    [tick.protocols :as p])
   (:import
    [java.time Instant]))

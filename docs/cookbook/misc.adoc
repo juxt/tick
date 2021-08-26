@@ -7,7 +7,7 @@ These examples don't have a home yet.
 Check if an expiration has passed:
 [source.code,clojure]
 ----
-(let [expiry (t/instant "2018-01-01T00:00")]
+(let [expiry (t/instant "2018-01-01T00:00:00.00Z")]
   (t/> (t/now)
        expiry))
 ----
@@ -21,7 +21,7 @@ For instance, to get a sequence of the first day of each month in a given year:
 
 [source.code,clojure]
 ----
-(let [intvl (t/bounds (t/year))]
+(let [intvl (t.i/bounds (t/year))]
   (t/range
     (t/beginning intvl)
     (t/end intvl)
@@ -35,51 +35,5 @@ Get the time difference between two instances:
 [source.code,clojure]
 ----
 (t/between (t/now) (t/epoch))
-----
-====
-
-
-====
-Not sure on input format? `parse` will do the work for you.
-
-[source.code,clojure]
-----
-(t/parse "2 pm")
-----
-[source.code,clojure]
-----
-(t/parse "14")
-----
-[source.code,clojure]
-----
-(t/parse "14:00")
-----
-[source.code,clojure]
-----
-(t/parse "2018-01-01")
-----
-[source.code,clojure]
-----
-(t/parse "2018-01-01T00:00")
-----
-[source.code,clojure]
-----
-(t/parse "2018-01-01T00:00:00")
-----
-[source.code,clojure]
-----
-(t/parse "2018-01-01T00:00:00+01:00")
-----
-[source.code,clojure]
-----
-(t/parse "2018-01-01T00:00:00+01:00[Europe/London]")
-----
-[source.code,clojure]
-----
-(t/parse "2019")
-----
-[source.code,clojure]
-----
-(t/parse "2000-01")
 ----
 ====

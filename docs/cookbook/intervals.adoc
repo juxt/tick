@@ -11,7 +11,7 @@ Specify the beginning and the end:
 
 [source.code,clojure]
 ----
-(t/new-interval (t/date-time "2000-01-01T00:00")
+(t.i/new-interval (t/date-time "2000-01-01T00:00")
                 (t/date-time "2001-01-01T00:00"))
 ----
 
@@ -23,16 +23,16 @@ Specify the beginning and the end:
 
 [source.code,clojure]
 ----
-(t/bounds (t/year 2000))
+(t.i/bounds (t/year 2000))
 ----
 
 All of the above result in the same interval:
 
 [source.code,clojure]
 ----
-(= (t/new-interval (t/date-time "2000-01-01T00:00")
+(= (t.i/new-interval (t/date-time "2000-01-01T00:00")
                    (t/date-time "2001-01-01T00:00"))
-   (t/bounds (t/year 2000))
+   (t.i/bounds (t/year 2000))
    {:tick/beginning (t/date-time "2000-01-01T00:00")
     :tick/end (t/date-time "2001-01-01T00:00")})
 ----
@@ -45,20 +45,20 @@ The duration of an interval can be modified using `extend`.
 Extend an instant to a interval
 [source.code,clojure]
 ----
-(t/extend (t/instant "2000-01-01T00:00")
+(t.i/extend (t/instant "2000-01-01T00:00:00.00Z")
   (t/new-period 3 :weeks))
 ----
 
 Extend an interval:
 [source.code,clojure]
 ----
-(t/extend (t/bounds (t/year 2000)) (t/new-period 1 :years))
+(t.i/extend (t.i/bounds (t/year 2000)) (t/new-period 1 :years))
 ----
 
 Shorten an interval:
 [source.code,clojure]
 ----
-(t/extend (t/bounds (t/year 2000)) (t/new-period -1 :months))
+(t.i/extend (t.i/bounds (t/year 2000)) (t/new-period -1 :months))
 ----
 ====
 
@@ -68,12 +68,12 @@ The beginning of an interval can be modified whilst preserving the duration.
 Shift the interval back in time:
 [source.code,clojure]
 ----
-(t/<< (t/bounds (t/year 2000)) (t/new-period 6 :months))
+(t/<< (t.i/bounds (t/year 2000)) (t/new-period 6 :months))
 ----
 
 Or forward in time:
 [source.code,clojure]
 ----
-(t/>> (t/bounds (t/today)) (t/new-duration 1 :half-days))
+(t/>> (t.i/bounds (t/today)) (t/new-duration 1 :half-days))
 ----
 ====

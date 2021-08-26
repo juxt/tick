@@ -8,7 +8,7 @@ Tick includes a small formatting api over that provided by jsr-310
 In ClojureScript, require ns _[tick.locale-en-us]_ to create custom formatters
 
 ----
- (require '[tick.alpha.api :as t])    
+ (require '[tick.core :as t])    
  
  (t/format :iso-zoned-date-time (t/zoned-date-time))
  

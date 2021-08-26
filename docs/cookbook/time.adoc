@@ -5,6 +5,29 @@ increasing efficiency.
 Times and dates can be easily stripped down to smaller modules of time,
 likewise they can be built up into complete instants.
 
+CAUTION: Extracting the date from an Instant (or other fields, such as time) you will 
+         get a local result.
+
+For example: 
+
+[source.code,clojure]
+----
+(t/date (t/instant "1999-12-31T00:59:59Z"))
+----
+
+The result maybe be `#time/date"1999-12-31"` or not, depending on your browser timezone 
+(or timezone of the jvm). 
+
+To get the date (or other fields) from an Instant in UTC, we must first go via a UTC ZonedDateTime"
+
+[source.code,clojure]
+----
+(->
+   (t/instant "1999-12-31T00:59:59Z")
+   (t/in "UTC")
+   (t/date))
+----
+
 === Create time
 
 ====
@@ -51,7 +74,7 @@ Or the time from an instant:
 
 [source.code,clojure]
 ----
-(t/time (t/instant "1999-12-31T23:59:59"))
+(t/time (t/instant "1999-12-31T00:59:59Z"))
 ----
 ====
 
@@ -68,15 +91,15 @@ Get the current time in another time-zone:
 Get a specific unit of time:
 [source.code,clojure]
 ----
-(t/hour (t/instant "1999-12-31T23:59:59"))
+(t/hour (t/instant "1999-12-31T23:59:59Z"))
 ----
 [source.code,clojure]
 ----
-(t/minute (t/instant "1999-12-31T23:59:59"))
+(t/minute (t/instant "1999-12-31T23:59:59Z"))
 ----
 [source.code,clojure]
 ----
-(t/second (t/instant "1999-12-31T23:59:59"))
+(t/second (t/instant "1999-12-31T23:59:59Z"))
 ----
 ====
 
@@ -111,7 +134,7 @@ To get the current date:
 Or the date from an instant:
 [source.code,clojure]
 ----
-(t/date (t/instant "1999-12-31T23:59:59"))
+(t/date (t/instant "1999-12-31T23:59:59Z"))
 ----
 ====
 
@@ -119,7 +142,7 @@ Or the date from an instant:
 Get the date in another time-zone:
 [source.code,clojure]
 ----
-(t/date (t/in (t/instant "1999-12-31T23:59:59") "Australia/Darwin"))
+(t/date (t/in (t/instant "1999-12-31T23:59:59Z") "Australia/Darwin"))
 ----
 ====
 
@@ -127,15 +150,15 @@ Get the date in another time-zone:
 Get a specific part of the date:
 [source.code,clojure]
 ----
-(t/year (t/instant "1999-12-31T23:59:59"))
+(t/year (t/instant "1999-12-31T23:59:59Z"))
 ----
 [source.code,clojure]
 ----
-(t/month (t/instant "1999-12-31T23:59:59"))
+(t/month (t/instant "1999-12-31T23:59:59Z"))
 ----
 [source.code,clojure]
 ----
-(t/day-of-month (t/instant "1999-12-31T23:59:59"))
+(t/day-of-month (t/instant "1999-12-31T23:59:59Z"))
 ----
 ====
 
@@ -204,11 +227,6 @@ Make up a `date-time`
 ----
 [source.code,clojure]
 ----
-(-> (t/parse "1pm")
-    (t/on "2018-10-20"))
-----
-[source.code,clojure]
-----
 (-> (t/tomorrow)
     (t/at (t/midnight)))
 ----
@@ -217,9 +235,8 @@ Make up a `date-time`
 (-> (t/noon)
     (t/on (t/yesterday)))
 ----
-====
 
-====
+
 Make up a `Zoned-Date-Time`
 [source.code,clojure]
 ----

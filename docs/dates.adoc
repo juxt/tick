@@ -345,6 +345,30 @@ To convert between any of these types, simply call the eponymous
 function corresponding to the destination type with the source type as
 an argument.
 
+CAUTION: When converting between Instants (which are always UTC) and other data types, please
+be aware that current default zone of the browser or jvm will affect the result.
+
+For example: 
+
+[source.code,clojure]
+----
+(t/date (t/instant "1999-12-31T00:00:00Z"))
+----
+
+The result maybe be `1999-12-31` or not, depending on your browser timezone 
+(or timezone of the jvm). 
+
+To get the date (or other fields) from an Instant in UTC, we must first go via a UTC ZonedDateTime"
+
+[source.code,clojure]
+----
+(->
+   (t/instant "1999-12-31T00:59:59Z")
+   (t/in "UTC")
+   (t/date))
+----
+
+
 .Converting between types
 ====
 To convert between an `instant` and a `zoned-date-time`:
@@ -420,25 +444,25 @@ Days of the week, and months of the year, are available as constants listed in <
 .Tick constants and their corresponding host types
 |===
 |Tick|Java|JavaScript
-|tick.alpha.api/MONDAY|java.time.DayOfWeek.MONDAY|DayOfWeek.MONDAY
-|tick.alpha.api/TUESDAY|java.time.DayOfWeek.TUESDAY|DayOfWeek.TUESDAY
-|tick.alpha.api/WEDNESDAY|java.time.DayOfWeek.WEDNESDAY|DayOfWeek.WEDNESDAY
-|tick.alpha.api/THURSDAY|java.time.DayOfWeek.THURSDAY|DayOfWeek.THURSDAY
-|tick.alpha.api/FRIDAY|java.time.DayOfWeek.FRIDAY|DayOfWeek.FRIDAY
-|tick.alpha.api/SATURDAY|java.time.DayOfWeek.SATURDAY|DayOfWeek.SATURDAY
-|tick.alpha.api/SUNDAY|java.time.DayOfWeek.SUNDAY|DayOfWeek.SUNDAY
-|tick.alpha.api/JANUARY|java.time.Month.JANUARY|Month.JANUARY
-|tick.alpha.api/FEBRUARY|java.time.Month.FEBRUARY|Month.FEBRUARY
-|tick.alpha.api/MARCH|java.time.Month.MARCH|Month.MARCH
-|tick.alpha.api/APRIL|java.time.Month.APRIL|Month.APRIL
-|tick.alpha.api/MAY|java.time.Month.MAY|Month.MAY
-|tick.alpha.api/JUNE|java.time.Month.JUNE|Month.JUNE
-|tick.alpha.api/JULY|java.time.Month.JULY|Month.JULY
-|tick.alpha.api/AUGUST|java.time.Month.AUGUST|Month.AUGUST
-|tick.alpha.api/SEPTEMBER|java.time.Month.SEPTEMBER|Month.SEPTEMBER
-|tick.alpha.api/OCTOBER|java.time.Month.OCTOBER|Month.OCTOBER
-|tick.alpha.api/NOVEMBER|java.time.Month.NOVEMBER|Month.NOVEMBER
-|tick.alpha.api/DECEMBER|java.time.Month.DECEMBER|Month.DECEMBER
+|tick.core/MONDAY|java.time.DayOfWeek.MONDAY|DayOfWeek.MONDAY
+|tick.core/TUESDAY|java.time.DayOfWeek.TUESDAY|DayOfWeek.TUESDAY
+|tick.core/WEDNESDAY|java.time.DayOfWeek.WEDNESDAY|DayOfWeek.WEDNESDAY
+|tick.core/THURSDAY|java.time.DayOfWeek.THURSDAY|DayOfWeek.THURSDAY
+|tick.core/FRIDAY|java.time.DayOfWeek.FRIDAY|DayOfWeek.FRIDAY
+|tick.core/SATURDAY|java.time.DayOfWeek.SATURDAY|DayOfWeek.SATURDAY
+|tick.core/SUNDAY|java.time.DayOfWeek.SUNDAY|DayOfWeek.SUNDAY
+|tick.core/JANUARY|java.time.Month.JANUARY|Month.JANUARY
+|tick.core/FEBRUARY|java.time.Month.FEBRUARY|Month.FEBRUARY
+|tick.core/MARCH|java.time.Month.MARCH|Month.MARCH
+|tick.core/APRIL|java.time.Month.APRIL|Month.APRIL
+|tick.core/MAY|java.time.Month.MAY|Month.MAY
+|tick.core/JUNE|java.time.Month.JUNE|Month.JUNE
+|tick.core/JULY|java.time.Month.JULY|Month.JULY
+|tick.core/AUGUST|java.time.Month.AUGUST|Month.AUGUST
+|tick.core/SEPTEMBER|java.time.Month.SEPTEMBER|Month.SEPTEMBER
+|tick.core/OCTOBER|java.time.Month.OCTOBER|Month.OCTOBER
+|tick.core/NOVEMBER|java.time.Month.NOVEMBER|Month.NOVEMBER
+|tick.core/DECEMBER|java.time.Month.DECEMBER|Month.DECEMBER
 |===
 
 

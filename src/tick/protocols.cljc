@@ -10,7 +10,20 @@
   (offset-by [dt amount] "Set a date-time to be offset by an amount"))
 
 (defprotocol IParseable
-  (parse [_] "Parse to most applicable instance."))
+  (parse [_] 
+    "Parse to most applicable instance. 
+    
+    Do not use this function if you know the expected format of the string
+that you want to parse. This is partly because for example t/instant, t/date etc  will
+be much faster, but also because if the string you pass it is not in the format you
+expect, this function may still convert it into some entity that you weren't expecting.
+
+If you have a string in a non-standard format, use a formatter and the parse fn of they entity you want.
+
+For example:
+
+(cljc.java-time.local-date/parse \"20200202\" (t/formatter \"yyyyMMdd\"))
+"))
 
 (defprotocol ITimeShift
   (forward-number [_ n] "Increment time")
