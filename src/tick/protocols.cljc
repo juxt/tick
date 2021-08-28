@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.protocols
-  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide]))
+  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= = next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide]))
 
 (defprotocol ITimeReify
   (on [time date] "Set time be ON a date")
@@ -55,7 +55,7 @@ For example:
   (<= [x y] "Is x before or at the same time as y?")
   (> [x y] "Is x after y?")
   (>= [x y] "Is x after or at the same time as y?")
-  (=== [x y] "Is x equals to y?"))
+  (= [x y] "Is x equals to y?"))
 
 (defprotocol MinMax
   (min-of-type [_] "Return the min")
