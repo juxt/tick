@@ -64,6 +64,26 @@
   (testing "Creation of clock with fixed instant"
     (is (= "2017-10-31T16:00:00Z" (str (t/instant (t/clock "2017-10-31T16:00:00Z")))))))
 
+(deftest zdt-and-instant-equality-test
+  (testing "ZonedDateTimes in different zones should be equals"
+    (is (p/=
+      (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+      (t/zoned-date-time "2017-10-31T13:00:00-07:00[America/Los_Angeles]"))))
+
+  (testing "ZoneDateTimes and OffsetDateTime should be equals if represents the same point in time"
+    (is (p/=
+      (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+      (t/offset-date-time "2017-10-31T13:00-07:00"))))
+
+  (testing "ZoneDateTimes and platform Date should be equals if represents the same point in time"
+    (is (p/=
+      (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+      (t/inst "2017-10-31T20:00:00Z"))))
+
+  (testing "Instants and ZonedDateTimes should be equals if represents the same point in time"
+    (is (p/=
+            (t/instant (t/clock "2017-10-31T16:00:00Z"))
+            (t/zoned-date-time "2017-10-31T16:00:00Z[UTC]")))))
 
 ;; TODO: tick function
 
