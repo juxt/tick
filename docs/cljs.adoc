@@ -36,7 +36,9 @@ So by using Tick you might come close to doubling your build size!
 
 But is that a problem? That depends, but really 
 330k is my no means small to start with, so likely for the majority of potential users it would
-not be an issue at all.
+not be an issue at all. https://widdindustries.com/clojurescript-datetime-lib-comparison/[cljc.java-time is pitted against another 'lightweight' Cljs date/time library in this
+experiement] which shows a web app using it does not load more slowly and over multiple visits will
+download less data overall.
   
 Moving the implementation to https://github.com/henryw374/tempo[Tempo] will mean the 
 build includes only the compiled Clojurescript of tick itself.
