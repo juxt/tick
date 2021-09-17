@@ -19,8 +19,7 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 
 == Docs
 
-Tick's documentation site is currently down. All documentation is available in the docs dir in this repo and see below for instructions
-on how to run the docs site locally.
+https://host-22a9c.web.app[Tick Documentation]
 
 == Status
 
