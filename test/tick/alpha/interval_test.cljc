@@ -12,8 +12,8 @@
 
 (s/check-asserts true)
 
-;todo - this was copied over from old dates-test ns. doesnt pass
-#_(deftest date-relation-test
+
+(deftest date-relation-test
   (is (=
         (ti/relation
           (ti/new-interval

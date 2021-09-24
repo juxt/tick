@@ -141,32 +141,32 @@
 
 (defn equals? [x y]
   (and
-    (= (p/beginning x) (p/beginning y))
-    (= (p/end x) (p/end y))))
+    (t/= (p/beginning x) (p/beginning y))
+    (t/= (p/end x) (p/end y))))
 
 (defn meets? [x y]
-  (= (p/end x) (p/beginning y)))
+  (t/= (p/end x) (p/beginning y)))
 
 (defn overlaps? [x y]
   (and
-   (p/< (p/beginning x) (p/beginning y))
-   (p/> (p/end x) (p/beginning y))
-   (p/< (p/end x) (p/end y))))
+   (t/< (p/beginning x) (p/beginning y))
+   (t/> (p/end x) (p/beginning y))
+   (t/< (p/end x) (p/end y))))
 
 (defn during? [x y]
   (and
-   (p/> (p/beginning x) (p/beginning y))
-   (p/< (p/end x) (p/end y))))
+   (t/> (p/beginning x) (p/beginning y))
+   (t/< (p/end x) (p/end y))))
 
 (defn starts? [x y]
   (and
-   (= (p/beginning x) (p/beginning y))
-   (p/< (p/end x) (p/end y))))
+   (t/= (p/beginning x) (p/beginning y))
+   (t/< (p/end x) (p/end y))))
 
 (defn finishes? [x y]
   (and
-   (p/> (p/beginning x) (p/beginning y))
-   (= (p/end x) (p/end y))))
+   (t/> (p/beginning x) (p/beginning y))
+   (t/= (p/end x) (p/end y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.
 (defn conv
@@ -393,6 +393,8 @@
 (extend-protocol p/ITimeComparison
   ;todo - impl for cljs.core.PersistentHashMap
   #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
+  (= [x y] (and (t/= (t/beginning x) (t/beginning y))
+             (t/= (t/end x) (t/end y))))
   (< [x y] (#{precedes? meets?} (basic-relation x y)))
   (<= [x y] (#{precedes? meets? equals? starts? overlaps? finished-by?} (basic-relation x y)))
   (> [x y] (#{preceded-by? met-by?} (basic-relation x y)))
