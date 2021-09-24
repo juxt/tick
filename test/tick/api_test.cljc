@@ -225,6 +225,9 @@
 (deftest comparison-test
   (let [point (t/truncate (t/instant) :millis)
         later (t/>> point (t/new-duration 1 :millis))]
+    (testing "max-min"
+      (is (= later (t/max point later point later)))
+      (is (= point (t/min point later point later))))
     (testing "comparables not="
       (doseq [point (point-in-time-comparable point)]
         (testing "comparables ="
@@ -305,6 +308,7 @@
     (is (not (t/>= t1 t2)))
     (is (t/>= t1 t1))
     (is (t/>= t2 t1))))
+
 
 (deftest day-of-week
   (let [days (fn [strings] (map t/day-of-week strings))]

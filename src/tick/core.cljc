@@ -743,26 +743,6 @@
     (p/backward-number t n-or-d)
     (p/backward-duration t n-or-d)))
 
-(defn greater [x y]
-  (if (neg? (compare x y)) y x))
-
-(defn max
-  "Find the latest of the given arguments. Callers should ensure that no
-  argument is nil."
-  [arg & args]
-  (assert (every? some? (cons arg args)))
-  (reduce #(greater %1 %2) arg args))
-
-(defn lesser [x y]
-  (if (neg? (compare x y)) x y))
-
-(defn min
-  "Find the earliest of the given arguments. Callers should ensure that no
-  argument is nil."
-  [arg & args]
-  (assert (every? some? (cons arg args)))
-  (reduce #(lesser %1 %2) arg args))
-
 (extend-type Instant
   p/ITimeRangeable
   (range
@@ -845,36 +825,6 @@
 
 (defn duration [x]
   (cljc.java-time.duration/between (p/beginning x) (p/end x)))
-
-(defn- beginning-composite [m]
-  (let [{:tick/keys [beginning intervals]} m]
-    (if intervals
-      (apply min (map :tick/beginning intervals))
-      beginning)))
-
-(defn- end-composite [m]
-  (let [{:tick/keys [end intervals]} m]
-    (if intervals
-      (apply max (map :tick/end intervals))
-      end)))
-
-#?(:clj
-   (extend-protocol p/ITimeSpan
-     clojure.lang.IPersistentMap
-     (beginning [m] (beginning-composite m))
-     (end [m] (end-composite m))))
-
-#?(:cljs
-   (extend-protocol p/ITimeSpan
-     PersistentArrayMap
-     (beginning [m] (beginning-composite m))
-     (end [m] (end-composite m))))
-
-#?(:cljs
-   (extend-protocol p/ITimeSpan
-     PersistentHashMap
-     (beginning [m] (beginning-composite m))
-     (end [m] (end-composite m))))
 
 ;; Periods
 
@@ -1327,6 +1277,57 @@
                     (recur y (first more) (clojure.core/next more))
                     (p/>= y (first more)))
                   false)))
+
+(defn greater [x y]
+  (if (> x y) x y))
+
+(defn max
+  "Find the latest of the given arguments. Callers should ensure that no
+  argument is nil."
+  [arg & args]
+  (assert (every? some? (cons arg args)))
+  (reduce greater arg args))
+
+(defn lesser [x y]
+  (if (< x y) x y))
+
+(defn min
+  "Find the earliest of the given arguments. Callers should ensure that no
+  argument is nil."
+  [arg & args]
+  (assert (every? some? (cons arg args)))
+  (reduce lesser arg args))
+
+(defn- beginning-composite [m]
+  (let [{:tick/keys [beginning intervals]} m]
+    (if intervals
+      (apply min (map :tick/beginning intervals))
+      beginning)))
+
+(defn- end-composite [m]
+  (let [{:tick/keys [end intervals]} m]
+    (if intervals
+      (apply max (map :tick/end intervals))
+      end)))
+
+#?(:clj
+   (extend-protocol p/ITimeSpan
+     clojure.lang.IPersistentMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
+
+#?(:cljs
+   (extend-protocol p/ITimeSpan
+     PersistentArrayMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
+
+#?(:cljs
+   (extend-protocol p/ITimeSpan
+     PersistentHashMap
+     (beginning [m] (beginning-composite m))
+     (end [m] (end-composite m))))
+
 
 ;; Lengths of time (durations & periods)
 
