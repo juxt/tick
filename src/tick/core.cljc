@@ -948,6 +948,9 @@
   LocalTime
   (min-of-type [_] cljc.java-time.local-time/min)
   (max-of-type [_] cljc.java-time.local-time/max)
+  LocalDate
+  (min-of-type [_] cljc.java-time.local-date/min)
+  (max-of-type [_] cljc.java-time.local-date/max)
   LocalDateTime
   (min-of-type [_] cljc.java-time.local-date-time/min)
   (max-of-type [_] cljc.java-time.local-date-time/max)
