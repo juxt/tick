@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.core
-  (:refer-clojure :exclude [format + - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
+  (:refer-clojure :exclude [format + - inc dec max min range time int long = < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide])
   (:require
     [clojure.string :as str]
     [tick.protocols :as p]
@@ -72,7 +72,7 @@
   (parse [s]
     (condp re-matches s
       #"(\d{1,2})\s*(am|pm)"
-      :>> (fn [[_ h ap]] (cljc.java-time.local-time/of (cond-> (parse-int h) (= "pm" ap) (clojure.core/+ 12)) 0))
+      :>> (fn [[_ h ap]] (cljc.java-time.local-time/of (cond-> (parse-int h) (clojure.core/= "pm" ap) (clojure.core/+ 12)) 0))
       #"(\d{1,2})"
       :>> (fn [[_ h]] (cljc.java-time.local-time/of (parse-int h) 0))
       #"\d{2}:\d{2}\S*"
@@ -505,61 +505,6 @@
 (defn previous-or-same
   ([dow] (cljc.java-time.temporal.temporal-adjusters/previous-or-same (p/day-of-week dow)))
   ([t dow] (with t (previous-or-same dow))))
-
-;; Comparison
-
-(extend-protocol p/ITimeComparison
-  Instant
-  (< [x y] (cljc.java-time.instant/is-before x y))
-  (<= [x y] (not (cljc.java-time.instant/is-after x y)))
-  (> [x y] (cljc.java-time.instant/is-after x y))
-  (>= [x y] (not (cljc.java-time.instant/is-before x y)))
-  LocalDateTime
-  (< [x y] (cljc.java-time.local-date-time/is-before x y))
-  (<= [x y] (not (cljc.java-time.local-date-time/is-after x y)))
-  (> [x y] (cljc.java-time.local-date-time/is-after x y))
-  (>= [x y] (not (cljc.java-time.local-date-time/is-before x y)))
-  #?(:clj Date :cljs js/Date)
-  (<  [x y] (neg? (compare x y)))
-  (<= [x y] (not (pos? (compare x y))))
-  (>  [x y] (pos? (compare x y)))
-  (>= [x y] (not (neg? (compare x y))))
-  LocalDate
-  (< [x y] (cljc.java-time.local-date/is-before x y))
-  (<= [x y] (not (cljc.java-time.local-date/is-after x y)))
-  (> [x y] (cljc.java-time.local-date/is-after x y))
-  (>= [x y] (not (cljc.java-time.local-date/is-before x y)))
-  LocalTime
-  (< [x y] (cljc.java-time.local-time/is-before x y))
-  (<= [x y] (not (cljc.java-time.local-time/is-after x y)))
-  (> [x y] (cljc.java-time.local-time/is-after x y))
-  (>= [x y] (not (cljc.java-time.local-time/is-before x y)))
-  OffsetDateTime
-  (< [x y] (cljc.java-time.offset-date-time/is-before x y))
-  (<= [x y] (not (cljc.java-time.offset-date-time/is-after x y)))
-  (> [x y] (cljc.java-time.offset-date-time/is-after x y))
-  (>= [x y] (not (cljc.java-time.offset-date-time/is-before x y)))
-  ZonedDateTime
-  (< [x y] (cljc.java-time.zoned-date-time/is-before x y))
-  (<= [x y] (not (cljc.java-time.zoned-date-time/is-after x y)))
-  (> [x y] (cljc.java-time.zoned-date-time/is-after x y))
-  (>= [x y] (not (cljc.java-time.zoned-date-time/is-before x y)))
-  Year
-  (< [x y] (cljc.java-time.year/is-before x y))
-  (<= [x y] (not (cljc.java-time.year/is-after x y)))
-  (> [x y] (cljc.java-time.year/is-after x y))
-  (>= [x y] (not (cljc.java-time.year/is-before x y)))
-  YearMonth
-  (< [x y] (cljc.java-time.year-month/is-before x y))
-  (<= [x y] (not (cljc.java-time.year-month/is-after x y)))
-  (> [x y] (cljc.java-time.year-month/is-after x y))
-  (>= [x y] (not (cljc.java-time.year-month/is-before x y)))
-  Duration
-  (< [x y] (neg? (cljc.java-time.duration/compare-to x y)))
-  (<= [x y] (or (= x y) (cljc.java-time.duration/compare-to x y)))
-  (> [x y] (pos? (cljc.java-time.duration/compare-to x y)))
-  (>= [x y] (or (= x y) (pos? (cljc.java-time.duration/compare-to x y)))))
-
 
 ;; Units
 
@@ -1167,6 +1112,70 @@
   ([] (p/zoned-date-time (now)))
   ([v] (p/zoned-date-time v)))
 
+;; Comparison
+
+(extend-protocol p/ITimeComparison
+  Instant
+  (< [x y] (cljc.java-time.instant/is-before x (instant y)))
+  (<= [x y] (not (cljc.java-time.instant/is-after x (instant y))))
+  (> [x y] (cljc.java-time.instant/is-after x (instant y)))
+  (>= [x y] (not (cljc.java-time.instant/is-before x (instant y))))
+  (= [x y] (clojure.core/= x (p/instant y)))
+  LocalDateTime
+  (< [x y] (cljc.java-time.local-date-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-date-time/is-after x y)))
+  (> [x y] (cljc.java-time.local-date-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-date-time/is-before x y)))
+  (= [x y] (clojure.core/= x y))
+  #?(:clj Date :cljs js/Date)
+  (<  [x y] (neg? (compare x (inst y))))
+  (<= [x y] (not (pos? (compare x (inst y)))))
+  (>  [x y] (pos? (compare x (inst y))))
+  (>= [x y] (not (neg? (compare x (inst y)))))
+  (= [x y] (clojure.core/= x (p/inst y)))
+  LocalDate
+  (< [x y] (cljc.java-time.local-date/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-date/is-after x y)))
+  (> [x y] (cljc.java-time.local-date/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-date/is-before x y)))
+  (= [x y] (clojure.core/= x y))
+  LocalTime
+  (< [x y] (cljc.java-time.local-time/is-before x y))
+  (<= [x y] (not (cljc.java-time.local-time/is-after x y)))
+  (> [x y] (cljc.java-time.local-time/is-after x y))
+  (>= [x y] (not (cljc.java-time.local-time/is-before x y)))
+  (= [x y] (clojure.core/= x y))
+  OffsetDateTime
+  (< [x y] (cljc.java-time.offset-date-time/is-before x (offset-date-time y)))
+  (<= [x y] (not (cljc.java-time.offset-date-time/is-after x (offset-date-time y))))
+  (> [x y] (cljc.java-time.offset-date-time/is-after x (offset-date-time y)))
+  (>= [x y] (not (cljc.java-time.offset-date-time/is-before x (offset-date-time y))))
+  (= [x y] (cljc.java-time.offset-date-time/is-equal x (offset-date-time y)))
+  ZonedDateTime
+  (< [x y] (cljc.java-time.zoned-date-time/is-before x (zoned-date-time y)))
+  (<= [x y] (not (cljc.java-time.zoned-date-time/is-after x (zoned-date-time y))))
+  (> [x y] (cljc.java-time.zoned-date-time/is-after x (zoned-date-time y)))
+  (>= [x y] (not (cljc.java-time.zoned-date-time/is-before x (zoned-date-time y))))
+  (= [x y] (cljc.java-time.zoned-date-time/is-equal x (zoned-date-time y)))
+  Year
+  (< [x y] (cljc.java-time.year/is-before x y))
+  (<= [x y] (not (cljc.java-time.year/is-after x y)))
+  (> [x y] (cljc.java-time.year/is-after x y))
+  (>= [x y] (not (cljc.java-time.year/is-before x y)))
+  (= [x y] (clojure.core/= x y))
+  YearMonth
+  (< [x y] (cljc.java-time.year-month/is-before x y))
+  (<= [x y] (not (cljc.java-time.year-month/is-after x y)))
+  (> [x y] (cljc.java-time.year-month/is-after x y))
+  (>= [x y] (not (cljc.java-time.year-month/is-before x y)))
+  (= [x y] (clojure.core/= x y))
+  Duration
+  (< [x y] (neg? (cljc.java-time.duration/compare-to x y)))
+  (<= [x y] (or (clojure.core/= x y) (cljc.java-time.duration/compare-to x y)))
+  (> [x y] (pos? (cljc.java-time.duration/compare-to x y)))
+  (>= [x y] (or (clojure.core/= x y) (pos? (cljc.java-time.duration/compare-to x y))))
+  (= [x y] (clojure.core/= x y)))
+
 ;; Extraction
 
 (defn nanosecond [t] (p/nanosecond t))
@@ -1274,6 +1283,14 @@
 (defn end [v] (p/end v))
 
 ;; Comparisons
+(defn =
+  ([_x] true)
+  ([x y] (p/= x y))
+  ([x y & more] (if (p/= x y)
+                  (if (clojure.core/next more)
+                    (recur y (first more) (clojure.core/next more))
+                    (p/= y (first more)))
+                  false)))
 
 (defn <
   ([_x] true)
@@ -1322,4 +1339,7 @@
 (defn days [v] (p/days v))
 (defn months [v] (p/months v))
 (defn years [v] (p/years v))
+
+(defn divide [t divisor]
+  (p/divide t divisor))
 

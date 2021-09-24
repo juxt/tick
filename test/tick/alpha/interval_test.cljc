@@ -12,6 +12,19 @@
 
 (s/check-asserts true)
 
+;todo - this was copied over from old dates-test ns. doesnt pass
+#_(deftest date-relation-test
+  (is (=
+        (ti/relation
+          (ti/new-interval
+            (t/zoned-date-time "2021-02-24T00:00Z[GMT]")
+            (t/zoned-date-time "2021-02-25T00:00Z[GMT]"))
+          (ti/new-interval
+            (t/zoned-date-time "2021-02-23T00:00Z[Europe/London]")
+            (t/zoned-date-time "2021-02-24T00:00Z[Europe/London]")))
+        :met-by)))
+
+
 (deftest basic-relations-test
   (is (= (count ti/basic-relations) 13))
   (is (distinct? ti/basic-relations)))

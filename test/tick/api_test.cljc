@@ -6,7 +6,6 @@
      :refer [deftest is testing run-tests]
      :refer-macros [deftest is testing run-tests]]
     [tick.core :as t]
-    [tick.protocols :as p]
     [tick.locale-en-us]
     [cljc.java-time.clock]
     [cljc.java-time.instant]
@@ -14,7 +13,58 @@
     [cljc.java-time.month]
     [cljc.java-time.year]))
 
-;; Constructor test
+(deftest time-construction-test
+  (testing "(time)"
+    (is (t/time? (t/time))))
+  (testing "(midnight)"
+    (is (t/time? (t/midnight)))
+    (is (= "00:00" (str (t/midnight)))))
+  (testing "(noon)"
+    (is (t/time? (t/noon)))
+    (is (= "12:00" (str (t/noon))))))
+
+(deftest date-construction-test
+  (is (= (t/date "2018-01-11")
+        (t/date (t/instant 1515691416624))))
+  (is (t/date-time? (t/noon (t/today))))
+  (t/with-clock (-> (t/date "2018-02-14") (t/at "10:00"))
+    (testing "(noon (today))"
+      (is (= "2018-02-14T12:00" (str (t/noon (t/today))))))
+    (testing "(noon (date))"
+      (is (= "2018-02-14T12:00" (str (t/noon (t/date))))))))
+
+;; TODO: Clock tests
+;; Create with a value for a fixed clock. Value can be a time or a zone
+
+(deftest clock-test
+  (testing "clock"
+    (t/with-clock (-> (t/date "2018-02-14") (t/at "10:00") (t/in "America/New_York"))
+      (testing "(clock) return type"
+        (is (t/clock? (t/clock))))
+      (testing "Time shifting the clock back by 2 hours"
+        (is (= "2018-02-14T13:00:00Z" (str (t/instant (t/<< (t/clock) (t/new-duration 2 :hours)))))))
+      (testing "with instant"
+        (is (= (t/zone (t/clock (t/instant)))
+              (t/zone "America/New_York"))))))
+
+  (testing "Converting using with-clock"
+    (t/with-clock (t/clock (t/zone "America/New_York"))
+      (testing "inst to zoned-date-time"
+        (is (= (t/zoned-date-time #inst"2019-08-07T16:00")
+              (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
+      (testing "date-time to zoned-date-time"
+        (is (= (t/zoned-date-time (t/date-time "2019-08-07T12:00"))
+              (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
+      (testing "date-time to offset-date-time"
+        (is (= (t/offset-date-time (t/date-time "2019-08-07T12:00"))
+              (t/offset-date-time "2019-08-07T12:00-04:00"))))))
+
+  (testing "Creating a clock with a zone, and returning that zone"
+    (is (= "America/New_York" (str (t/zone (t/clock (t/zone "America/New_York")))))))
+
+  (testing "Creation of clock with fixed instant"
+    (is (= "2017-10-31T16:00:00Z" (str (t/instant (t/clock "2017-10-31T16:00:00Z")))))))
+
 
 (deftest constructor-test
   (is (t/year? (t/year 2017)))
@@ -55,6 +105,8 @@
     (is (= (t/date-time "2017-08-08T12:00:00") (t/noon (t/today))))
     (is (= (t/date-time "2017-08-08T00:00:00") (t/midnight (t/today))))))
 
+
+
 (deftest instant-test
   (testing "instant basics"
     (is (t/instant? (t/instant (t/now))))
@@ -64,15 +116,14 @@
   (deftest offset-date-time-test
     (let [t "2018-09-24T18:57:08.996+01:00"]
       (testing "offset date time basics"
-        (is (t/offset-date-time? (p/parse t)))
         (is (t/offset-date-time? (t/offset-date-time (t/now))))
         (is (t/offset-date-time? (t/offset-date-time t)))
         (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
         (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time))))))))
 
 (deftest zoned-date-time-test
-  (is (t/zoned-date-time? (p/parse "2020-12-15T12:00:10Z[Europe/London]")))
-  (is (t/zoned-date-time? (p/parse "2020-12-15T12:00:10+04:00[Europe/London]"))))
+  (is (t/zoned-date-time? (t/zoned-date-time "2020-12-15T12:00:10Z[Europe/London]")))
+  (is (t/zoned-date-time? (t/zoned-date-time "2020-12-15T12:00:10+04:00[Europe/London]"))))
 
 (deftest fields-test
   (let [xs [(t/now)
@@ -96,11 +147,12 @@
     (doseq [pre-defined (vals t/predefined-formatters)]
       (is pre-defined)))
   (let [d "3030-05-03"]
-    (is (= d (t/format :iso-local-date (p/parse d))))
-    (is (= d (t/format (t/formatter :iso-local-date) (p/parse d))))
-    (is (= d (t/format (t/formatter "YYYY-MM-dd") (p/parse d))))
+    (is (= d (t/format :iso-local-date (t/date d))))
+    (is (= d (t/format (t/formatter :iso-local-date) (t/date d))))
+    (is (= d (t/format (t/formatter "YYYY-MM-dd") (t/date d))))
     #?(:clj
-       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) (p/parse d)))))))
+       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) 
+                              (t/date d)))))))
 
 (deftest epoch-test
   (is (= (cljc.java-time.instant/parse "1970-01-01T00:00:00Z") (t/epoch))))
@@ -164,8 +216,50 @@
       (t/units (t/new-period 10 :years)))))
 
 ;; Comparison test
+(defn point-in-time-comparable [i]
+  [i
+   (t/inst i)
+   (t/zoned-date-time i)
+   (t/offset-date-time i)])
 
 (deftest comparison-test
+  (let [point (t/truncate (t/instant) :millis)
+        later (t/>> point (t/new-duration 1 :millis))]
+    (testing "comparables not="
+      (doseq [point (point-in-time-comparable point)]
+        (testing "comparables ="
+          (is (apply t/= point (point-in-time-comparable point)))
+          (is (apply t/>= point (point-in-time-comparable point))))
+        (is (apply t/<= point (point-in-time-comparable later))))
+      (doseq [later (point-in-time-comparable later)]
+        (is (apply t/>= later (point-in-time-comparable point))))
+      
+      (doseq [point (point-in-time-comparable point)
+              later (point-in-time-comparable later)]
+        (is (t/<= point later))
+        (is (t/< point later))
+        (is (t/>= later point))
+        (is (t/> later point)))))
+  
+  (testing "ZonedDateTimes in different zones should be equals"
+    (is (t/=
+          (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+          (t/zoned-date-time "2017-10-31T13:00:00-07:00[America/Los_Angeles]"))))
+
+  (testing "ZoneDateTimes and OffsetDateTime should be equals if represents the same point in time"
+    (is (t/=
+          (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+          (t/offset-date-time "2017-10-31T13:00-07:00"))))
+
+  (testing "ZoneDateTimes and platform Date should be equals if represents the same point in time"
+    (is (t/=
+          (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")
+          (t/inst "2017-10-31T20:00:00Z"))))
+
+  (testing "Instants and ZonedDateTimes should be equals if represents the same point in time"
+    (is (t/=
+          (t/instant (t/clock "2017-10-31T16:00:00Z"))
+          (t/zoned-date-time "2017-10-31T16:00:00Z[UTC]"))))
   (is
     (t/<
       (t/now)
@@ -276,3 +370,10 @@
   (is (= (t/zoned-date-time "2021-04-23T11:18:46.594720-04:00[America/Toronto]")
          (t/in (t/zoned-date-time "2021-04-23T08:18:46.594720-07:00[America/Los_Angeles]")
                (t/zone "America/Toronto")))))
+
+(deftest divide-test
+  (is
+    ;; Duration -> Long -> Duration
+    (= (t/new-duration 6 :hours) (t/divide (t/new-duration 6 :days) 24))
+    ;; Duration -> Duration -> Long
+    (= 63 (t/divide (t/new-duration 21 :days) (t/new-duration 8 :hours)))))

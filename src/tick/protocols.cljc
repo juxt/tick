@@ -1,7 +1,7 @@
 ;; Copyright © 2016-2017, JUXT LTD.
 
 (ns tick.protocols
-  (:refer-clojure :exclude [+ - inc dec max min range time int long < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide]))
+  (:refer-clojure :exclude [+ - inc dec max min range time int long = < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide]))
 
 (defprotocol ITimeReify
   (on [time date] "Set time be ON a date")
@@ -11,7 +11,15 @@
 
 (defprotocol IParseable
   (parse [_] 
-    "Parse to most applicable instance. 
+    "
+    Parse is not in the main api because it is slow and may give surprising behaviour.
+    
+    Various tick functions in the public api  (e.g between) still accept strings as arguments and will attempt
+    to parse the args into an applicable date/time entity before carrying out the main work of the 
+    function. Calling these functions with strings is not recommended but has been kept for backward
+    compatibility.
+    
+    Parse to most applicable instance. 
     
     Do not use this function if you know the expected format of the string
 that you want to parse. This is partly because for example t/instant, t/date etc  will
@@ -51,6 +59,7 @@ For example:
   (zoned-date-time [_] "Make a java.time.ZonedDateTime instance."))
 
 (defprotocol ITimeComparison
+  (= [x y] "Is x the same as y?")
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
   (> [x y] "Is x after y?")

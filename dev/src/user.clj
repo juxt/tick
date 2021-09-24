@@ -9,7 +9,7 @@
 
 (set! *warn-on-reflection* true)
 
-(defn set-zone [tz]
+(defn set-zone [^String tz]
   (TimeZone/setDefault (TimeZone/getTimeZone tz))
   (alter-var-root #'t/*clock*
     (constantly (cljc.java-time.zone-id/system-default)))
@@ -33,4 +33,6 @@
   (refresh-all)
   (clojure.tools.namespace.repl/clear)
   (test-clj)
+  (cljs/figwheel-start!)
+  (cljs/figwheel-stop!)
 )
