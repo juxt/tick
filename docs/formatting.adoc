@@ -14,6 +14,6 @@ In ClojureScript, require ns _[tick.locale-en-us]_ to create custom formatters
  
  (require '[tick.locale-en-us]) ; only need this require for custom format patterns
  ; and it's only needed for cljs, although the ns is cljc
- (t/format (tick.format/formatter "yyyy-MMM-dd") (t/date))
+ (t/format (t/formatter "yyyy-MMM-dd") (t/date))
 ----
 
