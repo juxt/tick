@@ -575,6 +575,14 @@
     :months (cljc.java-time.period/of-months n)
     :years (cljc.java-time.period/of-years n)))
 
+;; Durations. Convenience functions to create durations of specific
+;; units.
+
+(defn of-nanos
+  "Takes a java.lang.Long n and returns a duration of n nanoseconds."
+  [n] 
+  (new-duration n :nanos))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
