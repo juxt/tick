@@ -583,6 +583,10 @@
   [n] 
   (new-duration n :nanos))
 
+(defn of-micros
+  "Takes a java.lang.Long n and returns a duration of n micros."
+  [n]
+  (new-duration n :micros))
 ;; Coercions
 
 (extend-protocol p/IExtraction
