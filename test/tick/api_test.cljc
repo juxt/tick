@@ -348,7 +348,9 @@
 ;; Durations. Convenience functions to create durations of specific
 ;; units.
 (deftest duration-functions-test
-  (is (= (t/of-nanos 10) (t/new-duration 10 :nanos))))
+  (is (= (t/of-nanos 10) (t/new-duration 10 :nanos)))
+  (is (= (t/of-micros 10) (t/new-duration 10 :micros))))
+
 
 
 (deftest predicates-test
