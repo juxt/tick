@@ -345,6 +345,12 @@
 
   (is (= (t/new-duration 24 :hours) (t/duration (t/tomorrow)))))
 
+;; Durations. Convenience functions to create durations of specific
+;; units.
+(deftest duration-functions-test
+  (is (= (t/of-nanos 10) (t/new-duration 10 :nanos))))
+
+
 (deftest predicates-test
   (is (true? (t/clock? (t/clock))))
   (is (true? (t/day-of-week? t/MONDAY)))
