@@ -622,6 +622,11 @@
   [n]
   (new-period n :months))
 
+(defn of-years
+  "Takes a java.lang.Long n and returns a period of n years."
+  [n]
+  (new-period n :years))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
