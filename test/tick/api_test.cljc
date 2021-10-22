@@ -349,7 +349,8 @@
 ;; units.
 (deftest duration-functions-test
   (is (= (t/of-nanos 10) (t/new-duration 10 :nanos)))
-  (is (= (t/of-micros 10) (t/new-duration 10 :micros))))
+  (is (= (t/of-micros 10) (t/new-duration 10 :micros)))
+  (is (= (t/of-millis 10) (t/new-duration 10 :millis))))
 
 
 
