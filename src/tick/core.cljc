@@ -603,6 +603,11 @@
   [n]
   (new-duration n :minutes))
 
+(defn of-hours
+  "Takes a java.lang.Long n and returns a duration of n hours."
+  [n]
+  (new-duration n :hours))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
