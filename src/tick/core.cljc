@@ -608,6 +608,15 @@
   [n]
   (new-duration n :hours))
 
+
+;; Periods. Convenience functions to create durations of specific
+;; units.
+
+(defn of-days
+  "Takes a java.lang.Long n and returns a period of n days."
+  [n]
+  (new-period n :days))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
