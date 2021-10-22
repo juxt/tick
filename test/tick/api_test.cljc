@@ -345,6 +345,25 @@
 
   (is (= (t/new-duration 24 :hours) (t/duration (t/tomorrow)))))
 
+;; Durations. Convenience functions to create durations of specific
+;; units.
+(deftest duration-functions-test
+  (is (= (t/of-nanos 10) (java.time.Duration/ofNanos 10)))
+  (is (= (t/of-micros 10) (t/new-duration 10 :micros))) ;java.time.Duration doesn't have ofMicros method
+  (is (= (t/of-millis 10) (java.time.Duration/ofMillis 10)))
+  (is (= (t/of-seconds 10) (java.time.Duration/ofSeconds 10)))
+  (is (= (t/of-minutes 10) (java.time.Duration/ofMinutes 10)))
+  (is (= (t/of-hours 10) (java.time.Duration/ofHours 10))))
+
+
+;; Periods. Convenience functions to create periods of specific
+;; units.
+(deftest period-functions-test
+  (is (= (t/of-days 10) (java.time.Period/ofDays 10)))
+  (is (= (t/of-months 10) (java.time.Period/ofMonths 10)))
+  (is (= (t/of-years 10) (java.time.Period/ofYears 10))))
+
+
 (deftest predicates-test
   (is (true? (t/clock? (t/clock))))
   (is (true? (t/day-of-week? t/MONDAY)))

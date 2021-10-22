@@ -575,6 +575,58 @@
     :months (cljc.java-time.period/of-months n)
     :years (cljc.java-time.period/of-years n)))
 
+;; Durations. Convenience functions to create durations of specific
+;; units.
+
+(defn of-nanos
+  "Takes a java.lang.Long n and returns a duration of n nanoseconds."
+  [n] 
+  (new-duration n :nanos))
+
+(defn of-micros
+  "Takes a java.lang.Long n and returns a duration of n micros."
+  [n]
+  (new-duration n :micros))
+
+(defn of-millis
+  "Takes a java.lang.Long n and returns a duration of n micros."
+  [n]
+  (new-duration n :millis))
+
+(defn of-seconds
+  "Takes a java.lang.Long n and returns a duration of n seconds."
+  [n]
+  (new-duration n :seconds))
+
+(defn of-minutes
+  "Takes a java.lang.Long n and returns a duration of n minutes."
+  [n]
+  (new-duration n :minutes))
+
+(defn of-hours
+  "Takes a java.lang.Long n and returns a duration of n hours."
+  [n]
+  (new-duration n :hours))
+
+
+;; Periods. Convenience functions to create durations of specific
+;; units.
+
+(defn of-days
+  "Takes a java.lang.Long n and returns a period of n days."
+  [n]
+  (new-period n :days))
+
+(defn of-months
+  "Takes a java.lang.Long n and returns a period of n months."
+  [n]
+  (new-period n :months))
+
+(defn of-years
+  "Takes a java.lang.Long n and returns a period of n years."
+  [n]
+  (new-period n :years))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
