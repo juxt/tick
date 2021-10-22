@@ -593,6 +593,11 @@
   [n]
   (new-duration n :millis))
 
+(defn of-seconds
+  "Takes a java.lang.Long n and returns a duration of n seconds."
+  [n]
+  (new-duration n :seconds))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
