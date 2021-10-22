@@ -348,12 +348,12 @@
 ;; Durations. Convenience functions to create durations of specific
 ;; units.
 (deftest duration-functions-test
-  (is (= (t/of-nanos 10) (t/new-duration 10 :nanos)))
-  (is (= (t/of-micros 10) (t/new-duration 10 :micros)))
-  (is (= (t/of-millis 10) (t/new-duration 10 :millis)))
-  (is (= (t/of-seconds 10) (t/new-duration 10 :seconds)))
-  (is (= (t/of-minutes 10) (t/new-duration 10 :minutes)))
-  (is (= (t/of-hours 10) (t/new-duration 10 :hours))))
+  (is (= (t/of-nanos 10) (java.time.Duration/ofNanos 10)))
+  (is (= (t/of-micros 10) (t/new-duration 10 :micros))) ;java.time.Duration doesn't have ofMicros method
+  (is (= (t/of-millis 10) (java.time.Duration/ofMillis 10)))
+  (is (= (t/of-seconds 10) (java.time.Duration/ofSeconds 10)))
+  (is (= (t/of-minutes 10) (java.time.Duration/ofMinutes 10)))
+  (is (= (t/of-hours 10) (java.time.Duration/ofHours 10))))
 
 
 
