@@ -587,6 +587,12 @@
   "Takes a java.lang.Long n and returns a duration of n micros."
   [n]
   (new-duration n :micros))
+
+(defn of-millis
+  "Takes a java.lang.Long n and returns a duration of n micros."
+  [n]
+  (new-duration n :millis))
+
 ;; Coercions
 
 (extend-protocol p/IExtraction
