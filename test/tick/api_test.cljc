@@ -356,6 +356,10 @@
   (is (= (t/of-hours 10) (java.time.Duration/ofHours 10))))
 
 
+;; Periods. Convenience functions to create periods of specific
+;; units.
+(deftest period-functions-test
+  (is (= (t/of-days 10) (java.time.Period/ofDays 10))))
 
 (deftest predicates-test
   (is (true? (t/clock? (t/clock))))
