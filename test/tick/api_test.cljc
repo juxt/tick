@@ -352,7 +352,8 @@
   (is (= (t/of-micros 10) (t/new-duration 10 :micros)))
   (is (= (t/of-millis 10) (t/new-duration 10 :millis)))
   (is (= (t/of-seconds 10) (t/new-duration 10 :seconds)))
-  (is (= (t/of-minutes 10) (t/new-duration 10 :minutes))))
+  (is (= (t/of-minutes 10) (t/new-duration 10 :minutes)))
+  (is (= (t/of-hours 10) (t/new-duration 10 :hours))))
 
 
 
