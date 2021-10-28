@@ -35,4 +35,5 @@
   (test-clj)
   (cljs/figwheel-start!)
   (cljs/figwheel-stop!)
+  (cljs/cljs-repl)
 )

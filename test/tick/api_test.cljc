@@ -237,6 +237,17 @@
             truncate-to truncate-tos]
       (is (t/truncate date truncate-to)))))
 
+(deftest parse-test 
+  (is (t/date? (t/parse-date "2020/02/02" (t/formatter "yyyy/MM/dd"))))
+  (is (t/year? (t/parse-year "20" (t/formatter "yy"))))
+  (is (t/year-month? (t/parse-year-month "20/02" (t/formatter "yy/MM"))))
+  (is (t/date-time? (t/parse-date-time "2020/02/02:2002" (t/formatter "yyyy/MM/dd:HHmm"))))
+  (is (t/time? (t/parse-time "2002" (t/formatter "HHmm"))))
+  (is (t/zoned-date-time? (t/parse-zoned-date-time "2020/02/02:2002:Z" 
+                            (t/formatter "yyyy/MM/dd:HHmm:VV"))))
+  (is (t/offset-date-time? (t/parse-offset-date-time "2020/02/02:2002:-08:30" 
+                             (t/formatter "yyyy/MM/dd:HHmm:VV")))))
+
 (deftest comparison-test
   (let [point (t/truncate (t/instant) :millis)
         later (t/>> point (t/new-duration 1 :millis))]
@@ -363,20 +374,20 @@
 ;; Durations. Convenience functions to create durations of specific
 ;; units.
 (deftest duration-functions-test
-  (is (= (t/of-nanos 10) (java.time.Duration/ofNanos 10)))
+  (is (= (t/of-nanos 10) (t/new-duration 10 :nanos)))
   (is (= (t/of-micros 10) (t/new-duration 10 :micros))) ;java.time.Duration doesn't have ofMicros method
-  (is (= (t/of-millis 10) (java.time.Duration/ofMillis 10)))
-  (is (= (t/of-seconds 10) (java.time.Duration/ofSeconds 10)))
-  (is (= (t/of-minutes 10) (java.time.Duration/ofMinutes 10)))
-  (is (= (t/of-hours 10) (java.time.Duration/ofHours 10))))
+  (is (= (t/of-millis 10) (t/new-duration 10 :millis)))
+  (is (= (t/of-seconds 10) (t/new-duration 10 :seconds)))
+  (is (= (t/of-minutes 10) (t/new-duration 10 :minutes)))
+  (is (= (t/of-hours 10) (t/new-duration 10 :hours))))
 
 
 ;; Periods. Convenience functions to create periods of specific
 ;; units.
 (deftest period-functions-test
-  (is (= (t/of-days 10) (java.time.Period/ofDays 10)))
-  (is (= (t/of-months 10) (java.time.Period/ofMonths 10)))
-  (is (= (t/of-years 10) (java.time.Period/ofYears 10))))
+  (is (= (t/of-days 10) (t/new-period 10 :days)))
+  (is (= (t/of-months 10) (t/new-period 10 :months)))
+  (is (= (t/of-years 10) (t/new-period 10 :years))))
 
 
 (deftest predicates-test

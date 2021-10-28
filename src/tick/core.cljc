@@ -1416,3 +1416,31 @@
 (defn divide [t divisor]
   (p/divide t divisor))
 
+(defn parse-date
+  "to parse an iso-formatted date, use (t/date \"2020..\") instead"
+  [date-str formatter]
+  (cljc.java-time.local-date/parse date-str formatter))
+(defn parse-date-time
+  "to parse an iso-formatted date-time, use (t/date-time \"2020..\") instead"
+  [date-str formatter]
+  (cljc.java-time.local-date-time/parse date-str formatter))
+(defn parse-time
+  "to parse an iso-formatted time, use (t/time \"20:20..\") instead"
+  [date-str formatter]
+  (cljc.java-time.local-time/parse date-str formatter))
+(defn parse-offset-date-time
+  "to parse an iso-formatted offset-date-time, use (t/offset-date-time \"2020..\") instead"
+  [date-str formatter]
+  (cljc.java-time.offset-date-time/parse date-str formatter))
+(defn parse-year
+  "to parse an iso-formatted year, use (t/year \"2020\") instead"
+  [date-str formatter]
+  (cljc.java-time.year/parse date-str formatter))
+(defn parse-year-month
+  "to parse an iso-formatted year-month, use (t/year-month \"2020..\") instead"
+  [date-str formatter]
+  (cljc.java-time.year-month/parse date-str formatter))
+(defn parse-zoned-date-time 
+  "to parse an iso-formatted zoned-date-time, use (t/zoned-date-time \"2020..\") instead"
+  [date-str formatter]
+  (cljc.java-time.zoned-date-time/parse date-str formatter))
