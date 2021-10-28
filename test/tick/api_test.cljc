@@ -222,6 +222,21 @@
    (t/zoned-date-time i)
    (t/offset-date-time i)])
 
+(deftest truncate-test 
+  (let [dates [(t/instant) (t/zoned-date-time) (t/date-time)
+               (t/offset-date-time) (t/time)]
+        truncate-tos [:nanos
+                     :micros
+                     :millis
+                     :seconds
+                     :minutes
+                     :hours
+                     :half-days
+                     :days     ]]
+    (doseq [date dates 
+            truncate-to truncate-tos]
+      (is (t/truncate date truncate-to)))))
+
 (deftest comparison-test
   (let [point (t/truncate (t/instant) :millis)
         later (t/>> point (t/new-duration 1 :millis))]

@@ -40,6 +40,8 @@ install:
 			clojure -M:release install --version $(VERSION)
 deploy:
 			clojure -M:release --version $(VERSION)
+lint:
+			clj-kondo --lint src test
 
 # hooray for stackoverflow
 .PHONY: list

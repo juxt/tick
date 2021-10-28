@@ -3,6 +3,9 @@
 (ns tick.protocols
   (:refer-clojure :exclude [+ - inc dec max min range time int long = < <= > >= next >> << atom swap! swap-vals! compare-and-set! reset! reset-vals! second divide]))
 
+(defprotocol ITruncate 
+  (truncate [date-time unit-kw]))
+
 (defprotocol ITimeReify
   (on [time date] "Set time be ON a date")
   (at [date time] "Set date to be AT a time")

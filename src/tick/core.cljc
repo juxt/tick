@@ -535,9 +535,26 @@
           :when k]
       [k (cljc.java-time.temporal.temporal-amount/get x tu)])))
 
+(extend-protocol p/ITruncate
+  Instant
+  (truncate [x u ]
+    (cljc.java-time.instant/truncated-to x (get unit-map u)))
+  LocalDateTime
+  (truncate [x u ]
+    (cljc.java-time.local-date-time/truncated-to x (get unit-map u)))
+  ZonedDateTime
+  (truncate [x u ]
+    (cljc.java-time.zoned-date-time/truncated-to x (get unit-map u)))
+  OffsetDateTime
+  (truncate [x u ]
+    (cljc.java-time.offset-date-time/truncated-to x (get unit-map u)))
+  LocalTime
+  (truncate [x u ]
+    (cljc.java-time.local-time/truncated-to x (get unit-map u))))
+
 (defn truncate [x u]
   {:pre [(contains? unit-map u)]}
-  (cljc.java-time.instant/truncated-to x (get unit-map u)))
+  (p/truncate x u))
 
 ;; Durations & Periods
 
