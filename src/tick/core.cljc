@@ -32,7 +32,8 @@
     [cljc.java-time.temporal.chrono-unit]
     [cljc.java-time.format.date-time-formatter]
     #?@(:cljs
-        [[java.time.format :refer [DateTimeFormatter]]
+        [[goog.object]
+         [java.time.format :refer [DateTimeFormatter]]
          [java.time :refer [Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime
                             LocalDateTime LocalDate Year YearMonth OffsetDateTime OffsetTime]]
          [cljs.java-time.extend-eq-and-compare]]))
