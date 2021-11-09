@@ -7,7 +7,7 @@
 
 * +/- functions now only work on periods or durations. Use >>/<< to move a date by an amount
 
-This is so args to +/-  are associative, commutative etc, same as clojure.core +/-
+This is so these functions make a stronger analogy to clojure's +/-. For example, the args to +  are associative, commutative & distributive.
 
 * parse function has moved out of the main api. 
 
