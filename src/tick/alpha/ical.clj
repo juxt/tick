@@ -45,12 +45,12 @@
 (defprotocol ICalendarValue
   (serialize-value [_] ""))
 
-(def DATE-TIME-FORM-1-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
+(def DATE-TIME-FORM-1-PATTERN (DateTimeFormatter/ofPattern "yyyyMMdd'T'HHmmss"))
 
 ;; Only call with ZoneID of UTC otherwise produces invalid ICAL format
-(def DATE-TIME-FORM-2-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmssX"))
+(def DATE-TIME-FORM-2-PATTERN (DateTimeFormatter/ofPattern "yyyyMMdd'T'HHmmssX"))
 
-(def DATE-TIME-FORM-3-PATTERN (DateTimeFormatter/ofPattern "YYYYMMdd'T'HHmmss"))
+(def DATE-TIME-FORM-3-PATTERN (DateTimeFormatter/ofPattern "yyyyMMdd'T'HHmmss"))
 
 (extend-protocol ICalendarValue
   String
