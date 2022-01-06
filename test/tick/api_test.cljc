@@ -346,6 +346,22 @@
     (is (every? #{cljc.java-time.day-of-week/friday} (days ["fri" "friday"])))
     (is (every? #{cljc.java-time.day-of-week/saturday} (days ["sat" "saturday"])))))
 
+(deftest adjusters
+  (is (= (t/date "2022-01-15")
+         (t/day-of-week-in-month (t/date "2022-01-01") 3 t/SATURDAY)))
+  (is (= (t/date "2022-01-01")
+         (t/first-in-month (t/date "2022-01-01") t/SATURDAY)))
+  (is (= (t/date "2022-01-29")
+         (t/last-in-month (t/date "2022-01-01") t/SATURDAY)))
+  (is (= (t/date "2022-01-08")
+         (t/next (t/date "2022-01-01") t/SATURDAY)))
+  (is (= (t/date "2022-01-01")
+         (t/next-or-same (t/date "2022-01-01") t/SATURDAY)))
+  (is (= (t/date "2021-12-25")
+         (t/previous (t/date "2022-01-01") t/SATURDAY)))
+  (is (= (t/date "2022-01-01")
+         (t/previous-or-same (t/date "2022-01-01") t/SATURDAY))))
+
 (deftest month
   (let [months (fn [strings] (map t/month strings))]
     (is (every? #{cljc.java-time.month/january} (months ["jan" "january"])))
