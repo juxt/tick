@@ -323,6 +323,7 @@
 
   DayOfWeek
   (int [d] (cljc.java-time.day-of-week/get-value d))
+  (day-of-week [d] d)
 
   LocalDateTime
   (time [dt] (cljc.java-time.local-date-time/to-local-time dt))
