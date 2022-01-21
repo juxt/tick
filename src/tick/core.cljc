@@ -119,7 +119,15 @@
   ([^LocalDate date]
    (p/at date cljc.java-time.local-time/noon)))
 
-(defn parse-day [input]
+(defn parse-day 
+  "en locale specific and borderline deprecated. 
+  consider writing your own regex or use a formatter. For example:
+  
+  (-> (t/formatter \"EEE\")
+      (cljc.java-time.format.date-time-formatter/parse \"Tue\")
+      (cljc.java-time.day-of-week/from))
+  "
+  [input]
   (condp re-matches (str/lower-case input)
     #"^(mon)(day)?$" cljc.java-time.day-of-week/monday
     #"^(tue)(s|sday)?$" cljc.java-time.day-of-week/tuesday
@@ -130,7 +138,15 @@
     #"^(sun)(day)?$" cljc.java-time.day-of-week/sunday
     nil))
 
-(defn parse-month [input]
+(defn parse-month 
+  "en locale specific and borderline deprecated. Consider writing your 
+   own regex or use a formatter. For example:
+   
+   (-> (t/formatter \"MMM\")    
+       (cljc.java-time.format.date-time-formatter/parse \"Jan\")   
+       (cljc.java-time.month/from))
+   " 
+  [input]
   (condp re-matches (str/lower-case input)
     #"^(jan)(uary)?$" cljc.java-time.month/january
     #"^(feb)(ruary)?$" cljc.java-time.month/february
