@@ -42,8 +42,9 @@ The other case where this might come up is when formatting Instants to string. A
 
 === Singular vs Plural ?
 
-As with java.time, any functions working with amounts of time (ie Durations or Periods), function names will be in the plural. Functions that
-work with dates and times are singular. Knowing that, `t/second` vs `t/seconds` makes sense.
+As with java.time, any functions working with amounts of time (ie Durations or Periods), 
+will have names which are in the plural. Functions that
+work with dates and times are singular. Knowing that, e.g. `t/second` vs `t/seconds` makes sense.
 
 == Status
 
