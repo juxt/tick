@@ -25,9 +25,11 @@ https://host-22a9c.web.app[Full Tick Documentation]
 
 === Instants 
 
-Instants are not 'calendar-aware' - they just contain millis/nanos field representing an offset from the Unix epoch. 
+Instants are not 'calendar-aware' - they just contain millis/nanos field representing an 
+offset from the Unix epoch. This means Instants have no method to get their year or month for example, 
+because to do so would require a calendar (e.g. the Gregorian calendar).
 
-Tick provides sugar over this when accessing properties of an Instant though. For example
+Tick provides some help with this when accessing properties of an Instant though. For example
 `(t/day-of-week (t/now))` is fine. To make that work, tick first converts the Instant into a ZonedDateTime 
 and the zone of that will be the browser's or jvm's timezone. To be explicit about the zone in that case we would do:  
 
@@ -38,13 +40,16 @@ and the zone of that will be the browser's or jvm's timezone. To be explicit abo
     t/day-of-week)
 ----
 
-The other case where this might come up is when formatting Instants to string. Adding a zone to the formatter fixes the problems.
+The other cases where calendar-awareness might come up is when formatting Instants to string or when
+shifting them by e.g. years/months, so Tick 
+https://widdindustries.com/why-not-interop/[shows explanatory error messages in that case].
 
 === Singular vs Plural ?
 
 As with java.time, any functions working with amounts of time (ie Durations or Periods), 
 will have names which are in the plural. Functions that
-work with dates and times are singular. Knowing that, e.g. `t/second` vs `t/seconds` makes sense.
+work with dates and times are singular. Knowing that, e.g. `t/second` vs `t/seconds` 
+makes sense.
 
 == Status
 
