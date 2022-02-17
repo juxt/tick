@@ -110,6 +110,7 @@
 (deftest instant-test
   (testing "instant basics"
     (is (t/instant? (t/instant (t/now))))
+    (is (t/instant? (t/instant (t/date))))
     (is (t/instant? (t/instant (str cljc.java-time.instant/min))))
     (is (t/instant? (t/instant (t/zoned-date-time)))))
 
@@ -117,11 +118,13 @@
     (let [t "2018-09-24T18:57:08.996+01:00"]
       (testing "offset date time basics"
         (is (t/offset-date-time? (t/offset-date-time (t/now))))
+        (is (t/offset-date-time? (t/offset-date-time (t/date))))
         (is (t/offset-date-time? (t/offset-date-time t)))
         (is (t/offset-date-time? (t/offset-date-time (t/date-time))))
         (is (t/offset-date-time? (t/offset-date-time (t/zoned-date-time))))))))
 
 (deftest zoned-date-time-test
+  (is (t/zoned-date-time? (t/zoned-date-time (t/date "2020-12-15"))))
   (is (t/zoned-date-time? (t/zoned-date-time "2020-12-15T12:00:10Z[Europe/London]")))
   (is (t/zoned-date-time? (t/zoned-date-time "2020-12-15T12:00:10+04:00[Europe/London]"))))
 

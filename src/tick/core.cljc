@@ -221,6 +221,12 @@
   #?(:clj Number :cljs number)
   (instant [n] (cljc.java-time.instant/of-epoch-milli n))
 
+  LocalDate
+  (inst [ld] (p/inst (p/zoned-date-time ld)))
+  (instant [ld] (p/instant (p/zoned-date-time ld)))
+  (offset-date-time [ld] (cljc.java-time.zoned-date-time/to-offset-date-time (p/zoned-date-time ld)))
+  (zoned-date-time [ld] (cljc.java-time.local-date/at-start-of-day ld (current-zone)))
+
   LocalDateTime
   (inst [ldt] (p/inst (p/zoned-date-time ldt)))
   (instant [ldt] (p/instant (p/zoned-date-time ldt)))
