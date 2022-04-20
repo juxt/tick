@@ -1,6 +1,7 @@
 = tick
 Malcolm Sparks <mal@juxt.pro>; Henry Widd <henry@widdindustries.com>; Johanna Antonelli <joa@juxt.pro>
-0.5.0-RC1, 2021-08-03
+0.5.0-RC5, 2022-04-20
+:favicon:
 :toc: left
 :toclevels: 4
 :docinfo: shared
