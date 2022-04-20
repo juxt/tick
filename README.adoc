@@ -19,7 +19,7 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 
 == Docs
 
-https://host-22a9c.web.app[Full Tick Documentation]
+https://juxt.github.io/tick/[Full Tick Documentation]
 
 == Top tips 
 
