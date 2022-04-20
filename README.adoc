@@ -30,14 +30,15 @@ offset from the Unix epoch. This means Instants have no method to get their year
 because to do so would require a calendar (e.g. the Gregorian calendar).
 
 Tick provides some help with this when accessing properties of an Instant though. For example
-`(t/day-of-week (t/now))` is fine. To make that work, tick first converts the Instant into a ZonedDateTime 
-and the zone of that will be the browser's or jvm's timezone. To be explicit about the zone in that case we would do:  
+`(t/year (t/now))` works. To make that possible, tick first converts the Instant into a ZonedDateTime 
+(which does have a calendar). Take note however that the zone of the ZonedDateTime will be the 
+browser's or jvm's timezone. To be explicit about the zone required do this:  
 
 [source,clojure]
 ----
 (-> (t/now)
     (t/in "UTC")
-    t/day-of-week)
+    t/year)
 ----
 
 The other cases where calendar-awareness might come up is when formatting Instants to string or when
