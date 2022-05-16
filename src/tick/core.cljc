@@ -1220,7 +1220,7 @@
   (= [x y] (clojure.core/= x y))
   Duration
   (< [x y] (neg? (cljc.java-time.duration/compare-to x y)))
-  (<= [x y] (or (clojure.core/= x y) (cljc.java-time.duration/compare-to x y)))
+  (<= [x y] (or (clojure.core/= x y) (neg? (cljc.java-time.duration/compare-to x y))))
   (> [x y] (pos? (cljc.java-time.duration/compare-to x y)))
   (>= [x y] (or (clojure.core/= x y) (pos? (cljc.java-time.duration/compare-to x y))))
   (= [x y] (clojure.core/= x y)))
