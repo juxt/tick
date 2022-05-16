@@ -311,8 +311,12 @@
   (testing "durations"
     (is (t/> (t/new-duration 20 :seconds) (t/new-duration 10 :seconds)))
     (is (t/>= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))
+    (is (t/>= (t/new-duration 20 :seconds) (t/new-duration 19 :seconds)))
+    (is (not (t/>= (t/new-duration 19 :seconds) (t/new-duration 20 :seconds))))
     (is (t/< (t/new-duration 10 :seconds) (t/new-duration 20 :seconds)))
-    (is (t/<= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))))
+    (is (t/<= (t/new-duration 20 :seconds) (t/new-duration 20 :seconds)))
+    (is (t/<= (t/new-duration 19 :seconds) (t/new-duration 20 :seconds)))
+    (is (not (t/<= (t/new-duration 20 :seconds) (t/new-duration 19 :seconds))))))
 
 
 (deftest comparison-test-date
