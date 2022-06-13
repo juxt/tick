@@ -11,8 +11,8 @@
       :init (fn []
               (try
                 (println "[tick] Loading Clojure code, please wait...")
-                (require 'user)
-                (in-ns 'user)
+                (require 'repl)
+                (in-ns 'repl)
                 (catch Exception e
                   (.printStackTrace e)
                   (println "[tick] Failed to require user, this usually means there was a syntax error. See exception above.")))))))

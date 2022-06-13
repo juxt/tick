@@ -1,12 +1,12 @@
 {:paths ["src"]
- :deps  {cljc.java-time/cljc.java-time {:mvn/version "0.1.18"
+ :deps  {com.widdindustries/cljc.java-time {:mvn/version "0.1.21"
                                         ;:git/url "https://github.com/henryw374/cljc.java-time.git"
                                         ;:sha "5837778b307870c1ff0715fab692211dec253a6f"
                                         }
          cljsjs/js-joda-timezone       {:mvn/version "2.2.0-0"}
          cljsjs/js-joda-locale-en-us   {:mvn/version "3.1.1-1"}
-         time-literals/time-literals   {:mvn/version "0.1.5"
-                                        :exclusions  [cljs.java-time/cljs.java-time]}}
+         com.widdindustries/time-literals {:mvn/version "0.1.10"
+                                           :exclusions [com.widdindustries/cljs.java-time]}}
 
  :aliases
         {:nyc          {:jvm-opts ["-Duser.timezone=America/New_York"]}
@@ -14,31 +14,17 @@
 
          :release      {:extra-deps {applied-science/deps-library {:mvn/version "RELEASE"}}
                         :main-opts  ["-m" "applied-science.deps-library"]}
-         :bb           {:extra-deps  {tubular/tubular {:mvn/version "1.3.0"}}
-                        :extra-paths ["dev" "test"]}
-         :dev          {:extra-deps  {com.bhauman/figwheel-main          {:mvn/version "0.2.12"}
-                                      cider/piggieback                   {:mvn/version "0.4.0"}
-                                      com.bhauman/cljs-test-display      {:mvn/version "0.1.1"}
-                                      org.clojure/clojurescript          {;:mvn/version "1.10.844"
-                                                                          :git/url "https://github.com/clojure/clojurescript.git"
-                                                                          :sha     "76ac6bf41300f821f052d03537edf7e86694fc6d"
-
-                                                                          }
-                                      org.clojure/data.xml               {:mvn/version "0.2.0-alpha5"}
-                                      org.clojure/tools.namespace        {:mvn/version "0.2.11"}
-                                      org.apache.xmlgraphics/batik-swing {:mvn/version "1.9"}
-                                      io.aviso/pretty                    {:mvn/version "0.1.34"}
-                                      spyscope/spyscope                  {:mvn/version "0.1.6"}
-                                      fipp/fipp                          {:mvn/version "0.6.12"}}
-                        :extra-paths ["dev/src" "test"]
-                        :jvm-opts    ["-Dclojure.spec.compile-asserts=true"]}
-         :test-clj     {:extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0.732"}
-                                      lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}}
-                        :extra-paths ["test"]}
-         :test-chrome  {:extra-paths ["test" "cljs-test-runner-out/gen"]
-                        :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
-                                      org.clojure/clojurescript {:mvn/version "1.10.764"}}
-                        :main-opts   ["-m" "cljs-test-runner.main" "-c" "test/cljs-test-opts.edn" "-x" "chrome-headless"]}
+         :dev          {:extra-deps  {}
+                        :extra-paths ["dev/src" "test"]}
+         :test-clj {:extra-paths ["test"]
+                    :extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0.732"}
+                                      lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}}}
+         :test-cljs {:extra-paths ["dev/src" "test" "web-target"]
+                     :extra-deps  {com.widdindustries/tiado-cljs2
+                                   { ;:local/root "../shadow-template" 
+                                    :git/url "https://github.com/henryw374/tiado-cljs2.git"
+                                    :sha "fbd9f3b8df3523ccf11bbc685836ce7f96f18068"
+                                    }}}
          ; this is node using foreign-libs.
          ; although not recommended, whilst tick depends on cljsjs, this should 'just work'
          :test-node    {:extra-paths ["test" "cljs-test-runner-out/gen"]
@@ -58,8 +44,7 @@
                                       org.clojure/clojurescript {:mvn/version "1.10.764"}}
                         :main-opts   ["-m" "figwheel.main" "-O" "simple" "--build-once" "docs"]}
 
-         :dev-rebel    {:extra-paths ["aliases/rebel"]
-                        :extra-deps  {com.bhauman/rebel-readline      {:mvn/version "0.1.1"}
-                                      com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-                                      io.aviso/pretty                 {:mvn/version "0.1.34"}}
-                        :main-opts   ["-m" "tick.rebel.main"]}}}
+         :build     {:extra-paths ["dev/src"]
+                     :extra-deps  {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
+                                   slipset/deps-deploy           {:mvn/version "RELEASE"}}
+                     :ns-default  build}}}

@@ -1,3 +1,7 @@
+image:https://img.shields.io/clojars/v/tick.svg?style=svg["clojars",link="https://clojars.org/tick"]
+
+image:https://github.com/juxt/tick/actions/workflows/tests.yaml/badge.svg?style=svg["tests build",link="https://github.com/juxt/tick/actions/workflows/tests.yaml"]
+
 = tick
 
 A Clojure(Script) library for dealing with time. Intended as a
@@ -22,6 +26,10 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 https://juxt.github.io/tick/[Full Tick Documentation]
 
 == Top tips 
+
+=== java.time
+
+In both Clojure and Clojurescript versions, tick is just calling through to java.time methods. Understanding https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[the main entities of java.time] is necessary to use tick. For example, one should know that there are 2 separate ways to measure amounts of time, 3 ways to represent a point on the timeline and so on.
 
 === Instants 
 
@@ -63,7 +71,7 @@ minor changes.
 Get the latest from https://clojars.org/tick[Clojars] and
 add to your `project.clj`, `build.boot` or `deps.edn`.
 
-Tick versions 0.4.24-alpha and up require minimum Clojurescript version of 1.10.741
+To use this from Clojurescript, you must have at least version 1.11.51. If using shadow-cljs, it must be at least version 2.19.3
 
 For Clojurescript users of Tick, see https://github.com/juxt/tick/blob/master/docs/cljs.adoc[docs/cljs.adoc], for
 some discussion around Clojurescript build size.
@@ -75,8 +83,6 @@ clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "RELEASE" } tick/tic
 ----
 
 == Development
-
-image:https://circleci.com/gh/juxt/tick/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/juxt/tick/tree/master"]
 
 === Develop The Documentation Site
 
@@ -119,28 +125,15 @@ Or outside of the REPL run:
 make test-all
 ----
 
-which will run clojure, clojurescript (node) and clojurescript (chrome) tests.
-JVM tests are currently running with https://github.com/lambdaisland/kaocha[Kaocha] while JS tests are using figwheel-main and the cljs-test-runner.
+which will run clojure and clojurescript (chrome) tests.
+tests are running with https://github.com/lambdaisland/kaocha[Kaocha] 
 
-As long as you have you have started your repl with these aliases "-A:dev:test-clj", you can also run backend clojure tests in the repl with something like
+As long as you have you have started your repl with these aliases "-A:test-cljs:test-clj", you can also run backend clojure tests in the repl with something like
 
 ----
 (require '[kaocha.repl :as kr])
 (kr/run :clj)
 ----
-
-=== npm dependencies
-
-For running the ClojureScript tests you will need the following npm dependencies installed:
-
-----
-sudo npm install -g karma-cli
-sudo npm install -g karma
-sudo npm install -g karma-chrome-launcher
-sudo npm install -g karma-cljs-test
-----
-
-Check `.circleci/config.yml` for the versions that are known to work.
 
 ==== Setting `CHROME_BIN`
 
@@ -157,9 +150,9 @@ Set the environment variable `CHROME_BIN` to wherever Chrome or Chromium is inst
 
 create a git tag.
 
-`make install VERSION=your-tag` (this installs in ~/.m2 - check that things look ok)
+`make install` (this installs in ~/.m2 - check that things look ok)
 
-`make deploy VERSION=your-tag`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
+`make deploy`  - you need to have set up clojars credentials as per https://github.com/applied-science/deps-library
 
 `git push origin new-tag-name`
 

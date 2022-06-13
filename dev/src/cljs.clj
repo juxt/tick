@@ -1,22 +1,20 @@
 (ns cljs
-  (:require [figwheel.main.api :as fig]
-            ))
+  (:require [com.widdindustries.tiado-cljs2 :as util]))
 
+(defn test-watch []
+  (util/browser-test-build :watch {}))
 
-(defn figwheel-start! []
-  (fig/start {:mode :serve} "tick")
-  (println "auto run tests at http://localhost:9500/figwheel-extra-main/auto-testing"))
+(comment
 
-(defn figwheel-stop! []
-  (fig/stop-all))
+  ; start up live-compilation of tests
+  (test-watch)
+  ; run cljs tests, having opened browser at test page (see print output of above "for tests, open...")
+  (util/run-tests)
+  ; start a cljs repl session in the test build. :cljs/quit to exit
+  (util/repl :browser-test-build)
+  ; run tests in headless browser
+  (util/compile-and-run-tests-headless* :release)
 
-(defn cljs-repl []
-  (fig/cljs-repl "tick"))
+  (util/stop-server)
 
-(comment 
-  
-  (figwheel-start!)
-  (cljs-repl)
-  
-  
   )
