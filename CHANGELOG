@@ -1,3 +1,11 @@
+
+# 0.5.0-RC6
+
+To use this version from Clojurescript, you must have at least version 1.11.51. If using shadow-cljs, it must be at least version 2.19.3
+
+The reason is that time-literals lib is using reader conditionals in data_readers.cljc which has only just been 
+fixed in the latest Clojurescript.
+
 # 0.5
 
 * tick.core is the main api ns now. tick.alpha.api has been removed

@@ -106,45 +106,14 @@ make release-docs-cljs
 
 === Develop Tick
 
-Jack in with cider or equivalent method in other IDEs, and start the cljs build with:
-
 ----
-(figwheel-start!)
+clj -Atest-clj:test-cljs
 ----
 
+ - To start testing clojurescript, follow instructions in the `cljs` ns.
+ - To start testing clojure, follow instructions in the the `repl` ns.
 
-And when you get a REPL you can run all the JVM tests with
-
-----
-(test-clj)
-----
-
-Or outside of the REPL run:
-
-----
-make test-all
-----
-
-which will run clojure and clojurescript (chrome) tests.
-tests are running with https://github.com/lambdaisland/kaocha[Kaocha] 
-
-As long as you have you have started your repl with these aliases "-A:test-cljs:test-clj", you can also run backend clojure tests in the repl with something like
-
-----
-(require '[kaocha.repl :as kr])
-(kr/run :clj)
-----
-
-==== Setting `CHROME_BIN`
-
-If you get an error similar to the following:
-
-----
-No binary for ChromeHeadless browser on your platform.
-----
-
-Set the environment variable `CHROME_BIN` to wherever Chrome or Chromium is installed on your platform.
-
+See the .github dir to see instructions for CLI testing
 
 === Release
 
