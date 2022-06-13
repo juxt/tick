@@ -797,8 +797,8 @@
   (forward-duration [t d] (cljc.java-time.instant/plus t d))
   (backward-duration [t d] (cljc.java-time.instant/minus t d))
   #?(:clj Date :cljs js/Date)
-  (forward-duration [t d] (p/forward-duration (p/instant t) d))
-  (backward-duration [t d] (p/backward-duration (p/instant t) d))
+  (forward-duration [t d] (p/inst (p/forward-duration (p/instant t) d)))
+  (backward-duration [t d] (p/inst (p/backward-duration (p/instant t) d)))
   LocalDate
   (forward-number [t n] (cljc.java-time.local-date/plus-days t n))
   (backward-number [t n] (cljc.java-time.local-date/minus-days t n))

@@ -251,6 +251,11 @@
 (deftest comparison-test
   (let [point (t/truncate (t/instant) :millis)
         later (t/>> point (t/new-duration 1 :millis))]
+    (testing "shifting inst"
+      (let [i (t/inst)]
+        (is (= i (-> i 
+                     (t/>> (t/new-duration 10 :seconds))
+                     (t/<< (t/new-duration 10 :seconds)))))))
     (testing "max-min"
       (is (= later (t/max point later point later)))
       (is (= point (t/min point later point later))))

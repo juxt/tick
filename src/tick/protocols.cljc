@@ -56,13 +56,13 @@ For example:
   (end [_] "Return the end of a span of time"))
 
 (defprotocol IConversion
-  (inst [_] "Make a java.util.Date instance.")
+  (inst [_] "Make a java.util.Date or js/Date instance.")
   (instant [_] "Make a java.time.Instant instance.")
   (offset-date-time [_] "Make a java.time.OffsetDateTime instance.")
   (zoned-date-time [_] "Make a java.time.ZonedDateTime instance."))
 
 (defprotocol ITimeComparison
-  (= [x y] "Is x the same as y?")
+  (= [x y] "Is x the same point on the timeline as y?")
   (< [x y] "Is x before y?")
   (<= [x y] "Is x before or at the same time as y?")
   (> [x y] "Is x after y?")
