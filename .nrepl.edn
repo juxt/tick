@@ -1,3 +1,1 @@
-{ ;:bind         "::"
- ;:transport    nrepl.transport/tty
- :middleware   [cider.piggieback/wrap-cljs-repl]}
+{:middleware   [shadow.cljs.devtools.server.nrepl/middleware]}

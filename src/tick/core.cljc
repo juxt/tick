@@ -5,9 +5,10 @@
   (:require
     [clojure.string :as str]
     [tick.protocols :as p]
-    #?(:clj [tick.file]) ; for protocol extn
+    #?@(:clj [[tick.file] ; for protocol extn
+              [time-literals.data-readers] ; must be required for literals to work on jvm
+              ]) 
     [time-literals.read-write]
-    [time-literals.data-readers] ; must be required for literals to work on jvm
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
     [cljc.java-time.local-time]

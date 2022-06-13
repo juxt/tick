@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+    <organization>
+        <name>Juxt Ltd</name>
+        <url>http://juxt.pro</url>
+    </organization>
+    <description>Time as a value</description>
+    <url>https://github.com/juxt/tick</url>
+    <licenses>
+        <license>
+            <url>http://opensource.org/licenses/MIT</url>
+            <name>MIT</name>
+            <comments/>
+        </license>
+    </licenses>
+    <packaging>jar</packaging>
+    <scm>
+    <url>https://github.com/juxt/tick</url>
+    <connection>scm:git:git@github.com:juxt/tick.git</connection>
+    <developerConnection>scm:git:git@github.com:juxt/tick.git</developerConnection>
+  </scm>
+    <distributionManagement>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars repository</name>
+            <url>https://clojars.org/repo</url>
+        </repository>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>clojars</id>
+            <url>https://repo.clojars.org/</url>
+        </repository>
+    </repositories>
+</project>

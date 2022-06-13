@@ -24,25 +24,25 @@ deploy-docs:
 			make && cd docs && firebase deploy
 test-clj:
 			./bin/kaocha :clj
-test-chrome:
-			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -M:test-chrome
-
 test-node:
 			rm -rf cljs-test-runner-out && mkdir -p cljs-test-runner-out/gen && clojure -Sverbose -M:test-node
-
-test-all:
-			make test-clj && make test-chrome && make test-node
-
 # For developing the cljs used by the documentation, starts a REPL and a server at localhost:9500
 dev-docs-cljs:
 			clojure -M:docs-watch
 # Builds production js and html files
-release-docs-cljs:
+release-docs-cljs: 
 			make && clojure -A:docs-release
+test-cljs-shadow:
+			clojure -Atest-cljs -X com.widdindustries.tiado-cljs2/tests-ci-shadow :compile-mode :release
+test:
+			make test-clj && make test-cljs
+clean:
+			clj -T:build clean
 install:
-			clojure -M:release install --version $(VERSION)
+			make clean && clj -T:build jar && clj -T:build install \
+			&& mkdir -p tmp && cd tmp
 deploy:
-			clojure -M:release --version $(VERSION)
+			clj -T:build deploy
 lint:
 			clj-kondo --lint src test
 
