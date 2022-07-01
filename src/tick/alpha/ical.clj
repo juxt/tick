@@ -213,7 +213,7 @@
              (set (char-range \0 \9))))
 
 (s/def ::iana-token
-  (s/+ (conj ALPHA-DIGIT #{\-})))
+  (s/+ (conj ALPHA-DIGIT \-)))
 
 (s/def ::x-name
   (s/cat
