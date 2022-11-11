@@ -702,8 +702,6 @@ specified offset:
 ====
 
 ====
-
-====
 `pm` - Give an interval covering the afternoon of a given date:
 [source.code,clojure]
 ----
