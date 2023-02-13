@@ -29,6 +29,7 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 == Should you use Tick?
 
 * If you are just working on the JVM and are comfortable with the `java.time` API then raw interop will work just fine.
+* If you are working in Javascript but not in a highly constrained context such as a https://github.com/mfikes/esprit[microcontroller] then use https://github.com/henryw374/cljc.java-time[cljc.java-time], its build size https://widdindustries.com/blog/clojurescript-datetime-lib-comparison.html[will not adversely affect your users]. The reason is the native Date implementation is https://maggiepint.com/2017/04/09/fixing-javascript-date-getting-started/[flawed]
 * If you meet any of the following criteria, use https://github.com/henryw374/cljc.java-time[cljc.java-time]:
 ** are creating cross-platform date-time logic
 ** are not proficient in java.time and would like https://widdindustries.com/why-not-interop/[improved error messages]
