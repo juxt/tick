@@ -31,9 +31,10 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 * If you are just working on the JVM and are comfortable with the `java.time` API then raw interop will work just fine.
 * If you meet any of the following criteria, use https://github.com/henryw374/cljc.java-time[cljc.java-time]:
 ** are creating cross-platform date-time logic
-** are not proficient in java.time and would like improved error messages
+** are not proficient in java.time and would like https://widdindustries.com/why-not-interop/[improved error messages]
 ** would rather not maintain type hints in your code
-* If you meet the criteria to use cljc.java-time but would like a more terse API and the benefits of e.g. `(t/with-clock ...)` but will not miss having every date-time recipe one google search away, then tick might be a good choice. 
+* If you meet the criteria to use cljc.java-time but would like a more terse API and the benefits of e.g. `(t/with-clock ...)` but will not miss having every date-time recipe one google search away, then tick might be a good choice.
+* Similar in aiming for a terse API, but jvm-only is https://github.com/dm3/clojure.java-time[clojure.java-time].
 
 == Top tips 
 
