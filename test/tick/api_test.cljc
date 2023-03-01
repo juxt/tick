@@ -150,8 +150,12 @@
     (is (= d (t/format :iso-local-date (t/date d))))
     (is (= d (t/format (t/formatter :iso-local-date) (t/date d))))
     (is (= d (t/format (t/formatter "YYYY-MM-dd") (t/date d))))
-    #?(:clj
-       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH) 
+    #?(:bb
+       ; bb only inlcludes the English Locale by default
+       (is (= "3030-May-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH)
+                              (t/date d))))
+       :clj
+       (is (= "3030-mai-03" (t/format (t/formatter "YYYY-MMM-dd" java.util.Locale/FRENCH)
                               (t/date d)))))))
 
 (deftest epoch-test
@@ -222,7 +226,7 @@
    (t/zoned-date-time i)
    (t/offset-date-time i)])
 
-(deftest truncate-test 
+(deftest truncate-test
   (let [dates [(t/instant) (t/zoned-date-time) (t/date-time)
                (t/offset-date-time) (t/time)]
         truncate-tos [:nanos
@@ -233,19 +237,19 @@
                      :hours
                      :half-days
                      :days     ]]
-    (doseq [date dates 
+    (doseq [date dates
             truncate-to truncate-tos]
       (is (t/truncate date truncate-to)))))
 
-(deftest parse-test 
+(deftest parse-test
   (is (t/date? (t/parse-date "2020/02/02" (t/formatter "yyyy/MM/dd"))))
   (is (t/year? (t/parse-year "20" (t/formatter "yy"))))
   (is (t/year-month? (t/parse-year-month "20/02" (t/formatter "yy/MM"))))
   (is (t/date-time? (t/parse-date-time "2020/02/02:2002" (t/formatter "yyyy/MM/dd:HHmm"))))
   (is (t/time? (t/parse-time "2002" (t/formatter "HHmm"))))
-  (is (t/zoned-date-time? (t/parse-zoned-date-time "2020/02/02:2002:Z" 
+  (is (t/zoned-date-time? (t/parse-zoned-date-time "2020/02/02:2002:Z"
                             (t/formatter "yyyy/MM/dd:HHmm:VV"))))
-  (is (t/offset-date-time? (t/parse-offset-date-time "2020/02/02:2002:-08:30" 
+  (is (t/offset-date-time? (t/parse-offset-date-time "2020/02/02:2002:-08:30"
                              (t/formatter "yyyy/MM/dd:HHmm:VV")))))
 
 (deftest comparison-test
@@ -253,7 +257,7 @@
         later (t/>> point (t/new-duration 1 :millis))]
     (testing "shifting inst"
       (let [i (t/inst)]
-        (is (= i (-> i 
+        (is (= i (-> i
                      (t/>> (t/new-duration 10 :seconds))
                      (t/<< (t/new-duration 10 :seconds)))))))
     (testing "max-min"
@@ -267,14 +271,14 @@
         (is (apply t/<= point (point-in-time-comparable later))))
       (doseq [later (point-in-time-comparable later)]
         (is (apply t/>= later (point-in-time-comparable point))))
-      
+
       (doseq [point (point-in-time-comparable point)
               later (point-in-time-comparable later)]
         (is (t/<= point later))
         (is (t/< point later))
         (is (t/>= later point))
         (is (t/> later point)))))
-  
+
   (testing "ZonedDateTimes in different zones should be equals"
     (is (t/=
           (t/zoned-date-time "2017-10-31T16:00:00-04:00[America/New_York]")

@@ -1,0 +1,16 @@
+{:min-bb-version
+ "1.2.174"
+
+ :paths
+ ["src" "test"]
+
+ :deps
+ {current/deps {:local/root "."}}
+
+ :tasks
+ {:requires ([clojure.test :as c.test]
+             [tick.api-test :as api-test])
+  test      {:doc "Run all tests in namespace tick.api-test"
+             :task (do (println "Running tests")
+                     (in-ns 'api-test)
+                     (c.test/run-all-tests))}}}
