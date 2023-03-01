@@ -22,9 +22,15 @@ jobs:
 
       - name: Run Clj Unit tests
         run: make test-clj
-        
-      - name: Install Chrome  
+
+      - name: Install Chrome
         uses: browser-actions/setup-chrome@latest
-        
-      - name: Run Cljs Unit tests  
-        run: make test-cljs-shadow        
+
+      - name: Run Cljs Unit tests
+        run: make test-cljs-shadow
+
+      - name: Install babashka master
+        run: bash <(curl -s https://raw.githubusercontent.com/babashka/babashka/master/install)
+
+      - name: Run bb tests
+        run: bb test

@@ -7,7 +7,7 @@
     [tick.protocols :as p]
     #?@(:clj [[tick.file] ; for protocol extn
               [time-literals.data-readers] ; must be required for literals to work on jvm
-              ]) 
+              ])
     [time-literals.read-write]
     [cljc.java-time.local-date]
     [cljc.java-time.local-date-time]
@@ -45,7 +45,7 @@
        [java.util Date]
        [java.time Clock ZoneId ZoneOffset Instant Duration Period DayOfWeek Month ZonedDateTime LocalTime LocalDateTime LocalDate Year YearMonth ZoneId OffsetDateTime OffsetTime]
        [java.time.format DateTimeFormatter]
-       [java.time.temporal Temporal ]
+       [java.time.temporal Temporal]
        [clojure.lang ILookup Seqable]
        [java.util Locale])))
 
@@ -120,10 +120,10 @@
   ([^LocalDate date]
    (p/at date cljc.java-time.local-time/noon)))
 
-(defn parse-day 
-  "en locale specific and borderline deprecated. 
+(defn parse-day
+  "en locale specific and borderline deprecated.
   consider writing your own regex or use a formatter. For example:
-  
+
   (-> (t/formatter \"EEE\")
       (cljc.java-time.format.date-time-formatter/parse \"Tue\")
       (cljc.java-time.day-of-week/from))
@@ -139,14 +139,14 @@
     #"^(sun)(day)?$" cljc.java-time.day-of-week/sunday
     nil))
 
-(defn parse-month 
-  "en locale specific and borderline deprecated. Consider writing your 
+(defn parse-month
+  "en locale specific and borderline deprecated. Consider writing your
    own regex or use a formatter. For example:
-   
-   (-> (t/formatter \"MMM\")    
-       (cljc.java-time.format.date-time-formatter/parse \"Jan\")   
+
+   (-> (t/formatter \"MMM\")
+       (cljc.java-time.format.date-time-formatter/parse \"Jan\")
        (cljc.java-time.month/from))
-   " 
+   "
   [input]
   (condp re-matches (str/lower-case input)
     #"^(jan)(uary)?$" cljc.java-time.month/january
@@ -442,40 +442,60 @@
    :second-of-day                cljc.java-time.temporal.chrono-field/second-of-day
    :second-of-minute             cljc.java-time.temporal.chrono-field/second-of-minute
    :year                         cljc.java-time.temporal.chrono-field/year
-   :year-of-era                  cljc.java-time.temporal.chrono-field/year-of-era                 })
+   :year-of-era                  cljc.java-time.temporal.chrono-field/year-of-era})
 
-(deftype FieldsLookup [t]
-  #?(:clj Seqable :cljs ISeqable)
-  (#?(:cljs -seq :clj seq) [_]
-    (->> field-map
-         (keep (fn [[k _v]]
-                 (let [cf (get field-map k)]
-                   (when (cljc.java-time.temporal.temporal/is-supported t cf)
-                     [k (cljc.java-time.temporal.temporal/get-long t cf)]))))
-         (into {})
-         seq))
-  ILookup
-  (#?(:clj valAt :cljs -lookup) [_ fld]
-    (when-let [f (get field-map fld)]
-      (cljc.java-time.temporal.temporal/get-long t f)))
-  (#?(:clj valAt :cljs -lookup) [_ fld notfound]
-    (if-let [f (get field-map fld)]
-      (try
-        (cljc.java-time.temporal.temporal/get-long t f)
-        (catch #?(:clj java.time.temporal.UnsupportedTemporalTypeException :cljs js/Error) _e
-          notfound))
-      notfound)))
+(defn- fields-map [t]
+  (->> field-map
+    (keep (fn [[k _v]]
+            (let [cf (get field-map k)]
+              (when (cljc.java-time.temporal.temporal/is-supported t cf)
+                [k (cljc.java-time.temporal.temporal/get-long t cf)]))))
+    (into {})))
 
-(defn fields [t]
-  (->FieldsLookup t))
+#?(:bb nil
+   :clj
+   (deftype FieldsLookup [t]
+     Seqable
+     (seq [_]
+       (seq (fields-map t)))
+     ILookup
+     (valAt [_ fld]
+       (when-let [f (get field-map fld)]
+         (cljc.java-time.temporal.temporal/get-long t f)))
+     (valAt [_ fld notfound]
+       (if-let [f (get field-map fld)]
+         (try
+           (cljc.java-time.temporal.temporal/get-long t f)
+           (catch java.time.temporal.UnsupportedTemporalTypeException _e
+             notfound))
+         notfound)))
+   :cljs
+   (deftype FieldsLookup [t]
+     ISeqable
+     (-seq [_]
+       (seq (fields-map t)))
+     ILookup
+     (-lookup [_ fld]
+       (when-let [f (get field-map fld)]
+         (cljc.java-time.temporal.temporal/get-long t f)))
+     (-lookup [_ fld notfound]
+       (if-let [f (get field-map fld)]
+         (try
+           (cljc.java-time.temporal.temporal/get-long t f)
+           (catch js/Error _e
+             notfound))
+         notfound))))
+
+#?(:bb   (defn fields [t] (fields-map t))
+   :clj  (defn fields [t] (->FieldsLookup t))
+   :cljs (defn fields [t] (->FieldsLookup t)))
 
 ;; With
 
 (defn with
   "Adjust a temporal with an adjuster or field"
   ([t adj]
-   (cljc.java-time.temporal.temporal/with t adj)
-    )
+   (cljc.java-time.temporal.temporal/with t adj))
   ([t fld new-value]
    (when-let [f (get field-map fld)]
      (cljc.java-time.temporal.temporal/with t f new-value))))
@@ -625,7 +645,7 @@
 
 (defn of-nanos
   "Takes a java.lang.Long n and returns a duration of n nanoseconds."
-  [n] 
+  [n]
   (new-duration n :nanos))
 
 (defn of-micros
@@ -1108,7 +1128,7 @@
 (def SATURDAY cljc.java-time.day-of-week/saturday)
 (def SUNDAY cljc.java-time.day-of-week/sunday)
 
-(def JANUARY cljc.java-time.month/january )
+(def JANUARY cljc.java-time.month/january)
 (def FEBRUARY cljc.java-time.month/february)
 (def MARCH cljc.java-time.month/march)
 (def APRIL cljc.java-time.month/april)
@@ -1278,7 +1298,7 @@
    :iso-local-date       cljc.java-time.format.date-time-formatter/iso-local-date
    :iso-instant          cljc.java-time.format.date-time-formatter/iso-instant
 
-   ; these exist in java but not in js-joda 
+   ; these exist in java but not in js-joda
    ;:iso-offset-date      (. DateTimeFormatter -ISO_OFFSET_DATE)
    ;:rfc-1123-date-time   (. DateTimeFormatter -RFC_1123_DATE_TIME)
    ;:iso-week-date        (. DateTimeFormatter -ISO_WEEK_DATE)
@@ -1296,7 +1316,7 @@
   * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
   or
   * formatter name - :iso-instant :iso-local-date etc
-  
+
   and a Locale, which is optional."
   ([fmt]
    (formatter
@@ -1468,7 +1488,7 @@
   "to parse an iso-formatted year-month, use (t/year-month \"2020..\") instead"
   [date-str formatter]
   (cljc.java-time.year-month/parse date-str formatter))
-(defn parse-zoned-date-time 
+(defn parse-zoned-date-time
   "to parse an iso-formatted zoned-date-time, use (t/zoned-date-time \"2020..\") instead"
   [date-str formatter]
   (cljc.java-time.zoned-date-time/parse date-str formatter))
