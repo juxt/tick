@@ -4,7 +4,7 @@ image:https://github.com/juxt/tick/actions/workflows/tests.yaml/badge.svg?style=
 
 = tick
 
-A Clojure(Script) library for dealing with time. Intended as a
+A Clojure(Script) & babashka library for dealing with time. Intended as a
 replacement for clj-time.
 
 Based on Java 8 time (on the JVM) and js-joda (on JavaScript
@@ -91,6 +91,15 @@ Here is a one-liner to drop into a node repl with tick:
 ----
 clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version "RELEASE" } tick/tick {:mvn/version "RELEASE"} henryw374/js-joda {:mvn/version "RELEASE"} }}' -m cljs.main  -re node  --repl
 ----
+
+Here is how to get to a babashka (v 1.2.174+) repl with tick:
+
+----
+export BABASHKA_CLASSPATH=$(clojure -Spath -Sdeps '{:deps {tick/tick {:mvn/version "0.6.0"}}}')
+
+bb
+----
+
 
 == Development
 
