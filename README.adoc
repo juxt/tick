@@ -1,6 +1,6 @@
 image:https://img.shields.io/clojars/v/tick.svg?style=svg["clojars",link="https://clojars.org/tick"]
-
 image:https://github.com/juxt/tick/actions/workflows/tests.yaml/badge.svg?style=svg["tests build",link="https://github.com/juxt/tick/actions/workflows/tests.yaml"]
+image:https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg["bb compatible",link="https://babashka.org"]
 
 = tick
 
