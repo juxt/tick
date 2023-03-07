@@ -19,9 +19,8 @@ docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 			-o $@ \
 			docs/index.adoc
 
-# this just works on henryw374s machine. at some point docs will get hosted somewhere else
 deploy-docs:
-			make && cd docs && firebase deploy
+			make
 test-clj:
 			./bin/kaocha :clj
 test-node:

@@ -3,8 +3,6 @@
                                         ;:git/url "https://github.com/henryw374/cljc.java-time.git"
                                         ;:sha "5837778b307870c1ff0715fab692211dec253a6f"
                                         }
-         cljsjs/js-joda-timezone       {:mvn/version "2.2.0-0"}
-         cljsjs/js-joda-locale-en-us   {:mvn/version "3.1.1-1"}
          com.widdindustries/time-literals {:mvn/version "0.1.10"
                                            :exclusions [com.widdindustries/cljs.java-time]}}
 
@@ -25,8 +23,11 @@
                                     :git/url "https://github.com/henryw374/tiado-cljs2.git"
                                     :sha "fbd9f3b8df3523ccf11bbc685836ce7f96f18068"
                                     }}}
-         ; this is node using foreign-libs.
-         ; although not recommended, whilst tick depends on cljsjs, this should 'just work'
+         :build     {:extra-paths ["dev/src"]
+                     :extra-deps  {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
+                                   slipset/deps-deploy           {:mvn/version "RELEASE"}}
+                     :ns-default  build}
+         ;; following 3 aliases all broken. easiest opt is to try to use the shadow build
          :test-node    {:extra-paths ["test" "cljs-test-runner-out/gen"]
                         :extra-deps  {olical/cljs-test-runner   {:mvn/version "3.7.0" :exclusions [org.clojure/clojurescript]}
                                       org.clojure/clojurescript {:mvn/version "1.10.764"}}
@@ -44,7 +45,4 @@
                                       org.clojure/clojurescript {:mvn/version "1.10.764"}}
                         :main-opts   ["-m" "figwheel.main" "-O" "simple" "--build-once" "docs"]}
 
-         :build     {:extra-paths ["dev/src"]
-                     :extra-deps  {io.github.clojure/tools.build {:git/tag "v0.7.5" :git/sha "34727f7"}
-                                   slipset/deps-deploy           {:mvn/version "RELEASE"}}
-                     :ns-default  build}}}
+         }}

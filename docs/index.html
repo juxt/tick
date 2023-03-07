@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.16">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <meta name="author" content="Malcolm Sparks, Henry Widd, Johanna Antonelli">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <title>tick</title>
@@ -768,6 +768,7 @@ h3 .yada, #toctitle .yada, .sidebarblock > .content > .title .yada { font-weight
 <li><a href="#_clojurescript">2.2. Clojurescript</a>
 <ul class="sectlevel3">
 <li><a href="#_npm_setup">NPM Setup</a></li>
+<li><a href="#_non_npm_setup">Non-NPM Setup</a></li>
 <li><a href="#_optional_timezone_locale_data_for_reducing_build_size">Optional Timezone &amp; Locale data for reducing build size</a>
 <ul class="sectlevel4">
 <li><a href="#_timezones">Timezones</a></li>
@@ -866,6 +867,7 @@ h3 .yada, #toctitle .yada, .sidebarblock > .content > .title .yada { font-weight
 <li><a href="#_tick_reference">10.9. Tick Reference</a></li>
 </ul>
 </li>
+<li><a href="#_references">References</a></li>
 </ul>
 </div>
 </div>
@@ -1066,7 +1068,7 @@ project.</p>
 <div class="sect3">
 <h4 id="_npm_setup">NPM Setup</h4>
 <div class="paragraph">
-<p>If you are using Shadow-cljs or just foreign-libs (via Figwheel for example) then there is
+<p>If you are using Shadow-cljs then there is
 no npm setup you need to do.</p>
 </div>
 <div class="paragraph">
@@ -1081,9 +1083,11 @@ Assuming you have tick in your deps.edn, from your project directory, run</p>
 <div class="paragraph">
 <p>Now your package.json has the required npm libs added.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_non_npm_setup">Non-NPM Setup</h4>
 <div class="paragraph">
-<p>Exclude the transitive cljsjs dependencies so that js-joda is not included twice.
-<a href="https://clojurescript.org/reference/dependencies#cljsjs">The Clojurescript site</a> provides more info.</p>
+<p>Add <a href="https://clojars.org/henryw374/js-joda">js-joda</a> and <a href="https://clojars.org/henryw374/js-joda-locale-en-us">js-joda-locale-en-us</a> and <a href="https://clojars.org/cljsjs/js-joda-timezone">js-joda-timezone</a> to your dependencies.</p>
 </div>
 </div>
 <div class="sect3">
@@ -4734,9 +4738,6 @@ specified offset:</p>
 </div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>pm</code> - Give an interval covering the afternoon of a given date:</p>
 </div>
@@ -4745,11 +4746,10 @@ specified offset:</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t.i/pm (t/today))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>range</code> - Give a lazy sequence of times from start to finish.</p>
 </div>
@@ -4760,11 +4760,10 @@ specified offset:</p>
 	 (t/new-duration 1 :minutes))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>relation</code> - Show the relation of two intervals:</p>
 </div>
@@ -4793,11 +4792,10 @@ see <a href="#relation-yesterday-tomorrow">above</a> for more.
 </tr>
 </table>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>reset!</code> - Reset an atom clock with one 5 mins slow.</p>
 </div>
@@ -4808,11 +4806,10 @@ see <a href="#relation-yesterday-tomorrow">above</a> for more.
      (t/reset! clk clk2))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>reset-vals!</code> - Reset an atom clock with one 5 mins slow, and give the
 value of before and after.</p>
@@ -4824,11 +4821,10 @@ value of before and after.</p>
      (t/reset-vals! clk clk2))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>scale</code> - Increase an interval by a given duration:</p>
 </div>
@@ -4839,11 +4835,10 @@ value of before and after.</p>
          (t/new-duration 10 :minutes))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>seconds</code> - Give a duration in seconds:</p>
 </div>
@@ -4852,11 +4847,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/seconds (t/new-duration 5 :minutes))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>second</code> - Give the second of time:</p>
 </div>
@@ -4865,11 +4859,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/second (t/now))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>time</code> - Give the time of an instant:</p>
 </div>
@@ -4878,11 +4871,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/time (t/now))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>today</code> - Give todays date:</p>
 </div>
@@ -4891,11 +4883,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/today)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>tomorrow</code> - Give tomorrows date:</p>
 </div>
@@ -4904,11 +4895,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/tomorrow)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>truncate</code> - Lessen precision of an instant:</p>
 </div>
@@ -4917,11 +4907,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/truncate (t/instant) :days)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>union</code> - Join two time-ordered sequences together into one ordered sequence</p>
 </div>
@@ -4930,11 +4919,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t.i/union [(t/today)] [(t/yesterday) (t/tomorrow)])</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>unit-map</code> - A map of units of time that tick works with:</p>
 </div>
@@ -4948,11 +4936,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(:minutes t/unit-map)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>unite</code> - Unite concurrent intervals ordered by beginning:</p>
 </div>
@@ -4964,11 +4951,10 @@ value of before and after.</p>
 	  		  (t/instant "2000-02-02T00:00:00.00Z"))])</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>units</code> - Give the appropriate units for a duration:</p>
 </div>
@@ -4977,11 +4963,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/units (t/new-duration 1000000001 :nanos))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>with</code> - Return a date with an altered field:</p>
 </div>
@@ -4990,11 +4975,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/with (t/today) :day-of-month 1)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>with-clock</code> - macro to evaluate code in the context of a given clock:</p>
 </div>
@@ -5004,11 +4988,10 @@ value of before and after.</p>
   (t/with-clock clk (t/time)))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>year</code> - Give the year:</p>
 </div>
@@ -5022,11 +5005,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/year (t/date "2000-01-01"))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>year-month</code> - Give the year and month:</p>
 </div>
@@ -5040,11 +5022,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/year-month (t/date "2000-01-01"))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>years</code> - Give a duration in years.</p>
 </div>
@@ -5053,11 +5034,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/years (t/new-period 10 :years))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>yesterday</code> - Give yesterdays date:</p>
 </div>
@@ -5066,11 +5046,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/yesterday)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>zone</code> - Give the time zone:</p>
 </div>
@@ -5084,11 +5063,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/zone (t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]"))</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>zone-offset</code> - Give the <code>java.time.ZoneOffset</code> with a specified offset:</p>
 </div>
@@ -5097,11 +5075,10 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/zone-offset 1 30 59)</code></pre>
 </div>
 </div>
+</div>
+</div>
 <div class="exampleblock">
 <div class="content">
-
-</div>
-</div>
 <div class="paragraph">
 <p><code>zoned-date-time</code> - Create a <code>java.time.ZonedDateTime</code>:</p>
 </div>
@@ -5115,20 +5092,20 @@ value of before and after.</p>
 <pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/zoned-date-time "2000-01-01T00:00:00Z[Australia/Darwin]")</code></pre>
 </div>
 </div>
-<div class="exampleblock">
-<div class="content">
-<div class="paragraph">
-<p>= References</p>
 </div>
-<div class="ulist">
-<ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+<div class="ulist bibliography">
+<ul class="bibliography">
 <li>
-<p>[<a id="ISO8601"></a>] <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601: Data elements and interchange formats – Information interchange – Representation of dates and times</a></p>
+<p><a id="ISO8601"></a>[ISO8601] <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601: Data elements and interchange formats – Information interchange – Representation of dates and times</a></p>
 </li>
 </ul>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>

@@ -36,7 +36,7 @@
               :version    version
               :jar-file   jar-file
               :class-dir  class-dir})
-  (println (str "clj -Sdeps '{:deps {tick/tick {:mvn/version \"" version "\"}}}'"))
+  (println (str "clj -Sdeps '{:deps {"lib" {:mvn/version \"" version "\"}}}'"))
   )
 
 (defn deploy [_]

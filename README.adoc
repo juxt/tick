@@ -83,6 +83,8 @@ add to your `project.clj`, `build.boot` or `deps.edn`.
 
 To use this from Clojurescript, you must have at least version 1.11.51. If using shadow-cljs, it must be at least version 2.19.3
 
+If using cljsjs, add https://clojars.org/henryw374/js-joda[js-joda] and https://clojars.org/henryw374/js-joda-locale-en-us[js-joda-locale-en-us] and https://clojars.org/cljsjs/js-joda-timezone[js-joda-timezone] to your dependencies as well.
+
 For Clojurescript users of Tick, see https://github.com/juxt/tick/blob/master/docs/cljs.adoc[docs/cljs.adoc], for
 some discussion around Clojurescript build size.
 
@@ -110,14 +112,13 @@ Build the html
 make
 ----
 
-Build the CLJS and start a figwheel repl+server
-----
-make dev-docs-cljs
-----
+`make dev-docs-cljs` to build the js for the site needs fixing.
 
-Navigate to localhost:9500 in your browser
+----
 
 === Build a production version of the Documentation Site
+
+The following is not working currently:
 
 ----
 make release-docs-cljs

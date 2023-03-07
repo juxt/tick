@@ -9,7 +9,7 @@ There is a plan to move to the new platform Javascript Date API, called https://
 
 === NPM Setup
 
-If you are using Shadow-cljs or just foreign-libs (via Figwheel for example) then there is 
+If you are using Shadow-cljs then there is 
 no npm setup you need to do.
 
 If you are using webpack (cljs :bundle option) in your build, first add the transitive npm dependencies to your package.json. 
@@ -21,8 +21,9 @@ clj -m cljs.main --install-deps
 
 Now your package.json has the required npm libs added. 
 
-Exclude the transitive cljsjs dependencies so that js-joda is not included twice. 
-https://clojurescript.org/reference/dependencies#cljsjs[The Clojurescript site] provides more info.
+=== Non-NPM Setup 
+
+Add https://clojars.org/henryw374/js-joda[js-joda] and https://clojars.org/henryw374/js-joda-locale-en-us[js-joda-locale-en-us] and https://clojars.org/cljsjs/js-joda-timezone[js-joda-timezone] to your dependencies.
 
 === Optional Timezone & Locale data for reducing build size
 
