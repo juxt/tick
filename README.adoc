@@ -16,7 +16,7 @@ https://github.com/henryw374/tempo[Tempo] when it is available.
 (require '[tick.core :as t])
 
 ;; Get the current time
-(t/now)
+(t/instant)
 ----
 
 See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/North 2019] for some background
@@ -41,24 +41,24 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 
 === java.time
 
-In both Clojure and Clojurescript versions, tick is just calling through to java.time methods. Understanding https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[the main entities of java.time] is necessary to use tick. For example, one should know that there are 2 separate ways to measure amounts of time, 3 ways to represent a point on the timeline and so on.
+In both Clojure and Clojurescript versions, tick is just calling through to java.time methods. Understanding https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[the main entities of java.time] is necessary to use tick. For example, one should know that there are 2 separate ways to measure amounts of time (Period and Duration), 3 ways to represent a point on the timeline (Instant, ZonedDateTime & OffsetDateTime) and so on.
 
 === Instants 
 
-Instants are not 'calendar-aware' - they just contain millis/nanos field representing an 
+Instants are not 'calendar-aware' - they just contain millis+nanos fields representing an 
 offset from the Unix epoch. This means Instants have no method to get their year or month for example, 
-because to do so would require a calendar (e.g. the Gregorian calendar).
+because to do so would require a calendar (e.g. the https://en.wikipedia.org/wiki/Gregorian_calendar[Gregorian calendar]).
 
-Tick provides some help with this when accessing properties of an Instant though. For example
-`(t/year (t/now))` works. To make that possible, tick first converts the Instant into a ZonedDateTime 
+However, the following does work in Tick:
+`(t/year (t/instant))`. To make that possible, tick first converts the Instant into a ZonedDateTime 
 (which does have a calendar). Take note however that the zone of the ZonedDateTime will be the 
 browser's or jvm's timezone. To be explicit about the zone required do this:  
 
 [source,clojure]
 ----
-(-> (t/now)
+(-> (t/instant)
     (t/in "UTC")
-    t/year)
+    (t/year))
 ----
 
 The other cases where calendar-awareness might come up is when formatting Instants to string or when
