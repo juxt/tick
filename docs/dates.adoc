@@ -7,7 +7,7 @@ them.
 
 If we asked a stranger for the time they'd likely respond with the just time of day, for example, "a quarter to eight". It would be uncommon for them to tell you the date and timezone also, unless you asked for it. This is the same time that we learn to read as children, on analog watches and wall-clocks.
 
-So let's start with asking _tick_ for the time of day, with the `time` function. We demonstate this with our first example:
+So let's start with asking _tick_ for the time of day, with the `time` function. We demonstrate this with our first example:
 
 .Getting the time
 ====
