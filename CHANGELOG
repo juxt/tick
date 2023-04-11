@@ -1,3 +1,7 @@
+# 0.6.1 
+
+Add equivalents of clojure.core's max-key and min-key 
+
 # 0.6 
 
 Tick works on babashka
