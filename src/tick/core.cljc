@@ -1418,6 +1418,38 @@
   (assert (every? some? (cons arg args)))
   (reduce lesser arg args))
 
+(defn max-key
+  "Same as clojure.core/max-key, but works on dates, rather than numbers"
+  ([_k x] x)
+  ([k x y] (if (> (k x) (k y)) x y))
+  ([k x y & more]
+   (let [kx (k x) ky (k y)
+         [v kv] (if (> kx ky) [x kx] [y ky])]
+     (loop [v v kv kv more more]
+       (if more
+         (let [w (first more)
+               kw (k w)]
+           (if (>= kw kv)
+             (recur w kw (clojure.core/next more))
+             (recur v kv (clojure.core/next more))))
+         v)))))
+
+(defn min-key
+  "Same as clojure.core/min-key, but works on dates, rather than numbers"
+  ([_k x] x)
+  ([k x y] (if (< (k x) (k y)) x y))
+  ([k x y & more]
+   (let [kx (k x) ky (k y)
+         [v kv] (if (< kx ky) [x kx] [y ky])]
+     (loop [v v kv kv more more]
+       (if more
+         (let [w (first more)
+               kw (k w)]
+           (if (<= kw kv)
+             (recur w kw (clojure.core/next more))
+             (recur v kv (clojure.core/next more))))
+         v)))))
+
 (defn- beginning-composite [m]
   (let [{:tick/keys [beginning intervals]} m]
     (if intervals

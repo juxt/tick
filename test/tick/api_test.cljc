@@ -263,6 +263,9 @@
     (testing "max-min"
       (is (= later (t/max point later point later)))
       (is (= point (t/min point later point later))))
+    (testing "max-min key"
+      (is (= {:foo later} (t/max-key :foo {:foo point} {:foo later} {:foo point} {:foo later})))
+      (is (= {:foo point} (t/min-key :foo {:foo point} {:foo later} {:foo point} {:foo later}))))
     (testing "comparables not="
       (doseq [point (point-in-time-comparable point)]
         (testing "comparables ="
