@@ -343,9 +343,12 @@ Give the am pm time:
       (>= hour 12)
       (format "%02d:%02d PM" hour minute)
 
-      (< hour 12)
-      (format "%02d:%02d AM" hour minute))))
+      (>= hour 1)
+      (format "%02d:%02d AM" hour minute)
 
+      (= hour 0)
+      (format "12:%02d AM" minute))))
+      
 ----
 NOTE: "12 noon is by definition neither *ante meridiem* (before noon) nor *post
 meridiem* (after noon), then 12 a.m. refers to midnight at the start of the
