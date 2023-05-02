@@ -1,11 +1,14 @@
 Tick is implemented using the api of `java.time` and an understanding of the https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[concepts behind java.time] will be very useful when working with tick, 
 because tick entities are java.time entities (Instant, LocalTime etc). 
 
-The most common question relates to 'calling xyz method doesn't work with Instants, why not?' The answer is that Instants are not calendar aware and probably you need
-to convert the Instant to a ZonedDateTime first. Look at the concepts link mentioned for a full explanation.
+The most common question relates to 'calling xyz method doesn't work with Instants, why not?' The `top tips` section in the README gives the answer and solutions.
+
+java.time has a much larger API than tick. tick only aims to cover what we feel are the most commonly occurring date-time use-cases. At this point (5+ years into the life of tick) we don't feel we are missing any functions. If you feel you have a good candidate for addition, please argue why you think it is an everyday need as part of the issue. 
 
 Where tick doesn't provide the api you need,
-you can look at the java.time api (most readily available as https://github.com/henryw374/cljc.java-time[cljc.java-time]) to see if there alternatives. If you cannot find the help you need in the tick documentation, it 
+you can look at the java.time api (most readily available as https://github.com/henryw374/cljc.java-time[cljc.java-time]) to see if there alternatives. 
+
+If you cannot find the help you need in the tick documentation, it 
 is quite likely that someone will have had the same query and had it resolved on https://stackoverflow.com/questions/tagged/java-time[Stack Overflow].
 
 We welcome PR's with tests, but may be a bit slow in getting to them as we are very busy!
