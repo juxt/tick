@@ -41,9 +41,22 @@ Instances of other `java.time` types are readily constructed with _tick_.
 
 * Add durations to durations
 
+You can use "between" to get durations and periods from instants and dates.
+
+[source.code,clojure]
+----
+(t/between (t/new-date 2023 05 10) (t/new-date 2023 05 15)) ;; => #time/period "P5D"
+(t/between #inst "2023-05-10" #inst "2023-05-15") ;; => #time/duration "PT120H"
+----
+
 == Comparison
 
-NOTE: TBD
+Tick implements the basic comparison functions =,<,>,<= and >= for durations:
+
+[source.code,clojure]
+----
+(t/< (t/of-hours 5) (t/of-hours 10)) ;; => true
+----
 
 == Misc
 
