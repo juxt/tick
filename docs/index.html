@@ -1093,13 +1093,10 @@ Assuming you have tick in your deps.edn, from your project directory, run</p>
 <div class="sect3">
 <h4 id="_optional_timezone_locale_data_for_reducing_build_size">Optional Timezone &amp; Locale data for reducing build size</h4>
 <div class="paragraph">
-<p>The use of timezones and locales is optional to allow a smaller build size.</p>
+<p>The use of timezones and locales is optional to allow a smaller build size. The way they are implemented in JsJoda means that they are accessed via side-effecting <code>require</code>. This is ugly, but there is no other option available.</p>
 </div>
 <div class="paragraph">
-<p>Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped) and it <a href="https://clojureverse.org/t/cljc-java-time-will-drop-all-npm-foreign-lib-dependencies/6208/5?u=henry_w">doesn&#8217;t seem possible to reduce this</a>.</p>
-</div>
-<div class="paragraph">
-<p>For comparison, a basic Cljs app with React is about 330k unzipped.</p>
+<p>Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped). For comparison, a basic Cljs app with React is about 330k unzipped.</p>
 </div>
 <div class="paragraph">
 <p>So by using Tick you might come close to doubling your build size!</p>
@@ -1139,6 +1136,17 @@ build includes only the compiled Clojurescript of tick itself.</p>
 <div class="paragraph">
 <p>Note that this is pulling in all of the history of timezones as well. If you don&#8217;t need historic data and you
 want to reduce build size, js-joda provides pre-build packages for just the more recent data.</p>
+</div>
+<div class="paragraph">
+<p>Also note that in the tick.core ns is <code><strong>clock</strong></code> which is initially set to the current default zone  - whatever that happens to be at the time the ns is loaded. <code><strong>clock</strong></code> is used for ambient where+now information such as when getting the current time. If no zone data has been loaded at the time tick.core is evaluated then the current default zone will be SYSTEM (see <a href="https://js-joda.github.io/js-joda/manual/ZonedDateTime.html">JsJoda docs</a> for info). If you would rather the zone be a proper IANA zone, then after require&#8217;ing <code>tick.timezone</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>(set! tick.core/*clock* (cljc.java-time.clock/system-default-zone))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>for example. This avoids the need to ensure that tick.timezone is loaded before tick.core</p>
 </div>
 </div>
 <div class="sect4">
@@ -1204,7 +1212,7 @@ them.</p>
 <p>If we asked a stranger for the time they&#8217;d likely respond with the just time of day, for example, "a quarter to eight". It would be uncommon for them to tell you the date and timezone also, unless you asked for it. This is the same time that we learn to read as children, on analog watches and wall-clocks.</p>
 </div>
 <div class="paragraph">
-<p>So let&#8217;s start with asking <em>tick</em> for the time of day, with the <code>time</code> function. We demonstate this with our first example:</p>
+<p>So let&#8217;s start with asking <em>tick</em> for the time of day, with the <code>time</code> function. We demonstrate this with our first example:</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 1. Getting the time</div>
@@ -2153,20 +2161,25 @@ to extract certain fields from time values.</p>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>You can use "between" to get durations and periods from instants and dates.</p>
+</div>
+<div class="listingblock code">
+<div class="content">
+<pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/between (t/new-date 2023 05 10) (t/new-date 2023 05 15)) ;; =&gt; #time/period "P5D"
+(t/between #inst "2023-05-10" #inst "2023-05-15") ;; =&gt; #time/duration "PT120H"</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_comparison_2">5.3. Comparison</h3>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-TBD
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>Tick implements the basic comparison functions =,&lt;,&gt;,&#8656; and &gt;= for durations:</p>
+</div>
+<div class="listingblock code">
+<div class="content">
+<pre class="highlight"><code class="language-clojure" data-lang="clojure">(t/&lt; (t/of-hours 5) (t/of-hours 10)) ;; =&gt; true</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -3137,8 +3150,11 @@ alone - <code>12:00</code> in 5 days is still <code>12:00</code> (ignoring dayli
       (&gt;= hour 12)
       (format "%02d:%02d PM" hour minute)
 
-      (&lt; hour 12)
-      (format "%02d:%02d AM" hour minute))))</pre>
+      (&gt;= hour 1)
+      (format "%02d:%02d AM" hour minute)
+
+      (= hour 0)
+      (format "12:%02d AM" minute))))</pre>
 </div>
 </div>
 <div class="admonitionblock note">

@@ -977,14 +977,6 @@
     (not= 1 (compare (p/end event) (p/end t)))))
 
 (extend-protocol p/ITimeSpan
-  #?(:clj String :cljs string)
-  (beginning [s] (p/beginning (p/parse s)))
-  (end [s] (p/end (p/parse s)))
-
-  #?(:clj Number :cljs number)
-  (beginning [n] (p/beginning (p/time n)))
-  (end [n] (p/end (p/time n)))
-
   LocalDate
   (beginning [date] (cljc.java-time.local-date/at-start-of-day date))
   (end [date] (cljc.java-time.local-date/at-start-of-day (inc date)))

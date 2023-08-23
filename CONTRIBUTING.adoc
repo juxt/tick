@@ -1,7 +1,7 @@
 Tick is implemented using the api of `java.time` and an understanding of the https://docs.oracle.com/javase/tutorial/datetime/iso/overview.html[concepts behind java.time] will be very useful when working with tick, 
 because tick entities are java.time entities (Instant, LocalTime etc). 
 
-The most common question relates to 'calling xyz method doesn't work with Instants, why not?' The `top tips` section in the README gives the answer and solutions.
+The most common questions relate to 'calling xyz method doesn't work with Instants, why not?' The `top tips` section in the README gives the answer and solutions.
 
 java.time has a much larger API than tick. tick only aims to cover what we feel are the most commonly occurring date-time use-cases. At this point (5+ years into the life of tick) we don't feel we are missing any functions. If you feel you have a good candidate for addition, please argue why you think it is an everyday need as part of the issue. 
 

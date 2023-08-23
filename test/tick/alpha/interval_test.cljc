@@ -371,46 +371,46 @@
                              (t/instant "2017-01-01T14:00:00Z"))]
            (ti/intersection coll1 coll2))))
 
-  (let [coll1 [(ti/new-interval (p/parse "2017-04-11T00:00")
-                                (p/parse "2017-04-14T00:00"))
-               (ti/new-interval (p/parse "2017-04-18T00:00")
-                                (p/parse "2017-04-20T00:00"))
-               (ti/new-interval (p/parse "2017-12-20T00:00")
-                                (p/parse "2017-12-23T00:00"))
-               (ti/new-interval (p/parse "2017-12-27T00:00")
-                                (p/parse "2018-01-01T00:00"))
-               (ti/new-interval (p/parse "2018-01-02T00:00")
-                                (p/parse "2018-01-08T00:00"))]
-        coll2 [(ti/bounds "2017")]]
-    (is (= [(ti/new-interval (p/parse "2017-04-11T00:00")
-                             (p/parse "2017-04-14T00:00"))
-            (ti/new-interval (p/parse "2017-04-18T00:00")
-                             (p/parse "2017-04-20T00:00"))
-            (ti/new-interval (p/parse "2017-12-20T00:00")
-                             (p/parse "2017-12-23T00:00"))
-            (ti/new-interval (p/parse "2017-12-27T00:00")
-                             (p/parse "2018-01-01T00:00"))]
+  (let [coll1 [(ti/new-interval (t/date-time "2017-04-11T00:00")
+                                (t/date-time "2017-04-14T00:00"))
+               (ti/new-interval (t/date-time "2017-04-18T00:00")
+                                (t/date-time "2017-04-20T00:00"))
+               (ti/new-interval (t/date-time "2017-12-20T00:00")
+                                (t/date-time "2017-12-23T00:00"))
+               (ti/new-interval (t/date-time "2017-12-27T00:00")
+                                (t/date-time "2018-01-01T00:00"))
+               (ti/new-interval (t/date-time "2018-01-02T00:00")
+                                (t/date-time "2018-01-08T00:00"))]
+        coll2 [(ti/bounds (t/year "2017"))]]
+    (is (= [(ti/new-interval (t/date-time "2017-04-11T00:00")
+                             (t/date-time "2017-04-14T00:00"))
+            (ti/new-interval (t/date-time "2017-04-18T00:00")
+                             (t/date-time "2017-04-20T00:00"))
+            (ti/new-interval (t/date-time "2017-12-20T00:00")
+                             (t/date-time "2017-12-23T00:00"))
+            (ti/new-interval (t/date-time "2017-12-27T00:00")
+                             (t/date-time "2018-01-01T00:00"))]
            (ti/intersection coll1 coll2))))
 
-  (let [coll1 [(ti/new-interval (p/parse "2017-04-11T00:00")
-                                (p/parse "2017-04-14T00:00"))
-               (ti/new-interval (p/parse "2017-04-18T00:00")
-                                (p/parse "2017-04-20T00:00"))
-               (ti/new-interval (p/parse "2017-12-20T00:00")
-                                (p/parse "2017-12-23T00:00"))
-               (ti/new-interval (p/parse "2017-12-27T00:00")
-                                (p/parse "2018-01-01T00:00"))
-               (ti/new-interval (p/parse "2018-01-02T00:00")
-                                (p/parse "2018-01-08T00:00"))]
-        coll2 [(ti/bounds "2017")]]
-    (is (= [(ti/new-interval (p/parse "2017-04-11T00:00")
-                             (p/parse "2017-04-14T00:00"))
-            (ti/new-interval (p/parse "2017-04-18T00:00")
-                             (p/parse "2017-04-20T00:00"))
-            (ti/new-interval (p/parse "2017-12-20T00:00")
-                             (p/parse "2017-12-23T00:00"))
-            (ti/new-interval (p/parse "2017-12-27T00:00")
-                             (p/parse "2018-01-01T00:00"))]
+  (let [coll1 [(ti/new-interval (t/date-time "2017-04-11T00:00")
+                                (t/date-time "2017-04-14T00:00"))
+               (ti/new-interval (t/date-time "2017-04-18T00:00")
+                                (t/date-time "2017-04-20T00:00"))
+               (ti/new-interval (t/date-time "2017-12-20T00:00")
+                                (t/date-time "2017-12-23T00:00"))
+               (ti/new-interval (t/date-time "2017-12-27T00:00")
+                                (t/date-time "2018-01-01T00:00"))
+               (ti/new-interval (t/date-time "2018-01-02T00:00")
+                                (t/date-time "2018-01-08T00:00"))]
+        coll2 [(ti/bounds (t/year "2017"))]]
+    (is (= [(ti/new-interval (t/date-time "2017-04-11T00:00")
+                             (t/date-time "2017-04-14T00:00"))
+            (ti/new-interval (t/date-time "2017-04-18T00:00")
+                             (t/date-time "2017-04-20T00:00"))
+            (ti/new-interval (t/date-time "2017-12-20T00:00")
+                             (t/date-time "2017-12-23T00:00"))
+            (ti/new-interval (t/date-time "2017-12-27T00:00")
+                             (t/date-time "2018-01-01T00:00"))]
            (ti/intersection coll1 coll2)))
 
     (testing "Empty sets"
@@ -480,10 +480,10 @@
                                 (t/instant "2017-01-01T14:00:00Z"))]]
     (is (empty? (ti/difference coll1 coll2))))
 
-  (is (= [(ti/bounds "2017-07-31" "2017-08-13")]
+  (is (= [(ti/bounds (t/date "2017-07-31") (t/date "2017-08-13"))]
          (ti/difference
-           [(ti/bounds "2017-07-31" "2017-08-13")]
-           [(ti/bounds "2017-01-01")])))
+           [(ti/bounds (t/date "2017-07-31") (t/date "2017-08-13"))]
+           [(ti/bounds (t/date "2017-01-01"))])))
 
   (testing "Empty sets"
     (let [coll1 []
@@ -673,12 +673,12 @@
   (is (= (t/date "2017-09-01") (first (ti/divide-by t/date "2017-09"))))
   (is (= (t/date "2017-09-30") (last (ti/divide-by t/date "2017-09"))))
   (is (= 31 (count (ti/divide-by t/date "2017-10"))))
-  (is (= 8 (count (ti/divide-by t/date (ti/bounds "2017-10-03" "2017-10-10")))))
-  (is (= [(t/date "2017-09-10")] (ti/divide-by t/date (ti/bounds "2017-09-10T12:00" "2017-09-10T14:00"))))
-  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (ti/divide-by t/date (ti/bounds "2017-09-10T12:00" "2017-09-11T14:00"))))
-  (is (= 2 (count (ti/divide-by t/year-month (ti/bounds "2017-09-10" "2017-10-10")))))
-  (is (= 3 (count (ti/divide-by t/year (ti/bounds "2017-09-10T12:00" "2019")))))
-  (is (= 3 (count (ti/divide-by t/year (ti/bounds "2017-09-10T12:00" "2019-02")))))
+  (is (= 8 (count (ti/divide-by t/date (ti/bounds (t/date "2017-10-03") (t/date "2017-10-10"))))))
+  (is (= [(t/date "2017-09-10")] (ti/divide-by t/date (ti/bounds (t/date-time "2017-09-10T12:00") (t/date-time "2017-09-10T14:00")))))
+  (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (ti/divide-by t/date (ti/bounds (t/date-time "2017-09-10T12:00") (t/date-time "2017-09-11T14:00")))))
+  (is (= 2 (count (ti/divide-by t/year-month (ti/bounds (t/date "2017-09-10") (t/date "2017-10-10"))))))
+  (is (= 3 (count (ti/divide-by t/year (ti/bounds (t/date-time "2017-09-10T12:00") (t/year "2019"))))))
+  (is (= 3 (count (ti/divide-by t/year (ti/bounds (t/date-time "2017-09-10T12:00") (t/year-month "2019-02"))))))
   (is (= 24 (count (ti/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10"))))))
 
 ;; TODO: Divide by duration

@@ -15,7 +15,8 @@
          :dev          {:extra-deps  {}
                         :extra-paths ["dev/src" "test"]}
          :test-clj {:extra-paths ["test"]
-                    :extra-deps  {lambdaisland/kaocha           {:mvn/version "1.0.732"}
+                    :extra-deps  {org.clojure/tools.namespace {:mvn/version "1.4.4"}
+                                  lambdaisland/kaocha           {:mvn/version "1.0.732"}
                                       lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}}}
          :test-cljs {:extra-paths ["dev/src" "test" "web-target"]
                      :extra-deps  {com.widdindustries/tiado-cljs2

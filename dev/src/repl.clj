@@ -4,8 +4,11 @@
     [clojure.tools.namespace.repl :refer [refresh refresh-all]]
     [kaocha.repl :as kr]
     [tick.core :as t]
-    [tick.viz :refer [show-canvas view label]])
+    ;[tick.viz :refer [show-canvas view label]]
+    )
   (:import (java.util TimeZone)))
+
+(clojure.tools.namespace.repl/set-refresh-dirs "src" "test")
 
 (set! *warn-on-reflection* true)
 
