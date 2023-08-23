@@ -27,11 +27,9 @@ Add https://clojars.org/henryw374/js-joda[js-joda] and https://clojars.org/henry
 
 === Optional Timezone & Locale data for reducing build size
 
-The use of timezones and locales is optional to allow a smaller build size. 
+The use of timezones and locales is optional to allow a smaller build size. The way they are implemented in JsJoda means that they are accessed via side-effecting `require`. This is ugly, but there is no other option available.
 
-Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped) and it https://clojureverse.org/t/cljc-java-time-will-drop-all-npm-foreign-lib-dependencies/6208/5?u=henry_w[doesn't seem possible to reduce this].
-
-For comparison, a basic Cljs app with React is about 330k unzipped. 
+Minified, gzipped js-joda (what gets pulled in if you use anything of tick) is around 43k (or 205k unzipped). For comparison, a basic Cljs app with React is about 330k unzipped. 
 
 So by using Tick you might come close to doubling your build size! 
 
@@ -62,6 +60,14 @@ add the following require:
 
 Note that this is pulling in all of the history of timezones as well. If you don't need historic data and you 
 want to reduce build size, js-joda provides pre-build packages for just the more recent data.
+
+Also note that in the tick.core ns is `*clock*` which is initially set to the current default zone  - whatever that happens to be at the time the ns is loaded. `*clock*` is used for ambient where+now information such as when getting the current time. If no zone data has been loaded at the time tick.core is evaluated then the current default zone will be SYSTEM (see https://js-joda.github.io/js-joda/manual/ZonedDateTime.html[JsJoda docs] for info). If you would rather the zone be a proper IANA zone, then after require'ing `tick.timezone` 
+
+----
+(set! tick.core/*clock* (cljc.java-time.clock/system-default-zone))
+----
+
+for example. This avoids the need to ensure that tick.timezone is loaded before tick.core
 
 ==== Formatting & Parsing
 
