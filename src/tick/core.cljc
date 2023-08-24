@@ -100,13 +100,13 @@
 
 (def ^{:dynamic true} *clock* (cljc.java-time.clock/system-default-zone))
 
-(defn now []
+(defn now "same as (t/instant)" []
   (cljc.java-time.instant/now *clock*))
 
-(defn today []
+(defn today "same as (t/date)" []
   (cljc.java-time.local-date/now *clock*))
 
-(defn epoch []
+(defn epoch "Constant for the 1970-01-01T00:00:00Z epoch instant" []
   cljc.java-time.instant/epoch)
 
 
@@ -293,8 +293,8 @@
   (month [i] (p/month (p/date i)))
   (year [i] (p/year (p/date i)))
   (year-month [i] (p/year-month (p/date i)))
-  (zone [i] (cljc.java-time.zone-id/of "UTC"))
-  (zone-offset [i] cljc.java-time.zone-offset/utc)
+  (zone [_i] (cljc.java-time.zone-id/of "UTC"))
+  (zone-offset [_i] cljc.java-time.zone-offset/utc)
 
   #?(:clj String :cljs string)
   (time [s] (cljc.java-time.local-time/parse s))
@@ -412,7 +412,9 @@
 
 ;; Fields
 
-(def field-map
+(def 
+  ^{:doc "keyword to chrono-field"}
+  field-map
   {:aligned-day-of-week-in-month cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-month
    :aligned-day-of-week-in-year  cljc.java-time.temporal.chrono-field/aligned-day-of-week-in-year
    :aligned-week-of-month        cljc.java-time.temporal.chrono-field/aligned-week-of-month
@@ -503,8 +505,8 @@
 ;; Built-in adjusters
 
 (defn day-of-week-in-month
-  ([ordinal dow] (cljc.java-time.temporal.temporal-adjusters/day-of-week-in-month ordinal (p/day-of-week dow)))
-  ([t ordinal dow] (with t (day-of-week-in-month ordinal dow))))
+  ([ordinal day-of-week] (cljc.java-time.temporal.temporal-adjusters/day-of-week-in-month ordinal (p/day-of-week day-of-week)))
+  ([t ordinal day-of-week] (with t (day-of-week-in-month ordinal day-of-week))))
 
 (defn first-day-of-month
   ([] (cljc.java-time.temporal.temporal-adjusters/first-day-of-month))
@@ -523,8 +525,8 @@
   ([t] (with t (first-day-of-year))))
 
 (defn first-in-month
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/first-in-month (p/day-of-week dow)))
-  ([t dow] (with t (first-in-month dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/first-in-month (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (first-in-month day-of-week))))
 
 (defn last-day-of-month
   ([] (cljc.java-time.temporal.temporal-adjusters/last-day-of-month))
@@ -535,28 +537,29 @@
   ([t] (with t (last-day-of-year))))
 
 (defn last-in-month
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/last-in-month (p/day-of-week dow)))
-  ([t dow] (with t (last-in-month dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/last-in-month (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (last-in-month day-of-week))))
 
 (defn next
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/next (p/day-of-week dow)))
-  ([t dow] (with t (next dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/next (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (next day-of-week))))
 
 (defn next-or-same
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/next-or-same (p/day-of-week dow)))
-  ([t dow] (with t (next-or-same dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/next-or-same (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (next-or-same day-of-week))))
 
 (defn previous
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/previous (p/day-of-week dow)))
-  ([t dow] (with t (previous dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/previous (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (previous day-of-week))))
 
 (defn previous-or-same
-  ([dow] (cljc.java-time.temporal.temporal-adjusters/previous-or-same (p/day-of-week dow)))
-  ([t dow] (with t (previous-or-same dow))))
+  ([day-of-week] (cljc.java-time.temporal.temporal-adjusters/previous-or-same (p/day-of-week day-of-week)))
+  ([t day-of-week] (with t (previous-or-same day-of-week))))
 
 ;; Units
 
-(def unit-map
+(def ^{:doc "keyword to chrono-unit"} 
+  unit-map
   {:nanos     cljc.java-time.temporal.chrono-unit/nanos
    :micros    cljc.java-time.temporal.chrono-unit/micros
    :millis    cljc.java-time.temporal.chrono-unit/millis
@@ -574,9 +577,16 @@
    :eras      cljc.java-time.temporal.chrono-unit/eras
    :forever   cljc.java-time.temporal.chrono-unit/forever  })
 
-(def reverse-unit-map (into {} (map vec (map reverse unit-map))))
+(def reverse-unit-map ^{:doc "chrono-unit to keyword"}
+  (into {} (map vec (map reverse unit-map))))
 
-(defn units [x]
+(defn units 
+  "the units contained within TemporalAmount x.
+  
+  Seconds and nanos for Duration.
+  Years, months, days for Period
+  "
+  [x]
   (into {}
     (for [tu (cljc.java-time.temporal.temporal-amount/get-units x)
           :let [k (reverse-unit-map tu)]
@@ -600,7 +610,9 @@
   (truncate [x u ]
     (cljc.java-time.local-time/truncated-to x (get unit-map u))))
 
-(defn truncate [x u]
+(defn truncate 
+  "Returns a copy of x truncated to the specified unit."
+  [x u]
   {:pre [(contains? unit-map u)]}
   (p/truncate x u))
 
@@ -696,7 +708,7 @@
 
 (extend-protocol p/IExtraction
   Duration
-  (zone-offset [d] (cljc.java-time.zone-offset/of-total-seconds (new-duration 1 :seconds))))
+  (zone-offset [_d] (cljc.java-time.zone-offset/of-total-seconds (new-duration 1 :seconds))))
 
 ;; Clocks
 
@@ -725,6 +737,7 @@
   (clock [z] (cljc.java-time.clock/system z)))
 
 (defn tick-resolution
+  "Obtains a clock that returns instants from the specified clock truncated to the nearest occurrence of the specified duration."
   ([clk]
    (tick-resolution clk (new-duration 1 :seconds)))
   ([clk dur]
@@ -758,27 +771,34 @@
    )
 
 (defn atom
+  "construct atomic clock"
   ([clk] (->AtomicClock (clojure.core/atom clk)))
   ([] (atom (current-clock))))
 
-(defn swap! [at f & args]
+(defn swap!
+  "swap! on atomic clock 'at' "
+  [at f & args]
   (apply clojure.core/swap! (:*clock at) f args))
 
-(defn swap-vals! [at f & args]
+(defn swap-vals!
+  "swap-vals! on atomic clock 'at' " 
+  [at f & args]
   (apply clojure.core/swap-vals! (:*clock at) f args))
 
-(defn compare-and-set! [at oldval newval]
+(defn compare-and-set!
+  "cas on atomic clock 'at' "
+  [at oldval newval]
   (clojure.core/compare-and-set!
    (:*clock at)
    oldval
    newval))
 
-(defn reset! [at newval]
+(defn reset! "reset! on atomic clock 'at' " [at newval]
   (clojure.core/reset!
    (:*clock at)
    newval))
 
-(defn reset-vals! [at newval]
+(defn reset-vals! "reset-vals! on atomic clock 'at' " [at newval]
   (clojure.core/reset-vals!
    (:*clock at)
    newval))
@@ -851,12 +871,12 @@
   (forward-duration [clk d] (cljc.java-time.clock/offset clk d))
   (backward-duration [clk d] (cljc.java-time.clock/offset clk (negated d))))
 
-(defn >> [t n-or-d]
+(defn >> "shift Temporal forward" [t n-or-d]
   (if (number? n-or-d)
     (p/forward-number t n-or-d)
     (p/forward-duration t n-or-d)))
 
-(defn << [t n-or-d]
+(defn << "shift Temporal backward" [t n-or-d]
   (if (number? n-or-d)
     (p/backward-number t n-or-d)
     (p/backward-duration t n-or-d)))
@@ -938,11 +958,11 @@
   (divide [d x] (p/divide-duration x d)))
 
 ;;;
-(defn between [v1 v2] (p/between v1 v2))
-(defn beginning [v] (if (satisfies? p/ITimeSpan v) (p/beginning v) v))
-(defn end [v] (if (satisfies? p/ITimeSpan v) (p/end v) v))
+(defn between "the span of time between v1 and v2" [v1 v2] (p/between v1 v2))
+(defn beginning "the beginning of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/beginning v) v))
+(defn end "the end of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/end v) v))
 
-(defn duration [x]
+(defn duration "return duration contained within the range of ITimeSpan 'x',  which can be a year, year-month or date " [x]
   (cljc.java-time.duration/between (beginning x) (end x)))
 
 ;; Periods
@@ -1011,16 +1031,16 @@
 
 (extend-protocol p/ILocalTime
   #?(:clj Date :cljs js/Date)
-  (local? [d] false)
+  (local? [_d] false)
 
   Instant
-  (local? [i] false)
+  (local? [_i] false)
 
   LocalDateTime
-  (local? [i] true)
+  (local? [_i] true)
 
   LocalTime
-  (local? [i] true)
+  (local? [_i] true)
 
   nil
   (local? [_] nil))
@@ -1057,32 +1077,32 @@
 
 ;; Ago/hence
 
-(defn ago [dur]
+(defn ago "current instant shifted back by duration 'dur'" [dur]
   (p/backward-duration (now) dur))
 
-(defn hence [dur]
+(defn hence "current instant shifted forward by duration 'dur'" [dur]
   (p/forward-duration (now) dur))
 
-(defn midnight? [^LocalDateTime t]
+(defn midnight? [^Temporal t]
   (cljc.java-time.duration/is-zero (cljc.java-time.duration/between t (beginning (p/date t)))))
 
 ;; Predicates
-(defn clock?            [v] (cljc.java-time.extn.predicates/clock? v))
-(defn day-of-week?      [v] (cljc.java-time.extn.predicates/day-of-week? v))
-(defn duration?         [v] (cljc.java-time.extn.predicates/duration? v))
-(defn instant?          [v] (cljc.java-time.extn.predicates/instant? v))
-(defn date?             [v] (cljc.java-time.extn.predicates/local-date? v))
-(defn date-time?        [v] (cljc.java-time.extn.predicates/local-date-time? v))
-(defn time?             [v] (cljc.java-time.extn.predicates/local-time? v))
-(defn month?            [v] (cljc.java-time.extn.predicates/month? v))
-(defn offset-date-time? [v] (cljc.java-time.extn.predicates/offset-date-time? v))
-(defn period?           [v] (cljc.java-time.extn.predicates/period? v))
-(defn year?             [v] (cljc.java-time.extn.predicates/year? v))
-(defn year-month?       [v] (cljc.java-time.extn.predicates/year-month? v))
-(defn zone?             [v] (cljc.java-time.extn.predicates/zone-id? v))
-(defn zone-offset?      [v] (cljc.java-time.extn.predicates/zone-offset? v))
-(defn zoned-date-time?  [v] (cljc.java-time.extn.predicates/zoned-date-time? v))
-(defn interval?         [v] (satisfies? p/ITimeSpan v))
+(defn clock?            "true if v is a clock?" [v] (cljc.java-time.extn.predicates/clock? v))
+(defn day-of-week?      "true if v is a day-of-week?" [v] (cljc.java-time.extn.predicates/day-of-week? v))
+(defn duration?         "true if v is a duration?" [v] (cljc.java-time.extn.predicates/duration? v))
+(defn instant?          "true if v is a instant?" [v] (cljc.java-time.extn.predicates/instant? v))
+(defn date?             "true if v is a date?" [v] (cljc.java-time.extn.predicates/local-date? v))
+(defn date-time?        "true if v is a date-time?" [v] (cljc.java-time.extn.predicates/local-date-time? v))
+(defn time?             "true if v is a time?" [v] (cljc.java-time.extn.predicates/local-time? v))
+(defn month?            "true if v is a month?" [v] (cljc.java-time.extn.predicates/month? v))
+(defn offset-date-time? "true if v is a offset-date-time?" [v] (cljc.java-time.extn.predicates/offset-date-time? v))
+(defn period?           "true if v is a period?" [v] (cljc.java-time.extn.predicates/period? v))
+(defn year?             "true if v is a year?" [v] (cljc.java-time.extn.predicates/year? v))
+(defn year-month?       "true if v is a year-month?" [v] (cljc.java-time.extn.predicates/year-month? v))
+(defn zone?             "true if v is a zone?" [v] (cljc.java-time.extn.predicates/zone-id? v))
+(defn zone-offset?      "true if v is a zone-offset?" [v] (cljc.java-time.extn.predicates/zone-offset? v))
+(defn zoned-date-time?  "true if v is a zoned-date-time?" [v] (cljc.java-time.extn.predicates/zoned-date-time? v))
+(defn interval?         "true if v is a interval?" [v] (satisfies? p/ITimeSpan v))
 
 (def MONDAY cljc.java-time.day-of-week/monday)
 (def TUESDAY cljc.java-time.day-of-week/tuesday)
@@ -1107,20 +1127,21 @@
 
 (def UTC (zone "UTC"))
 
-(def min-of-type p/min-of-type)
-(def max-of-type p/max-of-type)
+(def ^{:doc "return e.g Instant/MIN given and Instant"} min-of-type p/min-of-type)
+(def ^{:doc "return e.g Instant/MAX given and Instant"} max-of-type p/max-of-type)
 
-(def range p/range)
+(def ^{:doc "Returns a lazy seq of times from start (inclusive) to end (exclusive, nil means forever), by step, where start defaults to 0, step to 1, and end to infinity."} 
+  range p/range)
 
 (defn int [arg] (p/int arg))
 (defn long [arg] (p/long arg))
 
 ;; Reification
 
-(defn on [t d] (p/on t d))
-(defn at [d t] (p/at d t))
-(defn in [ldt z] (p/in ldt z))
-(defn offset-by [ldt offset] (p/offset-by ldt offset))
+(defn on "Set time be ON a date" [t d] (p/on t d))
+(defn at "Set date to be AT a time" [d t] (p/at d t))
+(defn in "Set a date-time to be in a time-zone" [ldt z] (p/in ldt z))
+(defn offset-by "Set a date-time to be offset by an amount" [ldt offset] (p/offset-by ldt offset))
 
 (defn date
   ([] (today))
@@ -1212,44 +1233,54 @@
 
 ;; Extraction
 
-(defn nanosecond [t] (p/nanosecond t))
-(defn microsecond [t] (p/microsecond t))
-(defn millisecond [t] (p/millisecond t))
-(defn second [t] (p/second t))
-(defn minute [t] (p/minute t))
-(defn hour [t] (p/hour t))
+(defn nanosecond "extract nanosecond from t" [t] (p/nanosecond t))
+(defn microsecond "extract microsecond from t" [t] (p/microsecond t))
+(defn millisecond "extract millisecond from t" [t] (p/millisecond t))
+(defn second "extract second from t" [t] (p/second t))
+(defn minute "extract minute from t" [t] (p/minute t))
+(defn hour "extract hour from t" [t] (p/hour t))
 
 ;; Conversions, with 0-arity defaults
 
 (defn time
+  "extract time from v"
   ([] (p/time (now)))
   ([v] (p/time v)))
 
 (defn day-of-week
+  "extract day-of-week from v"
   ([] (p/day-of-week (today)))
   ([v] (p/day-of-week v)))
 
 (defn day-of-month
+  "extract day-of-month from v"
   ([] (p/day-of-month (today)))
   ([v] (p/day-of-month v)))
 
 (defn month
+  "extract month from v"
   ([] (p/month (today)))
   ([v] (p/month v)))
 
 (defn year
+  "extract year from v"
   ([] (p/year (today)))
   ([v] (p/year v)))
 
 (defn year-month
+  "extract year-month from v"
   ([] (p/year-month (today)))
   ([v] (p/year-month v)))
 
 (defn clock
+  "return i as a clock"
   ([] (current-clock))
   ([i] (p/clock i)))
 
-(defmacro with-clock [^java.time.Clock clock & body]
+(defmacro with-clock 
+  "temporarily change ambient now+zone info 
+   the given 'clock' could be an Instant, zone or zoned-date-time"
+  [^java.time.Clock clock & body]
   `(binding [*clock* (p/clock ~clock)]
      ~@body))
 
@@ -1314,6 +1345,9 @@
 
 ;; Comparisons
 (defn =
+  "Same as clojure.core/=, but works on dates, rather than numbers.
+  can compare different types, e.g. Instant vs ZonedDateTime
+  "
   ([_x] true)
   ([x y] (p/= x y))
   ([x y & more] (if (p/= x y)
@@ -1323,6 +1357,7 @@
                   false)))
 
 (defn <
+  "Same as clojure.core/<, but works on dates, rather than numbers"
   ([_x] true)
   ([x y] (p/< x y))
   ([x y & more] (if (p/< x y)
@@ -1332,6 +1367,7 @@
                   false)))
 
 (defn <=
+  "Same as clojure.core/<=, but works on dates, rather than numbers"
   ([_x] true)
   ([x y] (p/<= x y))
   ([x y & more] (if (p/<= x y)
@@ -1341,6 +1377,7 @@
                   false)))
 
 (defn >
+  "Same as clojure.core/>, but works on dates, rather than numbers"
   ([_x] true)
   ([x y] (p/> x y))
   ([x y & more] (if (p/> x y)
@@ -1350,6 +1387,7 @@
                   false)))
 
 (defn >=
+  "Same as clojure.core/>=, but works on dates, rather than numbers"
   ([_x] true)
   ([x y] (p/>= x y))
   ([x y & more] (if (p/>= x y)
@@ -1358,7 +1396,7 @@
                     (p/>= y (first more)))
                   false)))
 
-(defn greater [x y]
+(defn greater "the greater of x and y" [x y]
   (if (> x y) x y))
 
 (defn max
@@ -1368,7 +1406,7 @@
   (assert (every? some? (cons arg args)))
   (reduce greater arg args))
 
-(defn lesser [x y]
+(defn lesser "the lesser of x and y" [x y]
   (if (< x y) x y))
 
 (defn min
@@ -1443,17 +1481,17 @@
 
 ;; Lengths of time (durations & periods)
 
-(defn nanos [v] (p/nanos v))
-(defn micros [v] (p/micros v))
-(defn millis [v] (p/millis v))
-(defn seconds [v] (p/seconds v))
-(defn minutes [v] (p/minutes v))
-(defn hours [v] (p/hours v))
-(defn days [v] (p/days v))
-(defn months [v] (p/months v))
-(defn years [v] (p/years v))
+(defn nanos  "extract nanos from 'v'" [v] (p/nanos v))
+(defn micros "extract micros from 'v'" [v] (p/micros v))
+(defn millis "extract millis from 'v'" [v] (p/millis v))
+(defn seconds"extract seconds from 'v'" [v] (p/seconds v))
+(defn minutes"extract minutes from 'v'" [v] (p/minutes v))
+(defn hours  "extract hours from 'v'" [v] (p/hours v))
+(defn days   "extract days from 'v'" [v] (p/days v))
+(defn months "extract months from 'v'" [v] (p/months v))
+(defn years  "extract years from 'v'" [v] (p/years v))
 
-(defn divide [t divisor]
+(defn divide "divisor is a unit e.g. :hours or " [t divisor]
   (p/divide t divisor))
 
 (defn parse-date
