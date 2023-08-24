@@ -50,7 +50,7 @@
   (testing "Converting using with-clock"
     (t/with-clock (t/clock (t/zone "America/New_York"))
       (testing "inst to zoned-date-time"
-        (is (= (t/zoned-date-time #inst"2019-08-07T16:00")
+        (is (= (t/zoned-date-time "2019-08-07T16:00Z")
               (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
       (testing "date-time to zoned-date-time"
         (is (= (t/zoned-date-time (t/date-time "2019-08-07T12:00"))
@@ -193,7 +193,7 @@
   (is
    (=
     (t/new-duration 2 :minutes)
-    (t/between #inst "2020-01-01T12:00" #inst "2020-01-01T12:02")))
+    (t/between (t/date-time "2020-01-01T12:00") (t/date-time "2020-01-01T12:02"))))
 
   (testing "LocalDate"
     (is (= (t/new-period 1 :days)
@@ -332,8 +332,8 @@
 
 
 (deftest comparison-test-date
-  (let [t1 #inst "2019-12-24"
-        t2 #inst "2019-12-31"]
+  (let [t1 (t/inst "2019-12-24T00:00:00.000Z")
+        t2 (t/inst "2019-12-31T00:00:00.000Z")]
 
     (is (t/< t1 t2))
     (is (not (t/< t1 t1)))

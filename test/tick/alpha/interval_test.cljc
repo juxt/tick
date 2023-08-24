@@ -568,8 +568,8 @@
                             (t/date-time "2018-01-10T00:00"))]}
           (ti/group-by
             (ti/divide (ti/bounds (t/year 2016) (t/year 2019)) t/year)
-            [(ti/new-interval (t/date-time #inst "2017-12-20")
-               (t/date-time #inst "2018-01-10"))])))))
+            [(ti/new-interval (t/date-time "2017-12-20T00:00")
+               (t/date-time "2018-01-10T00:00"))])))))
 
   (testing "O"
     (is
