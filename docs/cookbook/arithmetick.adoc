@@ -1,22 +1,25 @@
-== Arithmetic
+
+== Arithmetic & Shifting operations
 
 The tick library lends itself to doing additions, subtractions
 and divisions of time chunks and durations. Below are some
 examples of how time can be treated as a quantity which can be operated
 on.
 
+Note that the function to find the amount of time between two dates is `t/between`. Using the legacy Date object it was common to get the epoch offset of two dates and subtract one from the other - so very much arithmetic. `tick` however sticks to the java.time naming convention of `between`. Also note that this epoch-offset arithmetic would only ever be applied to 2 dates, not 3, 4, 5 ... For this reason, `t/+` and `t/-` only work for amounts of time, not dates, in that they can take more than 2 arguments, and so are analagous to their clojure.core equivalents. 
+
 === Simple maths
 
 Operating on an instant it will return another instant in time.
 
 ====
-Addition:
+Shifting forward:
 [source.code,clojure]
 ----
 (t/>> (t/now)
      (t/new-duration 15 :minutes))
 ----
-Subtraction:
+Shifting backward:
 [source.code,clojure]
 ----
 (t/<< (t/now)
@@ -28,14 +31,14 @@ An interval has a beginning and an end, operating on it
 will return a modified interval.
 
 ====
-Addition:
+Shifting interval end forward:
 [source.code,clojure]
 ----
 (t.i/extend {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")
            :tick/end (t/instant "2018-01-10T00:00:00.00Z")}
   (t/new-period 10 :weeks))
 ----
-Subtraction:
+Shifting interval end backward:
 [source.code,clojure]
 ----
 (t.i/extend {:tick/beginning (t/instant "2018-01-01T00:00:00.00Z")

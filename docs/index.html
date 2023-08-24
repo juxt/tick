@@ -857,7 +857,7 @@ h3 .yada, #toctitle .yada, .sidebarblock > .content > .title .yada { font-weight
 <li><a href="#_interval_manipulation">Interval Manipulation:</a></li>
 </ul>
 </li>
-<li><a href="#_arithmetic">10.6. Arithmetic</a>
+<li><a href="#_arithmetic_shifting_operations">10.6. Arithmetic &amp; Shifting operations</a>
 <ul class="sectlevel3">
 <li><a href="#_simple_maths">Simple maths</a></li>
 </ul>
@@ -3399,12 +3399,15 @@ keep as an instant for as long as possible.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_arithmetic">10.6. Arithmetic</h3>
+<h3 id="_arithmetic_shifting_operations">10.6. Arithmetic &amp; Shifting operations</h3>
 <div class="paragraph">
 <p>The tick library lends itself to doing additions, subtractions
 and divisions of time chunks and durations. Below are some
 examples of how time can be treated as a quantity which can be operated
 on.</p>
+</div>
+<div class="paragraph">
+<p>Note that the function to find the amount of time between two dates is <code>t/between</code>. Using the legacy Date object it was common to get the epoch offset of two dates and subtract one from the other - so very much arithmetic. <code>tick</code> however sticks to the java.time naming convention of <code>between</code>. Also note that this epoch-offset arithmetic would only ever be applied to 2 dates, not 3, 4, 5 &#8230;&#8203; For this reason, <code>t/+</code> and <code>t/-</code> only work for amounts of time, not dates, in that they can take more than 2 arguments, and so are analagous to their clojure.core equivalents.</p>
 </div>
 <div class="sect3">
 <h4 id="_simple_maths">Simple maths</h4>
@@ -3414,7 +3417,7 @@ on.</p>
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
-<p>Addition:</p>
+<p>Shifting forward:</p>
 </div>
 <div class="listingblock code">
 <div class="content">
@@ -3423,7 +3426,7 @@ on.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Subtraction:</p>
+<p>Shifting backward:</p>
 </div>
 <div class="listingblock code">
 <div class="content">
@@ -3440,7 +3443,7 @@ will return a modified interval.</p>
 <div class="exampleblock">
 <div class="content">
 <div class="paragraph">
-<p>Addition:</p>
+<p>Shifting interval end forward:</p>
 </div>
 <div class="listingblock code">
 <div class="content">
@@ -3450,7 +3453,7 @@ will return a modified interval.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Subtraction:</p>
+<p>Shifting interval end backward:</p>
 </div>
 <div class="listingblock code">
 <div class="content">
