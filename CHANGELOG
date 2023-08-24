@@ -1,3 +1,9 @@
+# 0.7.0
+
+* tick.interval.bounds function is now consistent for years, year-months and dates in setting the `end` to be inclusive
+* Strings are no longer accepted as beginning/end when constructing an interval
+* Strings are no longer accepted as arguments to clock
+
 # 0.6.1 
 
 Add equivalents of clojure.core's max-key and min-key 

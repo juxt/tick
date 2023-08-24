@@ -25,46 +25,11 @@
   {:tick/beginning beginning
    :tick/end end})
 
-(defprotocol ITimeSpanable
-  (temporal-value [_] "Return a value of a type that satisfies p/ITimeSpan"))
-
-(extend-protocol ITimeSpanable
-  #?(:clj clojure.lang.Fn :cljs function)
-  (temporal-value [f] (temporal-value (f)))
-
-  Instant
-  (temporal-value [i] i)
-
-  #?(:clj String :cljs string)
-  (temporal-value [s] (temporal-value (p/parse s)))
-
-  LocalDate
-  (temporal-value [d] d)
-
-  LocalTime
-  (temporal-value [t] t)
-
-  LocalDateTime
-  (temporal-value [ldt] ldt)
-
- #?(:clj Date :cljs js/Date)
-  (temporal-value [d] (p/instant d))
-
-  YearMonth
-  (temporal-value [ym] ym)
-
-  Year
-  (temporal-value [y] y)
-
-  OffsetDateTime
-  (temporal-value [odt] odt)
-
-  ZonedDateTime
-  (temporal-value [zdt] zdt))
-
 (defn new-interval [v1 v2]
-  (let [t1 (p/beginning (temporal-value v1))
-        t2 (p/end (temporal-value v2))]
+  (let [t1 (if (satisfies? p/ITimeSpan v1) 
+             (t/beginning v1) v1)
+        t2 (if (satisfies? p/ITimeSpan v2)
+             (t/end v2) v2)]
     (if (p/< t1 t2)
       {:tick/beginning t1
        :tick/end t2}
@@ -80,13 +45,13 @@
 
 (defn extend [ival dur]
   (make-interval
-    (p/beginning ival)
-    (p/forward-duration (p/end ival) dur)))
+    (t/beginning ival)
+    (p/forward-duration (t/end ival) dur)))
 
 (defn scale [ival factor]
   (make-interval
-    (p/beginning ival)
-    (p/forward-duration (p/beginning ival) (cljc.java-time.duration/multiplied-by (t/duration ival) factor))))
+    (t/beginning ival)
+    (p/forward-duration (t/beginning ival) (cljc.java-time.duration/multiplied-by (t/duration ival) factor))))
 
 (extend-protocol p/ITimeShift
   ;todo - impl for cljs.core.PersistentHashMap
@@ -120,53 +85,53 @@
 (extend-protocol p/ITimeReify
   ;todo - impl for cljs.core.PersistentHashMap
   #?(:clj clojure.lang.IPersistentMap :cljs PersistentArrayMap)
-  (on [i date] (new-interval (p/on (p/beginning i) date) (p/on (p/end i) date)))
-  (in [i zone] (new-interval (p/in (p/beginning i) zone) (p/in (p/end i) zone))))
+  (on [i date] (new-interval (p/on (t/beginning i) date) (p/on (t/end i) date)))
+  (in [i zone] (new-interval (p/in (t/beginning i) zone) (p/in (t/end i) zone))))
 
 (defn bounds [& args]
   (make-interval
-    (apply t/min (map p/beginning args))
-    (apply t/max (map p/end args))))
+    (apply t/min (map t/beginning args))
+    (apply t/max (map t/end args))))
 
 (defn am [^LocalDate date]
-  (new-interval (p/beginning date) (t/noon date)))
+  (new-interval (t/beginning date) (t/noon date)))
 
 (defn pm [^LocalDate date]
-  (new-interval (t/noon date) (p/end date)))
+  (new-interval (t/noon date) (t/end date)))
 
 ;; Allen's Basic Relations
 
 (defn precedes? [x y]
-  (p/< (p/end x) (p/beginning y)))
+  (p/< (t/end x) (t/beginning y)))
 
 (defn equals? [x y]
   (and
-    (t/= (p/beginning x) (p/beginning y))
-    (t/= (p/end x) (p/end y))))
+    (t/= (t/beginning x) (t/beginning y))
+    (t/= (t/end x) (t/end y))))
 
 (defn meets? [x y]
-  (t/= (p/end x) (p/beginning y)))
+  (t/= (t/end x) (t/beginning y)))
 
 (defn overlaps? [x y]
   (and
-   (t/< (p/beginning x) (p/beginning y))
-   (t/> (p/end x) (p/beginning y))
-   (t/< (p/end x) (p/end y))))
+   (t/< (t/beginning x) (t/beginning y))
+   (t/> (t/end x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn during? [x y]
   (and
-   (t/> (p/beginning x) (p/beginning y))
-   (t/< (p/end x) (p/end y))))
+   (t/> (t/beginning x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn starts? [x y]
   (and
-   (t/= (p/beginning x) (p/beginning y))
-   (t/< (p/end x) (p/end y))))
+   (t/= (t/beginning x) (t/beginning y))
+   (t/< (t/end x) (t/end y))))
 
 (defn finishes? [x y]
   (and
-   (t/> (p/beginning x) (p/beginning y))
-   (t/= (p/end x) (p/end y))))
+   (t/> (t/beginning x) (t/beginning y))
+   (t/= (t/end x) (t/end y))))
 
 ;; Six pairs of the relations are converses.  For example, the converse of "a precedes b" is "b preceded by a"; whenever the first relation is true, its converse is true also.
 (defn conv
@@ -274,21 +239,21 @@
 
 (defn split-with-assert [ival t]
   (assert
-    (and (p/< (p/beginning ival) t)
-         (p/< t (p/end ival))))
+    (and (p/< (t/beginning ival) t)
+         (p/< t (t/end ival))))
   (split ival t))
 
 (defn slice-interval [ival beginning end]
-  (let [beginning (t/max (p/beginning ival) beginning)
-        end (t/min (p/end ival) end)]
+  (let [beginning (t/max (t/beginning ival) beginning)
+        end (t/min (t/end ival) end)]
     (when (p/< beginning end)
       (if (associative? ival)
         (assoc ival :tick/beginning beginning :tick/end end)
         (make-interval beginning end)))))
 
 (defn split-interval [ival t]
-  [(slice-interval ival (p/beginning ival) t)
-   (slice-interval ival t (p/end ival))])
+  [(slice-interval ival (t/beginning ival) t)
+   (slice-interval ival t (t/end ival))])
 
 ;; Maps either represent single intervals, having :tick/beginning and
 ;; :tick/end, or with a :tick/intervals entry containing groups of
@@ -328,9 +293,9 @@
   (split [this t]
     (if-let [intervals (:tick/intervals this)]
       [(assoc this :tick/intervals
-              (vec (keep #(slice % (p/beginning this) t) intervals)))
+              (vec (keep #(slice % (t/beginning this) t) intervals)))
        (assoc this :tick/intervals
-              (vec (keep #(slice % t (p/end this)) intervals)))]
+              (vec (keep #(slice % t (t/end this)) intervals)))]
       (split-interval this t)))
 
   LocalDate
@@ -363,10 +328,10 @@
   concurrent."
   ([x y]
    (case (relation x y)
-     :overlaps (slice x (p/beginning y) (p/end x))
-     :overlapped-by (slice x (p/beginning x) (p/end y))
+     :overlaps (slice x (t/beginning y) (t/end x))
+     :overlapped-by (slice x (t/beginning x) (t/end y))
      (:starts :finishes :during :equals) x
-     (:started-by :finished-by :contains) (slice x (p/beginning y) (p/end y))
+     (:started-by :finished-by :contains) (slice x (t/beginning y) (t/end y))
      nil))
   ([x y & args]
    (reduce concur (concur x y) args)))
@@ -389,7 +354,7 @@
 ;; intervals using the normal <, >, <=, >= operators.
 
 (defn interval [t]
-  (new-interval (p/beginning t) (p/end t)))
+  (new-interval (t/beginning t) (t/end t)))
 
 (extend-protocol p/ITimeComparison
   ;todo - impl for cljs.core.PersistentHashMap
@@ -488,7 +453,7 @@
             (lazy-seq
               (if (<= (count colls) 1)
                 (first colls)
-                (let [[c1 c2 & r] (sort-by #(p/beginning (first %)) (remove nil? colls))]
+                (let [[c1 c2 & r] (sort-by #(t/beginning (first %)) (remove nil? colls))]
                   (if (nil? c2)
                     c1
                     (if (disjoint? (first c1) (first c2))
@@ -498,7 +463,7 @@
                                           (next c1))
                                     (next c2)
                                     r))))))))]
-    (union (for [coll colls :when coll] (sort-by p/beginning coll)))))
+    (union (for [coll colls :when coll] (sort-by t/beginning coll)))))
 
 (defn conj [coll interval]
   (union coll [interval]))
@@ -525,41 +490,41 @@
                   (intersection xs (assert-proper-head (next ys)))
 
                   :started-by
-                  (cons (slice x (p/beginning y) (p/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (slice x (p/end y) (p/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :finished-by
-                  (cons (slice x (p/beginning y) (p/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
                           (assert-proper-head (next xs))
                           (assert-proper-head (next ys))))
 
                   :overlaps
-                  (cons (slice x (p/beginning y) (p/end x))
+                  (cons (slice x (t/beginning y) (t/end x))
                         (intersection
-                          (assert-proper-head (cons (slice x (p/beginning y) (p/end x)) (next xs)))
-                          (assert-proper-head (cons (slice y (p/end x) (p/end y)) (next ys)))))
+                          (assert-proper-head (cons (slice x (t/beginning y) (t/end x)) (next xs)))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y)) (next ys)))))
 
 
                   :overlapped-by
-                  (cons (slice x (p/beginning x) (p/end y))
+                  (cons (slice x (t/beginning x) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (slice x (p/end y) (p/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :contains
-                  (cons (slice x (p/beginning y) (p/end y))
+                  (cons (slice x (t/beginning y) (t/end y))
                         (intersection
-                          (assert-proper-head (cons (slice x (p/end y) (p/end x)) (next xs)))
+                          (assert-proper-head (cons (slice x (t/end y) (t/end x)) (next xs)))
                           (assert-proper-head (next ys))))
 
                   :during
                   (cons x
                         (intersection
                           (assert-proper-head (next xs))
-                          (assert-proper-head (cons (slice y (p/end x) (p/end y)) (next ys)))))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y)) (next ys)))))
 
                   :equals
                   (cons x
@@ -577,7 +542,7 @@
                   (cons x
                         (intersection
                           (assert-proper-head (next xs))
-                          (assert-proper-head (cons (slice y (p/end x) (p/end y))
+                          (assert-proper-head (cons (slice y (t/end x) (t/end y))
                                                     (next ys))))))
 
                 ;; List of nothing because one of the collections is
@@ -624,26 +589,26 @@
                        (:started-by :overlapped-by)
                        (difference
                          (assert-proper-head
-                           (cons (slice x (p/end y) (p/end x)) (next xs)))
+                           (cons (slice x (t/end y) (t/end x)) (next xs)))
                          (assert-proper-head (next ys)))
 
                        :finished-by
-                       (cons (slice x (p/beginning x) (p/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head (next xs))
                                (assert-proper-head (next ys))))
 
                        :overlaps
-                       (cons (slice x (p/beginning x) (p/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head (next xs))
                                ys))
 
                        :contains
-                       (cons (slice x (p/beginning x) (p/beginning y))
+                       (cons (slice x (t/beginning x) (t/beginning y))
                              (difference
                                (assert-proper-head
-                                 (cons (slice x (p/end y) (p/end x)) (next xs)))
+                                 (cons (slice x (t/end y) (t/end x)) (next xs)))
                                (assert-proper-head (next ys))))))
                    ;; If xs but no ys
                    xs)
@@ -665,12 +630,12 @@
                  (partition 2 1)
                  (keep (fn [[x y]]
                          (when-not (meets? x y)
-                           (new-interval (p/end x) (p/beginning y))))))]
+                           (new-interval (t/end x) (t/beginning y))))))]
       (cond-> r
-        (not= (p/beginning (first coll)) (p/min-of-type (p/beginning (first coll))))
-        (#(concat [(new-interval (p/min-of-type (p/beginning (first coll))) (p/beginning (first coll)))] %))
-        (not= (p/end (last coll)) (p/max-of-type (p/end (last coll))))
-        (#(concat % [(new-interval (p/end (last coll)) (p/max-of-type (p/end (last coll))))]))))))
+        (not= (t/beginning (first coll)) (p/min-of-type (t/beginning (first coll))))
+        (#(concat [(new-interval (p/min-of-type (t/beginning (first coll))) (t/beginning (first coll)))] %))
+        (not= (t/end (last coll)) (p/max-of-type (t/end (last coll))))
+        (#(concat % [(new-interval (t/end (last coll)) (p/max-of-type (t/end (last coll))))]))))))
 
 (defn disjoin
   "Split s1 across the grating defined by s2"
@@ -690,12 +655,12 @@
 ;;             :starts (recur (next xs) ys result)
 ;;             (:started-by :overlapped-by)
 ;;             (recur (cons (slice x (t/end y) (t/end x)) (next xs)) (next ys) result)
-;;             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (slice x (p/beginning x) (p/beginning y))))
-;;            :overlaps (recur (next xs) ys (clojure.core/conj result (slice x (p/beginning x) (p/beginning y))))
+;;             :finished-by (recur (next xs) (next ys) (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))
+;;            :overlaps (recur (next xs) ys (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))
 ;;            :contains
-             #_(recur (cons (slice x (p/end y) (p/end x)) (next xs))
+             #_(recur (cons (slice x (t/end y) (t/end x)) (next xs))
                     (next ys)
-                    (clojure.core/conj result (slice x (p/beginning x) (p/beginning y))))))
+                    (clojure.core/conj result (slice x (t/beginning x) (t/beginning y))))))
          (apply clojure.core/conj result xs))
        result)))
   ([s1 s2 & sets]
@@ -709,12 +674,12 @@
   [ival f]
   (cond->
       (p/range
-        (f (p/beginning ival))
-        (f (p/end ival)))
+        (f (t/beginning ival))
+        (f (t/end ival)))
     ;; Since range is exclusive, we must add one more value, but only
     ;; if it concurs rather than merely meets.
-    (concur (f (p/end ival)) ival)
-    (concat [(f (p/end ival))])))
+    (concur (f (t/end ival)) ival)
+    (concat [(f (t/end ival))])))
 
 (defn divide-by-duration
   "Divide an interval by a duration, returning a sequence of
@@ -724,20 +689,20 @@
   intervals."
   [ival dur]
   (->> (p/range
-         (p/beginning ival)
-         (p/end ival)
+         (t/beginning ival)
+         (t/end ival)
          dur)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (p/forward-duration % dur) (p/end ival))))))
+       (map (juxt identity #(t/min (p/forward-duration % dur) (t/end ival))))))
 
 (defn divide-by-period
   [ival period]
   (->> (p/range
-         (p/beginning ival)
-         (p/end ival)
+         (t/beginning ival)
+         (t/end ival)
          period)
        ;; Bound by given interval, last will become a remainder.
-       (map (juxt identity #(t/min (p/forward-duration % period) (p/end ival))))))
+       (map (juxt identity #(t/min (p/forward-duration % period) (t/end ival))))))
 
 (defn divide-by-divisor [ival divisor]
   (divide-by-duration ival (cljc.java-time.duration/divided-by (t/duration ival) divisor)))
@@ -819,7 +784,7 @@
               [])
 
             :finished-by
-            (let [[_seg1 seg2] (split-with-assert ival (p/beginning group))]
+            (let [[_seg1 seg2] (split-with-assert ival (t/beginning group))]
               (recur
                 (next intervals)
                 (next groups)
@@ -827,7 +792,7 @@
                 []))
 
             :started-by
-            (let [[seg1 seg2] (split-with-assert ival (p/end group))]
+            (let [[seg1 seg2] (split-with-assert ival (t/end group))]
               (recur
                 (cons seg2 (next intervals))
                 (next groups)
@@ -835,7 +800,7 @@
                 []))
 
             :overlapped-by
-            (let [[seg1 seg2] (split-with-assert ival (p/end group))]
+            (let [[seg1 seg2] (split-with-assert ival (t/end group))]
               (recur
                 (cons seg2 (next intervals))
                 (next groups)           ; end of this group
@@ -853,7 +818,7 @@
             (recur
               (next intervals)
               (next groups)
-              (assoc result group [(slice ival (p/beginning group) (p/end group))])
+              (assoc result group [(slice ival (t/beginning group) (t/end group))])
               [])
 
             (:overlaps)
@@ -861,7 +826,7 @@
               (next intervals)
               groups
               result
-              (clojure.core/conj current-intervals (slice ival (p/beginning group) (p/end ival))))))
+              (clojure.core/conj current-intervals (slice ival (t/beginning group) (t/end ival))))))
 
         ;; No more groups
         result)
@@ -880,8 +845,8 @@
     (if (empty? ivals)
       {}
       (let [r (apply bounds ivals)
-            b (f (p/beginning r))
-            e (f (p/end r))
+            b (f (t/beginning r))
+            e (f (t/end r))
             groups (p/range b (t/inc e))]
         (group-by groups ivals))))
   #?(:clj Iterable :cljs LazySeq)
