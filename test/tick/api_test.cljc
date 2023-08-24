@@ -50,20 +50,23 @@
   (testing "Converting using with-clock"
     (t/with-clock (t/clock (t/zone "America/New_York"))
       (testing "inst to zoned-date-time"
-        (is (= (t/zoned-date-time "2019-08-07T16:00Z")
+        (is (t/= (t/zoned-date-time "2019-08-07T16:00Z")
               (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
       (testing "date-time to zoned-date-time"
-        (is (= (t/zoned-date-time (t/date-time "2019-08-07T12:00"))
+        (is (t/= (t/zoned-date-time (t/date-time "2019-08-07T12:00"))
               (t/zoned-date-time "2019-08-07T12:00-04:00[America/New_York]"))))
       (testing "date-time to offset-date-time"
-        (is (= (t/offset-date-time (t/date-time "2019-08-07T12:00"))
+        (is (t/= (t/offset-date-time (t/date-time "2019-08-07T12:00"))
               (t/offset-date-time "2019-08-07T12:00-04:00"))))))
 
   (testing "Creating a clock with a zone, and returning that zone"
     (is (= "America/New_York" (str (t/zone (t/clock (t/zone "America/New_York")))))))
 
   (testing "Creation of clock with fixed instant"
-    (is (= "2017-10-31T16:00:00Z" (str (t/instant (t/clock "2017-10-31T16:00:00Z")))))))
+    (is (= "2017-10-31T16:00:00Z" (str (t/instant (t/clock (t/instant "2017-10-31T16:00:00Z")))))))
+
+  (testing "Creation of clock with fixed offset"
+    (is (= "+01:00" (str (t/zone (t/clock (t/offset-date-time "2017-10-31T16:00:00+01:00"))))))))
 
 
 (deftest constructor-test
@@ -185,7 +188,7 @@
   (is
     (=
       (t/new-duration 2 :minutes)
-      (t/between "2020-01-01T12:00" "2020-01-01T12:02")))
+      (t/between (t/date-time "2020-01-01T12:00") (t/date-time "2020-01-01T12:02"))))
   (is
     (=
       (t/new-duration 30 :minutes)
@@ -299,7 +302,7 @@
 
   (testing "Instants and ZonedDateTimes should be equals if represents the same point in time"
     (is (t/=
-          (t/instant (t/clock "2017-10-31T16:00:00Z"))
+          (t/instant (t/clock (t/instant "2017-10-31T16:00:00Z")))
           (t/zoned-date-time "2017-10-31T16:00:00Z[UTC]"))))
   (is
     (t/<

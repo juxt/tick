@@ -711,17 +711,18 @@
   (clock [zdt] (cljc.java-time.clock/fixed (cljc.java-time.zoned-date-time/to-instant zdt)
                  (cljc.java-time.zoned-date-time/get-zone zdt)))
 
-  #?(:clj Object :cljs object)
+  LocalDateTime
   (clock [o] (p/clock (p/zoned-date-time o)))
+
+  OffsetDateTime
+  (clock [zdt] (cljc.java-time.clock/fixed (cljc.java-time.offset-date-time/to-instant zdt)
+                 (cljc.java-time.offset-date-time/get-offset zdt)))
 
   Clock
   (clock [clk] clk)
 
   ZoneId
-  (clock [z] (cljc.java-time.clock/system z))
-
-  #?(:clj String :cljs string)
-  (clock [s] (p/clock (p/parse s))))
+  (clock [z] (cljc.java-time.clock/system z)))
 
 (defn tick-resolution
   ([clk]
@@ -923,10 +924,6 @@
     ([from to step] (cond->> (iterate #(cljc.java-time.year/plus % step) from)
                       to (take-while #(p/< % to))))))
 
-(extend-protocol p/IDivisible
-  #?(:clj String :cljs string)
-  (divide [s d] (p/divide (p/parse s) d)))
-
 (extend-protocol p/IDivisibleDuration
   #?(:clj Long :cljs number)
   (divide-duration [n duration] (cljc.java-time.duration/divided-by duration n))
@@ -940,8 +937,13 @@
   p/IDivisible
   (divide [d x] (p/divide-duration x d)))
 
+;;;
+(defn between [v1 v2] (p/between v1 v2))
+(defn beginning [v] (if (satisfies? p/ITimeSpan v) (p/beginning v) v))
+(defn end [v] (if (satisfies? p/ITimeSpan v) (p/end v) v))
+
 (defn duration [x]
-  (cljc.java-time.duration/between (p/beginning x) (p/end x)))
+  (cljc.java-time.duration/between (beginning x) (end x)))
 
 ;; Periods
 
@@ -960,8 +962,6 @@
   (between [v1 v2] (cljc.java-time.duration/between v1 (p/offset-date-time v2)))
   #?@(:clj [Temporal
             (between [v1 v2] (cljc.java-time.duration/between v1 v2))])
-  #?(:clj String :cljs string)
-  (between [v1 v2] (p/between (p/parse v1) (p/parse v2)))
   #?(:clj Date :cljs js/Date)
   (between [x y] (p/between (p/instant x) (p/instant y))))
 
@@ -973,8 +973,8 @@
   of the event."
   [t event]
   (and
-    (not= 1 (compare (p/beginning t) (p/beginning event)))
-    (not= 1 (compare (p/end event) (p/end t)))))
+    (not= 1 (compare (beginning t) (beginning event)))
+    (not= 1 (compare (end event) (end t)))))
 
 (extend-protocol p/ITimeSpan
   LocalDate
@@ -982,40 +982,12 @@
   (end [date] (cljc.java-time.local-date/at-start-of-day (inc date)))
 
   Year
-  (beginning [year] (p/beginning (cljc.java-time.year/at-month year 1)))
-  (end [year] (p/end (cljc.java-time.year/at-month year 12)))
+  (beginning [year] (beginning (cljc.java-time.year/at-month year 1)))
+  (end [year] (beginning (cljc.java-time.year/at-month (inc year) 1)))
 
   YearMonth
-  (beginning [ym] (p/beginning (cljc.java-time.year-month/at-day ym 1)))
-  (end [ym] (p/end (cljc.java-time.year-month/at-end-of-month ym)))
-
-  Instant
-  (beginning [i] i)
-  (end [i] i)
-
-  ZonedDateTime
-  (beginning [i] i)
-  (end [i] i)
-
-  OffsetDateTime
-  (beginning [i] i)
-  (end [i] i)
-
-  #?(:clj Date :cljs js/Date)
-  (beginning [i] (p/instant i))
-  (end [i] (p/instant i))
-
-  LocalDateTime
-  (beginning [x] x)
-  (end [x] x)
-
-  LocalTime
-  (beginning [x] x)
-  (end [x] x)
-
-  nil
-  (beginning [_] nil)
-  (end [_] nil))
+  (beginning [ym] (beginning (cljc.java-time.year-month/at-day ym 1)))
+  (end [ym] (beginning (cljc.java-time.year-month/at-day (inc ym) 1))))
 
 (extend-protocol p/ITimeReify
   LocalTime
@@ -1092,7 +1064,7 @@
   (p/forward-duration (now) dur))
 
 (defn midnight? [^LocalDateTime t]
-  (cljc.java-time.duration/is-zero (cljc.java-time.duration/between t (p/beginning (p/date t)))))
+  (cljc.java-time.duration/is-zero (cljc.java-time.duration/between t (beginning (p/date t)))))
 
 ;; Predicates
 (defn clock?            [v] (cljc.java-time.extn.predicates/clock? v))
@@ -1339,10 +1311,6 @@
   ([fmt o]
    (cljc.java-time.format.date-time-formatter/format (formatter fmt) o)))
 
-;;;
-(defn between [v1 v2] (p/between v1 v2))
-(defn beginning [v] (p/beginning v))
-(defn end [v] (p/end v))
 
 ;; Comparisons
 (defn =

@@ -664,17 +664,21 @@
              (t/date-time "2017-08-09T00:00:00"))
           (ti/pm (t/today))))))
 
-;; TODO: Interval testing
+;; TODO: more Interval testing
+(deftest successive-intervals-meet
+  (doseq [x [(t/date) (t/year) (t/year-month)]]
+    (is (ti/meets? (t/end x) (t/beginning (t/inc x))))))
 
 (deftest division-test2
   (is (= 365 (count (ti/divide-by t/date (t/year 2017)))))
   (is (= 12 (count (ti/divide-by t/year-month (t/year 2017)))))
-  (is (= 30 (count (ti/divide-by t/date "2017-09"))))
-  (is (= (t/date "2017-09-01") (first (ti/divide-by t/date "2017-09"))))
-  (is (= (t/date "2017-09-30") (last (ti/divide-by t/date "2017-09"))))
-  (is (= 31 (count (ti/divide-by t/date "2017-10"))))
+  (is (= 30 (count (ti/divide-by t/date (t/year-month "2017-09")))))
+  (is (= (t/date "2017-09-01") (first (ti/divide-by t/date (t/year-month "2017-09")))))
+  (is (= (t/date "2017-09-30") (last (ti/divide-by t/date (t/year-month "2017-09")))))
+  (is (= 31 (count (ti/divide-by t/date (t/year-month "2017-10")))))
   (is (= 8 (count (ti/divide-by t/date (ti/bounds (t/date "2017-10-03") (t/date "2017-10-10"))))))
-  (is (= [(t/date "2017-09-10")] (ti/divide-by t/date (ti/bounds (t/date-time "2017-09-10T12:00") (t/date-time "2017-09-10T14:00")))))
+  (is (= [(t/date "2017-09-10")] (ti/divide-by t/date (ti/bounds (t/date-time "2017-09-10T12:00")
+                                                        (t/date-time "2017-09-10T14:00")))))
   (is (= [(t/date "2017-09-10") (t/date "2017-09-11")] (ti/divide-by t/date (ti/bounds (t/date-time "2017-09-10T12:00") (t/date-time "2017-09-11T14:00")))))
   (is (= 2 (count (ti/divide-by t/year-month (ti/bounds (t/date "2017-09-10") (t/date "2017-10-10"))))))
   (is (= 3 (count (ti/divide-by t/year (ti/bounds (t/date-time "2017-09-10T12:00") (t/year "2019"))))))

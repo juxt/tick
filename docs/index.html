@@ -2459,7 +2459,7 @@ user&gt; (println @clk)
 <p>Intervals are maps containing both a <code>tick/beginning</code> and a <code>tick/end</code> entry. This flexible design allows any Clojure map to be treated as an interval.</p>
 </div>
 <div class="paragraph">
-<p>Intervals can be represented two local times as well as instants.</p>
+<p>The start and end of an interval should have the same type.</p>
 </div>
 <div class="paragraph">
 <p>Interval functions are currently alpha status and so reside in the <code>tick.alpha.interval</code> namespace, rather than the
@@ -2485,8 +2485,8 @@ main <code>tick.core</code> namespace.</p>
 </div>
 <div class="listingblock code">
 <div class="content">
-<pre class="highlight"><code class="language-clojure" data-lang="clojure">{:tick/beginning "2018-12-31T23:55:00Z"
- :tick/end "2019-01-01T00:00:00Z"}</code></pre>
+<pre class="highlight"><code class="language-clojure" data-lang="clojure">{:tick/beginning (t/instant "2018-12-31T23:55:00Z")
+ :tick/end (t/instant "2019-01-01T00:00:00Z"})</code></pre>
 </div>
 </div>
 </div>
@@ -2509,7 +2509,7 @@ main <code>tick.core</code> namespace.</p>
 <div class="sect2">
 <h3 id="_derivation_3">7.2. Derivation</h3>
 <div class="paragraph">
-<p>Dates, months and years can also be considered to be themselves ranges, and can be converted to intervals with the <code>t.i/bounds</code> function.</p>
+<p>Dates, months and years can also be considered to be themselves ranges, and can be converted to intervals with the <code>t.i/bounds</code> function. The start and end are both inclusive. This means for example that the <code>end</code> of one day <code>meets</code> the start of the next day.</p>
 </div>
 <div class="exampleblock">
 <div class="content">

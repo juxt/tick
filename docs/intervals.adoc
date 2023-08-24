@@ -4,7 +4,7 @@ In _tick_, an interval is a span of time defined by two points in time, the firs
 
 Intervals are maps containing both a `tick/beginning` and a `tick/end` entry. This flexible design allows any Clojure map to be treated as an interval.
 
-Intervals can be represented two local times as well as instants.
+The start and end of an interval should have the same type.
 
 Interval functions are currently alpha status and so reside in the `tick.alpha.interval` namespace, rather than the 
 main `tick.core` namespace.
@@ -24,8 +24,8 @@ Here we use a literal map syntax to construct an interval representing the last 
 
 [source.code,clojure]
 ----
-{:tick/beginning "2018-12-31T23:55:00Z"
- :tick/end "2019-01-01T00:00:00Z"}
+{:tick/beginning (t/instant "2018-12-31T23:55:00Z")
+ :tick/end (t/instant "2019-01-01T00:00:00Z"})
 ----
 
 ====
@@ -43,7 +43,7 @@ Alternatively, we can use the `t.i/new-interval` function which takes the two bo
 
 == Derivation
 
-Dates, months and years can also be considered to be themselves ranges, and can be converted to intervals with the `t.i/bounds` function.
+Dates, months and years can also be considered to be themselves ranges, and can be converted to intervals with the `t.i/bounds` function. The start and end are both inclusive. This means for example that the `end` of one day `meets` the start of the next day.
 
 ====
 To return today as an interval:
