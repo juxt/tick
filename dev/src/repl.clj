@@ -3,9 +3,7 @@
     [cljs :refer :all]
     [clojure.tools.namespace.repl :refer [refresh refresh-all]]
     [kaocha.repl :as kr]
-    [tick.core :as t]
-    ;[tick.viz :refer [show-canvas view label]]
-    )
+    [tick.core :as t])
   (:import (java.util TimeZone)))
 
 (clojure.tools.namespace.repl/set-refresh-dirs "src" "test")
@@ -36,7 +34,5 @@
   (refresh-all)
   (clojure.tools.namespace.repl/clear)
   (test-clj)
-  (cljs/figwheel-start!)
-  (cljs/figwheel-stop!)
-  (cljs/cljs-repl)
+  
 )

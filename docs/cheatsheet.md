@@ -10,7 +10,7 @@ java.util.Date => `inst`
 
 js/Date => `inst`
 
-otherwise the same as java.time
+otherwise all camel-case equivalents of java.time names
 
 # Dates and Times
 
@@ -19,14 +19,17 @@ otherwise the same as java.time
 ### Now 
 
 ```clojure
-(t/date), (t/zoned-date-time), (t/instant)
+(t/date), (t/zoned-date-time), (t/instant), (t/...)
 ```
 
 temporarily change what clock is used to get the `now` or `where` information with `with-clock`
 
 ```clojure
-(t/with-clock (t/instant "2023-08-23T15:49:21.941342Z") 
-   (t/date))
+(t/with-clock 
+  ; the given 'clock' could be also be a zone, or a zoned-date-time etc
+  (t/instant "2023-08-23T15:49:21.941342Z") 
+   (t/date)) 
+ ; => returns (t/date "2023-08-23")
 ```
 
 ### Extraction 
@@ -56,7 +59,7 @@ set hours and smaller to zero
 ### from/to Strings 
 
 ```clojure
-(t/parse-... "xxx", (t/formatter "pattern"))
+(t/parse-... "2021-...", (t/formatter "pattern"))
 
 (t/format (t/date) (t/formatter "pattern"))
 ```
