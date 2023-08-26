@@ -1,4 +1,8 @@
+# Need to know 
 
+* Understand [the entities of java.time](https://github.com/juxt/tick#javatime)
+* a `temporal` is an entity that relates to the timeline (LocalDate, Instant, ZonedDateTime etc)
+* a `temporal-amount` is a quantity of time - either a Duration or a Period
 
 # Naming (compared to java.time)
 
@@ -12,7 +16,9 @@ js/Date => `inst`
 
 otherwise all camel-case equivalents of java.time names
 
-# Dates and Times
+# Temporals
+
+All functions relating to `temporals` have names in the singular, whereas functions relating to `temporal-amounts` have names in the plural, e.g. `(t/hour x)` vs `(t/hours x)`
 
 ## Construction
 
@@ -58,6 +64,19 @@ set hours and smaller to zero
 
 ### from/to Strings 
 
+ISO-formatted
+
+```clojure
+
+(t/instant "2020-02-02T00:00:00Z")
+(t/... "2020...")
+
+(str (t/instant))
+
+```
+
+Custom formats
+
 ```clojure
 (t/parse-... "2021-...", (t/formatter "pattern"))
 
@@ -75,14 +94,14 @@ round-trip to/from epoch millis
 (-> (t/instant) (cljc.java-time.instant/to-epoch-milli) (t/instant))
 ```
 
-### Relative 
+### Relative temporals aka `shifting`
 
 ```clojure
  (t/>> (t/instant) (t/of-hours 2))
  (t/<< ...)
 ```
 
-# Amounts of Time
+# Temporal Amounts
 
 ## Construction
 
@@ -92,10 +111,10 @@ round-trip to/from epoch millis
 (t/of-..)
 ```
 
-### From points in time
+### From temporals
 
 ```clojure
-(t/between point-a point-b)
+(t/between a b)
 ```
 
 ## Arithmetic
@@ -106,6 +125,8 @@ round-trip to/from epoch millis
 ```
 
 ## Extract parts
+
+function names in plural
 
 ```clojure
 (t/millis ...)
@@ -119,7 +140,13 @@ t/<, t/<=, t/=, ...
 t/max, t/max-by, t/min, t/min-by
 ```
 
-# Predicates 
+## contains
+
+```clojure 
+(t/coincident? {:tick/beginning x :tick/end y} z )
+```
+
+# Type Predicates 
 
 ```clojure
 (t/date-time? x)
