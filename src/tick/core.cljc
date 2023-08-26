@@ -987,15 +987,6 @@
 
 ;; TODO: Test concurrent? in tick.core-test
 
-(defn coincident?
-  "Does the span of time contain the given event? If the given event
-  is itself a span, then t must wholly contain the beginning and end
-  of the event."
-  [t event]
-  (and
-    (not= 1 (compare (beginning t) (beginning event)))
-    (not= 1 (compare (end event) (end t)))))
-
 (extend-protocol p/ITimeSpan
   LocalDate
   (beginning [date] (cljc.java-time.local-date/at-start-of-day date))
@@ -1398,6 +1389,26 @@
 
 (defn greater "the greater of x and y" [x y]
   (if (> x y) x y))
+
+(defn coincident?
+  "Does the span of time contain the given event? If the given event
+  is itself a span, then t must wholly contain the beginning and end
+  of the event."
+  [interval event]
+  (and
+    (<= (beginning interval) (beginning event))
+    (>= (end interval) (end event))))
+
+(comment
+  (require '[tick.core :as t])
+
+  (compare (t/instant "2020-02-05T00:00:00Z") (t/instant "2020-02-04T00:00:00Z"))
+
+  (let [(def event {:tick/beginning (t/instant "2020-02-02T00:00:00Z")
+                    :tick/end       (t/instant "2020-02-04T00:00:00Z")})]
+    (t/coincident? (t/instant "2020-02-03T00:00:00Z") interval))
+
+  )
 
 (defn max
   "Find the latest of the given arguments. Callers should ensure that no

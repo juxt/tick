@@ -354,6 +354,22 @@
     (is (t/>= t1 t1))
     (is (t/>= t2 t1))))
 
+(deftest coincidence-test
+  (let [int-beginning (t/instant "2020-02-02T00:00:00Z")
+        int-end (t/>> int-beginning (t/of-hours 2))
+        interval {:tick/beginning int-beginning
+                  :tick/end       int-end}]
+    (is (t/coincident? interval (t/>> int-beginning (t/of-hours 1))))
+    (is (not (t/coincident? interval (t/<< int-beginning (t/of-hours 1)))))
+    (is (t/coincident? interval int-beginning))
+    (is (t/coincident? interval int-end))
+    (is (t/coincident? interval interval))
+    (is (not (t/coincident? interval (-> interval
+                                         (update :tick/end #(t/>> % (t/of-nanos 1)))))))
+    
+    
+    ))
+
 
 (deftest day-of-week
   (let [days (fn [strings] (map t/day-of-week strings))]
