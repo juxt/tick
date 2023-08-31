@@ -1074,8 +1074,8 @@
 (defn hence "current instant shifted forward by duration 'dur'" [dur]
   (p/forward-duration (now) dur))
 
-(defn midnight? [^Temporal t]
-  (cljc.java-time.duration/is-zero (cljc.java-time.duration/between t (beginning (p/date t)))))
+(defn midnight? [t]
+  (clojure.core/= cljc.java-time.local-time/midnight (p/time t)))
 
 ;; Predicates
 (defn clock?            "true if v is a clock?" [v] (cljc.java-time.extn.predicates/clock? v))
@@ -1391,24 +1391,17 @@
   (if (> x y) x y))
 
 (defn coincident?
-  "Does the span of time contain the given event? If the given event
-  is itself a span, then t must wholly contain the beginning and end
-  of the event."
-  [interval event]
-  (and
-    (<= (beginning interval) (beginning event))
-    (>= (end interval) (end event))))
-
-(comment
-  (require '[tick.core :as t])
-
-  (compare (t/instant "2020-02-05T00:00:00Z") (t/instant "2020-02-04T00:00:00Z"))
-
-  (let [(def event {:tick/beginning (t/instant "2020-02-02T00:00:00Z")
-                    :tick/end       (t/instant "2020-02-04T00:00:00Z")})]
-    (t/coincident? (t/instant "2020-02-03T00:00:00Z") interval))
-
-  )
+  "for the 2-arity ver, Does containing-interval wholly contain the given contained-interval?
+  
+  for the 3-arity, does the event lie within the span of time described by start and end"
+  ([containing-interval contained-interval]
+   (and
+     (<= (beginning containing-interval) (beginning contained-interval))
+     (>= (end containing-interval) (end contained-interval))))
+  ([start end event]
+   (and
+     (<= start event)
+     (>= end event))))
 
 (defn max
   "Find the latest of the given arguments. Callers should ensure that no

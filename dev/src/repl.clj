@@ -6,6 +6,10 @@
     [tick.core :as t])
   (:import (java.util TimeZone)))
 
+(comment 
+  (remove-ns 'repl)
+  )
+
 (clojure.tools.namespace.repl/set-refresh-dirs "src" "test")
 
 (set! *warn-on-reflection* true)

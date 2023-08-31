@@ -1,8 +1,9 @@
 # Need to know 
 
-* Understand [the entities of java.time](https://github.com/juxt/tick#javatime)
 * a `temporal` is an entity that relates to the timeline (LocalDate, Instant, ZonedDateTime etc)
-* a `temporal-amount` is a quantity of time - either a Duration or a Period
+* a `temporal-amount` is an entity representing a quantity of time - either a Duration or a Period
+* a basic understanding of [the main entities of java.time](https://github.com/juxt/tick#javatime) is required to use tick
+* Where tick doesn’t provide the API you need, drop to [cljc.java-time](https://github.com/henryw374/cljc.java-time)
 
 # Naming (compared to java.time)
 
@@ -22,28 +23,29 @@ All functions relating to `temporals` have names in the singular, whereas functi
 
 ## Construction
 
-### Now 
+### Now
+
+zero-arity function for the required type 
 
 ```clojure
 (t/date), (t/zoned-date-time), (t/instant), (t/...)
 ```
 
-temporarily change what clock is used to get the `now` or `where` information with `with-clock`
+Temporarily change what clock is used to get the `now` or `where` information with `with-clock`
 
 ```clojure
-(t/with-clock 
-  ; the given 'clock' could be also be a zone, or a zoned-date-time etc
-  (t/instant "2023-08-23T15:49:21.941342Z") 
+(t/with-clock
+  (t/zoned-date-time "2023-08-23T20:00-10:00[Pacific/Honolulu]") 
    (t/date)) 
  ; => returns (t/date "2023-08-23")
 ```
 
-### Extraction 
-
-for example, get the date part out of a zdt
+### Extraction / Conversion
 
 ```clojure
 (t/date (t/zoned-date-time))
+(t/hour (t/zoned-date-time))
+(t/inst (t/zoned-date-time))
 ```
 
 set hours and smaller to zero
@@ -60,6 +62,9 @@ set hours and smaller to zero
 
 (-> (t/time "10:10")
     (t/on (t/date)))
+
+; 'set' or 'adjust' a specific field
+(t/with (t/date) (t/year 3030))
 ```
 
 ### from/to Strings 
@@ -120,7 +125,7 @@ round-trip to/from epoch millis
 ## Arithmetic
 
 ```clojure
-(t/+ (t/of-minutes 5) (t/of-minutes 5) (t/of-minutes 5))
+(t/+ (t/of-minutes 5) (t/of-minutes 5) (t/of-minutes 5), ...)
 (t/- ...)
 ```
 
@@ -140,16 +145,17 @@ t/<, t/<=, t/=, ...
 t/max, t/max-by, t/min, t/min-by
 ```
 
-## contains
+## contains/coincidence
 
 ```clojure 
-(t/coincident? {:tick/beginning x :tick/end y} z )
+(t/coincident? temporal-start temporal-end a-temporal))
 ```
 
 # Type Predicates 
 
 ```clojure
 (t/date-time? x)
+(t/...? x)
 ```
 
 # Units
@@ -159,6 +165,9 @@ t/APRIL,
 t/DECEMBER ...
 
 t/FRIDAY, t/MONDAY...
+
+(keys t/unit-map) => :nanos :days :seconds ...
+
 ```
 
 

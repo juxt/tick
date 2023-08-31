@@ -365,11 +365,15 @@
     (is (t/coincident? interval int-end))
     (is (t/coincident? interval interval))
     (is (not (t/coincident? interval (-> interval
-                                         (update :tick/end #(t/>> % (t/of-nanos 1)))))))
-    
-    
-    ))
-
+                                         (update :tick/end #(t/>> % (t/of-nanos 1))))))))
+  (testing "non-interval coincidence"
+    (doseq [[start-f new-amount] [[t/date t/of-days] [t/date-time t/of-hours]]]
+      (let [start (start-f)
+            end (t/>> start (new-amount 2))]
+        (is (t/coincident? start end (t/>> start (new-amount 1))))
+        (is (not (t/coincident? start end (t/<< start (new-amount 1)))))
+        (is (t/coincident? start end start))
+        (is (t/coincident? start end end))))))
 
 (deftest day-of-week
   (let [days (fn [strings] (map t/day-of-week strings))]
