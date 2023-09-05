@@ -959,8 +959,12 @@
 
 ;;;
 (defn between "the span of time between v1 and v2" [v1 v2] (p/between v1 v2))
-(defn beginning "the beginning of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/beginning v) v))
-(defn end "the end of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/end v) v))
+
+(defn beginning "the beginning of the range of ITimeSpan v or v" [v]
+  (try (p/beginning v) (catch #?(:clj Exception :cljs js/Error) _e v)))
+
+(defn end "the end of the range of ITimeSpan v or v" [v]
+  (try (p/end v) (catch #?(:clj Exception :cljs js/Error) _e v)))
 
 (defn duration "return duration contained within the range of ITimeSpan 'x',  which can be a year, year-month or date " [x]
   (cljc.java-time.duration/between (beginning x) (end x)))
