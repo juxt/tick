@@ -7,11 +7,21 @@
      :refer-macros [deftest is testing run-tests]]
     [tick.core :as t]
     [tick.locale-en-us]
+    [tick.protocols :as p]
     [cljc.java-time.clock]
     [cljc.java-time.instant]
     [cljc.java-time.day-of-week]
     [cljc.java-time.month]
-    [cljc.java-time.year]))
+    [cljc.java-time.year]
+    #?@(:cljs [[java.time :refer [Instant]]]))
+  #?(:clj
+     (:import [java.time Instant])))
+
+(extend-protocol p/ITimeSpan
+  ; as required by some tests in this ns
+  Instant
+  (beginning [i] i)
+  (end [i] i))
 
 (deftest time-construction-test
   (testing "(time)"

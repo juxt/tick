@@ -959,8 +959,8 @@
 
 ;;;
 (defn between "the span of time between v1 and v2" [v1 v2] (p/between v1 v2))
-(defn beginning "the beginning of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/beginning v) v))
-(defn end "the end of the range of ITimeSpan v or v" [v] (if (satisfies? p/ITimeSpan v) (p/end v) v))
+(defn beginning "the beginning of the range of ITimeSpan v or v" [v] (p/beginning v))
+(defn end "the end of the range of ITimeSpan v or v" [v] (p/end v))
 
 (defn duration "return duration contained within the range of ITimeSpan 'x',  which can be a year, year-month or date " [x]
   (cljc.java-time.duration/between (beginning x) (end x)))
@@ -988,6 +988,7 @@
 ;; TODO: Test concurrent? in tick.core-test
 
 (extend-protocol p/ITimeSpan
+  ; ITimeSpan is implemented by default on types with a natural beginning and end
   LocalDate
   (beginning [date] (cljc.java-time.local-date/at-start-of-day date))
   (end [date] (cljc.java-time.local-date/at-start-of-day (inc date)))
@@ -999,6 +1000,40 @@
   YearMonth
   (beginning [ym] (beginning (cljc.java-time.year-month/at-day ym 1)))
   (end [ym] (beginning (cljc.java-time.year-month/at-day (inc ym) 1))))
+
+(defn backward-compatible-time-span-extensions 
+  "pre v0.7, ITimeSpan was extended as per this body. run this function to create those extensions.
+  
+  ITimeSpan is implemented by default on types with a natural beginning and end"
+  []
+  (extend-protocol p/ITimeSpan
+    Instant
+    (beginning [i] i)
+    (end [i] i)
+
+    ZonedDateTime
+    (beginning [i] i)
+    (end [i] i)
+
+    OffsetDateTime
+    (beginning [i] i)
+    (end [i] i)
+
+    #?(:clj Date :cljs js/Date)
+    (beginning [i] (p/instant i))
+    (end [i] (p/instant i))
+
+    LocalDateTime
+    (beginning [x] x)
+    (end [x] x)
+
+    LocalTime
+    (beginning [x] x)
+    (end [x] x)
+
+    nil
+    (beginning [_] nil)
+    (end [_] nil)))
 
 (extend-protocol p/ITimeReify
   LocalTime

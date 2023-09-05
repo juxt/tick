@@ -8,7 +8,19 @@
    [clojure.test
     :refer [deftest is testing run-tests]
     :refer-macros [deftest is testing run-tests]]
-   [tick.alpha.interval :as ti]))
+   [tick.alpha.interval :as ti]
+   #?@(:cljs [[java.time :refer [Instant LocalDateTime LocalTime]]]))
+  #?(:clj
+     (:import [java.time LocalDateTime Instant LocalTime])))
+
+(extend-protocol p/ITimeSpan
+  ; as required by some tests in this ns
+  Instant
+  (beginning [i] i)
+  (end [i] i)
+  LocalDateTime
+  (beginning [i] i)
+  (end [i] i))
 
 (s/check-asserts true)
 
@@ -714,6 +726,10 @@
 
 ;; Can we disturb?
 (deftest cannot-disturb-test
+  (extend-protocol p/ITimeSpan
+    LocalTime
+    (beginning [i] i)
+    (end [i] i))
   (let
     [disturb-interval [(ti/new-interval (t/time "07:00") (t/time "22:00"))]
      no-disturb-interval (ti/complement disturb-interval)

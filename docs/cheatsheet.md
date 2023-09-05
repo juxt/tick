@@ -7,13 +7,11 @@
 
 # Naming (compared to java.time)
 
-LocalDate => `date`
-
-LocalDateTime => `date-time`
-
-java.util.Date => `inst` 
-
-js/Date => `inst`
+* LocalDate => `date`
+* LocalDateTime => `date-time`
+* LocalTime => `time`
+* java.util.Date => `inst` 
+* js/Date => `inst`
 
 otherwise all camel-case equivalents of java.time names
 
