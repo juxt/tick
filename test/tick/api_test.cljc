@@ -434,7 +434,9 @@
   (is (= (t/new-duration 1e9 :nanos) (t/new-duration 1 :seconds)))
   (is (= (t/new-duration 1000 :millis) (t/new-duration 1 :seconds)))
 
-  (is (= (t/new-duration 24 :hours) (t/duration (t/tomorrow)))))
+  (is (= (t/of-hours 24) (t/duration (t/date))))
+  (is (= (t/of-days 1) (t/duration {:tick/beginning (t/date)
+                                    :tick/end       (t/inc (t/date))}))))
 
 ;; Durations. Convenience functions to create durations of specific
 ;; units.

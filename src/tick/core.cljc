@@ -962,8 +962,8 @@
 (defn beginning "the beginning of the range of ITimeSpan v or v" [v] (p/beginning v))
 (defn end "the end of the range of ITimeSpan v or v" [v] (p/end v))
 
-(defn duration "return duration contained within the range of ITimeSpan 'x',  which can be a year, year-month or date " [x]
-  (cljc.java-time.duration/between (beginning x) (end x)))
+(defn duration "return Duration or Period (whichever appropriate based on type) contained within the range of ITimeSpan x" [x]
+  (between (beginning x) (end x)))
 
 ;; Periods
 
