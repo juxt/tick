@@ -1530,7 +1530,7 @@
 (defn months "extract months from 'v'" [v] (p/months v))
 (defn years  "extract years from 'v'" [v] (p/years v))
 
-(defn divide "divisor is a unit e.g. :hours or " [t divisor]
+(defn divide "divide TemporalAmount t by divisor, which is a unit e.g. :hours or a TemporalAmount" [t divisor]
   (p/divide t divisor))
 
 (defn parse-date
