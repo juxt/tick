@@ -185,33 +185,32 @@
 
 ;; Between test
 (deftest between-test
-  (is
-    (=
-      (let [now (t/now)]
-        (t/between
-          (t/<< now (t/new-duration 10 :seconds))
-          (t/>> now (t/new-duration 10 :seconds))))
-      (t/new-duration 20 :seconds)))
+
+  (let [now (t/instant)
+        from (t/<< now (t/new-duration 10 :seconds))
+        to (t/>> now (t/new-duration 10 :seconds))]
+    (is (= (t/new-duration 20 :seconds) (t/between from to) ))
+    (is (= 20 (t/between from to :seconds))))
   (is
     (= (t/new-duration 48 :hours)
       (t/between (t/beginning (t/today)) (t/end (t/tomorrow)))))
-  (is
-    (=
-      (t/new-duration 2 :minutes)
-      (t/between (t/date-time "2020-01-01T12:00") (t/date-time "2020-01-01T12:02"))))
+  (let [start (t/date-time "2020-01-01T12:00") 
+        end (t/date-time "2020-01-01T12:02")]
+    (is
+      (=
+        (t/new-duration 2 :minutes)
+        (t/between start end))
+      (= 2 (t/between start end :minutes))))
   (is
     (=
       (t/new-duration 30 :minutes)
       (t/between (t/new-time 11 0 0) (t/new-time 11 30 0))))
-  (is
-   (=
-    (t/new-duration 2 :minutes)
-    (t/between (t/date-time "2020-01-01T12:00") (t/date-time "2020-01-01T12:02"))))
-
   (testing "LocalDate"
-    (is (= (t/new-period 1 :days)
-          (t/between (t/date "2020-01-01")
-            (t/date "2020-01-02"))))))
+    (let [start (t/date "2020-01-01")
+          end (t/date "2020-01-02")]
+      (is (= (t/new-period 1 :days)
+            (t/between start end)))
+      (is (= 1 (t/between start end :days))))))
 
 ;; Range test
 

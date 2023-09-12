@@ -641,8 +641,8 @@
   (years [p] (cljc.java-time.period/get-years p)))
 
 (defn new-duration [n u]
+  {:pre [(contains? unit-map u)]}
   (let [unit (unit-map u)]
-    (assert unit (str "Not a unit: " u))
     (cljc.java-time.duration/of n unit)))
 
 (defn new-period [n u]
@@ -958,7 +958,14 @@
   (divide [d x] (p/divide-duration x d)))
 
 ;;;
-(defn between "the span of time between v1 and v2" [v1 v2] (p/between v1 v2))
+(defn between "for the 2-arity version, find the temporal-amount between v1 and v2, 
+or for the 3-arity version the amount of 'unit' between v1 and v2"
+  ([v1 v2] (p/between v1 v2))
+  ([v1 v2 unit]
+   {:pre [(contains? unit-map unit)]}
+   (cljc.java-time.temporal.chrono-unit/between (get unit-map unit)
+     v1 v2)))
+
 (defn beginning "the beginning of the range of ITimeSpan v or v" [v] (p/beginning v))
 (defn end "the end of the range of ITimeSpan v or v" [v] (p/end v))
 
