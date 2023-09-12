@@ -1,9 +1,10 @@
-# 0.7.0
+# 0.7.x
 
 * tick.interval.bounds function is now consistent for years, year-months and dates in setting the `end` to be inclusive
 * Strings are no longer accepted as beginning/end when constructing an interval
 * Strings are no longer accepted as arguments to clock
 * ITimeSpan no longer implemented for types where beginning/end were the same - to recreate earlier behaviour, run `(t/backward-compatible-time-span-extensions)`
+* add 3-arity between function to get quantity as number 
 
 # 0.6.1 
 

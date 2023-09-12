@@ -117,7 +117,8 @@ round-trip to/from epoch millis
 ### From temporals
 
 ```clojure
-(t/between a b)
+(t/between a b) ;=> returns temporal-amount
+(t/between a b :days) ;=> returns number
 ```
 
 ## Arithmetic
