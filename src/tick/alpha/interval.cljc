@@ -327,12 +327,14 @@
   representing the interval of time the given intervals are
   concurrent."
   ([x y]
-   (case (relation x y)
-     :overlaps (slice x (t/beginning y) (t/end x))
-     :overlapped-by (slice x (t/beginning x) (t/end y))
-     (:starts :finishes :during :equals) x
-     (:started-by :finished-by :contains) (slice x (t/beginning y) (t/end y))
-     nil))
+   (if (or (nil? x) (nil? y))
+     nil
+     (case (relation x y)
+       :overlaps (slice x (t/beginning y) (t/end x))
+       :overlapped-by (slice x (t/beginning x) (t/end y))
+       (:starts :finishes :during :equals) x
+       (:started-by :finished-by :contains) (slice x (t/beginning y) (t/end y))
+       nil)))
   ([x y & args]
    (reduce concur (concur x y) args)))
 

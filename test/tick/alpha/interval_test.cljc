@@ -164,7 +164,29 @@
       (ti/new-interval (instants 1) (instants 3))
       (ti/concur
         (ti/new-interval (instants 1) (instants 3))
-        (ti/new-interval (instants 0) (instants 3))))))
+        (ti/new-interval (instants 0) (instants 3)))))
+
+  (is
+    (=
+      (ti/new-interval (instants 1) (instants 2))
+      (ti/concur
+        (ti/new-interval (instants 1) (instants 3))
+        (ti/new-interval (instants 1) (instants 2))
+        (ti/new-interval (instants 0) (instants 2)))))
+
+  (is
+    (nil?
+      (ti/concur
+        (ti/new-interval (instants 1) (instants 2))
+        (ti/new-interval (instants 2) (instants 3))
+        (ti/new-interval (instants 0) (instants 2)))))
+
+  (is
+    (nil?
+      (ti/concur
+        (ti/new-interval (instants 0) (instants 1))
+        (ti/new-interval (instants 1) (instants 2))
+        (ti/new-interval (instants 2) (instants 3))))))
 
 ;; Sequence tests
 
