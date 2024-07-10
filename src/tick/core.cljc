@@ -1341,7 +1341,7 @@ or for the 3-arity version the amount of 'unit' between v1 and v2"
 (defn ^DateTimeFormatter formatter
   "Constructs a DateTimeFormatter out of either a
 
-  * format string - \"YYYY/mm/DD\" \"YYY HH:MM\" etc.
+  * format string - \"yyyy/MM/dd\" \"yyy HH:mm\" etc.
   or
   * formatter name - :iso-instant :iso-local-date etc
 
