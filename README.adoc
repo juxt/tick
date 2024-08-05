@@ -16,7 +16,7 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 == Status
 
 * tick.core - stable
-* tick.alpha.interval - Alpha: Ready to use with the caveat that the API might still undergo minor changes. Note also that this part of tick is not being actively maintained at the moment (other than to keep existing tests passing). There are currently around https://github.com/juxt/tick/issues?q=is%3Aissue+is%3Aopen+label%3Ainterval-calculus[10 open tickets]  relating to intervals which no one is looking at. It may be maintained again in the future of course.
+* tick.alpha.interval - Alpha: Ready to use with the caveat that the API might still undergo minor changes. Note also that this part of tick is not being actively maintained at the moment (other than to keep existing tests passing). There are currently around https://github.com/juxt/tick/issues?q=is%3Aissue+is%3Aopen+label%3Ainterval-calculus[4 open tickets]  relating to intervals which no one is looking at. It may be maintained again in the future of course.
 
 == Should you use Tick for date-time work?
 
@@ -117,7 +117,6 @@ make
 
 `make dev-docs-cljs` to build the js for the site needs fixing.
 
-----
 
 === Build a production version of the Documentation Site
 
