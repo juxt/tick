@@ -1,3 +1,10 @@
+# 1.0 
+
+No changes from 0.7.5
+
+There were no significant changes for over a year, the [1.0 checklist](https://github.com/juxt/tick/issues/135) was complete, so as per 
+[1.0 all the things](https://insideclojure.org/2020/02/18/lib-version/) approach, 0.7.5 was declared 1.0
+
 # 0.7.x
 
 * tick.interval.bounds function is now consistent for years, year-months and dates in setting the `end` to be inclusive
