@@ -83,7 +83,7 @@ Custom formats
 ```clojure
 (t/parse-... "2021-...", (t/formatter "pattern"))
 
-(t/format (t/date) (t/formatter "pattern"))
+(t/format (t/formatter "pattern") (t/date))
 ```
 
 ### from numbers 
