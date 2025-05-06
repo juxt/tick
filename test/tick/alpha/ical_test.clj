@@ -60,3 +60,18 @@
                ical/unfolding-line-seq
                first
                ical/line->contentline)))))
+
+(def multi-with-empty
+  "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-SOME-HEADER-BREAKING-SOMEWHERE-AT-
+ 75=foobar;X-TITLE=Some Place:geo:44.815458,20.462758
+
+FOO:bar")
+
+(deftest parse-line-ignore-empty-test
+  (testing "Empty lines are ignored"
+    (is (= ["X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-SOME-HEADER-BREAKING-SOMEWHERE-AT-75=foobar;X-TITLE=Some Place:geo:44.815458,20.462758"
+            "FOO:bar"]
+           (-> multi-with-empty
+               char-array
+               io/reader
+               ical/unfolding-line-seq)))))
