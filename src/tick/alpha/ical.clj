@@ -263,7 +263,7 @@
   [^java.io.BufferedReader rdr hold]
   (if-let [line (.readLine rdr)]
     (if (= (.charAt line 0) \space)
-      (recur rdr (conj hold line))
+      (recur rdr (conj hold (.substring line 1)))
       (cons (str/join hold) (lazy-seq (unfolding-line-seq* rdr [line]))))
     [(str/join hold)]))
 
