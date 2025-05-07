@@ -40,3 +40,38 @@
       (is (= "DTSTART" name))
       (is (= "US-EAST" (get params "TZID")))
       (is (= "20180116T140000" value)))))
+
+(def multiline
+  "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-SOME-HEADER-BREAKING-SOMEWHERE-AT-
+ 75=foobar;X-TITLE=Some Place:geo:44.815458,20.462758")
+
+(deftest parse-line-folding-test
+  (testing "Folded lines can be parsed"
+    (is (= {:name "X-APPLE-STRUCTURED-LOCATION",
+            :params
+            {"VALUE" "URI",
+             "X-SOME-HEADER-BREAKING-SOMEWHERE-AT-75" "foobar",
+             "X-TITLE" "Some Place"},
+            :value "geo:44.815458,20.462758",
+            :string-value "geo:44.815458,20.462758"}
+           (-> multiline
+               char-array
+               io/reader
+               ical/unfolding-line-seq
+               first
+               ical/line->contentline)))))
+
+(def multi-with-empty
+  "X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-SOME-HEADER-BREAKING-SOMEWHERE-AT-
+ 75=foobar;X-TITLE=Some Place:geo:44.815458,20.462758
+
+FOO:bar")
+
+(deftest parse-line-ignore-empty-test
+  (testing "Empty lines are ignored"
+    (is (= ["X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-SOME-HEADER-BREAKING-SOMEWHERE-AT-75=foobar;X-TITLE=Some Place:geo:44.815458,20.462758"
+            "FOO:bar"]
+           (-> multi-with-empty
+               char-array
+               io/reader
+               ical/unfolding-line-seq)))))
