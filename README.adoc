@@ -10,7 +10,7 @@ replacement for clj-time.
 Based on `java.time` (on the JVM) and `js-joda` (on JavaScript
 runtimes). 
 
-For a cross-platform library using Javascript's modern date-time API https://github.com/tc39/proposal-temporal[Temporal], see https://github.com/henryw374/tempo[Tempo] 
+For a cross-platform library using Javascript's modern date-time API https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Temporal[Temporal], see https://github.com/henryw374/tempo[Tempo] 
 
 See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/North 2019] for more background & rationale.
 
@@ -31,7 +31,7 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 
 * If working in a Javascript environment then one should be aware that the legacy Date API is https://maggiepint.com/2017/04/09/fixing-javascript-date-getting-started/[flawed]
 * Either tick or https://github.com/henryw374/cljc.java-time[cljc.java-time] (which underpins tick) are sane alternatives to js/Date. The JS build size https://widdindustries.com/blog/clojurescript-datetime-lib-comparison.html[will likely not adversely affect your users] and if you already know java.time then your knowledge will carry over. 
-* https://github.com/tc39/proposal-temporal[Temporal] is the native JS replacement for the legacy Date (similar to how java.time was on the JVM). It has some overlap with java.time but also some significant differences. Please see the https://github.com/henryw374/tempo[Tempo] library for an alternative to tick with uses that.
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Temporal[Temporal] is the native JS replacement for the legacy Date (similar to how java.time was on the JVM). It has some overlap with java.time but also some significant differences. Please see the https://github.com/henryw374/tempo[Tempo] library for an alternative to tick with uses that.
 
 == Usage 
 
