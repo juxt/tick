@@ -7,11 +7,12 @@ image:https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg[
 A Clojure(Script) & babashka library for dealing with time. Intended as a
 replacement for clj-time.
 
-Based on Java 8 time (on the JVM) and js-joda (on JavaScript
-runtimes). Javascript's modern date-time API https://github.com/tc39/proposal-temporal[Temporal] is a consideration as an alternative foundation for tick in future. See the 
-https://github.com/henryw374/tempo[Tempo] library if interested. 
+Based on `java.time` (on the JVM) and `js-joda` (on JavaScript
+runtimes). 
 
-See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/North 2019] for some background
+For a cross-platform library using Javascript's modern date-time API https://github.com/tc39/proposal-temporal[Temporal], see https://github.com/henryw374/tempo[Tempo] 
+
+See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/North 2019] for more background & rationale.
 
 == Status
 
@@ -20,14 +21,17 @@ See https://www.youtube.com/watch?v=UFuL-ZDoB2U[Henry Widd's talk at Clojure/Nor
 
 == Should you use Tick for date-time work?
 
-* If you are just working on the JVM and are comfortable with the `java.time` API then raw interop will work just fine.
-* If you are working in a Javascript environment then seriously consider using https://github.com/henryw374/cljc.java-time[cljc.java-time]: Its build size https://widdindustries.com/blog/clojurescript-datetime-lib-comparison.html[will not adversely affect your users] (unless in a highly constrained context such as a https://github.com/mfikes/esprit[microcontroller]). The reason is the native Date API is https://maggiepint.com/2017/04/09/fixing-javascript-date-getting-started/[flawed]
-* If you meet any of the following criteria, use https://github.com/henryw374/cljc.java-time[cljc.java-time]:
-** are creating cross-platform date-time logic
-** are not proficient in java.time and would like https://widdindustries.com/why-not-interop/[improved error messages]
-** would rather not maintain type hints in your code
-* If you meet the criteria to use cljc.java-time but would like a more terse API and the benefits of e.g. https://juxt.github.io/tick/#_substitution[(t/with-clock ...)] but will not miss having every date-time recipe one google search away, then tick might be a good choice. Tick uses https://github.com/henryw374/cljc.java-time[cljc.java-time] so you can always drop to that if Tick is missing something you need.
-* Similar in aiming for a terse API, but jvm-only is https://github.com/dm3/clojure.java-time[clojure.java-time].
+=== Concision vs Discoverability
+
+* If you are just working on the JVM then raw interop will work of course. Doing so, every java.time recipe is easily found via web search and there are many tutorials to aid understanding.
+* New and even experienced users of java.time often trip up on Instant not being calendar-aware, so if you would like https://widdindustries.com/why-not-interop/[improved error messages] then use either https://github.com/henryw374/cljc.java-time[cljc.java-time] (which has the same API as java.time and which underpins tick) or tick.
+* To use tick effectively an understanding of java.time is required. If you have that understanding and will spend significant time working with dates and times from Clojure, then learning Tick can be worthwhile because it provides a concise, single-ns API.
+
+=== Cross-Platform and/or just JS runtimes
+
+* If working in a Javascript environment then one should be aware that the legacy Date API is https://maggiepint.com/2017/04/09/fixing-javascript-date-getting-started/[flawed]
+* Either tick or https://github.com/henryw374/cljc.java-time[cljc.java-time] (which underpins tick) are sane alternatives to js/Date. The JS build size https://widdindustries.com/blog/clojurescript-datetime-lib-comparison.html[will likely not adversely affect your users] and if you already know java.time then your knowledge will carry over. 
+* https://github.com/tc39/proposal-temporal[Temporal] is the native JS replacement for the legacy Date (similar to how java.time was on the JVM). It has some overlap with java.time but also some significant differences. Please see the https://github.com/henryw374/tempo[Tempo] library for an alternative to tick with uses that.
 
 == Usage 
 
