@@ -706,8 +706,35 @@
        ;; Bound by given interval, last will become a remainder.
        (map (juxt identity #(t/min (p/forward-duration % period) (t/end ival))))))
 
-(defn divide-by-divisor [ival divisor]
-  (divide-by-duration ival (cljc.java-time.duration/divided-by (t/duration ival) divisor)))
+(defn divide-by-divisor 
+  "Divides the interval specified by `ival` into `divisor` spaced
+  intervals. The `divisor` must be a positive integer. The calculated
+  subintervals are exact down to the nearest nanosecond."
+  [ival divisor]
+  (assert (pos? divisor))
+  (assert (integer? divisor))
+  (let [total-nanos (t/nanos (t/duration ival))
+        original-beginning (:tick/beginning ival)]
+    ;; Note the algorithm here. We do not calculate a constant
+    ;; duration for each sub-interval. That ends up truncating
+    ;; fractional nanoseconds which can cause us problems with the
+    ;; last interval if we just add the durations togther n
+    ;; times. Instead, we calculate the total duration of the original
+    ;; interval in nanoseconds and compute the ending point of each
+    ;; subinterval as i/n * total duration. The duration of each
+    ;; sub-interval may differ by plus/minus one nanosecond, but the
+    ;; ending point is exactly the end of the original interval (i.e.,
+    ;; n/n * total duration = 1 * total duration = total duration).
+    (loop [i 1
+           sub-intervals []
+           beginning original-beginning]
+      (let [duration-to-end (t/new-duration (/ (* i total-nanos) divisor) :nanos)
+            end (t/>> original-beginning duration-to-end)]
+        (if (= i divisor)
+          (clojure.core/conj sub-intervals [beginning end])
+          (recur (inc i)
+                 (clojure.core/conj sub-intervals [beginning end])
+                 end))))))
 
 (defprotocol IDivisibleInterval
   (divide-interval [divisor ival] "Divide an interval by a given divisor"))
