@@ -717,7 +717,11 @@
   (is (= 2 (count (ti/divide-by t/year-month (ti/bounds (t/date "2017-09-10") (t/date "2017-10-10"))))))
   (is (= 3 (count (ti/divide-by t/year (ti/bounds (t/date-time "2017-09-10T12:00") (t/year "2019"))))))
   (is (= 3 (count (ti/divide-by t/year (ti/bounds (t/date-time "2017-09-10T12:00") (t/year-month "2019-02"))))))
-  (is (= 24 (count (ti/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10"))))))
+  (is (= 24 (count (ti/divide-by (t/new-duration 1 :hours) (t/date "2017-09-10")))))
+  ;; Issue #203
+  (is (= 17 (count (ti/divide-by 17
+                                 (ti/new-interval #time/zoned-date-time "2025-07-09T09:33-04:00"
+                                                  #time/zoned-date-time "2025-07-09T14:30-04:00"))))))
 
 ;; TODO: Divide by duration
 
