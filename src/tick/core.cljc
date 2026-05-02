@@ -628,7 +628,7 @@
 (extend-protocol p/ITimeLength
   Duration
   (nanos [d] (cljc.java-time.duration/to-nanos d))
-  (micros [d] (#?(:clj Long/divideUnsigned :cljs cljs.core//) (p/nanos d) 1000))
+  (micros [d] (quot (p/nanos d) 1000))
   (millis [d] (cljc.java-time.duration/to-millis d))
   (seconds [d] (cljc.java-time.duration/get-seconds d))
   (minutes [d] (cljc.java-time.duration/to-minutes d))
