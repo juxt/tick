@@ -445,7 +445,39 @@
   (is (= (t/of-millis 10) (t/new-duration 10 :millis)))
   (is (= (t/of-seconds 10) (t/new-duration 10 :seconds)))
   (is (= (t/of-minutes 10) (t/new-duration 10 :minutes)))
-  (is (= (t/of-hours 10) (t/new-duration 10 :hours))))
+  (is (= (t/of-hours 10) (t/new-duration 10 :hours)))
+
+  (testing "negative durations"
+    ;; #208: micros previously returned large positive values via Long/divideUnsigned
+    (is (= -1000000000 (t/nanos  (t/of-seconds -1))))
+    (is (= -1000000    (t/micros (t/of-seconds -1))))
+    (is (= -1000       (t/millis (t/of-seconds -1))))
+    (is (= -1 (t/seconds (t/of-seconds -1))))
+    (is (= -1 (t/minutes (t/of-minutes -1))))
+    (is (= -1 (t/hours   (t/of-hours   -1))))
+    (is (= -1 (t/days    (t/of-days    -1)))))
+
+  (testing "truncation"
+    ;; All unit fns truncate toward zero for positive durations
+    (is (= 1 (t/micros  (t/of-nanos  1001))))
+    (is (= 1 (t/millis  (t/of-micros 1234))))
+    (is (= 1 (t/seconds (t/of-millis 1999))))
+    (is (= 1 (t/minutes (t/of-seconds 61))))
+    (is (= 1 (t/hours   (t/of-minutes 99))))
+    (is (= 1 (t/days    (t/of-hours   25))))
+
+    ;; Negative seconds truncate toward -Infinity (due to internal repr)
+    (is (= -2 (t/seconds (t/of-nanos  -1000000001))))
+    (is (= -2 (t/seconds (t/of-micros -1000001))))
+    (is (= -2 (t/seconds (t/of-millis -1001))))
+
+    ;; All other negative units truncate toward zero
+    (is (= -1 (t/micros  (t/of-nanos  -1234))))
+    (is (= -1 (t/millis  (t/of-nanos  -1999999))))
+    (is (= -1 (t/millis  (t/of-micros -1001))))
+    (is (= -1 (t/minutes (t/of-seconds -61))))
+    (is (= -1 (t/hours   (t/of-minutes -99))))
+    (is (= -1 (t/days    (t/of-hours   -25))))))
 
 
 ;; Periods. Convenience functions to create periods of specific
