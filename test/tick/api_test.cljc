@@ -34,9 +34,10 @@
     (is (= "12:00" (str (t/noon))))))
 
 (deftest date-construction-test
-  (is (= (t/date "2018-01-11")
-        (t/date (t/instant 1515691416624))))
-  (is (t/date-time? (t/noon (t/today))))
+  (t/with-clock (t/zone-offset 0)
+    (is (= (t/date "2018-01-11")
+           (t/date (t/instant 1515691416624))))
+    (is (t/date-time? (t/noon (t/today)))))
   (t/with-clock (-> (t/date "2018-02-14") (t/at "10:00"))
     (testing "(noon (today))"
       (is (= "2018-02-14T12:00" (str (t/noon (t/today))))))
