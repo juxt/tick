@@ -472,10 +472,12 @@
     (is (= -2 (t/seconds (t/of-micros -1000001))))
     (is (= -2 (t/seconds (t/of-millis -1001))))
 
+    ;; Behavior of millis is platform-dependent (discrepancy in underlying js-joda lib vs java-time)
+    (is (= #?(:clj -1 :cljs -2) (t/millis (t/of-nanos  -1999999))))
+    (is (= #?(:clj -1 :cljs -2) (t/millis (t/of-micros -1001))))
+
     ;; All other negative units truncate toward zero
     (is (= -1 (t/micros  (t/of-nanos  -1234))))
-    (is (= -1 (t/millis  (t/of-nanos  -1999999))))
-    (is (= -1 (t/millis  (t/of-micros -1001))))
     (is (= -1 (t/minutes (t/of-seconds -61))))
     (is (= -1 (t/hours   (t/of-minutes -99))))
     (is (= -1 (t/days    (t/of-hours   -25))))))
