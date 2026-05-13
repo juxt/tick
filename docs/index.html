@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.26">
 <meta name="author" content="Malcolm Sparks, Henry Widd, Johanna Antonelli">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <title>tick</title>
@@ -2212,12 +2212,24 @@ TODO Don&#8217;t forget you can create instants from durations - this is often n
 </div>
 <div class="paragraph">
 <p>The problem with numeric times is that there are cases where the units
-are in seconds and cases where milliseconds are used. If <em>tick</em> were
-to convert numbers to times, it would be a source of confusion and
-bugs if the units were not clear. For this reason, you cannot convert
-numbers to times. However, you can first create the duration from the
-number, specifying the units explicitly, and then convert the duration
-to an <code>instant</code> (or <code>inst</code>).</p>
+are in seconds and cases where milliseconds are used. To avoid ambiguity
+about the units, the recommended approach is to first create the duration
+from the number, specifying the units explicitly, and then convert the
+duration to an <code>instant</code> (or <code>inst</code>).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<code>t/instant</code> does accept a bare number for convenience, treating it
+as epoch milliseconds. The duration-based form below is preferred because
+the units are explicit.
+</td>
+</tr>
+</table>
 </div>
 <div class="listingblock code">
 <div class="content">
