@@ -5,6 +5,8 @@
 
 STYLESDIR = .
 STYLESHEET = juxt.css
+VERSION := $(shell git describe --tags --always)
+REVDATE := $(shell git log -1 --format=%cs)
 
 .PHONY: 		watch default deploy test dev-docs-cljs docs/index.html
 
@@ -14,6 +16,8 @@ default:		docs/index.html
 docs/index.html:	docs/*.adoc docs/docinfo*.html ${STYLESDIR}/${STYLESHEET}
 			asciidoctor -d book \
 			-a "webfonts!" \
+			-a revnumber=${VERSION} \
+			-a revdate=${REVDATE} \
 			-a stylesdir=../${STYLESDIR} \
 			-a stylesheet=${STYLESHEET} \
 			-o $@ \
@@ -34,7 +38,7 @@ release-docs-cljs:
 test-cljs-shadow:
 			clojure -Atest-cljs -X com.widdindustries.tiado-cljs2/tests-ci-shadow :compile-mode :release
 test:
-			make test-clj && make test-cljs
+			make test-clj && make test-cljs-shadow
 clean:
 			clj -T:build clean
 install:
