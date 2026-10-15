@@ -30,7 +30,7 @@ Instances of other `java.time` types are readily constructed with _tick_.
 [%header,cols="l,a,l"]
 |===
 |Example|Description|Return type
-|(day "mon")|Monday|java.time.DayOfWeek
+|(day-of-week "mon")|Monday|java.time.DayOfWeek
 |(month "August")|August|java.time.Month
 |(month 12)|December|java.time.Month
 |(year-month "2012-12")|December 2012|java.time.YearMonth
