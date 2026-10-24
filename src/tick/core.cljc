@@ -229,7 +229,7 @@
                             ldt
                             (#?(:clj .getOffset :cljs .offset)
                               (-> (current-zone)
-                                  (cljc.java-time.zone-id/get-rules))
+                                  ^java.time.zone.ZoneRules (cljc.java-time.zone-id/get-rules))
                               ldt)))
   (zoned-date-time [ldt] (cljc.java-time.local-date-time/at-zone ldt (current-zone)))
 
