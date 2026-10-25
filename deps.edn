@@ -1,5 +1,6 @@
 {:paths ["src"]
- :deps  {com.widdindustries/cljc.java-time {:mvn/version "1.0"
+ :deps  {com.widdindustries/cljc.java-time {:mvn/version "1.0.1"
+                                        ;:local/root "../cljc.java-time"
                                         ;:git/url "https://github.com/henryw374/cljc.java-time.git"
                                         ;:sha "5837778b307870c1ff0715fab692211dec253a6f"
                                         }
